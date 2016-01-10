@@ -1,5 +1,6 @@
 package ru.rodsoft.openstreetmap.josm.plugins.CustomizePublicTransportStop;
 
+import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -20,6 +21,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
+
+
+
 
 
 
@@ -77,6 +81,8 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 	private static final String TROLLEYBUS_CAPTION = "Trolleybus";
 	private static final String SHARE_TAXI_CAPTION = "Share taxi";
 	private static final String BUS_CAPTION = "Bus";
+	private static final String BUS_STATION_CAPTION = "Bus station";
+	private static final String ASSIGN_TRANSPORT_TYPE_CAPTION = "Assign transport type";
 	private static final String NETWORK_LEVEL_CAPTION = "Network level";
 	private static final String OPERATOR_CAPTION = "Operator";
 	private static final String NETWORK_CAPTION = "Network";
@@ -100,6 +106,8 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 	private JCheckBox checkBoxIsBus;
 	private JCheckBox checkBoxIsTrolleybus;
 	private JCheckBox checkBoxIsShareTaxi;
+	private JCheckBox checkBoxIsBusStation;
+	private JCheckBox checkBoxIsAssignTransportType;
 	private JCheckBox checkBoxIsTram;
 	private JCheckBox checkBoxIsTrainStation;
 	private JCheckBox checkBoxIsTrainStop;
@@ -279,6 +287,15 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 	    checkBoxIsTrolleybus.addItemListener(this);
 	    contentPane.add(checkBoxIsTrolleybus);
 	    
+	    checkBoxIsBusStation = new JCheckBox(tr(BUS_STATION_CAPTION));
+	    layoutCons.gridx = 1;
+	    layoutCons.gridy = 6;
+	    layoutCons.weightx = 0.5;
+	    layoutCons.fill = GridBagConstraints.HORIZONTAL;
+	    gridbag.setConstraints(checkBoxIsBusStation, layoutCons);
+	    checkBoxIsBusStation.addItemListener(this);
+	    contentPane.add(checkBoxIsBusStation);
+
 	    checkBoxIsTram = new JCheckBox(tr(TRAM_CAPTION));
 	    layoutCons.gridx = 0;
 	    layoutCons.gridy = 7;
@@ -306,9 +323,18 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 	    checkBoxIsTrainStop.addItemListener(this);
 	    contentPane.add(checkBoxIsTrainStop);
 
-	    checkBoxIsBench = new JCheckBox(tr(BENCH_CAPTION));
+	    checkBoxIsAssignTransportType = new JCheckBox(tr(ASSIGN_TRANSPORT_TYPE_CAPTION));
 	    layoutCons.gridx = 0;
 	    layoutCons.gridy = 9;
+	    layoutCons.weightx = 0.5;
+	    layoutCons.fill = GridBagConstraints.HORIZONTAL;
+	    gridbag.setConstraints(checkBoxIsAssignTransportType, layoutCons);
+	    checkBoxIsAssignTransportType.addItemListener(this);
+	    contentPane.add(checkBoxIsAssignTransportType);
+
+	    checkBoxIsBench = new JCheckBox(tr(BENCH_CAPTION));
+	    layoutCons.gridx = 0;
+	    layoutCons.gridy = 10;
 	    layoutCons.weightx = 0.5;
 	    layoutCons.fill = GridBagConstraints.HORIZONTAL;
 	    gridbag.setConstraints(checkBoxIsBench, layoutCons);
@@ -317,7 +343,7 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 
 	    checkBoxIsShelder = new JCheckBox(tr(SHELDER_CAPTION));
 	    layoutCons.gridx = 1;
-	    layoutCons.gridy = 9;
+	    layoutCons.gridy = 10;
 	    layoutCons.weightx = 0.5;
 	    layoutCons.fill = GridBagConstraints.HORIZONTAL;
 	    gridbag.setConstraints(checkBoxIsShelder, layoutCons);
@@ -326,7 +352,7 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 
 	    checkBoxIsCover = new JCheckBox(tr(COVER_CAPTION));
 	    layoutCons.gridx = 0;
-	    layoutCons.gridy = 10;
+	    layoutCons.gridy = 11;
 	    layoutCons.weightx = 0.5;
 	    layoutCons.fill = GridBagConstraints.HORIZONTAL;
 	    gridbag.setConstraints(checkBoxIsCover, layoutCons);
@@ -335,7 +361,7 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 	    
 	    checkBoxIsArea = new JCheckBox(tr(AREA_CAPTION));
 	    layoutCons.gridx = 1;
-	    layoutCons.gridy = 10;
+	    layoutCons.gridy = 11;
 	    layoutCons.weightx = 0.5;
 	    layoutCons.fill = GridBagConstraints.HORIZONTAL;
 	    gridbag.setConstraints(checkBoxIsArea, layoutCons);
@@ -344,7 +370,7 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 
 	    JButton buttonSave = new JButton(tr(SAVE_BUTTON_CAPTION));
 	    layoutCons.gridx = 0;
-	    layoutCons.gridy = 11;
+	    layoutCons.gridy = 12;
 	    layoutCons.weightx = 0.5;
 	    layoutCons.fill = GridBagConstraints.HORIZONTAL;
 	    layoutCons.insets = new Insets(10, 0 , 0, 0);
@@ -355,7 +381,7 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 	    
 	    JButton buttonCancel = new JButton(tr(CANCEL_BUTTON_CAPTION));
 	    layoutCons.gridx = 1;
-	    layoutCons.gridy = 11;
+	    layoutCons.gridy = 12;
 	    layoutCons.weightx = 0.5;
 	    layoutCons.fill = GridBagConstraints.LINE_START;
 	    layoutCons.insets = new Insets(10, 0 , 0, 0);
@@ -526,6 +552,8 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 		setCheckBoxValue(checkBoxIsBus, stopArea.isBus);
 		setCheckBoxValue(checkBoxIsShareTaxi, stopArea.isShareTaxi);
 		setCheckBoxValue(checkBoxIsTrolleybus, stopArea.isTrolleybus);
+		setCheckBoxValue(checkBoxIsBusStation, stopArea.isBusStation);
+		setCheckBoxValue(checkBoxIsAssignTransportType, stopArea.isAssignTransportType);		
 		setCheckBoxValue(checkBoxIsTram, stopArea.isTram);
 		setCheckBoxValue(checkBoxIsTrainStation, stopArea.isTrainStation);
 		setCheckBoxValue(checkBoxIsTrainStop, stopArea.isTrainStation);
@@ -571,6 +599,8 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 		stopArea.isBus = getCheckBoxValue(checkBoxIsBus);
 		stopArea.isShareTaxi = getCheckBoxValue(checkBoxIsShareTaxi);
 		stopArea.isTrolleybus = getCheckBoxValue(checkBoxIsTrolleybus);
+		stopArea.isBusStation = getCheckBoxValue(checkBoxIsBusStation);
+		stopArea.isAssignTransportType = getCheckBoxValue(checkBoxIsAssignTransportType);
 		stopArea.isTram = getCheckBoxValue(checkBoxIsTram);
 		stopArea.isTrainStation = getCheckBoxValue(checkBoxIsTrainStation);
 		stopArea.isTrainStop = getCheckBoxValue(checkBoxIsTrainStop);

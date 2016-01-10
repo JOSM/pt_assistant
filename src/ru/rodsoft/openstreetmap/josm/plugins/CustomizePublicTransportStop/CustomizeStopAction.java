@@ -17,7 +17,6 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.command.AddCommand;
 import org.openstreetmap.josm.command.ChangeCommand;
-import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.data.coor.EastNorth;
@@ -92,7 +91,7 @@ public class CustomizeStopAction extends JosmAction {
                 tr(CUSTOMIZE_STOP_ACTION_MENU_NAME), CUSTOMIZE_STOP_ACTION_ICON_NAME,
                 tr(CUSTOMIZE_STOP_ACTION_MENU_TOOLTIP),
                 Shortcut.registerShortcut("tools:customizestop", tr("Tool: {0}", tr(CUSTOMIZE_STOP_ACTION_MENU_NAME)),
-                        0, Shortcut.DIRECT), true);
+                		KeyEvent.VK_U, Shortcut.DIRECT), true);
         action.putValue("help", ht("/Action/CustomizeStopAction"));
         return action;
     }
@@ -136,13 +135,6 @@ public class CustomizeStopAction extends JosmAction {
 		if(stopArea.stopPoints.size() == 0)
 		{
 			createStopPosition(stopArea);
-		}
-		if(stopArea.needBusStop())
-		{
-			if(!stopArea.searchBusStop())
-			{
-				createBusStop((Way)stopArea.selectedObject, stopArea);
-			}
 		}
 		List<Command> commands = stopArea.customize();
 		if(commands != null && !commands.isEmpty())
@@ -408,32 +400,6 @@ public class CustomizeStopAction extends JosmAction {
     }
 
     /**
-     * Calculation of center of platform, if platform is way
-     * @param platform Platform primitive
-     * @param stopArea Stop area
-     * @return Coordinates of center of platform
-     */
-    protected LatLon getCenterOfWay(OsmPrimitive platform, StopArea stopArea)
-    {
-		if(platform instanceof Way)
-		{ 
-			//p = mapView.getPoint((Node) stopArea.selectedObject);
-			Double sumLat = 0.0;
-			Double sumLon = 0.0;
-			Integer countNode = 0;
-			for(Node node : stopArea.getSelectedWay().getNodes())
-			{
-				LatLon coord = node.getCoor();
-				sumLat += coord.getX();
-				sumLon += coord.getY();
-				countNode++;
-			}
-			return new LatLon(sumLon / countNode, sumLat / countNode);		
-		}
-		return null;
-    }
-    
-    /**
      * Creation of stop position
      * @param stopArea Stop Area
      */
@@ -445,7 +411,7 @@ public class CustomizeStopAction extends JosmAction {
 			platformCoord = ((Node) stopArea.selectedObject).getCoor();
 		}
 		else
-			platformCoord = getCenterOfWay(stopArea.selectedObject, stopArea);
+			platformCoord = stopArea.getCenterOfWay(stopArea.selectedObject);
 		if(platformCoord == null)
 			return;
 		AbstractMap.SimpleEntry<Double, Node> nearestNode = getNearestNode(platformCoord, stopArea);
@@ -478,21 +444,4 @@ public class CustomizeStopAction extends JosmAction {
 		}
 	}
     
-    /**
-     * Creation of bus stop point, if platform is way
-     * @param platformWay Platform way
-     * @param stopArea Stop area
-     */
-	private void createBusStop(Way platformWay, StopArea stopArea) 
-	{
-		LatLon coord = getCenterOfWay(platformWay, stopArea);
-		
-		Node busStopNode = new Node();
-		busStopNode.setCoor(coord);
-		busStopNode.getKeys().put(StopArea.HIGHWAY_TAG, StopArea.BUS_STOP_TAG_VALUE);
-    	Main.main.undoRedo.add(new AddCommand(busStopNode));
-    	Main.main.undoRedo.add(new ChangePropertyCommand(busStopNode, StopArea.HIGHWAY_TAG, StopArea.BUS_STOP_TAG_VALUE));
-    	stopArea.otherMembers.add(busStopNode);
-	}
-
 }

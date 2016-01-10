@@ -6,8 +6,10 @@ import java.util.List;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.command.AddCommand;
+import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
+import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
@@ -24,7 +26,7 @@ public class StopArea {
 	public static final String COVERED_TAG = "covered";
 	public static final String SHELTER_TAG = "shelter";
 	private static final String BENCH_TAG = "bench";
-	public static final String TRAIN_TAG_VALUE = "train";
+	public static final String TRAIN_TAG = "train";
 	public static final String STOP_POSITION_TAG_VALUE = "stop_position";
 	public static final String STATION_TAG_VALUE = "station";
 	public static final String HALT_TAG_VALUE = "halt";
@@ -40,6 +42,9 @@ public class StopArea {
 	public static final String NAME_EN_TAG = "name:en";
 	public static final String NAME_TAG = "name";
 	public static final String HIGHWAY_TAG = "highway";
+	public static final String AMENITY_TAG = "amenity";
+	public static final String BUS_STATION_TAG_VALUE = "bus_station";
+	
 	public static final String BUS_STOP_TAG_VALUE = "bus_stop";
 	public static final String TYPE_TAG = "type";
 	public static final String PUBLIC_TRANSPORT_TAG = "public_transport";
@@ -87,6 +92,10 @@ public class StopArea {
 	 */
 	public Boolean isShareTaxi = false;
 	/**
+	 * Flag of bus station stop area
+	 */
+	public Boolean isBusStation = false;
+	/**
 	 * Flag of tram stop area
 	 */
 	public Boolean isTram = false;
@@ -100,6 +109,10 @@ public class StopArea {
 	public Boolean isTrainStation = false;
 	/**
 	 * Flag of bench on selected platform
+	 */
+	public Boolean isAssignTransportType = false;
+	/**
+	 * Flag of bench near platform
 	 */
 	public Boolean isBench = false;
 	/**
@@ -123,6 +136,11 @@ public class StopArea {
 	 */
 	public Boolean isArea = false;
 	/**
+	 * Separate node of bus stop or bus station
+	 */
+	public Node separateBusStopNode = null;
+	
+	/**
 	 * List of nodes of stop positions
 	 */
 	public final ArrayList<Node> stopPoints = new ArrayList<Node>();
@@ -139,6 +157,11 @@ public class StopArea {
 	 * Selected josm objects
 	 */
 	public OsmPrimitive selectedObject = null;
+	/**
+	 * Bus station objects
+	 */
+	public OsmPrimitive busStationObject = null;
+
 	
 	/**
 	 * Constructor of stop area object
@@ -172,6 +195,59 @@ public class StopArea {
 	}
 	
 	/**
+	 * Assign tag value to osm object
+	 * @param commands Command list
+	 * @param target Target OSM object
+	 * @param tag Tag name
+	 * @param tagValue Tag value
+	 * @return Resulting command list
+	 */
+	public static List<Command> assignTag(List<Command> commands, OsmPrimitive target, String tag, String tagValue)
+	{
+		if(commands == null)
+			commands = new ArrayList<Command>();
+		commands.add(new ChangePropertyCommand(target, tag, tagValue));
+		return commands;
+	}
+	
+	/**
+	 * Clear tag value of osm object
+	 * @param commands Command list
+	 * @param target Target OSM object
+	 * @param tag Tag name
+	 * @return Resulting command list
+	 */
+	public static List<Command> clearTag(List<Command> commands, OsmPrimitive target, String tag)
+	{
+		return assignTag(commands, target, tag, null);
+	}
+	
+    /**
+     * Calculation of center of platform, if platform is way
+     * @param platform Platform primitive
+     * @return Coordinates of center of platform
+     */
+    public LatLon getCenterOfWay(OsmPrimitive platform)
+    {
+		if(platform instanceof Way)
+		{ 
+			//p = mapView.getPoint((Node) stopArea.selectedObject);
+			Double sumLat = 0.0;
+			Double sumLon = 0.0;
+			Integer countNode = 0;
+			for(Node node : ((Way) platform).getNodes())
+			{
+				LatLon coord = node.getCoor();
+				sumLat += coord.getX();
+				sumLon += coord.getY();
+				countNode++;
+			}
+			return new LatLon(sumLon / countNode, sumLat / countNode);		
+		}
+		return null;
+    }
+
+	/**
 	 * Parsing of josm object tags and customizing of stop area object
 	 * @param member Josm object
 	 */
@@ -201,6 +277,10 @@ public class StopArea {
 			this.isTrainStop = true;
 		if(STATION_TAG_VALUE.equals(member.getKeys().get(RAILWAY_TAG)))
 			this.isTrainStation = true;
+		if(BUS_STATION_TAG_VALUE.equals(member.getKeys().get(AMENITY_TAG)))
+		{
+			this.isBusStation = true;
+		}
 		if(member == this.selectedObject)
 		{
 			if(YES_TAG_VALUE.equals(member.getKeys().get(BENCH_TAG)))
@@ -212,6 +292,22 @@ public class StopArea {
 			if(YES_TAG_VALUE.equals(member.getKeys().get(AREA_TAG)))
 				this.isArea = true;
 		}
+	}
+	
+	/**
+	 * Test, are transport types assigned to platforms
+	 * @param platform Platform object
+	 * @return true, if transport types assigned to this platforms
+	 */
+	public boolean testIsTransportTypeAssigned(OsmPrimitive platform)
+	{
+		String[] transportTypes = new String[] { BUS_TAG, TROLLEYBUS_TAG, SHARE_TAXI_TAG, TRAM_TAG, TRAIN_TAG };
+		for(String transportType : transportTypes)
+		{
+			if(YES_TAG_VALUE.equals(platform.getKeys().get(transportType)))
+				return true;			
+		}
+		return false;
 	}
 	
 	/**
@@ -285,10 +381,18 @@ public class StopArea {
 			this.ParseTags(selectedObject);
 			this.platforms.add(selectedObject);
 		}
-		if(!(this.isBus || this.isTrolleybus || this.isShareTaxi) && selectedObject != null && compareTag(selectedObject, HIGHWAY_TAG, BUS_STOP_TAG_VALUE))
+		for(OsmPrimitive platform : this.platforms)
+		{
+			if(testIsTransportTypeAssigned(platform))
+			{
+				this.isAssignTransportType = true;
+				break;
+			}
+		}
+		if(!(this.isBus || this.isTrolleybus || this.isShareTaxi) && selectedObject != null && (compareTag(selectedObject, HIGHWAY_TAG, BUS_STOP_TAG_VALUE) || isBusStation))
 		{
 			this.isBus = true;
-		}
+		}		
 	}
 	
 	/**
@@ -302,9 +406,8 @@ public class StopArea {
     	if(commands == null)
     		commands = new ArrayList<Command>();
     	
-    	StopArea stopArea = this;
-    	commands.add(new ChangePropertyCommand(target, NAME_TAG, "".equals(stopArea.name) ? null : stopArea.name));
-    	commands.add(new ChangePropertyCommand(target, NAME_EN_TAG, "".equals(stopArea.nameEn) ? null : stopArea.nameEn));
+    	commands = assignTag(commands, target, NAME_TAG, "".equals(name) ? null : name);
+    	commands = assignTag(commands, target, NAME_EN_TAG, "".equals(nameEn) ? null : nameEn);
     	return commands;
     }
 	
@@ -319,36 +422,62 @@ public class StopArea {
     	if(commands == null)
     		commands = new ArrayList<Command>();
     	
-    	StopArea stopArea = this;
     	commands = nameTagAssign(target,commands);
-    	commands.add(new ChangePropertyCommand(target, NETWORK_TAG, "".equals(stopArea.network) ? null : stopArea.network));
-    	commands.add(new ChangePropertyCommand(target, OPERATOR_TAG, "".equals(stopArea.operator) ? null : stopArea.operator));
-    	commands.add(new ChangePropertyCommand(target, SERVICE_TAG, null == stopArea.service || "city".equals(stopArea.service) ? null : stopArea.service));
+    	commands = assignTag(commands, target, NETWORK_TAG, "".equals(network) ? null : network);
+    	commands = assignTag(commands, target, OPERATOR_TAG, "".equals(operator) ? null : operator);
+    	commands = assignTag(commands, target, SERVICE_TAG, null == service || "city".equals(service) ? null : service);
     	
-    	transportTypeTagAssign(target, commands, isStopPoint, stopArea);
-    	if(target instanceof Relation)
-    		return commands;
-    	commands.add(new ChangePropertyCommand(target, TRAIN_TAG_VALUE, stopArea.isTrainStop || stopArea.isTrainStation ? YES_TAG_VALUE : null));
+    	transportTypeTagAssign(target, commands, isStopPoint);
     	return commands;
     }
 
+    /**
+     * Assign transport type tags to node
+     * @param target Josm object for tag assigning 
+     * @param commands Command list
+     * @param isStopPoint Flag of stop point
+     */
 	protected void transportTypeTagAssign(OsmPrimitive target,
-			List<Command> commands, Boolean isStopPoint, StopArea stopArea) {
-		if(isStopPoint && (stopArea.isTrainStop || stopArea.isTrainStation))
-    	{
-    		
-    		commands.add(new ChangePropertyCommand(target, BUS_TAG, null));
-    		commands.add(new ChangePropertyCommand(target, SHARE_TAXI_TAG, null));
-    		commands.add(new ChangePropertyCommand(target, TROLLEYBUS_TAG, null));
-    		commands.add(new ChangePropertyCommand(target, TRAM_TAG, null));
-    	}
-    	else
-    	{
-    		commands.add(new ChangePropertyCommand(target, BUS_TAG, stopArea.isBus ? YES_TAG_VALUE : null));
-    		commands.add(new ChangePropertyCommand(target, SHARE_TAXI_TAG, stopArea.isShareTaxi ? YES_TAG_VALUE : null));
-    		commands.add(new ChangePropertyCommand(target, TROLLEYBUS_TAG, stopArea.isTrolleybus ? YES_TAG_VALUE : null));
-    		commands.add(new ChangePropertyCommand(target, TRAM_TAG, stopArea.isTram ? YES_TAG_VALUE : null));
-    	}
+			List<Command> commands, Boolean isStopPoint) 
+	{
+		if(isStopPoint)
+		{
+			if(isTrainStop || isTrainStation)
+	    	{
+				commands = clearTag(commands, target, BUS_TAG);
+				commands = clearTag(commands, target, SHARE_TAXI_TAG);
+				commands = clearTag(commands, target, TROLLEYBUS_TAG);
+				commands = clearTag(commands, target, TRAM_TAG);
+	    		commands = assignTag(commands, target, TRAIN_TAG, YES_TAG_VALUE);
+	    	}
+	    	else
+	    	{
+	    		commands = assignTag(commands, target, BUS_TAG, isBus ? YES_TAG_VALUE : null);
+	    		commands = assignTag(commands, target, SHARE_TAXI_TAG, isShareTaxi ? YES_TAG_VALUE : null);
+	    		commands = assignTag(commands, target, TROLLEYBUS_TAG, isTrolleybus ? YES_TAG_VALUE : null);
+	    		commands = assignTag(commands, target, TRAM_TAG, isTram ? YES_TAG_VALUE : null);
+	    		commands = assignTag(commands, target, TRAIN_TAG, isTrainStation || isTrainStop ? YES_TAG_VALUE : null);
+	    	}
+		}
+		else
+		{
+			if(this.isAssignTransportType)
+	    	{
+	    		commands = assignTag(commands, target, BUS_TAG, isBus ? YES_TAG_VALUE : null);
+	    		commands = assignTag(commands, target, SHARE_TAXI_TAG, isShareTaxi ? YES_TAG_VALUE : null);
+	    		commands = assignTag(commands, target, TROLLEYBUS_TAG, isTrolleybus ? YES_TAG_VALUE : null);
+	    		commands = assignTag(commands, target, TRAM_TAG, isTram ? YES_TAG_VALUE : null);
+	    		commands = assignTag(commands, target, TRAIN_TAG, isTrainStation || isTrainStop ? YES_TAG_VALUE : null);
+	    	}
+			else
+			{
+	    		commands = clearTag(commands, target, BUS_TAG);
+	    		commands = clearTag(commands, target, SHARE_TAXI_TAG);
+	    		commands = clearTag(commands, target, TROLLEYBUS_TAG);
+	    		commands = clearTag(commands, target, TRAM_TAG);
+	    		commands = clearTag(commands, target, TRAIN_TAG);    		
+			}
+		}
 	}
     
     /**
@@ -400,7 +529,7 @@ public class StopArea {
      * @param isFirst true, if this platform is first in stop area
      * @return Resulting command list
      */
-    public List<Command> platformTagAssign(OsmPrimitive target, List<Command> commands, Boolean isSelected, Boolean isFirst)
+    public List<Command> platformTagAssign(OsmPrimitive target, List<Command> commands, Boolean isFirst)
     {
     	if(commands == null)
     		commands = new ArrayList<Command>();
@@ -416,7 +545,7 @@ public class StopArea {
         	if(target instanceof Way)
         		commands.add(new ChangePropertyCommand(target, HIGHWAY_TAG, PLATFORM_TAG_VALUE));
         	else
-        		if(isFirst)
+        		if(isFirst && !this.isBusStation)
         			commands.add(new ChangePropertyCommand(target, HIGHWAY_TAG, BUS_STOP_TAG_VALUE));
     	}
         commands.add(new ChangePropertyCommand(target, PUBLIC_TRANSPORT_TAG, PLATFORM_TAG_VALUE));
@@ -427,6 +556,10 @@ public class StopArea {
     		commands.add(new ChangePropertyCommand(target, COVERED_TAG, stopArea.isCovered ? YES_TAG_VALUE : null));
     		commands.add(new ChangePropertyCommand(target, AREA_TAG, stopArea.isArea ? YES_TAG_VALUE : null));
         }
+/*        if(stopArea.separateBusStopNode == null && isFirst && stopArea.isBusStation)
+        {
+    		commands.add(new ChangePropertyCommand(target, AMENITY_TAG, BUS_STATION_TAG_VALUE));
+        }*/
     	return commands;
     }
     
@@ -485,32 +618,130 @@ public class StopArea {
 	 */
 	public List<Command> customize()
 	{
-		List<Command> commands = null;
-		Boolean isFirst = true;
-		for(Node node : stopPoints)
+		try
 		{
-			commands = stopPointTagAssign(node, commands, isFirst);
-			isFirst = false;
-		}
-		isFirst = true;
-		for(OsmPrimitive platform : platforms)
-		{
-			commands = platformTagAssign(platform, commands, platform == selectedObject, isFirst);
-			isFirst = false;
-		}
-		for(OsmPrimitive otherMember : otherMembers)
-		{
-			commands = nameTagAssign(otherMember, commands);
-		}
-		if(thisRelation == null)
-		{
-			if(stopPoints.size() + platforms.size() + otherMembers.size() > 1)
+			List<Command> commands = new ArrayList<Command>();
+			separateBusStopNode = searchBusStop(StopArea.AMENITY_TAG, StopArea.BUS_STATION_TAG_VALUE);
+			if(separateBusStopNode == null)
+				separateBusStopNode = searchBusStop(StopArea.HIGHWAY_TAG, StopArea.BUS_STOP_TAG_VALUE);
+			if(this.isBusStation)
 			{
-				commands = createStopAreaRelation(commands);
+				clearExcessTags(commands, HIGHWAY_TAG, BUS_STOP_TAG_VALUE);
+			}
+			else
+			{
+				clearExcessTags(commands, AMENITY_TAG, BUS_STATION_TAG_VALUE);
+			}
+			if(!(this.isBus || this.isShareTaxi || this.isTrolleybus))
+			{
+				clearExcessTags(commands, HIGHWAY_TAG, BUS_STOP_TAG_VALUE);
+			}
+			Boolean isFirst = true;
+			for(Node node : stopPoints)
+			{
+				commands = stopPointTagAssign(node, commands, isFirst);
+				isFirst = false;
+			}
+			isFirst = true;
+			OsmPrimitive firstPlatform = null;
+			for(OsmPrimitive platform : platforms)
+			{
+				commands = platformTagAssign(platform, commands, isFirst);
+				if(isFirst)
+					firstPlatform = platform;
+				isFirst = false;
+			}
+			if(needBusStop(firstPlatform))
+			{
+				if(isBusStation)
+				{
+					if(separateBusStopNode == null)
+					{
+						commands = createSeparateBusStopNode(commands, firstPlatform, AMENITY_TAG, BUS_STATION_TAG_VALUE);
+					}	
+					else
+					{
+						commands = assignTag(commands, separateBusStopNode, AMENITY_TAG, BUS_STATION_TAG_VALUE);
+					}
+				}
+				else
+				{
+					if(separateBusStopNode == null)
+					{
+						commands = createSeparateBusStopNode(commands, firstPlatform, HIGHWAY_TAG, BUS_STOP_TAG_VALUE);
+					}	
+					else
+					{
+						commands = assignTag(commands, separateBusStopNode, HIGHWAY_TAG, BUS_STOP_TAG_VALUE);
+					}
+				}
+			}
+			for(OsmPrimitive otherMember : otherMembers)
+			{
+				commands = nameTagAssign(otherMember, commands);
+			}
+			if(thisRelation == null)
+			{
+				if(stopPoints.size() + platforms.size() + otherMembers.size() > 1)
+				{
+					commands = createStopAreaRelation(commands);
+				}
+			}
+			else
+			{
+				commands = generalTagAssign(thisRelation, commands, false);
+				commands = addNewRelationMembers(commands);
+			}
+			return commands;
+		}
+		catch(Exception ex)
+		{
+			MessageBox.ok(ex.getMessage());
+		}
+		return null;
+	}
+
+	/**
+	 * Adding of new stop area members to relation
+	 * @param commands Original command list
+	 * @param targetRelation Stop area relation
+	 * @param member Stop area relation member
+	 * @param roleName Role name
+	 * @return Resulting command list
+	 */
+	public static List<Command> addNewRelationMember(List<Command> commands, Relation targetRelation, OsmPrimitive member, String roleName)
+	{
+		for(RelationMember relationMember : targetRelation.getMembers())
+		{
+			if(relationMember.getMember() == member)
+			{
+				return commands;
 			}
 		}
-		else
-			commands = generalTagAssign(thisRelation, commands, false);
+		targetRelation.addMember(new RelationMember(roleName, member));
+		commands.add(new ChangeCommand(targetRelation, targetRelation));
+		return commands;	
+	}
+	
+	/**
+	 * Adding new stop area members to relation
+	 * @param commands Original command list
+	 * @return Resulting command list
+	 */
+	private List<Command> addNewRelationMembers(List<Command> commands) 
+	{
+		for(OsmPrimitive stopPoint : stopPoints)
+		{
+			commands = addNewRelationMember(commands, this.thisRelation, stopPoint, STOP_ROLE);
+		}
+		for(OsmPrimitive platform : platforms)
+		{
+			commands = addNewRelationMember(commands, this.thisRelation, platform, PLATFORM_ROLE);
+		}
+		for(OsmPrimitive otherMember : this.otherMembers)
+		{
+			commands = addNewRelationMember(commands, this.thisRelation, otherMember, null);
+		}
 		return commands;
 	}
 
@@ -519,13 +750,13 @@ public class StopArea {
 	 * @param member Josm object
 	 * @return true, if josm object is bus stop node or contains bus stop node
 	 */
-	private boolean searchBusStop(OsmPrimitive member)
+	private Node searchBusStop(OsmPrimitive member, String tag, String tagValue)
 	{
 		if(member instanceof Node)
-		{
-			if(compareTag(member, HIGHWAY_TAG, BUS_STOP_TAG_VALUE))
+		{			
+			if(compareTag(member, tag, tagValue))
 			{
-				return true;
+				return (Node)member;
 			}
 		}
 		else
@@ -533,45 +764,123 @@ public class StopArea {
 			Way memberWay = (Way) member;
 			for(Node node : memberWay.getNodes())
 			{
-				if(compareTag(node, HIGHWAY_TAG, BUS_STOP_TAG_VALUE))
+				if(compareTag(node, tag, tagValue))
 				{
-					return true;
+					return node;
 				}					
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	/**
 	 * Testing, do stop area contains bus stop node
 	 * @return true, if stop area contains bus stop node
 	 */
-	public boolean searchBusStop() 
+	public Node searchBusStop(String tag, String tagValue) 
 	{
 		for(OsmPrimitive platform : platforms)
 		{
-			if(searchBusStop(platform))
-				return true;
+			Node busStopNode = searchBusStop(platform, tag, tagValue);
+			if(busStopNode != null)
+				return busStopNode;
 		}
 		for(OsmPrimitive otherMember : this.otherMembers)
 		{
-			if(searchBusStop(otherMember))
-				return true;
+			Node busStopNode = searchBusStop(otherMember, tag, tagValue);
+			if(busStopNode != null)
+				return busStopNode;
 		}
-		return false;
+		return null;
 	}
 	
 	/**
 	 * Testing, must stop area to have separate bus stop node
 	 * @return True, stop area must to have separate bus stop node
 	 */
-	public boolean needBusStop()
+	public boolean needBusStop(OsmPrimitive firstPlatform)
 	{
-		if((this.isBus || this.isShareTaxi || this.isTrolleybus) && (selectedObject instanceof Way))
+		if(((this.isBus || this.isShareTaxi || this.isTrolleybus) && (firstPlatform instanceof Way)) || this.isBusStation)
 		{
 			return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Testing, is josm object bus stop node or contains bus stop node
+	 * @param member Josm object
+	 * @return true, if josm object is bus stop node or contains bus stop node
+	 */
+	private void clearExcessTags(List<Command> commands, OsmPrimitive target, String tag, String tagValue)
+	{
+		if(compareTag(target, tag, tagValue))
+		{
+			commands = clearTag(commands, target, tag);
+		}
+		if(target instanceof Way)
+		{
+			Way memberWay = (Way) target;
+			for(Node node : memberWay.getNodes())
+			{
+				if(compareTag(node, tag, tagValue))
+				{
+					commands = clearTag(commands, target, tag);
+				}					
+			}
+		}
+	}
+
+	/**
+	 * Clear excess tags
+	 * @param commands Command list
+	 * @param tag Tag name
+	 * @param tagValue Tag value
+	 */
+	public void clearExcessTags(List<Command> commands, String tag, String tagValue)
+	{
+		for(OsmPrimitive stopPoint : stopPoints)
+		{
+			clearExcessTags(commands, stopPoint, tag, tagValue);
+		}
+		for(OsmPrimitive platform : platforms)
+		{
+			clearExcessTags(commands, platform, tag, tagValue);
+		}
+		for(OsmPrimitive otherMember : this.otherMembers)
+		{
+			clearExcessTags(commands, otherMember, tag, tagValue);
+		}
+ 	}
+	
+	/**
+	 * Create separate bus stop node or assign bus stop tag to platform node
+	 * @param commands Original command list
+	 * @param firstPlatform First platform in stop area relation
+	 * @param tag Tag name
+	 * @param tagValue Tag value
+	 * @return Resulting command list
+	 */
+	protected List<Command> createSeparateBusStopNode(List<Command> commands, OsmPrimitive firstPlatform, String tag, String tagValue)
+	{
+		LatLon centerOfPlatform = getCenterOfWay(firstPlatform);
+		if(firstPlatform instanceof Way)
+		{
+			if(centerOfPlatform != null)
+			{
+				Node newNode =new Node();
+				newNode.setCoor(centerOfPlatform);
+		    	Main.main.undoRedo.add(new AddCommand(newNode));
+		    	Main.main.undoRedo.add(new ChangePropertyCommand(newNode, tag, tagValue));
+				commands = assignTag(commands, newNode, tag, tagValue);
+				otherMembers.add(newNode);
+			}
+		}
+		else
+		{
+    		commands = assignTag(commands, firstPlatform, tag, tagValue);
+		}
+		return commands;
 	}
 	
 }
