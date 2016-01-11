@@ -1,4 +1,4 @@
-package ru.rodsoft.openstreetmap.josm.plugins.CustomizePublicTransportStop;
+package ru.rodsoft.openstreetmap.josm.plugins.customizepublictransportstop;
 
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.WaySegment;

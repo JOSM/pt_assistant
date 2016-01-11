@@ -1,6 +1,5 @@
-package ru.rodsoft.openstreetmap.josm.plugins.CustomizePublicTransportStop;
+package ru.rodsoft.openstreetmap.josm.plugins.customizepublictransportstop;
 
-import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -22,43 +21,9 @@ import javax.swing.JTextField;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import org.openstreetmap.josm.Main;
 
-import ru.rodsoft.openstreetmap.josm.plugins.CustomizePublicTransportStop.MessageBox;
+import ru.rodsoft.openstreetmap.josm.plugins.customizepublictransportstop.MessageBox;
 
 /**
  * 
@@ -82,7 +47,7 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 	private static final String SHARE_TAXI_CAPTION = "Share taxi";
 	private static final String BUS_CAPTION = "Bus";
 	private static final String BUS_STATION_CAPTION = "Bus station";
-	private static final String ASSIGN_TRANSPORT_TYPE_CAPTION = "Assign transport type";
+	private static final String ASSIGN_TRANSPORT_TYPE_CAPTION = "Assign transport type to platform";
 	private static final String NETWORK_LEVEL_CAPTION = "Network level";
 	private static final String OPERATOR_CAPTION = "Operator";
 	private static final String NETWORK_CAPTION = "Network";
@@ -93,9 +58,11 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 	public static final String REGIONAL_NETWORK_CAPTION = "Regional";
 	public static final String LOCAL_NETWORK_CAPTION = "Local";
 	public static final String CITY_NETWORK_CAPTION = "City transport";
-	private String[] serviceCaptionStrings = { CITY_NETWORK_CAPTION, LOCAL_NETWORK_CAPTION, REGIONAL_NETWORK_CAPTION, LONG_DISTANCE_NETWORK_CAPTION };
-    private String[] serviceStrings = { StopArea.CITY_NETWORK_TAG_VALUE, StopArea.LOCAL_NETWORK_TAG_VALUE, 
-    									StopArea.REGIONAL_NETWORK_TAG_VALUE, StopArea.LONG_DISTANCE_NETWORK_TAG_VALUE };
+	public static final String HIGH_SPEED_NETWORK_CAPTION = "High speed";
+	
+	private String[] serviceCaptionStrings = { CITY_NETWORK_CAPTION, LOCAL_NETWORK_CAPTION, REGIONAL_NETWORK_CAPTION, LONG_DISTANCE_NETWORK_CAPTION, HIGH_SPEED_NETWORK_CAPTION };
+    private String[] serviceStrings = { OSMTags.CITY_NETWORK_TAG_VALUE, OSMTags.LOCAL_NETWORK_TAG_VALUE, 
+    									OSMTags.REGIONAL_NETWORK_TAG_VALUE, OSMTags.LONG_DISTANCE_NETWORK_TAG_VALUE, OSMTags.HIGH_SPEED_NETWORK_TAG_VALUE };
 
     private JDialog jDialog = null;
 	private JTextField textFieldName = null;
@@ -585,29 +552,29 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 		StopArea stopArea = this.stopArea;
 		try
 		{
-		if(stopArea == null)
-			stopArea = new StopArea();
-		stopArea.name = getTextFromControl(textFieldName);
-		stopArea.nameEn = getTextFromControl(textFieldNameEn);
-		stopArea.network = getTextFromControl(textFieldNetwork);
-		if(stopArea.network != null)
-			previousNetwork = stopArea.network;
-		stopArea.operator = getTextFromControl(textFieldOperator);
-		if(stopArea.operator != null)
-			previousOperator = stopArea.operator;
-		stopArea.service = serviceStrings[comboBoxService.getSelectedIndex()];
-		stopArea.isBus = getCheckBoxValue(checkBoxIsBus);
-		stopArea.isShareTaxi = getCheckBoxValue(checkBoxIsShareTaxi);
-		stopArea.isTrolleybus = getCheckBoxValue(checkBoxIsTrolleybus);
-		stopArea.isBusStation = getCheckBoxValue(checkBoxIsBusStation);
-		stopArea.isAssignTransportType = getCheckBoxValue(checkBoxIsAssignTransportType);
-		stopArea.isTram = getCheckBoxValue(checkBoxIsTram);
-		stopArea.isTrainStation = getCheckBoxValue(checkBoxIsTrainStation);
-		stopArea.isTrainStop = getCheckBoxValue(checkBoxIsTrainStop);
-		stopArea.isBench = getCheckBoxValue(checkBoxIsBench);
-		stopArea.isShelter = getCheckBoxValue(checkBoxIsShelder);
-		stopArea.isCovered = getCheckBoxValue(checkBoxIsCover);
-		stopArea.isArea = getCheckBoxValue(checkBoxIsArea);
+			if(stopArea == null)
+				stopArea = new StopArea();
+			stopArea.name = getTextFromControl(textFieldName);
+			stopArea.nameEn = getTextFromControl(textFieldNameEn);
+			stopArea.network = getTextFromControl(textFieldNetwork);
+			if(stopArea.network != null)
+				previousNetwork = stopArea.network;
+			stopArea.operator = getTextFromControl(textFieldOperator);
+			if(stopArea.operator != null)
+				previousOperator = stopArea.operator;
+			stopArea.service = serviceStrings[comboBoxService.getSelectedIndex()];
+			stopArea.isBus = getCheckBoxValue(checkBoxIsBus);
+			stopArea.isShareTaxi = getCheckBoxValue(checkBoxIsShareTaxi);
+			stopArea.isTrolleybus = getCheckBoxValue(checkBoxIsTrolleybus);
+			stopArea.isBusStation = getCheckBoxValue(checkBoxIsBusStation);
+			stopArea.isAssignTransportType = getCheckBoxValue(checkBoxIsAssignTransportType);
+			stopArea.isTram = getCheckBoxValue(checkBoxIsTram);
+			stopArea.isTrainStation = getCheckBoxValue(checkBoxIsTrainStation);
+			stopArea.isTrainStop = getCheckBoxValue(checkBoxIsTrainStop);
+			stopArea.isBench = getCheckBoxValue(checkBoxIsBench);
+			stopArea.isShelter = getCheckBoxValue(checkBoxIsShelder);
+			stopArea.isCovered = getCheckBoxValue(checkBoxIsCover);
+			stopArea.isArea = getCheckBoxValue(checkBoxIsArea);
 		}
 		catch(Exception ex)
 		{

@@ -1,4 +1,4 @@
-package ru.rodsoft.openstreetmap.josm.plugins.CustomizePublicTransportStop;
+package ru.rodsoft.openstreetmap.josm.plugins.customizepublictransportstop;
 import javax.swing.JOptionPane;
 import java.awt.Component;
 /** 
