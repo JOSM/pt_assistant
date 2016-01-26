@@ -564,7 +564,6 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase
 				else
 					if(stopArea.isBus || stopArea.isTrolleybus || stopArea.isShareTaxi)
 					{
-						MessageBox.ok(getTagValue(firstPlatform, "name"));
 						commands = assignTag(commands, firstPlatform, OSMTags.HIGHWAY_TAG, OSMTags.BUS_STOP_TAG_VALUE);
 					}
 			}

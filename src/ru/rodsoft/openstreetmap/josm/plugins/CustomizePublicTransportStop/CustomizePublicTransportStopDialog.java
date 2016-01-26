@@ -98,6 +98,14 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 	private HashMap<JCheckBox, Boolean> checkBoxValues = new HashMap<JCheckBox,Boolean>();
 	
 	/**
+	 * Previous stop name
+	 */
+	private static String previousName;
+	/**
+	 * Previous english stop name
+	 */
+	private static String previousNameEn;	
+	/**
 	 * Network name at previous call
 	 */
 	private static String previousNetwork = null;
@@ -502,10 +510,15 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 			return;
 		if(stopArea.name != null)
 			textFieldName.setText(stopArea.name);
+		else
+			if(previousName != null)
+				textFieldName.setText(previousName);
 		if(stopArea.nameEn != null)
 			textFieldNameEn.setText(stopArea.nameEn);
-		if(stopArea.network != null)
-			
+		else
+			if(previousNameEn != null)
+				textFieldNameEn.setText(previousNameEn);
+		if(stopArea.network != null)			
 			textFieldNetwork.setText(stopArea.network);
 		else
 			if(previousNetwork != null)
@@ -555,13 +568,13 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
 			if(stopArea == null)
 				stopArea = new StopArea();
 			stopArea.name = getTextFromControl(textFieldName);
+			previousName = stopArea.name;
 			stopArea.nameEn = getTextFromControl(textFieldNameEn);
+			previousNameEn = stopArea.nameEn;
 			stopArea.network = getTextFromControl(textFieldNetwork);
-			if(stopArea.network != null)
-				previousNetwork = stopArea.network;
+			previousNetwork = stopArea.network;
 			stopArea.operator = getTextFromControl(textFieldOperator);
-			if(stopArea.operator != null)
-				previousOperator = stopArea.operator;
+			previousOperator = stopArea.operator;
 			stopArea.service = serviceStrings[comboBoxService.getSelectedIndex()];
 			stopArea.isBus = getCheckBoxValue(checkBoxIsBus);
 			stopArea.isShareTaxi = getCheckBoxValue(checkBoxIsShareTaxi);
