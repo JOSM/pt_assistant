@@ -8,7 +8,7 @@ Network
 Operator
 Network level
 City transport
-Local
+Commuter
 Regional
 Long distance
 High speed
