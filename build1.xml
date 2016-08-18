@@ -8,7 +8,7 @@
     <property name="plugin.src.dir" value="src" />
     <property name="plugin.dist.dir" value="../../dist" />
     <property name="plugin.jar" value="${plugin.dist.dir}/conflation.jar" />
-    <property name="josm" location="../../core/dist/josm-custom.jar"/>
+    <property name="josm" location="../../dist/josm-custom.jar"/>
     <property name="jts.plugin.jar" location="${plugin.dist.dir}/jts.jar"/>  
     <property name="utilsplugin2.plugin.jar" location="${plugin.dist.dir}/utilsplugin2.jar"/>
 	
