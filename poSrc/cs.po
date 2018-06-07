@@ -1,0 +1,252 @@
+# Translations for the JOSM plugin 'pt_assistant' (cs)
+# Copyright (C) 2018 
+# This file is distributed under the same license as the josm-plugin_pt_assistant package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Language-Team: Czech (https://www.transifex.com/josm/teams/2544/cs/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+msgid "Bicycle and foot routes Tests"
+msgstr "Testy tras pro jízdní kola a pěší"
+
+msgid "Cancel"
+msgstr "Zrušit"
+
+msgid ""
+"Check if route relations are compatible with public transport version 2"
+msgstr ""
+"Kontroluje, zda relace route jsou kompatibilní se schématem veřejné dopravy "
+"verze 2"
+
+msgid "Do you want to download referrers of platforms and stop positions?"
+msgstr "Chcete stáhnout prvky odkazující na nástupiště a místa zastavení?"
+
+msgid "Do you want to make the roundabout round?"
+msgstr "Chcete udělat kruhový objezd kulatým?"
+
+msgid "Download incomplete route relation members"
+msgstr "Stáhnout nekompletní členy relace route"
+
+#, java-format
+msgid "Edit: {0}"
+msgstr "Úpravy: {0}"
+
+msgid "Extract node from line"
+msgstr "Vyjme bod z cesty"
+
+msgid "Fix error"
+msgstr "Opravit chybu"
+
+#, java-format
+msgid "Fixing ({0}/{1}): ''{2}''"
+msgstr "Opravuji ({0}/{1}): ''{2}''"
+
+msgid "Fixing errors ..."
+msgstr "Opravuji chyby ..."
+
+msgid "How do you want to proceed?"
+msgstr "Jak chcete pokračovat?"
+
+msgid "Include stop_area tests"
+msgstr "Zahrnout testy stop_area"
+
+msgid "Incomplete Members"
+msgstr "Nekompletní členy"
+
+#, java-format
+msgid "Mode: {0}"
+msgstr "Režim: {0}"
+
+msgid "No"
+msgstr "Ne"
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "PT: First or last way needs to be split"
+msgstr "VD: První nebo poslední cesta by měla být rozdělena"
+
+msgid "PT: Platform should not be part of a way"
+msgstr "VD: Nástupiště by nemělo být částí cesty"
+
+msgid "PT: Problem in the route segment with no automatic fix"
+msgstr "VD: Problém se segmentem trasy s žádnou automatickou opravou"
+
+msgid "PT: Problem in the route segment with one automatic fix"
+msgstr "VD: Problém se segmentem trasy s jednou automatickou opravou"
+
+msgid "PT: Relation member roles do not match tags"
+msgstr "VD: Role členů relace neodpovídají značkám"
+
+msgid "PT: Road is under construction"
+msgstr "VD: Silnice je ve výstavbě"
+
+msgid "PT: Route contains a gap that can be fixed by sorting"
+msgstr "VD: Trasa obsahuje mezeru, kterou lze zcelit seřazením."
+
+msgid "PT: Route gap can be closed by adding a single way"
+msgstr "VD: Mezeru v trase lze zacelit přidání jedné cesty"
+
+msgid ""
+"PT: Route gaps can decrease by sorting members. Further validations will be "
+"required"
+msgstr ""
+"VD: Mezery v trasách lze snížit seřazením členů. Bude ovšem potřeba výsledek"
+" zkontrolovat."
+
+msgid "PT: Route needs to be sorted, found tag fixme:relation=order members"
+msgstr ""
+"VD: Trasu je potřeba seřadit, nalezena značka fixme:relation=order members"
+
+msgid "PT: Route passes a oneway road in the wrong direction"
+msgstr "VD: Trasa probíhá jednosměrkou ve špatném směru"
+
+msgid ""
+"PT: Route relations of stop position(s) and platform(s) of stop area members"
+" diverge"
+msgstr "VD: Relace route zastávky a nástupiště zastávky divergují"
+
+msgid "PT: Route should start and end with a stop_position"
+msgstr "VD: Trasa by měla začínat a končit stop_position"
+
+msgid "PT: Route type does not match the type of the road it passes on"
+msgstr "VD: Typ trasy neodpovídá typu silnice, po které vede"
+
+msgid "PT: Stop area relation has no platform"
+msgstr "VD: Relace stop area nemá nástupiště"
+
+msgid "PT: Stop area relation has no stop position"
+msgstr "VD: Relace stop area nemá žádnou zastávku"
+
+msgid "PT: Stop not served"
+msgstr "VD: Zastávka není obsluhována"
+
+msgid "PT: Stop position or platform is not part of a stop area relation"
+msgstr "VD: Zastávka nebo nástupiště není součástí relace stop area"
+
+msgid "PT: Stop_position is not part of a way"
+msgstr "VD: Místo zastavení není na cestě"
+
+msgid "PT: The first stop of the route does not match the first way"
+msgstr "VD: První zastávka trasy neodpovídá první cestě"
+
+msgid "PT: The last stop of the route does not match the last way"
+msgstr "VD: Poslední zastávka neopdovídá poslední cestě"
+
+msgid ""
+"PT: The name of the first stop does not match the \"from\" tag of the route "
+"relation"
+msgstr "VD: Název první zastávky neodpovídá značce \"from\" relace trasy"
+
+msgid ""
+"PT: The name of the last stop does not match the \"to\" tag of the route "
+"relation"
+msgstr "VD: Název poslední zastávky neodpovídá značce \"to\" relace trasy"
+
+msgid "PT: dummy test warning"
+msgstr "VD: varování testovacího testu"
+
+msgid "PT_Assistant Fetch Request"
+msgstr "PT_Assistant Požadavek na čtení"
+
+msgid "PT_Assistant Message"
+msgstr "Zpráva Asistenta VD"
+
+#. showDialog(); FIXME
+msgid "PT_Assistant Proceed Request"
+msgstr "PT_Assistant Požadavek na pokračování"
+
+#, java-format
+msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
+msgstr "Doplněk PT_Assistant zjistil, že tato relace (id={0}) obsahuje chyby:"
+
+#. I18N: mnemonic: F
+msgctxt "menu"
+msgid "Public Transport"
+msgstr "Hromadná doprava"
+
+msgid "Public Transport Assistant tests"
+msgstr "Public Transport Assistant testy"
+
+msgid "Remember my choice and do not ask me again in this session"
+msgstr "Pamatuj si moje volbu a při tomto sezení se již neptej"
+
+msgid "Repeat last fix"
+msgstr "Opakovat poslední opravu"
+
+msgid "Roundabout round"
+msgstr "Zakulatit kruhový objezd"
+
+msgid ""
+"Route relations have incomplete members.\n"
+"They need to be downloaded to proceed with validation.\n"
+"Do you want to download them?"
+msgstr ""
+"Relace route má nekompletní členy.\n"
+"Před pokračováním kontroly musí být staženy.\n"
+"Chcete je stáhnout?"
+
+msgid ""
+"The relation has incomplete members. Do you want to download them and "
+"continue with the sorting?"
+msgstr ""
+"Relace obsahuje nekompletní členy. Chcete je stáhnout a pokračovat v "
+"třídění?"
+
+#, java-format
+msgid "Tool: {0}"
+msgstr "Nástroj: {0}"
+
+msgid "Type letter to select the fix variant or press Escape for no fix"
+msgstr ""
+"Stiskněte písmeno pro volbu opravy, nebo stiskněte Escape pro opuštění bez "
+"oprav"
+
+msgid "Updating map ..."
+msgstr "Aktualizuji mapu ..."
+
+msgid "Warning: the diplayed fix variants are based on less strict criteria"
+msgstr ""
+"Varování: zobrazené varianty oprav jsou založené na méně striktních "
+"kritériích"
+
+msgid "What do you want the segment to be?"
+msgstr "Čím se má segment stát?"
+
+msgid "Yes"
+msgstr "Ano"
+
+#, java-format
+msgid "{0} direction error"
+msgid_plural "{0} direction errors"
+msgstr[0] "{0} směrová chyba"
+msgstr[1] "{0} směrové chyby"
+msgstr[2] "{0} směrových chyb"
+msgstr[3] "{0} směrových chyb"
+
+#, java-format
+msgid "{0} road type error"
+msgid_plural "{0} road type errors"
+msgstr[0] "{0} chyba typu silnice"
+msgstr[1] "{0} chyby typu silnice"
+msgstr[2] "{0} chyb typu silnice"
+msgstr[3] "{0} chyb typu silnice"
+
+#. Plugin description for pt_assistant
+msgid ""
+"Provides validation and fixing for public transport route according to "
+"version 2 of the public transport schema"
+msgstr ""
+"Poskytuje kontrolu a opravy tras veřejné dopravy podle verze 2 schématu "
+"veřejné dopravy."

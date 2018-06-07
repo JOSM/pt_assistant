@@ -1,0 +1,253 @@
+# Translations for the JOSM plugin 'pt_assistant' (da)
+# Copyright (C) 2018 
+# This file is distributed under the same license as the josm-plugin_pt_assistant package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Language-Team: Danish (https://www.transifex.com/josm/teams/2544/da/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: da\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Bicycle and foot routes Tests"
+msgstr "Cykel- og gåruter test"
+
+msgid "Cancel"
+msgstr "Annuller"
+
+msgid ""
+"Check if route relations are compatible with public transport version 2"
+msgstr ""
+"Tjek om rute relationer er kompatible med offentlig transport version 2"
+
+msgid "Do you want to download referrers of platforms and stop positions?"
+msgstr "Vil du at downloade refererende platforme og stoppositioner?"
+
+msgid "Do you want to make the roundabout round?"
+msgstr "Vil du lave rundkørslen rund?"
+
+msgid "Download incomplete route relation members"
+msgstr "Download ufuldstændige rute relations medlemmer"
+
+#, java-format
+msgid "Edit: {0}"
+msgstr "Rediger: {0}"
+
+msgid "Fix error"
+msgstr "Ret fejl"
+
+#, java-format
+msgid "Fixing ({0}/{1}): ''{2}''"
+msgstr "Retter ({0}/{1}): ''{2}''"
+
+msgid "Fixing errors ..."
+msgstr "Retter fejl..."
+
+msgid "How do you want to proceed?"
+msgstr "Hvordan vil du fortsætte?"
+
+msgid "Include stop_area tests"
+msgstr "Medtag stopområde tests"
+
+msgid "Incomplete Members"
+msgstr "Ufuldstændige medlemmer"
+
+#, java-format
+msgid "Mode: {0}"
+msgstr "Tilstand: {0}"
+
+msgid "No"
+msgstr "Nej"
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "PT Wizard"
+msgstr "OT guide"
+
+msgid "PT: First or last way needs to be split"
+msgstr "OT: Første eller sidste vej skal deles"
+
+msgid "PT: Platform should not be part of a way"
+msgstr "OT: Platform bør ikke være en del af en vej"
+
+msgid "PT: Problem in the route segment with no automatic fix"
+msgstr "OT: Problem i rute segmentet uden automatiske rettelse"
+
+msgid "PT: Problem in the route segment with one automatic fix"
+msgstr "OT: Problem i rute segmentet med en automatiske rettelse"
+
+msgid "PT: Relation member roles do not match tags"
+msgstr "OT: Relations medlems roller passer ikke til tags"
+
+msgid "PT: Road is under construction"
+msgstr "OT: Vej er under udførelse"
+
+msgid "PT: Route contains a gap that can be fixed by sorting"
+msgstr "OT: Rute indeholder et hul, der kan rettes ved at sortere"
+
+msgid "PT: Route gap can be closed by adding a single way"
+msgstr "OT: Hul i rute kan lukkes ved at tilføje en enkelt vej"
+
+msgid ""
+"PT: Route gaps can decrease by sorting members. Further validations will be "
+"required"
+msgstr ""
+"OT: Rute huller antal kan falde ved at sortere medlemmer. Yderligere "
+"valideringer vil blive påkrævet"
+
+msgid "PT: Route needs to be sorted, found tag fixme:relation=order members"
+msgstr "PT: Rute skal sorteres, fandt tag fixme: relation=order members"
+
+msgid "PT: Route passes a oneway road in the wrong direction"
+msgstr "OT: Rute passerer en ensrettet vej i den forkerte retning"
+
+msgid ""
+"PT: Route relations of stop position(s) and platform(s) of stop area members"
+" diverge"
+msgstr ""
+"OT: Rute relationer med stop-position(er) og platform(e) med stopområde "
+"medlemmer afviger"
+
+msgid "PT: Route should start and end with a stop_position"
+msgstr "OT: Rute skal starte og slutte med en stop_position"
+
+msgid "PT: Route type does not match the type of the road it passes on"
+msgstr "OT: Rute type passer ikke til den type af vej den passerer på"
+
+msgid "PT: Stop area relation has no platform"
+msgstr "OT: Stopområde relation har ingen platform"
+
+msgid "PT: Stop area relation has no stop position"
+msgstr "OT: Stopområde relation har ingen stopposition"
+
+msgid "PT: Stop not served"
+msgstr "OT: Stop ikke serviceret"
+
+msgid "PT: Stop position or platform is not part of a stop area relation"
+msgstr ""
+"OT: Stopposition eller platform er ikke en del af en stopområde relation"
+
+msgid "PT: Stop_position is not part of a way"
+msgstr "OT: Stop_position er ikke en del af en vej"
+
+msgid "PT: The first stop of the route does not match the first way"
+msgstr "OT: Det første stop på ruten passer ikke til den første vej"
+
+msgid "PT: The last stop of the route does not match the last way"
+msgstr "OT: Det sidste stop på ruten passer ikke til den sidste vej"
+
+msgid ""
+"PT: The name of the first stop does not match the \"from\" tag of the route "
+"relation"
+msgstr ""
+"OT: Navnet på det første stop passer ikke til \"fra\" tag for rute "
+"relationen"
+
+msgid ""
+"PT: The name of the last stop does not match the \"to\" tag of the route "
+"relation"
+msgstr ""
+"OT: Navnet på det sidste stop passer ikke til \"til\" tag for rute "
+"relationen"
+
+msgid "PT: dummy test warning"
+msgstr "OT: dummy test advarsel"
+
+msgid "PT_Assistant Fetch Request"
+msgstr "OT_Assistent hent anmodning"
+
+msgid "PT_Assistant Message"
+msgstr "OT_Assistent besked"
+
+#. showDialog(); FIXME
+msgid "PT_Assistant Proceed Request"
+msgstr "OT_Assistent fortsæt anmodning"
+
+#, java-format
+msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
+msgstr "OT_Assistent udvidelse fandt at denne relation (id={0}) har fejl:"
+
+#. I18N: mnemonic: F
+msgctxt "menu"
+msgid "Public Transport"
+msgstr "Offentlig transport"
+
+msgid "Public Transport Assistant tests"
+msgstr "Offentlig transport assistent tests"
+
+msgid "Remember my choice and do not ask me again in this session"
+msgstr "Husk mit valg og spørg mig ikke igen i denne session"
+
+msgid "Repeat last fix"
+msgstr "Gentag seneste rettelse"
+
+msgid "Roundabout round"
+msgstr "Rundkørsel afrunde"
+
+msgid ""
+"Route relations have incomplete members.\n"
+"They need to be downloaded to proceed with validation.\n"
+"Do you want to download them?"
+msgstr ""
+"Rute relationer har ufuldstændige medlemmer.\n"
+"Der er brug for at de bliver hentet for at fortsætte med validering.\n"
+"Vil du downloade dem?"
+
+msgid ""
+"The relation has incomplete members. Do you want to download them and "
+"continue with the sorting?"
+msgstr ""
+"Relationen har ufuldstændige medlemmer. Vil du downloade dem og fortsætte "
+"med sorteringen?"
+
+#, java-format
+msgid "Tool: {0}"
+msgstr "Værktøj: {0}"
+
+msgid "Type letter to select the fix variant or press Escape for no fix"
+msgstr ""
+"Skriv bogstav for at vælge rettelses variant eller tryk på Escape for ingen "
+"rettelse"
+
+msgid "Updating map ..."
+msgstr "Opdaterer kort..."
+
+msgid "Warning: the diplayed fix variants are based on less strict criteria"
+msgstr ""
+"Advarsel: de viste rettelses varianter er baseret på mindre strenge "
+"kriterier"
+
+msgid "What do you want the segment to be?"
+msgstr "Hvad vil du have at segmentet skal være?"
+
+msgid "Yes"
+msgstr "Ja"
+
+#, java-format
+msgid "{0} direction error"
+msgid_plural "{0} direction errors"
+msgstr[0] "{0} retningsfejl"
+msgstr[1] "{0} retningsfejl"
+
+#, java-format
+msgid "{0} road type error"
+msgid_plural "{0} road type errors"
+msgstr[0] "{0} vejtypefejl"
+msgstr[1] "{0} vejtypefejl"
+
+#. Plugin description for pt_assistant
+msgid ""
+"Provides validation and fixing for public transport route according to "
+"version 2 of the public transport schema"
+msgstr ""
+"Tilbyder validering og rettelse af offentlig rute transport ifølge version 2"
+" af det offentlig transport skema"

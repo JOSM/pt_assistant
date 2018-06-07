@@ -25,9 +25,10 @@ jobs:
     - stage: i18n
       language: python
       python: "3.6"
-      install: pip install git+https://github.com/transifex/transifex-client.git
+      install: pip install --user git+https://github.com/transifex/transifex-client.git@699dd42e04074be92a07b5b87e8f1ea672a6571f#egg=transifex-client
       script: |
         if [ ! -z "$TRANSIFEX_TOKEN" ]; then
+          export PATH="$PATH:$HOME/.local/bin"
           ./gradlew generatePot
           TX_TOKEN="$TRANSIFEX_TOKEN" tx push -s --no-interactive
         fi
@@ -35,4 +36,4 @@ jobs:
 stages:
   - test
   - name: i18n
-    if: type = push AND branch = trunk
+    if: type = push AND branch = trunk AND repo = JOSM/pt_assistant

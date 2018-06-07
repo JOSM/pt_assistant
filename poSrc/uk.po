@@ -1,0 +1,252 @@
+# Translations for the JOSM plugin 'pt_assistant' (uk)
+# Copyright (C) 2018 
+# This file is distributed under the same license as the josm-plugin_pt_assistant package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Language-Team: Ukrainian (https://www.transifex.com/josm/teams/2544/uk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: uk\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+
+msgid "Bicycle and foot routes Tests"
+msgstr "Перевірка велосипедних та пішохідних маршрутів"
+
+msgid "Cancel"
+msgstr "Скасувати"
+
+msgid ""
+"Check if route relations are compatible with public transport version 2"
+msgstr ""
+"Перевірити чи звʼязок сумісний зі схемою позначення громадського транспорту "
+"версії 2"
+
+msgid "Do you want to download referrers of platforms and stop positions?"
+msgstr "Бажаєте завантажити обʼєкти, що посилаються на платформи та зупинки?"
+
+msgid "Do you want to make the roundabout round?"
+msgstr "Ви бажаєте зробити проїзд по кругу?"
+
+msgid "Download incomplete route relation members"
+msgstr "Завантажити відсутніх членів звʼязку маршруту"
+
+#, java-format
+msgid "Edit: {0}"
+msgstr "Редагувати: {0}"
+
+msgid "Fix error"
+msgstr "Виправити помилку"
+
+#, java-format
+msgid "Fixing ({0}/{1}): ''{2}''"
+msgstr "Виправлення ({0}/{1}): ''{2}''"
+
+msgid "Fixing errors ..."
+msgstr "Виправлення помилок…"
+
+msgid "How do you want to proceed?"
+msgstr "Як бажаєте продовжити?"
+
+msgid "Include stop_area tests"
+msgstr "Включаючи перевірку stop_area"
+
+msgid "Incomplete Members"
+msgstr "Незавантажені члени"
+
+#, java-format
+msgid "Mode: {0}"
+msgstr "Режим {0}"
+
+msgid "No"
+msgstr "Ні"
+
+msgid "Ok"
+msgstr "Так"
+
+msgid "PT Wizard"
+msgstr "ГТ Майстер"
+
+msgid "PT: First or last way needs to be split"
+msgstr "ГТ: Перший або останній відрізок треба розділити"
+
+msgid "PT: Platform should not be part of a way"
+msgstr "ГТ: платформа не повинна бути частиною дороги"
+
+msgid "PT: Problem in the route segment with no automatic fix"
+msgstr "ГТ: Проблема з відрізком маршруту, без автовиправлення"
+
+msgid "PT: Problem in the route segment with one automatic fix"
+msgstr "ГТ: Проблема з відрізком маршруту з одним автоматичним виправленням"
+
+msgid "PT: Relation member roles do not match tags"
+msgstr "ГТ: Роль члена звʼязку не відповідає теґам"
+
+msgid "PT: Road is under construction"
+msgstr "ГТ: Ремонт дороги"
+
+msgid "PT: Route contains a gap that can be fixed by sorting"
+msgstr "ГТ: Маршрут містить прогалини, що можна усунути впорядкуванням ліній"
+
+msgid "PT: Route gap can be closed by adding a single way"
+msgstr "ГТ: Прогалини в маршруті можна усунути додаванням одного відрізку"
+
+msgid ""
+"PT: Route gaps can decrease by sorting members. Further validations will be "
+"required"
+msgstr ""
+"ГТ: Кількість розривів в маршруті може бути зменшена після виконання "
+"сорутваня його елементів. Після цього потрібна додаткова перевірка."
+
+msgid "PT: Route needs to be sorted, found tag fixme:relation=order members"
+msgstr ""
+"ГТ: потрібне впорядкування маршруту, знайдено теґ fixme:relation=order "
+"members"
+
+msgid "PT: Route passes a oneway road in the wrong direction"
+msgstr ""
+"ГТ: Маршрут проходить по дорозі з одностороннім рухом в помилковому напрямку"
+
+msgid ""
+"PT: Route relations of stop position(s) and platform(s) of stop area members"
+" diverge"
+msgstr "ГТ: члени звʼязків маршрутів місць зупинок та платформ  відрізняються"
+
+msgid "PT: Route should start and end with a stop_position"
+msgstr "ГТ: Маршрут повинен починатись та закінчуватись stop_position"
+
+msgid "PT: Route type does not match the type of the road it passes on"
+msgstr "ГТ: Тип маршруту не відповідає типу дороги, по якій він проходить"
+
+msgid "PT: Stop area relation has no platform"
+msgstr "ГТ: Звʼязок зупинки не містить платформу"
+
+msgid "PT: Stop area relation has no stop position"
+msgstr "ГТ: Звʼязок зупинки не містить місця зупинки"
+
+msgid "PT: Stop not served"
+msgstr "ГТ: Зупинка не обслуговується"
+
+msgid "PT: Stop position or platform is not part of a stop area relation"
+msgstr "ГТ: Місце зупинки або платформа не входять до складу звʼязка зупинки"
+
+msgid "PT: Stop_position is not part of a way"
+msgstr "ГТ: місце зупинки не входить до складу дороги"
+
+msgid "PT: The first stop of the route does not match the first way"
+msgstr "ГТ: Перша зупинка маршруту знаходиться не на початку першого відрізку"
+
+msgid "PT: The last stop of the route does not match the last way"
+msgstr ""
+"ГТ: остання зупинка маршруту на знаходиться в кінці останнього відрізку"
+
+msgid ""
+"PT: The name of the first stop does not match the \"from\" tag of the route "
+"relation"
+msgstr ""
+"ГТ: Назва першої зупинки не збігається з теґом \"from\" у звʼязку маршруту"
+
+msgid ""
+"PT: The name of the last stop does not match the \"to\" tag of the route "
+"relation"
+msgstr ""
+"ГТ: Назва останньої зупинки не збігається з полем \"to\" у звʼязку маршруту"
+
+msgid "PT: dummy test warning"
+msgstr "ГТ: фіктивне попередження"
+
+msgid "PT_Assistant Fetch Request"
+msgstr "ГТ_Помічник Надіслати запит"
+
+msgid "PT_Assistant Message"
+msgstr "ГТ_Помічник Повідомлення"
+
+#. showDialog(); FIXME
+msgid "PT_Assistant Proceed Request"
+msgstr "ГТ_Помічник Продовжити запит"
+
+#, java-format
+msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
+msgstr "ГТ_Помічник втулок визначив, що цей звʼязок (id={0}) містить помилки:"
+
+msgid "Public Transport Assistant tests"
+msgstr "Перевірки Помічника громадського транспорту"
+
+msgid "Remember my choice and do not ask me again in this session"
+msgstr "Запамʼятати мій вибір та не запитувати знов у цьому сеансі"
+
+msgid "Repeat last fix"
+msgstr "Повторити останні виправлення"
+
+msgid "Roundabout round"
+msgstr "Проїзд по кругу"
+
+msgid ""
+"Route relations have incomplete members.\n"
+"They need to be downloaded to proceed with validation.\n"
+"Do you want to download them?"
+msgstr ""
+"Звʼязки маршрутів містять незавантажених членів.\n"
+"Їх треба завантажити, для того щоб виконати перевірку.\n"
+"Завантажити їх?"
+
+msgid ""
+"The relation has incomplete members. Do you want to download them and "
+"continue with the sorting?"
+msgstr ""
+"Звʼязок завантажено не повністю. Завантажити відсутніх членів та продовжити "
+"сортування?"
+
+#, java-format
+msgid "Tool: {0}"
+msgstr "Інструмент: {0}"
+
+msgid "Type letter to select the fix variant or press Escape for no fix"
+msgstr ""
+"Натисніть літеру, щоб вибрати варіант виправлення або натисніть Esc, що "
+"оминути його"
+
+msgid "Updating map ..."
+msgstr "Оновлення мапи…"
+
+msgid "Warning: the diplayed fix variants are based on less strict criteria"
+msgstr ""
+"Попередження: показані варіанти виправлення засновані на менш жорстких "
+"критеріях"
+
+msgid "What do you want the segment to be?"
+msgstr "Чим повинен бути цей відрізок?"
+
+msgid "Yes"
+msgstr "Так"
+
+#, java-format
+msgid "{0} direction error"
+msgid_plural "{0} direction errors"
+msgstr[0] "{0} помилка напрямку"
+msgstr[1] "{0} помилки напрямку"
+msgstr[2] "{0} помилок напрямку"
+msgstr[3] "{0} помилок напрямку"
+
+#, java-format
+msgid "{0} road type error"
+msgid_plural "{0} road type errors"
+msgstr[0] "{0} помилка типу дороги"
+msgstr[1] "{0} помилки типу дороги"
+msgstr[2] "{0} помилок типу дороги"
+msgstr[3] "{0} помилок типу дороги"
+
+#. Plugin description for pt_assistant
+msgid ""
+"Provides validation and fixing for public transport route according to "
+"version 2 of the public transport schema"
+msgstr ""
+"Забезпечує перевірку і виправлення маршрутів громадського транспорту "
+"відповідно до версії 2 схеми позначення маршрутів громадського транспорту"

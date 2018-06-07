@@ -1,0 +1,283 @@
+# Translations for the JOSM plugin 'pt_assistant' (de)
+# Copyright (C) 2018 
+# This file is distributed under the same license as the josm-plugin_pt_assistant package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Language-Team: German (https://www.transifex.com/josm/teams/2544/de/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Bicycle and foot routes Tests"
+msgstr "Tests für Fahrrad- und Fußgängerrouten"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid ""
+"Check if route relations are compatible with public transport version 2"
+msgstr ""
+"Prüft, ob Routen-Relationen kompatibel mit dem Schema des öffentlichen "
+"Verkehrs Version 2 sind"
+
+msgid "Do you want to download referrers of platforms and stop positions?"
+msgstr ""
+"Möchten Sie Verweise auf Plattformen und Haltepositionen herunterladen?"
+
+msgid "Do you want to make the roundabout round?"
+msgstr "Möchten Sie den Kreisverkehr rund machen?"
+
+msgid "Download incomplete route relation members"
+msgstr "Unvollständige Routenrelationselemente herunterladen"
+
+#, java-format
+msgid "Edit: {0}"
+msgstr "Bearbeiten: {0}"
+
+msgid "Extract node from line"
+msgstr "Punkt aus Linie extrahieren"
+
+msgid "Fix error"
+msgstr "Fehler beheben"
+
+#, java-format
+msgid "Fixing ({0}/{1}): ''{2}''"
+msgstr "Berichtigung ({0}/{1}): ''{2}''"
+
+msgid "Fixing errors ..."
+msgstr "Fehler werden berichtigt …"
+
+msgid "How do you want to proceed?"
+msgstr "Wie möchten Sie fortfahren?"
+
+msgid "Include stop_area tests"
+msgstr "Haltebereichprüfungen miteinbeziehen"
+
+msgid "Incomplete Members"
+msgstr "Unvollständige Elemente"
+
+#, java-format
+msgid "Mode: {0}"
+msgstr "Modus: {0}"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "PT Wizard"
+msgstr "ÖV-Einrichtungsassistent"
+
+msgid "PT: First or last way needs to be split"
+msgstr "ÖV: Erste oder letzte Linie muss aufgeteilt werden"
+
+msgid "PT: Platform should not be part of a way"
+msgstr "ÖV: Bahn-/Bussteig sollte nicht Teil einer Linie sein"
+
+msgid "PT: Problem in the route segment with no automatic fix"
+msgstr "ÖV: Problem im Routenabschnitt ohne automatischer Korrektur"
+
+msgid "PT: Problem in the route segment with one automatic fix"
+msgstr "ÖV: Problem im Routenabschnitt mit automatischer Korrektur"
+
+msgid "PT: Relation member roles do not match tags"
+msgstr "ÖV: Relationsmitgliederrollen passen nicht zu den Merkmalen"
+
+msgid "PT: Road is under construction"
+msgstr "ÖV: Straße ist im Bau"
+
+msgid "PT: Route contains a gap that can be fixed by sorting"
+msgstr ""
+"ÖV: Route enthält eine Lücke, die durch das Sortieren behoben werden kann."
+
+msgid "PT: Route gap can be closed by adding a single way"
+msgstr ""
+"ÖV: Die Lücke in der Route kann durch das Hinzufügen eines Weges geschlossen"
+" werden."
+
+msgid ""
+"PT: Route gaps can decrease by sorting members. Further validations will be "
+"required"
+msgstr ""
+"ÖV: Lücken in der Route können durch Sortierung der Elemente verringert "
+"werden. Weitere Prüfungen sind erforderlich"
+
+msgid "PT: Route needs to be sorted, found tag fixme:relation=order members"
+msgstr ""
+"ÖV: Das Tag „fixme:relation=order“ wurde gefunden. Die Route sollte sortiert"
+" werden."
+
+msgid "PT: Route passes a oneway road in the wrong direction"
+msgstr "ÖV: Route führt in falscher Richtung über eine Einbahnstraße"
+
+msgid ""
+"PT: Route relations of stop position(s) and platform(s) of stop area members"
+" diverge"
+msgstr ""
+"ÖV: Routenrelationen von Haltepunkt(en) und Plattform(en) der "
+"Haltebereichselemente weichen voneinander ab"
+
+msgid "PT: Route should start and end with a stop_position"
+msgstr "ÖV: Route sollte mit einem Halteplatz beginnen und enden"
+
+msgid "PT: Route type does not match the type of the road it passes on"
+msgstr "ÖV: Routentyp passt nicht zum Typ der Straße, auf der sie verläuft"
+
+msgid "PT: Stop area relation has no platform"
+msgstr "ÖV: Haltebereichrelation hat keine Plattform"
+
+msgid "PT: Stop area relation has no stop position"
+msgstr "ÖV: Haltebereichrelation hat keine Haltestelle"
+
+msgid "PT: Stop not served"
+msgstr "ÖV: Haltestelle nicht bedient"
+
+msgid "PT: Stop position or platform is not part of a stop area relation"
+msgstr ""
+"ÖV: Haltstelle oder Plattform ist nicht Teil einer Haltebereichrelation"
+
+msgid "PT: Stop_position is not part of a way"
+msgstr "ÖV: Haltepunkt ist nicht Teil einer Linie"
+
+msgid "PT: The first stop of the route does not match the first way"
+msgstr ""
+"ÖV: Die erste Haltestelle der Route stimmt nicht mit der ersten Linie "
+"überein"
+
+msgid "PT: The last stop of the route does not match the last way"
+msgstr ""
+"ÖV: Die Endhaltestelle der Route stimmt nicht mit der letzten Linie überein"
+
+msgid ""
+"PT: The name of the first stop does not match the \"from\" tag of the route "
+"relation"
+msgstr ""
+"ÖV: Der Name der ersten Haltestelle stimmt nicht mit dem \"von\"-Merkmal der"
+" Routenrelation überein"
+
+msgid ""
+"PT: The name of the last stop does not match the \"to\" tag of the route "
+"relation"
+msgstr ""
+"ÖV: Der Name der Endhaltestelle stimmt nicht mit dem \"nach\"-Merkmal der "
+"Routenrelation überein"
+
+#, java-format
+msgid "PT: There is a gap in the {0} route"
+msgstr "ÖV: Es gibt eine Lücke in der Route {0}"
+
+msgid "PT: dummy test warning"
+msgstr "ÖV: Pseudotestwarnung"
+
+msgid "PT_Assistant Fetch Request"
+msgstr "PT_Assistant Abrufanforderung"
+
+msgid "PT_Assistant Message"
+msgstr "PT_Assistant Meldung"
+
+#. showDialog(); FIXME
+msgid "PT_Assistant Proceed Request"
+msgstr "PT_Assistant Fahranforderung"
+
+#, java-format
+msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
+msgstr ""
+"PT_Assistant-Erweiterungen hat Fehler in dieser Relation (id={0}) gefunden:"
+
+#. I18N: mnemonic: F
+msgctxt "menu"
+msgid "Public Transport"
+msgstr "Öffentlicher Verkehr"
+
+msgid "Public Transport Assistant tests"
+msgstr "Tests des Assistenten für Öffentlichen Verkehr"
+
+msgid "Remember my choice and do not ask me again in this session"
+msgstr "Meine Wahl merken und in dieser Sitzung nicht wieder danach fragen"
+
+msgid "Repeat last fix"
+msgstr "Letzte Korrektur wiederholen"
+
+msgid "Replace Membership"
+msgstr "Mitgliedschaft ersetzen"
+
+msgid "Roundabout round"
+msgstr "Kreisverkehr rund machen"
+
+msgid ""
+"Route relations have incomplete members.\n"
+"They need to be downloaded to proceed with validation.\n"
+"Do you want to download them?"
+msgstr ""
+"Routenrelationen haben unvollständige Mitglieder.\n"
+"Sie müssen zum Fortsetzen der Validierung heruntergeladen werden.\n"
+"Möchten Sie sie herunterladen?"
+
+msgid "Set up PT Assistant for more convenient use"
+msgstr "Den ÖV-Assistenten für bequemere Benutzung einrichten"
+
+msgid ""
+"The relation has incomplete members. Do you want to download them and "
+"continue with the sorting?"
+msgstr ""
+"Die Relation hat unvollständige Elemente. Sollen sie heruntergeladen und mit"
+" der Sortierung fortgefahren werden?"
+
+#, java-format
+msgid "Tool: {0}"
+msgstr "Werkzeug: {0}"
+
+msgid "Type letter to select the fix variant or press Escape for no fix"
+msgstr ""
+"Tippen Sie einen Buchstaben zum Auswählen einer Korrekturvariante ein oder "
+"drücken Sie Esc für keine Korrektur"
+
+msgid "Updating map ..."
+msgstr "Karte wird aktualisiert …"
+
+msgid "Warning: the diplayed fix variants are based on less strict criteria"
+msgstr ""
+"Warnung: die angezeigten Korrekturvarianten basieren auf weniger strengen "
+"Kriterien"
+
+msgid "What do you want the segment to be?"
+msgstr "Was soll mit dem Abschnitt geschehen?"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "requires single node to be selected."
+msgstr "Es muss ein einzelner Punkt ausgewählt sein."
+
+msgid "suggested value : "
+msgstr "vorgeschlagener Wert"
+
+#, java-format
+msgid "{0} direction error"
+msgid_plural "{0} direction errors"
+msgstr[0] "{0} Richtungsfehler"
+msgstr[1] "{0} Richtungsfehler"
+
+#, java-format
+msgid "{0} road type error"
+msgid_plural "{0} road type errors"
+msgstr[0] "{0} Straßentypfehler"
+msgstr[1] "{0} Straßentypfehler"
+
+#. Plugin description for pt_assistant
+msgid ""
+"Provides validation and fixing for public transport route according to "
+"version 2 of the public transport schema"
+msgstr ""
+"Bietet Validierung und Berichtigung für Routen des öffentlichen Verkehrs "
+"nach Version 2 des Schemas des öffentlichen Verkehrs"
