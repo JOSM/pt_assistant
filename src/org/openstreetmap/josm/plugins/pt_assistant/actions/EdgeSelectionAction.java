@@ -214,7 +214,6 @@ public class EdgeSelectionAction extends MapMode {
 						tr("Mode of Travel -> {0} \n total ways selected -> {1}", modeOfTravel, edgeSet.size()))
 								.setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(1200).show();
 				ds.setSelected(edgeSet);
-				AutoScaleAction.zoomToSelection();
 				AutoScaleAction.autoScale("selection");
 			}
 
@@ -255,7 +254,6 @@ public class EdgeSelectionAction extends MapMode {
 			new Notification(tr("Mode of Travel -> {0} \n total ways selected -> {1}", modeOfTravel, edgeSet.size()))
 					.setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(900).show();
 			ds.setSelected(edgeSet);
-			AutoScaleAction.zoomToSelection();
 			AutoScaleAction.autoScale("selection");
 
 		} else if (shift && !ctrl && initial != null) {
@@ -291,7 +289,6 @@ public class EdgeSelectionAction extends MapMode {
 						tr("Mode of Travel -> {0} \n total ways selected -> {1}", modeOfTravel, edgeSet.size()))
 								.setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(900).show();
 				ds.setSelected(edgeSet);
-				AutoScaleAction.zoomToSelection();
 				AutoScaleAction.autoScale("selection");
 			}
 		}
