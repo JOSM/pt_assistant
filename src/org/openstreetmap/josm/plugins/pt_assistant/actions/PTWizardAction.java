@@ -12,9 +12,9 @@ import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -54,7 +54,8 @@ import org.openstreetmap.josm.gui.mappaint.StyleSource;
 import org.openstreetmap.josm.io.CachedFile;
 import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.spi.preferences.StringSetting;
-import org.openstreetmap.josm.tools.GBC;;
+import org.openstreetmap.josm.tools.GBC;
+import org.openstreetmap.josm.tools.Logging;;
 
 public final class PTWizardAction extends JosmAction {
 
@@ -138,14 +139,12 @@ public final class PTWizardAction extends JosmAction {
 	}
 
 	private void readPreferencesFromXML() {
-		System.out.println("READING FROM XML FILE");
-
 		try {
 			CachedFile cf = getCachedFile();
 			if (cf == null)
 				return;
 			List<String> lines = new ArrayList<>();
-			try (BufferedReader in = cf.getContentReader()){
+			try (BufferedReader in = cf.getContentReader()) {
 				String line;
 				while ((line = in.readLine()) != null) {
 	                if (!line.contains("{{{") && !line.contains("}}}")) {
@@ -155,22 +154,19 @@ public final class PTWizardAction extends JosmAction {
 
 	            in.close();
 	            File f = new File(".tempfile.xml");
-	            FileWriter fw = new FileWriter(f);
-	            BufferedWriter out = new BufferedWriter(fw);
-	            for(String s : lines)
-	                 out.write(s);
-	            out.flush();
-	            out.close();
-				fw.close();
+	            try (BufferedWriter out = Files.newBufferedWriter(f.toPath(), StandardCharsets.UTF_8)) {
+    	            for (String s : lines) {
+    	                out.write(s);
+    	            }
+	            }
 
 				InputStream is = Files.newInputStream(f.toPath());
 				new CustomConfigurator.XMLCommandProcessor(Main.pref).openAndReadXML(is);
 				f.delete();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logging.error(e);
 		}
-
     }
 
 	@SuppressWarnings("resource")

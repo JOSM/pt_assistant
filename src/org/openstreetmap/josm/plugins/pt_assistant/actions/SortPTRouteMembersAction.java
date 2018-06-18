@@ -1,5 +1,4 @@
 // License: GPL. For details, see LICENSE file.
-
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
@@ -67,7 +66,9 @@ public class SortPTRouteMembersAction extends JosmAction {
                     List<Relation> incomplete = Collections.singletonList(rel);
                     Future<?> future = MainApplication.worker.submit(new DownloadRelationMemberTask(
                             incomplete,
-                            DownloadSelectedIncompleteMembersAction.buildSetOfIncompleteMembers(incomplete),
+                            Utils.filteredCollection(
+                                    DownloadSelectedIncompleteMembersAction.buildSetOfIncompleteMembers(
+                                            Collections.singletonList(rel)), OsmPrimitive.class),
                             MainApplication.getLayerManager().getEditLayer()));
 
                         MainApplication.worker.submit(() -> {

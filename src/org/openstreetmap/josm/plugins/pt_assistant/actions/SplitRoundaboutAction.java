@@ -21,6 +21,7 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.AlignInCircleAction;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
+import org.openstreetmap.josm.actions.downloadtasks.DownloadParams;
 import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.Command;
@@ -39,6 +40,7 @@ import org.openstreetmap.josm.gui.dialogs.relation.DownloadRelationMemberTask;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
+import org.openstreetmap.josm.tools.Utils;
 
 /**
  * This action allows the user to split a selected roundabout.
@@ -78,7 +80,7 @@ public class SplitRoundaboutAction extends JosmAction {
                 rbbox.getTopLeftLon() - lonOffset,
                 rbbox.getTopLeftLat() + latOffset,
                 rbbox.getBottomRightLon() + lonOffset);
-        Future<?> future = task.download(false, area, null);
+        Future<?> future = task.download(new DownloadParams(), area, null);
 
         MainApplication.worker.submit(() -> {
             try {
@@ -130,7 +132,8 @@ public class SplitRoundaboutAction extends JosmAction {
 
         Future<?> future = MainApplication.worker.submit(new DownloadRelationMemberTask(
             parents,
-            DownloadSelectedIncompleteMembersAction.buildSetOfIncompleteMembers(parents),
+            Utils.filteredCollection(DownloadSelectedIncompleteMembersAction.buildSetOfIncompleteMembers(
+                    new ArrayList<>(parents)), OsmPrimitive.class),
             MainApplication.getLayerManager().getEditLayer()));
 
         MainApplication.worker.submit(() -> {

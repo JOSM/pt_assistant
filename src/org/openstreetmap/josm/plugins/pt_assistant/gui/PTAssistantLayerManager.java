@@ -4,9 +4,8 @@ package org.openstreetmap.josm.plugins.pt_assistant.gui;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Collection;
 
-import org.openstreetmap.josm.data.SelectionChangedListener;
+import org.openstreetmap.josm.data.osm.DataSelectionListener;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
@@ -15,7 +14,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPlugin;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 
 public class PTAssistantLayerManager
-    implements SelectionChangedListener, PropertyChangeListener {
+    implements DataSelectionListener, PropertyChangeListener {
 
     public static final PTAssistantLayerManager PTLM = new PTAssistantLayerManager();
     private PTAssistantLayer layer;
@@ -35,11 +34,11 @@ public class PTAssistantLayerManager
      * Listens to a selection change
      */
     @Override
-    public void selectionChanged(Collection<? extends OsmPrimitive> newSelection) {
+    public void selectionChanged(SelectionChangeEvent event) {
 
         ArrayList<OsmPrimitive> routes = new ArrayList<>();
 
-        for (OsmPrimitive primitive : newSelection) {
+        for (OsmPrimitive primitive : event.getSelection()) {
             if (primitive.getType().equals(OsmPrimitiveType.RELATION)
                     && (RouteUtils.isVersionTwoPTRoute((Relation) primitive)
                         || RouteUtils.isBicycleRoute((Relation) primitive)

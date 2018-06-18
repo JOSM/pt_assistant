@@ -15,8 +15,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Relation;
+import org.openstreetmap.josm.data.osm.event.SelectionEventManager;
 import org.openstreetmap.josm.data.validation.OsmValidator;
 import org.openstreetmap.josm.gui.IconToggleButton;
 import org.openstreetmap.josm.gui.MainApplication;
@@ -80,7 +80,7 @@ public class PTAssistantPlugin extends Plugin {
 		MainMenu menu = MainApplication.getMenu();
 		JMenu PublicTransportMenu = menu.addMenu("File", trc("menu", "Public Transport"), KeyEvent.VK_P, 5, ht("/Menu/Public Transport"));
 
-		DataSet.addSelectionListener(PTAssistantLayerManager.PTLM);
+		SelectionEventManager.getInstance().addSelectionListener(PTAssistantLayerManager.PTLM);
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(PTAssistantLayerManager.PTLM);
 		addToPTAssistantmenu(PublicTransportMenu);
 		initialiseWizard();
