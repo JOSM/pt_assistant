@@ -5,7 +5,7 @@ jdk:
   - oraclejdk8
   - oraclejdk9
 
-script: ./gradlew build minJosmVersionClasses
+script: ./gradlew build compileJava_minJosm compileJava_latestJosm
 
 deploy:
   provider: releases
@@ -25,7 +25,7 @@ jobs:
     - stage: i18n
       language: python
       python: "3.6"
-      install: pip install --user git+https://github.com/transifex/transifex-client.git@699dd42e04074be92a07b5b87e8f1ea672a6571f#egg=transifex-client
+      install: pip install --user git+https://github.com/transifex/transifex-client.git#egg=transifex-client
       script: |
         if [ ! -z "$TRANSIFEX_TOKEN" ]; then
           export PATH="$PATH:$HOME/.local/bin"

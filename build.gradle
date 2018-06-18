@@ -1,15 +1,15 @@
 import java.util.regex.Pattern
 
 plugins {
-  id 'eclipse'
-  id 'org.openstreetmap.josm' version '0.4.8'
+  id "eclipse"
+  id "org.openstreetmap.josm" version "0.5.0"
 }
 
 repositories {
   jcenter()
 }
 dependencies {
-  testImplementation "org.openstreetmap.josm:josm-unittest:"
+  testImplementation "org.openstreetmap.josm:josm-unittest:SNAPSHOT"
   def junitVersion = "5.2.0"
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
   testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
@@ -28,13 +28,6 @@ sourceSets {
     po {
       srcDirs = ["$projectDir/poSrc"]
     }
-    resources {
-      srcDirs = ["$projectDir"]
-      include "images/**"
-      include "GPL-*"
-      include "README"
-      include "LICENSE"
-    }
   }
   test {
     java {
@@ -43,5 +36,27 @@ sourceSets {
     resources {
       srcDirs = ["test/data"]
     }
+  }
+}
+tasks.withType(ProcessResources.class).getByName(sourceSets.main.getProcessResourcesTaskName()) {
+  from(projectDir) {
+    include("images/**")
+    include("GPL-*")
+    include("README")
+    include("LICENSE")
+  }
+}
+
+// By default the git version is used, if that is not available this tries to get the SVN revision number
+if (project.version == null) {
+  def process = new ProcessBuilder("svn", "info").directory(project.projectDir).start()
+  if (process.waitFor() == 0) {
+    def pattern = Pattern.compile("Revision: ([1-9][0-9]*)")
+    Arrays.stream(process.inputStream.text.split("\n"))
+      .map { pattern.matcher(it) }
+      .filter { it.matches() }
+      .map { it.group(1) }
+      .findFirst()
+      .ifPresent { project.version = "r" + it.group(1) }
   }
 }
