@@ -1,0 +1,239 @@
+# Translations for the JOSM plugin 'pt_assistant' (pt)
+# Copyright (C) 2018 
+# This file is distributed under the same license as the josm-plugin_pt_assistant package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Language-Team: Portuguese (https://www.transifex.com/josm/teams/2544/pt/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Bicycle and foot routes Tests"
+msgstr "Testes de rotas de bicicleta e a pé"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid ""
+"Check if route relations are compatible with public transport version 2"
+msgstr ""
+"Verificar se as relações são compatíveis com a versão 2 do esquema de "
+"transportes públicos"
+
+msgid "Do you want to make the roundabout round?"
+msgstr "Quer tornar a rotunda circular?"
+
+msgid "Download incomplete route relation members"
+msgstr "Descarregar membros incompletos da relação de rota"
+
+#, java-format
+msgid "Edit: {0}"
+msgstr "Editar: {0}"
+
+msgid "Extract node from line"
+msgstr "Extrair nó de uma linha"
+
+msgid "Fix error"
+msgstr "Corrigir erro"
+
+#, java-format
+msgid "Fixing ({0}/{1}): ''{2}''"
+msgstr "Corrigindo ({0}/{1}): ''{2}''"
+
+msgid "Fixing errors ..."
+msgstr "A corrigir erros ..."
+
+msgid "How do you want to proceed?"
+msgstr "Como quer continuar?"
+
+msgid "Include stop_area tests"
+msgstr "Inluir testes stop_area (área de paragem)"
+
+msgid "Incomplete Members"
+msgstr "Membros Incompletos"
+
+#, java-format
+msgid "Mode: {0}"
+msgstr "Modo: {0}"
+
+msgid "No"
+msgstr "Não"
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "PT: First or last way needs to be split"
+msgstr "TP: É necessário dividir a primeira ou última via"
+
+msgid "PT: Platform should not be part of a way"
+msgstr "TP: A plataforma não deve fazer parte de uma via"
+
+msgid "PT: Problem in the route segment with no automatic fix"
+msgstr "TP: Problema no segmento de rota sem correção automática"
+
+msgid "PT: Problem in the route segment with one automatic fix"
+msgstr "TP: Problema no segmento de rota com uma correção automática"
+
+msgid "PT: Relation member roles do not match tags"
+msgstr "TP: As funções dos membros da relação não correspondem às etiquetas"
+
+msgid "PT: Road is under construction"
+msgstr "TP: A estrada está em construção"
+
+msgid "PT: Route contains a gap that can be fixed by sorting"
+msgstr ""
+"TP: A rota contém uma falha/intervalo que pode ser corrigido ordenando os "
+"membros"
+
+msgid "PT: Route gap can be closed by adding a single way"
+msgstr "TP: A falha/intervalo na rota pode ser corrigida adicionando uma via"
+
+msgid ""
+"PT: Route gaps can decrease by sorting members. Further validations will be "
+"required"
+msgstr ""
+"TP: As falhas/intervalos podem diminuir ordenando os membros. Serão "
+"necessárias validações posteriores"
+
+msgid "PT: Route needs to be sorted, found tag fixme:relation=order members"
+msgstr ""
+"TP: A rota tem de ser ordenada, foi encontrada a etiqueta "
+"fixme:relation=order members"
+
+msgid "PT: Route passes a oneway road in the wrong direction"
+msgstr "TP: A rota passa por uma estrada de um só sentido na direção errada"
+
+msgid ""
+"PT: Route relations of stop position(s) and platform(s) of stop area members"
+" diverge"
+msgstr ""
+"TP: As relações de rota de posições de paragem e plataformas de membros de "
+"áreas de paragem divergem"
+
+msgid "PT: Route should start and end with a stop_position"
+msgstr ""
+"TP: A rota deve começar e terminar com stop_position (posição de paragem)"
+
+msgid "PT: Route type does not match the type of the road it passes on"
+msgstr "TP: O tipo de rota não corresponde ao tipo de estrada em que passa"
+
+msgid "PT: Stop area relation has no platform"
+msgstr "TP: A relação de área de paragem não tem plataforma"
+
+msgid "PT: Stop area relation has no stop position"
+msgstr "TP: A relação de área de paragem não tem posição de paragem"
+
+msgid "PT: Stop not served"
+msgstr "TP: Paragem não utilizada"
+
+msgid "PT: Stop position or platform is not part of a stop area relation"
+msgstr ""
+"TP: A posição de paragem ou a plataforma não faz parte da uma relação de "
+"área de paragem"
+
+msgid "PT: Stop_position is not part of a way"
+msgstr "TP: A posição de paragem não faz parte de uma via"
+
+msgid "PT: The first stop of the route does not match the first way"
+msgstr "TP: A primeira paragem da rota não corresponde à primeira via"
+
+msgid "PT: The last stop of the route does not match the last way"
+msgstr "TP: A última paragem da rota não corresponde à última via"
+
+msgid ""
+"PT: The name of the first stop does not match the \"from\" tag of the route "
+"relation"
+msgstr ""
+"TP: O nome da primeira paragem não corresponde à etiqueta \"from\" (de) da "
+"relação de rota"
+
+msgid ""
+"PT: The name of the last stop does not match the \"to\" tag of the route "
+"relation"
+msgstr ""
+"TP: O nome da última paragem não corresponde à etiqueta \"to\" (para) da "
+"relação de rota"
+
+msgid "PT: dummy test warning"
+msgstr "TP: aviso de teste simulado"
+
+msgid "PT_Assistant Fetch Request"
+msgstr "Pedido de Processamento do Assistente_TP"
+
+msgid "PT_Assistant Message"
+msgstr "Mensagem do Assistente_TP"
+
+#. showDialog(); FIXME
+msgid "PT_Assistant Proceed Request"
+msgstr "Pedido de Continuação do Assistente_TP"
+
+#, java-format
+msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
+msgstr "O módulo Assistente_TP descobriu que esta relação (id={0}) tem erros:"
+
+#. I18N: mnemonic: F
+msgctxt "menu"
+msgid "Public Transport"
+msgstr "Transporte Público"
+
+msgid "Public Transport Assistant tests"
+msgstr "Testes de Assistência de Transporte Público"
+
+msgid "Remember my choice and do not ask me again in this session"
+msgstr "Lembrar a minha escolha e não perguntar novamente durante esta sessão"
+
+msgid "Repeat last fix"
+msgstr "Repetir última correção"
+
+msgid "Roundabout round"
+msgstr "Rotunda circular"
+
+msgid ""
+"Route relations have incomplete members.\n"
+"They need to be downloaded to proceed with validation.\n"
+"Do you want to download them?"
+msgstr ""
+"As relações de rotas têm membros incompletos.\n"
+"Eles têm de ser descarregados para continuar com a validação.\n"
+"Quer descarregá-los?"
+
+#, java-format
+msgid "Tool: {0}"
+msgstr "Ferramenta: {0}"
+
+msgid "Type letter to select the fix variant or press Escape for no fix"
+msgstr ""
+"Digite a letra para selecionar a variante de correção ou pressione a tecla "
+"Escape para não corrigir"
+
+msgid "Updating map ..."
+msgstr "A atualizar o mapa ..."
+
+msgid "Warning: the diplayed fix variants are based on less strict criteria"
+msgstr ""
+"Aviso: as variantes de correção mostradas são baseadas em critérios menos "
+"rigorosos"
+
+msgid "Yes"
+msgstr "Sim"
+
+#, java-format
+msgid "{0} direction error"
+msgid_plural "{0} direction errors"
+msgstr[0] "{0} erro de direção"
+msgstr[1] "{0} erros de direção"
+
+#, java-format
+msgid "{0} road type error"
+msgid_plural "{0} road type errors"
+msgstr[0] "{0} erro de tipo de estrada"
+msgstr[1] "{0} erros de tipo de estrada"

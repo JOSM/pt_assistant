@@ -1,0 +1,171 @@
+# Translations for the JOSM plugin 'pt_assistant' (pl)
+# Copyright (C) 2018 
+# This file is distributed under the same license as the josm-plugin_pt_assistant package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Language-Team: Polish (https://www.transifex.com/josm/teams/2544/pl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pl\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+
+msgid "Bicycle and foot routes Tests"
+msgstr "Testy tras rowerowych i pieszych"
+
+msgid "Cancel"
+msgstr "Anuluj"
+
+msgid ""
+"Check if route relations are compatible with public transport version 2"
+msgstr ""
+"Sprawdź, czy relacje tras są kompatybilne z transportem publicznym w wersji "
+"2"
+
+msgid "Download incomplete route relation members"
+msgstr "Pobierz niekompletnych członków relacji tras"
+
+#, java-format
+msgid "Edit: {0}"
+msgstr "Edycja: {0}"
+
+msgid "Extract node from line"
+msgstr "Wydziel węzeł z drogi"
+
+msgid "Fix error"
+msgstr "Napraw błąd"
+
+#, java-format
+msgid "Fixing ({0}/{1}): ''{2}''"
+msgstr "Naprawianie ({0}/{1}): „{2}''"
+
+msgid "Fixing errors ..."
+msgstr "Naprawianie błędów..."
+
+msgid "How do you want to proceed?"
+msgstr "Co chcesz przeprowadzić?"
+
+msgid "Include stop_area tests"
+msgstr "Dołącz testy obszarów_zatrzymań"
+
+msgid "Incomplete Members"
+msgstr "Niekompletni członkowie"
+
+#, java-format
+msgid "Mode: {0}"
+msgstr "Tryb: {0}"
+
+msgid "No"
+msgstr "Nie"
+
+msgid "Ok"
+msgstr "Zatwierdź"
+
+msgid "PT Wizard"
+msgstr "Czarodziej TP"
+
+msgid "PT: First or last way needs to be split"
+msgstr "TP: Pierwsza lub ostatnia droga musi zostać rozdzielona"
+
+msgid "PT: Platform should not be part of a way"
+msgstr "TP: Przystanek nie powinien być częścią drogi"
+
+msgid "PT: Relation member roles do not match tags"
+msgstr "TP: Role członków relacji nie pasują do znaczników"
+
+msgid "PT: Road is under construction"
+msgstr "TP: Droga jest w trakcie budowy"
+
+msgid "PT: Route contains a gap that can be fixed by sorting"
+msgstr ""
+"TP: Trasa zawiera przerwę, która może zostać naprawiona poprzez sortowanie"
+
+msgid "PT: Route gap can be closed by adding a single way"
+msgstr ""
+"TP: Przerwa w trasie może zostać zamknięta poprzez dodanie pojedynczej drogi"
+
+msgid "PT: Route should start and end with a stop_position"
+msgstr "TP: Trasa powinna zaczynać się i kończyć w miejscu_zatrzymania"
+
+msgid "PT: Stop area relation has no platform"
+msgstr "TP: Relacja obszaru zatrzymania nie posiada przystanku"
+
+msgid "PT: Stop area relation has no stop position"
+msgstr "TP: Relacja obszaru zatrzymania nie posiada miejsca zatrzymania"
+
+msgid "PT: Stop not served"
+msgstr "TP: Nie podano miejsca zatrzymania"
+
+msgid "PT: Stop_position is not part of a way"
+msgstr "TP: Miejsce_zatrzymania nie jest częścią drogi"
+
+#, java-format
+msgid "PT: There is a gap in the {0} route"
+msgstr "TP: W trasie {0} jest przerwa"
+
+msgid "PT: dummy test warning"
+msgstr "TP: ćwiczebne ostrzeżenie testowe"
+
+msgid "PT_Assistant Fetch Request"
+msgstr "PT_Assistant - żądanie pobierania"
+
+#. I18N: mnemonic: F
+msgctxt "menu"
+msgid "Public Transport"
+msgstr "Transport publiczny"
+
+msgid "Public Transport Assistant tests"
+msgstr "Testy asystenta transportu publicznego"
+
+msgid "Remember my choice and do not ask me again in this session"
+msgstr "Zapamiętaj mój wybór i nie pytaj ponownie w tej sesji"
+
+msgid "Repeat last fix"
+msgstr "Powtórz ostatnią korektę"
+
+msgid "Replace Membership"
+msgstr "Zastąp członkostwo"
+
+#, java-format
+msgid "Tool: {0}"
+msgstr "Narzędzie: {0}"
+
+msgid "Updating map ..."
+msgstr "Aktualizowanie mapy..."
+
+msgid "Yes"
+msgstr "Tak"
+
+msgid "suggested value : "
+msgstr "sugerowana wartość : "
+
+#, java-format
+msgid "{0} direction error"
+msgid_plural "{0} direction errors"
+msgstr[0] "{0} błąd kierunku"
+msgstr[1] "{0} błędy kierunku"
+msgstr[2] "{0} błędów kierunku"
+msgstr[3] "{0} błędów kierunku"
+
+#, java-format
+msgid "{0} road type error"
+msgid_plural "{0} road type errors"
+msgstr[0] "{0} błąd rodzaju drogi"
+msgstr[1] "{0} błędy rodzaju drogi"
+msgstr[2] "{0} błędów rodzaju drogi"
+msgstr[3] "{0} błędów rodzaju drogi"
+
+#. Plugin description for pt_assistant
+msgid ""
+"Provides validation and fixing for public transport route according to "
+"version 2 of the public transport schema"
+msgstr ""
+"Zapewnia sprawdzenie i naprawę tras transportu publicznego zgodnie z wersją "
+"2 schematu transportu publicznego"

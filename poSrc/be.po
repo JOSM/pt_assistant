@@ -1,0 +1,194 @@
+# Translations for the JOSM plugin 'pt_assistant' (be)
+# Copyright (C) 2018 
+# This file is distributed under the same license as the josm-plugin_pt_assistant package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Language-Team: Belarusian (https://www.transifex.com/josm/teams/2544/be/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: be\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+msgid "Cancel"
+msgstr "Скасаваць"
+
+msgid ""
+"Check if route relations are compatible with public transport version 2"
+msgstr ""
+"Правярае сумяшчальнасць дачыненняў маршрутаў з 2-й версіяй маршрутаў "
+"грамадскага транспарта"
+
+msgid "Do you want to download referrers of platforms and stop positions?"
+msgstr "Жадаеце сцягнуць аб''екты, якія спасылаюцца на платформы і прыпынкі?"
+
+msgid "Download incomplete route relation members"
+msgstr "Спампаваць патрэбных удзельнікаў дачынення маршруту"
+
+#, java-format
+msgid "Edit: {0}"
+msgstr "Змяніць: {0}"
+
+msgid "Fix error"
+msgstr "Выправіць памылку"
+
+#, java-format
+msgid "Fixing ({0}/{1}): ''{2}''"
+msgstr "Выпраўленне ({0}/{1}): ''{2}''"
+
+msgid "Fixing errors ..."
+msgstr "Выпраўленне памылак ..."
+
+msgid "How do you want to proceed?"
+msgstr "Што вы выбераце для працягу?"
+
+msgid "Include stop_area tests"
+msgstr "Уключаючы праверку stop_area"
+
+#, java-format
+msgid "Mode: {0}"
+msgstr "Рэжым: {0}"
+
+msgid "No"
+msgstr "Не"
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "PT: First or last way needs to be split"
+msgstr "ГТ: Першую ці апошнюю лінію патрабуецца падзяліць"
+
+msgid "PT: Platform should not be part of a way"
+msgstr "ГТ: платформа не павiнна быць часткай дарогі"
+
+msgid "PT: Problem in the route segment with no automatic fix"
+msgstr "ГТ: Праблема ў сегменце маршруту без аўтаматычнага выпраўлення"
+
+msgid "PT: Problem in the route segment with one automatic fix"
+msgstr "ГТ: Праблема ў сегменце маршруту з адным аўтаматычным выпраўленнем"
+
+msgid "PT: Relation member roles do not match tags"
+msgstr "ГТ: Ролі ўдзельніка дачынення не адпавядаюць тэгам"
+
+msgid "PT: Road is under construction"
+msgstr "ГТ: Дарога яшчэ будуецца"
+
+msgid "PT: Route contains a gap that can be fixed by sorting"
+msgstr "ГТ: Маршрут утрымлівае разрыў, які можа быць ліквідаваны сартаваннем"
+
+msgid "PT: Route passes a oneway road in the wrong direction"
+msgstr ""
+"ГТ: Маршрут праходзіць па дарозе з аднабаковым рухам у зваротным кірунку"
+
+msgid ""
+"PT: Route relations of stop position(s) and platform(s) of stop area members"
+" diverge"
+msgstr ""
+"ГТ: Удзельнікі маршрутаў месцаў(а) прыпынку і платформаў(ы), якія ўваходзяць"
+" у зону прыпынку, адрозніваюцца"
+
+msgid "PT: Route should start and end with a stop_position"
+msgstr "ГТ: Маршрут павінен пачынацца і сканчацца stop_position"
+
+msgid "PT: Route type does not match the type of the road it passes on"
+msgstr "ГТ: Тып маршруту не адпавядае тыпу дарогі, па якой ён праходзіць"
+
+msgid "PT: Stop area relation has no platform"
+msgstr "ГТ: Дачыненне зоны прыпынку не ўключае платформу"
+
+msgid "PT: Stop area relation has no stop position"
+msgstr "ГТ: Дачыненне зоны прыпынку не ўключае месца прыпынку"
+
+msgid "PT: Stop not served"
+msgstr "ГТ: Прыпынак не абслугоўваецца."
+
+msgid "PT: Stop position or platform is not part of a stop area relation"
+msgstr "ГТ: Месца прыпынку ці платформа не ўлучаны ў дачыненне зоны прыпынку"
+
+msgid "PT: Stop_position is not part of a way"
+msgstr "ГТ: месца прыпынку не ўваходзіць у склад дарогі"
+
+msgid "PT: dummy test warning"
+msgstr "ГТ: фіктыўнае папярэджанне"
+
+msgid "PT_Assistant Fetch Request"
+msgstr "Запыт загрузкі PT_Assistant"
+
+msgid "PT_Assistant Message"
+msgstr "Паведамленне PT_Assistant"
+
+#. showDialog(); FIXME
+msgid "PT_Assistant Proceed Request"
+msgstr "Запыт наступнага дзеяння PT_Assistant"
+
+#, java-format
+msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
+msgstr ""
+"Модуль PT_Assistant выявіў, што ў гэтым дачыненні (id={0}) ёсць памылкі:"
+
+msgid "Public Transport Assistant tests"
+msgstr "Праверкі Памочніка грамадскага транспарту"
+
+msgid "Remember my choice and do not ask me again in this session"
+msgstr "Запомніць мой выбар і больш не пытаць у гэтым сеансе"
+
+msgid "Repeat last fix"
+msgstr "Паўтарыць апошняе выпраўленне"
+
+msgid ""
+"Route relations have incomplete members.\n"
+"They need to be downloaded to proceed with validation.\n"
+"Do you want to download them?"
+msgstr ""
+"Дачыненні маршрутаў маюць няпоўных удзельнікаў.\n"
+"Яны павінны быць загружаны, каб працягнуць праверку.\n"
+"Вы хочаце загрузіць іх?"
+
+#, java-format
+msgid "Tool: {0}"
+msgstr "Інструмент: {0}"
+
+msgid "Type letter to select the fix variant or press Escape for no fix"
+msgstr "ГТ: Праблема ў сегменце маршруту з адным аўтаматычным выпраўленнем"
+
+msgid "Updating map ..."
+msgstr "Абнаўленне карты ..."
+
+msgid "Warning: the diplayed fix variants are based on less strict criteria"
+msgstr ""
+"Папярэджанне: паказаныя варыянты выпраўлення заснаваны на менш строгіх "
+"крытэрах"
+
+msgid "Yes"
+msgstr "Так"
+
+#, java-format
+msgid "{0} direction error"
+msgid_plural "{0} direction errors"
+msgstr[0] "{0} памылка кірунку"
+msgstr[1] "{0} памылкі кірунку"
+msgstr[2] "{0} памылак кірунку"
+msgstr[3] "{0} памылак кірунку"
+
+#, java-format
+msgid "{0} road type error"
+msgid_plural "{0} road type errors"
+msgstr[0] "{0} памылка тыпу дарогі"
+msgstr[1] "{0} памылкі тыпу дарогі"
+msgstr[2] "{0} памылак тыпу дарогі"
+msgstr[3] "{0} памылак тыпу дарогі"
+
+#. Plugin description for pt_assistant
+msgid ""
+"Provides validation and fixing for public transport route according to "
+"version 2 of the public transport schema"
+msgstr ""
+"Забяспечвае праверку і выпраўленне маршрутаў грамадскага транспарта ў "
+"адпаведнасці з версіяй 2 схемы грамадскага транспарта"

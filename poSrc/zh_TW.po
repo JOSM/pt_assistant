@@ -1,0 +1,136 @@
+# Translations for the JOSM plugin 'pt_assistant' (zh_TW)
+# Copyright (C) 2018 
+# This file is distributed under the same license as the josm-plugin_pt_assistant package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Language-Team: Chinese (Taiwan) (https://www.transifex.com/josm/teams/2544/zh_TW/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Bicycle and foot routes Tests"
+msgstr "單車和步行路線測試"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid ""
+"Check if route relations are compatible with public transport version 2"
+msgstr "檢查路線關聯是否與 大眾運數V2 相容"
+
+msgid "CreatePlatformNodeShortcut"
+msgstr "CreatePlatformNodeShortcut"
+
+msgid "CreatePlatformNodeThroughReplaceAction"
+msgstr "CreatePlatformNodeThroughReplaceAction"
+
+msgid "Do you want to download referrers of platforms and stop positions?"
+msgstr "你想要下載月台與停車位置的參照嗎？"
+
+#, java-format
+msgid "Edit: {0}"
+msgstr "編輯: {0}"
+
+msgid "Fix error"
+msgstr "修正錯誤"
+
+#, java-format
+msgid "Fixing ({0}/{1}): ''{2}''"
+msgstr "正在修正 ({0}/{1})：「{2}」"
+
+msgid "Fixing errors ..."
+msgstr "正在修正錯誤 ..."
+
+msgid "How do you want to proceed?"
+msgstr "你想要怎麼處理？"
+
+#, java-format
+msgid "Mode: {0}"
+msgstr "模式：{0}"
+
+msgid "No"
+msgstr "否"
+
+msgid "Ok"
+msgstr "確定"
+
+msgid "PT: Platform should not be part of a way"
+msgstr "大眾運輸：月台不能是路徑的一部分"
+
+msgid "PT: Relation member roles do not match tags"
+msgstr "大眾運輸：關聯成員角色與標籤不符"
+
+msgid "PT: Route contains a gap that can be fixed by sorting"
+msgstr "大眾運輸：路線裏有間隙，重整即可修正"
+
+msgid "PT: Route should start and end with a stop_position"
+msgstr "大眾運輸：路線的開始與結束應該要是停車位置"
+
+msgid "PT: Stop area relation has no stop position"
+msgstr "大眾運輸：停靠站區域關聯沒有停車位"
+
+msgid "PT: Stop not served"
+msgstr "大眾運輸：停靠暫已停用"
+
+msgid "PT: Stop position or platform is not part of a stop area relation"
+msgstr "大眾運輸：停車位置或月台不是車站區域關聯的一部分"
+
+msgid "PT: Stop_position is not part of a way"
+msgstr "大眾運輸：停車位置不是路徑的一部分"
+
+msgid "PT: dummy test warning"
+msgstr "大眾運輸：偽測試警告"
+
+msgid "PT_Assistant Fetch Request"
+msgstr "大眾運輸助手取得要求"
+
+msgid "PT_Assistant Message"
+msgstr "大眾運輸助手訊息"
+
+#. showDialog(); FIXME
+msgid "PT_Assistant Proceed Request"
+msgstr "大眾運輸助手已處理要求"
+
+#, java-format
+msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
+msgstr "大眾運輸助手插件發現這個關聯 (id={0}) 有錯誤："
+
+#. I18N: mnemonic: F
+msgctxt "menu"
+msgid "Public Transport"
+msgstr "大眾運輸"
+
+msgid "Public Transport Assistant tests"
+msgstr "大眾運輸助手測試"
+
+msgid "Repeat last fix"
+msgstr "重複上次修正"
+
+#, java-format
+msgid "Tool: {0}"
+msgstr "工具：{0}"
+
+msgid "Updating map ..."
+msgstr "正在更新地圖 ..."
+
+msgid "Yes"
+msgstr "是"
+
+#, java-format
+msgid "{0} direction error"
+msgid_plural "{0} direction errors"
+msgstr[0] "{0} 方向錯誤"
+
+#, java-format
+msgid "{0} road type error"
+msgid_plural "{0} road type errors"
+msgstr[0] "{0} 道路類型錯誤"
