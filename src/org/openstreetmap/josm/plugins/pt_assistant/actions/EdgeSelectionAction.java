@@ -65,9 +65,9 @@ public class EdgeSelectionAction extends MapMode {
 	 * the edge
 	 */
 	private List<Way> getEdgeFromWay(Way initial, String modeOfTravel) {
-		List<Way> edge = new ArrayList<>();
+		List<Way> edge1 = new ArrayList<>();
 		if (!isWaySuitableForMode(initial, modeOfTravel))
-			return edge;
+			return edge1;
 
 		Way curr = initial;
 		while (true) {
@@ -77,11 +77,12 @@ public class EdgeSelectionAction extends MapMode {
 			}
 			options.remove(curr);
 			curr = chooseBestWay(options, modeOfTravel);
-			if (curr == null || edge.contains(curr))
+			if (curr == null || edge1.contains(curr))
 				break;
-			edge.add(curr);
+			edge1.add(curr);
 		}
 
+		List<Way> edge2 = new ArrayList<>();
 		curr = initial;
 		while (true) {
 			List<Way> options = curr.lastNode(true).getParentWays();
@@ -90,12 +91,17 @@ public class EdgeSelectionAction extends MapMode {
 			}
 			options.remove(curr);
 			curr = chooseBestWay(options, modeOfTravel);
-			if (curr == null || edge.contains(curr))
+			if (curr == null || edge2.contains(curr))
 				break;
-			edge.add(curr);
+			edge2.add(curr);
 		}
 
+		List<Way> edge = new ArrayList<>();
+		for (int i=edge1.size()-1; i>=0; i--)
+			edge.add(edge1.get(i));
+
 		edge.add(initial);
+		edge.addAll(edge2);
 		edge = sortEdgeWays(edge);
 		return edge;
 	}
@@ -210,10 +216,11 @@ public class EdgeSelectionAction extends MapMode {
 				edgeList.addAll(edge);
 				// set for a more accurate count
 				Set<Way> edgeSet = new HashSet<>(edgeList);
+				edgeList = sortEdgeWays(new ArrayList<>(edgeSet));
 				new Notification(
-						tr("Mode of Travel -> {0} \n total ways selected -> {1}", modeOfTravel, edgeSet.size()))
+						tr("Mode of Travel -> {0} \n total ways selected -> {1}", modeOfTravel, edgeList.size()))
 								.setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(1200).show();
-				ds.setSelected(edgeSet);
+				ds.setSelected(edgeList);
 				AutoScaleAction.autoScale("selection");
 			}
 
@@ -251,9 +258,10 @@ public class EdgeSelectionAction extends MapMode {
 			}
 			ds.clearSelection();
 			Set<Way> edgeSet = new HashSet<>(edgeList);
-			new Notification(tr("Mode of Travel -> {0} \n total ways selected -> {1}", modeOfTravel, edgeSet.size()))
+			edgeList = sortEdgeWays(new ArrayList<>(edgeSet));
+			new Notification(tr("Mode of Travel -> {0} \n total ways selected -> {1}", modeOfTravel, edgeList.size()))
 					.setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(900).show();
-			ds.setSelected(edgeSet);
+			ds.setSelected(edgeList);
 			AutoScaleAction.autoScale("selection");
 
 		} else if (shift && !ctrl && initial != null) {
@@ -285,10 +293,11 @@ public class EdgeSelectionAction extends MapMode {
 				}
 
 				Set<Way> edgeSet = new HashSet<>(edgeList);
+				edgeList = sortEdgeWays(new ArrayList<>(edgeSet));
 				new Notification(
-						tr("Mode of Travel -> {0} \n total ways selected -> {1}", modeOfTravel, edgeSet.size()))
+						tr("Mode of Travel -> {0} \n total ways selected -> {1}", modeOfTravel, edgeList.size()))
 								.setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(900).show();
-				ds.setSelected(edgeSet);
+				ds.setSelected(edgeList);
 				AutoScaleAction.autoScale("selection");
 			}
 		}
