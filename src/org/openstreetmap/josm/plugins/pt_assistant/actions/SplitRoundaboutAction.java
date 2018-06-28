@@ -134,7 +134,8 @@ public class SplitRoundaboutAction extends JosmAction {
 
         Future<?> future = MainApplication.worker.submit(new DownloadRelationMemberTask(
             parents,
-            DownloadSelectedIncompleteMembersAction.buildSetOfIncompleteMembers(parents),
+            Utils.filteredCollection(DownloadSelectedIncompleteMembersAction.buildSetOfIncompleteMembers(
+                    new ArrayList<>(parents)), OsmPrimitive.class),
             MainApplication.getLayerManager().getEditLayer()));
 
         MainApplication.worker.submit(() -> {
