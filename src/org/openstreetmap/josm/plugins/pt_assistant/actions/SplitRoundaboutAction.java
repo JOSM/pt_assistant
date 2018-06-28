@@ -21,7 +21,6 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.AlignInCircleAction;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
-import org.openstreetmap.josm.actions.downloadtasks.DownloadParams;
 import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.Command;
@@ -40,7 +39,6 @@ import org.openstreetmap.josm.gui.dialogs.relation.DownloadRelationMemberTask;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
-import org.openstreetmap.josm.tools.Utils;
 
 /**
  * This action allows the user to split a selected roundabout.
@@ -75,12 +73,13 @@ public class SplitRoundaboutAction extends JosmAction {
         BBox rbbox = roundabout.getBBox();
         double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 10;
         double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 10;
+
         Bounds area = new Bounds(
                 rbbox.getBottomRightLat() - latOffset,
                 rbbox.getTopLeftLon() - lonOffset,
                 rbbox.getTopLeftLat() + latOffset,
                 rbbox.getBottomRightLon() + lonOffset);
-        Future<?> future = task.download(new DownloadParams(), area, null);
+        Future<?> future = task.download(false, area, null);
 
         MainApplication.worker.submit(() -> {
             try {
@@ -111,9 +110,12 @@ public class SplitRoundaboutAction extends JosmAction {
 
         //split the roundabout on the designated nodes
         List<Node> splitNodes = getSplitNodes(roundabout);
+
         SplitWayCommand result = SplitWayCommand.split(
                 roundabout, splitNodes, Collections.emptyList());
+
         MainApplication.undoRedo.add(result);
+
         Collection<Way> splitWays = result.getNewWays();
         splitWays.add(result.getOriginalWay());
 
@@ -132,8 +134,7 @@ public class SplitRoundaboutAction extends JosmAction {
 
         Future<?> future = MainApplication.worker.submit(new DownloadRelationMemberTask(
             parents,
-            Utils.filteredCollection(DownloadSelectedIncompleteMembersAction.buildSetOfIncompleteMembers(
-                    new ArrayList<>(parents)), OsmPrimitive.class),
+            DownloadSelectedIncompleteMembersAction.buildSetOfIncompleteMembers(parents),
             MainApplication.getLayerManager().getEditLayer()));
 
         MainApplication.worker.submit(() -> {
@@ -166,9 +167,9 @@ public class SplitRoundaboutAction extends JosmAction {
             List<Node> splitNodes, Collection<Way> splitWays) {
         Map<Relation, Relation> changingRelation = new HashMap<>();
         Map<Relation, Integer> memberOffset = new HashMap<>();
+
         savedPositions.forEach((r, positions) ->
             positions.forEach(i -> {
-
                 if (!changingRelation.containsKey(r))
                     changingRelation.put(r, new Relation(r));
 
@@ -182,20 +183,26 @@ public class SplitRoundaboutAction extends JosmAction {
                 Way entryWay = entryExitWays.a;
                 Way exitWay = entryExitWays.b;
 
-                if (entryWay == null || exitWay == null)
+                if (entryWay == null || exitWay == null) {
                     return;
+                }
 
                 //get the entry and exit nodes, exit if not found
                 Node entryNode = getNodeInCommon(splitNodes, entryWay);
                 Node exitNode = getNodeInCommon(splitNodes, exitWay);
 
-                if (entryNode == null || exitNode == null)
+                if (entryNode == null || exitNode == null) {
                     return;
+                }
 
                 if (needSwap(entryNode, entryWay, exitNode, exitWay)) {
                     Node temp = entryNode;
                     entryNode = exitNode;
                     exitNode = temp;
+
+                    Way tempWay = entryWay;
+                    entryWay = exitWay;
+                    exitWay = tempWay;
                 }
 
                 //starting from the entry node, add split ways until the
@@ -212,6 +219,7 @@ public class SplitRoundaboutAction extends JosmAction {
                     parents.removeIf(w -> !splitWays.contains(w));
                     curr = parents.get(0);
                 }
+
                 c.addMember(i + offset++, new RelationMember(null, curr));
                 memberOffset.put(r, offset);
             }));
@@ -232,13 +240,22 @@ public class SplitRoundaboutAction extends JosmAction {
         boolean entryReversed = false;
         boolean exitReversed = false;
 
+        if (RouteUtils.isOnewayForPublicTransport(entryWay) == 0 && RouteUtils.isOnewayForPublicTransport(exitWay) == 0)
+        		return false;
+
         if (entryWay.firstNode().equals(entryNode)
-                && !entryWay.hasTag("oneway", "-1"))
+                && RouteUtils.isOnewayForPublicTransport(entryWay) == 1 )
             entryReversed = true;
 
         if (exitWay.lastNode().equals(exitNode)
-                && !exitWay.hasTag("oneway", "-1"))
+        		&& RouteUtils.isOnewayForPublicTransport(exitWay) == 1)
             exitReversed = true;
+
+        if (entryReversed && RouteUtils.isOnewayForPublicTransport(exitWay) == 0)
+        		return true;
+
+        if (exitReversed && RouteUtils.isOnewayForPublicTransport(entryWay) == 0)
+        		return true;
 
         return entryReversed && exitReversed;
     }
@@ -259,13 +276,17 @@ public class SplitRoundaboutAction extends JosmAction {
         //the ways returned are the ones exactly before and after the roundabout
         Pair<Way, Way> ret = new Pair<>(null, null);
 
-        RelationMember before = r.getMember(position-1);
-        if (before.isWay())
-            ret.a = before.getWay();
+        if (position > 0) {
+        		RelationMember before = r.getMember(position-1);
+        		if (before.isWay())
+        			ret.a = before.getWay();
+        }
 
-        RelationMember after = r.getMember(position);
-        if (after.isWay())
-            ret.b = after.getWay();
+        if (position < r.getMembers().size()) {
+        		RelationMember after = r.getMember(position);
+            if (after.isWay())
+                ret.b = after.getWay();
+        }
 
         return ret;
     }
