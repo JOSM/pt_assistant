@@ -39,7 +39,6 @@ import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersAct
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SplitRoundaboutAction;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
-import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantPreferenceSetting;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.BicycleFootRouteValidatorTest;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.PTAssistantValidatorTest;
 
@@ -109,7 +108,7 @@ public class PTAssistantPlugin extends Plugin {
 	 */
 	@Override
 	public PreferenceSetting getPreferenceSetting() {
-		return new PTAssistantPreferenceSetting();
+		return new PTAssistantPluginPreferences();
 	}
 
 	public static PTRouteSegment getLastFix() {
