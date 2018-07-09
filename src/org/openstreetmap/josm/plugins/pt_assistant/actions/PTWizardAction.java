@@ -112,11 +112,11 @@ public final class PTWizardAction extends JosmAction {
 	        JPanel panel = new JPanel(new GridBagLayout());
 	        panel.setBorder(BorderFactory.createEmptyBorder(0,10,10,10));
 
-	        DoubleSplitDialog dsd = new DoubleSplitDialog();
-	        dsd.setPreferredSize(new Dimension(250, 300));
-	        dsd.setButtonIcons("ok", "cancel");
+	        PTWizardDialog wizardDialog = new PTWizardDialog();
+	        wizardDialog.setPreferredSize(new Dimension(250, 300));
+	        wizardDialog.setButtonIcons("ok", "cancel");
 	        JScrollPane scrollPanel = new JScrollPane(panel);
-	        dsd.setContent(scrollPanel, false);
+	        wizardDialog.setContent(scrollPanel, false);
 	        nextAct(0, panel);
 	        String pages = Main.pref.get("pt_assistant.wizard.pages");
 	        int lastCheck = -1;
@@ -126,7 +126,7 @@ public final class PTWizardAction extends JosmAction {
 		        			return;
 	        			else
 	        				lastCheck = closeCheck;
-	        			ExtendedDialog dialog = dsd.showDialog();
+	        			ExtendedDialog dialog = wizardDialog.showDialog();
 	        			switch (dialog.getValue()) {
 	        				case 1: nextAct(i, panel); break;
 	        				default: return; // Do nothing
@@ -643,9 +643,9 @@ public final class PTWizardAction extends JosmAction {
 	    }
 	}
 
-    private class DoubleSplitDialog extends ExtendedDialog {
+    private class PTWizardDialog extends ExtendedDialog {
 
-		public DoubleSplitDialog() {
+		public PTWizardDialog() {
 			super(Main.parent, tr("PT Wizard"), new String[] { tr("Ok"), tr("Cancel") },
 					true);
 		}
