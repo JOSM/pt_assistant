@@ -18,8 +18,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -427,12 +429,12 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 		List<Relation> referrers1 = OsmPrimitive.getFilteredList(previousAffectedWay.getReferrers(), Relation.class);
 		referrers1.removeIf(r -> !RouteUtils.isPTRoute(r));
 
-		int Index1 = getIndex(previousAffectedWay, referrers1, previousAffectedWay);
+		Map<Relation, List<Integer>> Index1 = getIndex(previousAffectedWay, referrers1, previousAffectedWay);
 
 		List<Relation> referrers2 = OsmPrimitive.getFilteredList(affected.getReferrers(), Relation.class);
 		referrers2.removeIf(r -> !RouteUtils.isPTRoute(r));
 
-		int Index2 = getIndex(affected, referrers2, previousAffectedWay);
+		Map<Relation, List<Integer>> Index2 = getIndex(affected, referrers1, affected);
 
 		Way way1 = null, way2 = null;
 
@@ -516,7 +518,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 	}
 
 	// check if a way is present in a relation, if not then add it
-	private void checkMembership(Way way, List<Relation> referrers, int Index) {
+	private void checkMembership(Way way, List<Relation> referrers, Map<Relation, List<Integer>> Index) {
 		for (Relation r : referrers) {
 			boolean isMember = false;
 			for (RelationMember rm : r.getMembers()) {
@@ -527,27 +529,33 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 				}
 			}
 			if (!isMember) {
-				r.addMember(new RelationMember("", way));
+				for (int i=0; i< Index.get(r).size(); i++)
+					r.addMember(Index.get(r).get(i), new RelationMember("", way));
 			}
 		}
 	}
 
 	// get index where the way is present in a relation
-	private int getIndex(Way way, List<Relation> referrers, Way previousAffectedWay) {
-		int Index = -1;
+	private Map<Relation, List<Integer>> getIndex(Way way, List<Relation> referrers, Way previousAffectedWay) {
+		Map<Relation, List<Integer>> lst = new HashMap<>();
 		for (Relation r : referrers) {
+			List<Integer> Index = new ArrayList<>();
 			for (int i = 0; i < r.getMembers().size(); i++) {
 				if (r.getMembers().get(i).isWay() && r.getMembers().get(i).getWay().equals(previousAffectedWay)) {
-					Index = i;
+					Index.add(i);
 				}
 			}
+			lst.put(r, Index);
 		}
-		return Index;
+		return lst;
 	}
 
 	// take key value pair from the dialog box and add it to the existing ways
 	private void addTags(List<TagMap> affectedKeysList, List<Way> selectedWay, JComboBox<String> keys,
 			JComboBox<String> values, int type) {
+
+		MainApplication.getLayerManager().getEditDataSet().setSelected(selectedWay);
+
 		TagMap newKeys1 = affectedKeysList.get(0);
 		String prevValue = null;
 
@@ -561,7 +569,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 		} else if (keys.getSelectedItem() == "traffic_calming") {
 			newKeys1.put(keys.getSelectedItem().toString(), values.getSelectedItem().toString());
 			newKeys1.put("maxspeed", "30");
-		} else {
+		} else if (keys.getSelectedItem() != "none") {
 			if (newKeys1.containsKey("bus_bay")) {
 				prevValue = newKeys1.get("bus_bay");
 				newKeys1.put(keys.getSelectedItem().toString(), "both");
@@ -583,7 +591,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 			} else if (keys.getSelectedItem() == "traffic_calming") {
 				newKeys2.put(keys.getSelectedItem().toString(), values.getSelectedItem().toString());
 				newKeys2.put("maxspeed", "30");
-			} else {
+			} else if (keys.getSelectedItem() != "none") {
 				if (newKeys2.containsKey("bus_bay")) {
 					prevValue = newKeys2.get("bus_bay");
 					newKeys2.put(keys.getSelectedItem().toString(), "both");
@@ -836,7 +844,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
 		private void setOptionsWithBusBay() {
 			keys.setModel(
-					new DefaultComboBoxModel<>(new String[] { "bus_bay", "bridge", "tunnel", "traffic_calming" }));
+					new DefaultComboBoxModel<>(new String[] { "bus_bay", "bridge", "tunnel", "traffic_calming", "none" }));
 
 			if (affected.hasTag("bus_bay", "right") || previousAffectedWay.hasTag("bus_bay", "right")) {
 				values.setModel(new DefaultComboBoxModel<>(new String[] { "left", "right", "both" }));
@@ -869,6 +877,8 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 									new DefaultComboBoxModel<>(new String[] { "yes", "culvert", "building_passage" }));
 					} else if ("traffic_calming".equals(keys.getSelectedItem())) {
 						values.setModel(new DefaultComboBoxModel<>(new String[] { "table" }));
+					} else if ("none".equals(keys.getSelectedItem())) {
+						values.setModel(new DefaultComboBoxModel<>(new String[] { "" }));
 					}
 				}
 			});
@@ -876,7 +886,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
 		private void setOptionsWithTunnel() {
 			keys.setModel(
-					new DefaultComboBoxModel<>(new String[] { "tunnel", "bridge", "bus_bay", "traffic_calming" }));
+					new DefaultComboBoxModel<>(new String[] { "tunnel", "bridge", "bus_bay", "traffic_calming", "none" }));
 
 			if (previousAffectedWay.hasKey("waterway") || affected.hasKey("waterway"))
 				values.setModel(new DefaultComboBoxModel<>(new String[] { "culvert", "yes", "building_passage" }));
@@ -904,6 +914,8 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 						values.setModel(new DefaultComboBoxModel<>(new String[] { "yes" }));
 					} else if ("traffic_calming".equals(keys.getSelectedItem())) {
 						values.setModel(new DefaultComboBoxModel<>(new String[] { "table" }));
+					} else if ("none".equals(keys.getSelectedItem())) {
+						values.setModel(new DefaultComboBoxModel<>(new String[] { "" }));
 					}
 				}
 			});
@@ -911,7 +923,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
 		private void setOptionsWithBridge() {
 			keys.setModel(
-					new DefaultComboBoxModel<>(new String[] { "bridge", "bus_bay", "tunnel", "traffic_calming" }));
+					new DefaultComboBoxModel<>(new String[] { "bridge", "bus_bay", "tunnel", "traffic_calming", "none" }));
 
 			values.setModel(new DefaultComboBoxModel<>(new String[] { "yes" }));
 
@@ -936,6 +948,8 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 						values.setModel(new DefaultComboBoxModel<>(new String[] { "yes" }));
 					} else if ("traffic_calming".equals(keys.getSelectedItem())) {
 						values.setModel(new DefaultComboBoxModel<>(new String[] { "table" }));
+					} else if ("none".equals(keys.getSelectedItem())) {
+						values.setModel(new DefaultComboBoxModel<>(new String[] { "" }));
 					}
 				}
 			});
