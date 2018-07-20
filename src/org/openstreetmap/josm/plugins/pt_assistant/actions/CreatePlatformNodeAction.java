@@ -71,33 +71,27 @@ public class CreatePlatformNodeAction extends JosmAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// check if the preference contains the key or not, if not open up a dialog box
-		Set<String> keySet = Main.pref.getKeySet();
-		if (!keySet.contains("pt_assistant.transfer-details-action")) {
-			JPanel panel = new JPanel(new GridBagLayout());
-			transferDetailsDialog transferDialog = new transferDetailsDialog();
-			transferDialog.setPreferredSize(new Dimension(500, 300));
-			transferDialog.toggleEnable("way.split.segment-selection-dialog");
-			transferDialog.setButtonIcons("ok", "cancel");
-			transferDetails = new JCheckBox(I18n.tr("Add public_transport=platform to the platform node"));
-			panel.add(transferDetails);
-			JScrollPane scrollPanel = new JScrollPane(panel);
-			transferDialog.setContent(scrollPanel, true);
-			if (!transferDialog.toggleCheckState()) {
-				ExtendedDialog dialog = transferDialog.showDialog();
-				switch (dialog.getValue()) {
+		initialiseKeys();
+		JPanel panel = new JPanel(new GridBagLayout());
+		transferDetailsDialog transferDialog = new transferDetailsDialog();
+		transferDialog.setPreferredSize(new Dimension(500, 300));
+		transferDialog.toggleEnable("toggle-transfer-details-dialog");
+		transferDialog.setButtonIcons("ok", "cancel");
+		transferDetails = new JCheckBox(I18n.tr("Remove public_transport=platform from platform WAYS when transfering details to platform NODE."));
+		panel.add(transferDetails);
+		JScrollPane scrollPanel = new JScrollPane(panel);
+		transferDialog.setContent(scrollPanel, true);
+		if (transferDialog.toggleCheckState()) {
+			action();
+		} else {
+			ExtendedDialog dialog = transferDialog.showDialog();
+			switch (dialog.getValue()) {
 				case 1:
 					addToPreferences();
 					break;
 				default:
 					return; // Do nothing
-				}
-			} else {
-				action();
 			}
-
-		} else {
-			action();
 		}
 	}
 
@@ -122,53 +116,72 @@ public class CreatePlatformNodeAction extends JosmAction {
 		DataSet ds = getLayerManager().getEditDataSet();
 
 		if (platformWay != null && platformNode != null) {
-			HashMap<String, String> tagsForWay = new HashMap<>();
-			HashMap<String, String> tagsForNode = new HashMap<>(platformNode.getKeys());
-
-			HashMap<String, String> nodeTagsRemove = new HashMap<>(platformNode.getKeys());
-			nodeTagsRemove.replaceAll((key, value) -> null);
-
-			HashMap<String, String> wayTagsRemove = new HashMap<>(platformWay.getKeys());
-			wayTagsRemove.replaceAll((key, value) -> null);
-
-			tagsForNode.putAll(platformWay.getKeys());
-			tagsForNode.replace("public_transport", "platform");
-			tagsForNode.remove("amenity", "shelter");
-			tagsForNode.remove("shelter_type", "public_transport");
-
-			if (platformWay.hasTag("highway", "platform"))
-				tagsForWay.put("highway", "platform");
-			if (platformWay.hasTag("railway", "platform"))
-				tagsForWay.put("railway", "platform");
-			if (platformWay.hasTag("tactile_paving"))
-				tagsForWay.put("tactile_paving", platformWay.get("tactile_paving"));
-			if (platformWay.hasTag("wheelchair"))
-				tagsForWay.put("wheelchair", platformWay.get("wheelchair"));
-			if (Main.pref.getBoolean("pt_assistant.transfer-details-action"))
-				tagsForWay.put("public_transport", "platform");
-			else
-				tagsForWay.remove("public_transport", "platform");
-
 			List<Command> cmdList = new ArrayList<>();
-			cmdList.add(new ChangePropertyCommand(Collections.singleton(platformNode), nodeTagsRemove));
-			cmdList.add(new ChangePropertyCommand(Collections.singleton(platformWay), wayTagsRemove));
-			MainApplication.undoRedo.add(new SequenceCommand("Remove Tags", cmdList));
-			cmdList.clear();
+			if (Main.pref.getBoolean("pt_assistant.transfer-platformway-tag")) {
+				HashMap<String, String> tagsForWay = new HashMap<>();
+				HashMap<String, String> tagsForNode = new HashMap<>(platformNode.getKeys());
 
-			cmdList.add(new ChangePropertyCommand(Collections.singleton(platformNode), tagsForNode));
-			cmdList.add(new ChangePropertyCommand(Collections.singleton(platformWay), tagsForWay));
-			MainApplication.undoRedo.add(new SequenceCommand("Change Tags", cmdList));
-			cmdList.clear();
+				HashMap<String, String> nodeTagsRemove = new HashMap<>(platformNode.getKeys());
+				nodeTagsRemove.replaceAll((key, value) -> null);
 
-			Map<Relation, List<Integer>> savedPositions = getSavedPositions(platformWay);
-			List<Relation> parentStopAreaRelation = removeWayFromRelationsCommand(platformWay);
+				HashMap<String, String> wayTagsRemove = new HashMap<>(platformWay.getKeys());
+				wayTagsRemove.replaceAll((key, value) -> null);
 
-			cmdList.addAll(updateRelation(savedPositions, platformNode, platformWay, parentStopAreaRelation));
+				tagsForNode.putAll(platformWay.getKeys());
+				if (!Main.pref.getBoolean("pt_assistant.add-mode-of-transport-to-stop")) {
+					tagsForNode.replace("public_transport", "platform");
+				} else {
+					tagsForNode.remove("public_transport", "platform");
+					if (tagsForNode.containsKey("bus")) {
+						tagsForNode.remove("bus", "yes");
+						tagsForNode.put("highway", "bus_stop");
+					}
+					if (tagsForNode.containsKey("tram")) {
+						tagsForNode.remove("tram", "yes");
+						tagsForNode.put("railway", "tram_stop");
+					}
+				}
 
-			MainApplication.undoRedo.add(new SequenceCommand("Update Relations", cmdList));
+				tagsForNode.remove("amenity", "shelter");
+				tagsForNode.remove("shelter_type", "public_transport");
+
+				if (platformWay.hasTag("highway", "platform"))
+					tagsForWay.put("highway", "platform");
+				if (platformWay.hasTag("railway", "platform"))
+					tagsForWay.put("railway", "platform");
+				if (platformWay.hasTag("tactile_paving"))
+					tagsForWay.put("tactile_paving", platformWay.get("tactile_paving"));
+				if (platformWay.hasTag("wheelchair"))
+					tagsForWay.put("wheelchair", platformWay.get("wheelchair"));
+
+				// if the user has wants to keep the tag
+				if (!Main.pref.getBoolean("pt_assistant.transfer-details-action"))
+					tagsForWay.put("public_transport", "platform");
+				else
+					tagsForWay.remove("public_transport", "platform");
+
+				cmdList.add(new ChangePropertyCommand(Collections.singleton(platformNode), nodeTagsRemove));
+				cmdList.add(new ChangePropertyCommand(Collections.singleton(platformWay), wayTagsRemove));
+				MainApplication.undoRedo.add(new SequenceCommand("Remove Tags", cmdList));
+				cmdList.clear();
+
+				cmdList.add(new ChangePropertyCommand(Collections.singleton(platformNode), tagsForNode));
+				cmdList.add(new ChangePropertyCommand(Collections.singleton(platformWay), tagsForWay));
+				MainApplication.undoRedo.add(new SequenceCommand("Change Tags", cmdList));
+				cmdList.clear();
+
+			}
+
+			// based on the user's response decide whether to transfer the relations or not
+			if (Main.pref.getBoolean("pt_assistant.substitute-platformway-relation")) {
+				Map<Relation, List<Integer>> savedPositions = getSavedPositions(platformWay);
+				List<Relation> parentStopAreaRelation = removeWayFromRelationsCommand(platformWay);
+				cmdList.addAll(updateRelation(savedPositions, platformNode, platformWay, parentStopAreaRelation));
+				MainApplication.undoRedo.add(new SequenceCommand("Update Relations", cmdList));
+			}
 		}
 
-		if (platformNode != null && stopPositionNode != null) {
+		if (platformNode != null && stopPositionNode != null && Main.pref.getBoolean("pt_assistant.transfer-stopposition-tag")) {
 			dummy1 = new Node(platformNode.getEastNorth());
 			dummy2 = new Node(platformNode.getEastNorth());
 			dummy3 = new Node(platformNode.getEastNorth());
@@ -189,6 +202,18 @@ public class CreatePlatformNodeAction extends JosmAction {
 			platformNode.put("highway", "bus_stop");
 			if (!refs.isEmpty()) {
 				platformNode.put("route_ref", getRefs(refs));
+			}
+
+			if (Main.pref.getBoolean("pt_assistant.add-mode-of-transport-to-stop")) {
+				stopPositionNode.remove("public_transport");
+				if (stopPositionNode.hasTag("bus")) {
+					stopPositionNode.remove("bus");
+					stopPositionNode.put("highway", "bus_stop");
+				}
+				if (stopPositionNode.hasTag("tram")) {
+					stopPositionNode.remove("tram");
+					stopPositionNode.put("railway", "tram_stop");
+				}
 			}
 
 			List<OsmPrimitive> prims = new ArrayList<>();
@@ -354,7 +379,7 @@ public class CreatePlatformNodeAction extends JosmAction {
 	private class transferDetailsDialog extends ExtendedDialog {
 
 		public transferDetailsDialog() {
-			super(Main.parent, tr("Transfer details of stop to platform node"), new String[] { tr("Ok"), tr("Cancel") },
+			super(Main.parent, tr("transfering details to platform NODE."), new String[] { tr("Ok"), tr("Cancel") },
 					true);
 		}
 
@@ -363,5 +388,18 @@ public class CreatePlatformNodeAction extends JosmAction {
 			super.buttonAction(buttonIndex, evt);
 
 		}
+	}
+
+	private void initialiseKeys () {
+		// check if the preference contains the key or not, if not open up a dialog box
+		Set<String> keySet = Main.pref.getKeySet();
+		if (!keySet.contains("pt_assistant.substitute-platformway-relation"))
+			Main.pref.putBoolean("pt_assistant.substitute-platformway-relation", true);
+
+		if (!keySet.contains("pt_assistant.transfer-stopposition-tag"))
+			Main.pref.putBoolean("pt_assistant.transfer-stopposition-tag", true);
+
+		if (!keySet.contains("pt_assistant.transfer-platformway-tag"))
+			Main.pref.putBoolean("pt_assistant.transfer-platformway-tag", true);
 	}
 }

@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 
 import javax.swing.SwingUtilities;
 
+import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.Command;
@@ -125,81 +126,83 @@ public class SegmentChecker extends Checker {
          * first or last node of its parent ways which belong to this route.
          */
 
-        if (endStop.getStopPosition() == null) {
+        if (!Main.pref.getBoolean("pt_assistant.check-route-relation-start-end")) {
+        		if (endStop.getStopPosition() == null) {
 
-            List<Node> potentialStopPositionList = endStop.findPotentialStopPositions();
-            List<Node> stopPositionsOfThisRoute = new ArrayList<>();
-            boolean containsAtLeastOneStopPositionAsFirstOrLastNode = false;
+            		List<Node> potentialStopPositionList = endStop.findPotentialStopPositions();
+            		List<Node> stopPositionsOfThisRoute = new ArrayList<>();
+            		boolean containsAtLeastOneStopPositionAsFirstOrLastNode = false;
 
-            for (Node potentialStopPosition : potentialStopPositionList) {
+            		for (Node potentialStopPosition : potentialStopPositionList) {
 
-                int belongsToWay = belongsToAWayOfThisRoute(potentialStopPosition);
+                		int belongsToWay = belongsToAWayOfThisRoute(potentialStopPosition);
 
-                if (belongsToWay == 0) {
-                    stopPositionsOfThisRoute.add(potentialStopPosition);
-                    containsAtLeastOneStopPositionAsFirstOrLastNode = true;
-                }
+                		if (belongsToWay == 0) {
+                    		stopPositionsOfThisRoute.add(potentialStopPosition);
+                    		containsAtLeastOneStopPositionAsFirstOrLastNode = true;
+                		}
 
-                if (belongsToWay == 1) {
-                    stopPositionsOfThisRoute.add(potentialStopPosition);
-                }
-            }
+                		if (belongsToWay == 1) {
+                    		stopPositionsOfThisRoute.add(potentialStopPosition);
+                		}
+            		}
 
-            if (stopPositionsOfThisRoute.isEmpty()) {
-                List<Relation> primitives = new ArrayList<>(1);
-                primitives.add(relation);
-                List<OsmPrimitive> highlighted = new ArrayList<>(1);
-                highlighted.add(endStop.getPlatform());
-                Builder builder = TestError.builder(this.test, Severity.WARNING,
-                        PTAssistantValidatorTest.ERROR_CODE_END_STOP);
-                builder.message(tr("PT: Route should start and end with a stop_position"));
-                builder.primitives(primitives);
-                builder.highlight(highlighted);
-                TestError e = builder.build();
-                this.errors.add(e);
-                return;
-            }
+            		if (stopPositionsOfThisRoute.isEmpty()) {
+                		List<Relation> primitives = new ArrayList<>(1);
+                		primitives.add(relation);
+                		List<OsmPrimitive> highlighted = new ArrayList<>(1);
+                		highlighted.add(endStop.getPlatform());
+                		Builder builder = TestError.builder(this.test, Severity.WARNING,
+                			PTAssistantValidatorTest.ERROR_CODE_END_STOP);
+                		builder.message(tr("PT: Route should start and end with a stop_position"));
+                		builder.primitives(primitives);
+                		builder.highlight(highlighted);
+                		TestError e = builder.build();
+                		this.errors.add(e);
+                		return;
+            		}
 
-            if (stopPositionsOfThisRoute.size() == 1) {
-                endStop.setStopPosition(stopPositionsOfThisRoute.get(0));
-            }
+            		if (stopPositionsOfThisRoute.size() == 1) {
+                		endStop.setStopPosition(stopPositionsOfThisRoute.get(0));
+            		}
 
-            // At this point, there is at least one stop_position for this
-            // endStop:
-            if (!containsAtLeastOneStopPositionAsFirstOrLastNode) {
-                List<Relation> primitives = new ArrayList<>(1);
-                primitives.add(relation);
-                List<OsmPrimitive> highlighted = new ArrayList<>();
-                highlighted.addAll(stopPositionsOfThisRoute);
+            		// At this point, there is at least one stop_position for this
+            		// endStop:
+            			if (!containsAtLeastOneStopPositionAsFirstOrLastNode) {
+                		List<Relation> primitives = new ArrayList<>(1);
+                		primitives.add(relation);
+                		List<OsmPrimitive> highlighted = new ArrayList<>();
+                		highlighted.addAll(stopPositionsOfThisRoute);
 
-                Builder builder = TestError.builder(this.test, Severity.WARNING,
+                		Builder builder = TestError.builder(this.test, Severity.WARNING,
                         PTAssistantValidatorTest.ERROR_CODE_SPLIT_WAY);
-                builder.message(tr("PT: First or last way needs to be split"));
-                builder.primitives(primitives);
-                builder.highlight(highlighted);
-                TestError e = builder.build();
-                this.errors.add(e);
-            }
+                		builder.message(tr("PT: First or last way needs to be split"));
+                		builder.primitives(primitives);
+                		builder.highlight(highlighted);
+                		TestError e = builder.build();
+                		this.errors.add(e);
+            		}
 
-        } else {
+        		} else {
 
-            // if the stop_position is known:
-            int belongsToWay = this.belongsToAWayOfThisRoute(endStop.getStopPosition());
+            		// if the stop_position is known:
+            		int belongsToWay = this.belongsToAWayOfThisRoute(endStop.getStopPosition());
 
-            if (belongsToWay == 1) {
+            		if (belongsToWay == 1) {
 
-                List<Relation> primitives = new ArrayList<>(1);
-                primitives.add(relation);
-                List<OsmPrimitive> highlighted = new ArrayList<>();
-                highlighted.add(endStop.getStopPosition());
-                Builder builder = TestError.builder(this.test, Severity.WARNING,
+                		List<Relation> primitives = new ArrayList<>(1);
+                		primitives.add(relation);
+                		List<OsmPrimitive> highlighted = new ArrayList<>();
+                		highlighted.add(endStop.getStopPosition());
+                		Builder builder = TestError.builder(this.test, Severity.WARNING,
                         PTAssistantValidatorTest.ERROR_CODE_SPLIT_WAY);
-                builder.message(tr("PT: First or last way needs to be split"));
-                builder.primitives(primitives);
-                builder.highlight(highlighted);
-                TestError e = builder.build();
-                this.errors.add(e);
-            }
+                		builder.message(tr("PT: First or last way needs to be split"));
+                		builder.primitives(primitives);
+                		builder.highlight(highlighted);
+                		TestError e = builder.build();
+                		this.errors.add(e);
+            		}
+        		}
         }
 
     }

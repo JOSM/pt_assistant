@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.data.osm.Node;
@@ -157,37 +158,41 @@ public class RouteChecker extends Checker {
 
         boolean foundError = false;
 
-        String from = relation.get("from");
-        if (from != null) {
-            from = from.toLowerCase();
-            PTStop stop = manager.getFirstStop();
-            OsmPrimitive primitive = checkPTStopName(stop, from);
+        if (!Main.pref.getBoolean("pt_assistant.compare-name-from-tag")) {
+        		String from = relation.get("from");
+            if (from != null) {
+                from = from.toLowerCase();
+                PTStop stop = manager.getFirstStop();
+                OsmPrimitive primitive = checkPTStopName(stop, from);
 
-            if (primitive != null) {
-                Builder builder = TestError.builder(this.test, Severity.WARNING,
-                        PTAssistantValidatorTest.ERROR_CODE_FROM_TO_ROUTE_TAG);
-                builder.message(tr("PT: The name of the first stop does not match the \"from\" tag of the route relation"));
-                builder.primitives(primitive, relation);
-                TestError e = builder.build();
-                this.errors.add(e);
-                foundError = true;
+                if (primitive != null) {
+                    Builder builder = TestError.builder(this.test, Severity.WARNING,
+                            PTAssistantValidatorTest.ERROR_CODE_FROM_TO_ROUTE_TAG);
+                    builder.message(tr("PT: The name of the first stop does not match the \"from\" tag of the route relation"));
+                    builder.primitives(primitive, relation);
+                    TestError e = builder.build();
+                    this.errors.add(e);
+                    foundError = true;
+                }
             }
         }
 
-        String to = relation.get("to");
-        if (to != null) {
-            to = to.toLowerCase();
-            PTStop stop = manager.getLastStop();
-            OsmPrimitive primitive = checkPTStopName(stop, to);
+        if (!Main.pref.getBoolean("pt_assistant.compare-name-to-tag")) {
+        		String to = relation.get("to");
+            if (to != null) {
+                to = to.toLowerCase();
+                PTStop stop = manager.getLastStop();
+                OsmPrimitive primitive = checkPTStopName(stop, to);
 
-            if (primitive != null) {
-                Builder builder = TestError.builder(this.test, Severity.WARNING,
-                        PTAssistantValidatorTest.ERROR_CODE_FROM_TO_ROUTE_TAG);
-                builder.message(tr("PT: The name of the last stop does not match the \"to\" tag of the route relation"));
-                builder.primitives(primitive, relation);
-                TestError e = builder.build();
-                this.errors.add(e);
-                foundError = true;
+                if (primitive != null) {
+                    Builder builder = TestError.builder(this.test, Severity.WARNING,
+                            PTAssistantValidatorTest.ERROR_CODE_FROM_TO_ROUTE_TAG);
+                    builder.message(tr("PT: The name of the last stop does not match the \"to\" tag of the route relation"));
+                    builder.primitives(primitive, relation);
+                    TestError e = builder.build();
+                    this.errors.add(e);
+                    foundError = true;
+                }
             }
         }
 
