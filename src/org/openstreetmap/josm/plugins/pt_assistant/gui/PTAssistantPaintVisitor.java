@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -96,40 +97,47 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
 		HashMap<Long, String> stopOrderMap = new HashMap<>();
 		int stopCount = 1;
 
-		for (RelationMember rm : r.getMembers()) {
-			if (PTStop.isPTStop(rm) || (rm.getMember().isIncomplete() && (rm.isNode() || rm.hasRole("stop")
-					|| rm.hasRole("stop_entry_only") || rm.hasRole("stop_exit_only") || rm.hasRole("platform")
-					|| rm.hasRole("platform_entry_only") || rm.hasRole("platform_exit_only")))) {
+		// show refs for all the relations in the layer
+		Collection<Relation> allRelations = new ArrayList<>(MainApplication.getLayerManager().getActiveDataLayer().getDataSet().getRelations());
+		Double scale = MainApplication.getMap().mapView.getScale();
+		System.out.println("scale " + scale);
+		if (scale < 33) {
+			for (Relation relation : allRelations) {
+				for (RelationMember rm : relation.getMembers()) {
+					if (PTStop.isPTStop(rm) || (rm.getMember().isIncomplete() && (rm.isNode() || rm.hasRole("stop")
+							|| rm.hasRole("stop_entry_only") || rm.hasRole("stop_exit_only") || rm.hasRole("platform")
+							|| rm.hasRole("platform_entry_only") || rm.hasRole("platform_exit_only")))) {
 
-				StringBuilder sb = new StringBuilder();
+						StringBuilder sb = new StringBuilder();
 
-				if (stopOrderMap.containsKey(rm.getUniqueId())) {
-					sb.append(stopOrderMap.get(rm.getUniqueId())).append(";").append(stopCount);
-				} else {
-					if (r.hasKey("ref")) {
-						sb.append(r.get("ref"));
-					} else if (r.hasKey("name")) {
-						sb.append(r.get("name"));
-					} else {
-						sb.append("NA");
+						if (stopOrderMap.containsKey(rm.getUniqueId())) {
+							sb.append(stopOrderMap.get(rm.getUniqueId())).append(";").append(stopCount);
+						} else {
+							if (relation.hasKey("ref")) {
+								sb.append(relation.get("ref"));
+							} else if (relation.hasKey("name")) {
+								sb.append(relation.get("name"));
+							} else {
+								sb.append("NA");
+							}
+							sb.append(" - ").append(stopCount);
+						}
+
+						stopOrderMap.put(rm.getUniqueId(), sb.toString());
+						try {
+							if (PTStop.isPTStopPosition(rm))
+								drawStopLabel(rm.getMember(), sb.toString(), false);
+							else if (PTStop.isPTPlatform(rm))
+								drawStopLabel(rm.getMember(), sb.toString(), true);
+						} catch (NullPointerException ex) {
+							// do nothing
+							Logging.trace(ex);
+						}
+						stopCount++;
 					}
-					sb.append(" - ").append(stopCount);
 				}
-
-				stopOrderMap.put(rm.getUniqueId(), sb.toString());
-				try {
-					if (PTStop.isPTStopPosition(rm))
-						drawStopLabel(rm.getMember(), sb.toString(), false);
-					else if (PTStop.isPTPlatform(rm))
-						drawStopLabel(rm.getMember(), sb.toString(), true);
-				} catch (NullPointerException ex) {
-					// do nothing
-					Logging.trace(ex);
-				}
-				stopCount++;
 			}
 		}
-
 	}
 
 	private void drawCycleRoute(Relation r) {
@@ -436,6 +444,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
 
 		// draw the ref values of all parent routes:
 		List<String> parentsLabelList = new ArrayList<>();
+
 		for (OsmPrimitive parent : primitive.getReferrers()) {
 			if (parent.getType().equals(OsmPrimitiveType.RELATION)) {
 				Relation relation = (Relation) parent;
