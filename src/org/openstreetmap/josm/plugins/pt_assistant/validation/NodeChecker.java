@@ -6,6 +6,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -17,11 +18,13 @@ import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
+import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.validation.Severity;
 import org.openstreetmap.josm.data.validation.Test;
 import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.data.validation.TestError.Builder;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantPaintVisitor;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 
@@ -159,6 +162,65 @@ public class NodeChecker extends Checker {
         return null;
 
     }
+
+    protected void performRouteRefMatchingTest(Node primitive) {
+    		// the ref values of all parent routes:
+		List<String> parentsLabelList = new ArrayList<>();
+		for (OsmPrimitive parent : primitive.getReferrers()) {
+			if (parent.getType().equals(OsmPrimitiveType.RELATION)) {
+				Relation relation = (Relation) parent;
+				if (RouteUtils.isVersionTwoPTRoute(relation) && relation.get("ref") != null
+						&& !relation.get("ref").equals("")) {
+
+					boolean stringFound = false;
+					for (String s : parentsLabelList) {
+						if (s.equals(relation.get("ref"))) {
+							stringFound = true;
+						}
+					}
+					if (!stringFound) {
+						parentsLabelList.add(relation.get("ref"));
+					}
+
+				}
+			}
+		}
+
+		Collections.sort(parentsLabelList, new PTAssistantPaintVisitor.RefTagComparator());
+		String route_ref = null;
+		if (primitive.hasTag("route_ref")) route_ref = primitive.get("route_ref");
+		else if (primitive.hasTag("route_ref:De_Lijn")) route_ref = primitive.get("route_ref:De_Lijn");
+		else if (primitive.hasTag("route_ref:TECB")) route_ref = primitive.get("route_ref:TECB");
+		else if (primitive.hasTag("route_ref:TECH")) route_ref = primitive.get("route_ref:TECH");
+		else if (primitive.hasTag("route_ref:TECC")) route_ref = primitive.get("route_ref:TECC");
+		else if (primitive.hasTag("route_ref:TECN")) route_ref = primitive.get("route_ref:TECN");
+		else if (primitive.hasTag("route_ref:TECL")) route_ref = primitive.get("route_ref:TECL");
+		else if (primitive.hasTag("route_ref:TECX")) route_ref = primitive.get("route_ref:TECX");
+
+		if (route_ref != null) {
+			String[] splitted = route_ref.split("[|;]");
+			if (splitted.length != parentsLabelList.size()) {
+				Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_ROUTE_REF);
+            builder.message(tr("PT: Refs of the routes do not match with the route_ref tag of the primitive"));
+            builder.primitives(primitive);
+            TestError e = builder.build();
+            this.errors.add(e);
+
+			} else {
+				for(String s : splitted) {
+					if (!parentsLabelList.contains(s)) {
+						Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_ROUTE_REF);
+		                builder.message(tr("Refs of the routes do not match with the route_ref tag of the primitive"));
+		                builder.primitives(primitive);
+		                TestError e = builder.build();
+		                this.errors.add(e);
+						break;
+					}
+				}
+			}
+		}
+    }
+
 
     private static int showFixNodeTagDialog(TestError e) {
         Node problematicNode = (Node) e.getPrimitives().iterator().next();

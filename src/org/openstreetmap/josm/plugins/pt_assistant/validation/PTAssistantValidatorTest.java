@@ -62,6 +62,7 @@ public class PTAssistantValidatorTest extends Test {
     public static final int ERROR_CODE_STOP_AREA_NO_STOPS = 3762;
     public static final int ERROR_CODE_STOP_AREA_NO_PLATFORM = 3763;
     public static final int ERROR_CODE_STOP_AREA_COMPARE_RELATIONS = 3764;
+    public static final int ERROR_CODE_ROUTE_REF = 3765;
 
     public PTAssistantValidatorTest() {
         super(tr("Public Transport Assistant tests"),
@@ -70,7 +71,6 @@ public class PTAssistantValidatorTest extends Test {
 
     @Override
     public void visit(Node n) {
-
         if (n.isIncomplete()) {
             return;
         }
@@ -87,7 +87,7 @@ public class PTAssistantValidatorTest extends Test {
                 // check if stop positions are in any stop_area relation:
                 nodeChecker.performNodePartOfStopAreaTest();
             }
-
+            nodeChecker.performRouteRefMatchingTest(n);
         }
 
         // select only platforms
@@ -100,7 +100,7 @@ public class PTAssistantValidatorTest extends Test {
                 // check if platforms are in any stop_area relation:
                 nodeChecker.performNodePartOfStopAreaTest();
             }
-
+            nodeChecker.performRouteRefMatchingTest(n);
         }
 
         this.errors.addAll(nodeChecker.getErrors());
@@ -109,7 +109,6 @@ public class PTAssistantValidatorTest extends Test {
 
     @Override
     public void visit(Relation r) {
-
         // Download incomplete members. If the download does not work, return
         // and do not do any testing.
         if (r.hasIncompleteMembers()) {
@@ -360,6 +359,7 @@ public class PTAssistantValidatorTest extends Test {
             routeChecker.performFirstLastWayStopTest();
         }
         routeChecker.performSortingTest();
+
         List<TestError> routeCheckerErrors = routeChecker.getErrors();
 
         SegmentChecker segmentChecker = new SegmentChecker(r, this);
