@@ -3,46 +3,49 @@ package org.openstreetmap.josm.plugins.pt_assistant;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-import java.util.Set;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.data.preferences.BooleanProperty;
 import org.openstreetmap.josm.gui.preferences.DefaultTabPreferenceSetting;
 import org.openstreetmap.josm.gui.preferences.PreferenceTabbedPane;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
 
 public class PTAssistantPluginPreferences extends DefaultTabPreferenceSetting {
-	private JCheckBox downloadIncompleteMembers;
-	private JCheckBox stopArea;
-	private JCheckBox transferDetails;
-	private JCheckBox optionsForMendAction;
-	private JCheckBox substitutePlatformRelation;
-	private JCheckBox stopPositionNodeTag;
-	private JCheckBox platformWayDetailsTag;
-	private JCheckBox compareNameWithFirstStop;
-	private JCheckBox compareNameWithLastStop;
-	private JCheckBox checkStartEndIsStopPosition;
-	private JCheckBox modeOfTransportToStop;
-	private JCheckBox splitWay1;
-	private JCheckBox splitWay2;
+	private final JCheckBox downloadIncompleteMembers;
+	private final JCheckBox stopArea;
+	private final JCheckBox transferDetails;
+	private final JCheckBox optionsForMendAction;
+	private final JCheckBox substitutePlatformRelation;
+	private final JCheckBox stopPositionNodeTag;
+	private final JCheckBox platformWayDetailsTag;
+	private final JCheckBox compareNameWithFirstStop;
+	private final JCheckBox compareNameWithLastStop;
+	private final JCheckBox checkStartEndIsStopPosition;
+	private final JCheckBox modeOfTransportToStop;
+	private final JCheckBox splitWay1;
+	private final JCheckBox splitWay2;
+	public static final BooleanProperty DOWNLOAD_INCOMPLETE = new BooleanProperty("pt_assistant.download-incomplete", false);
+	public static final BooleanProperty STOP_AREA_TEST = new BooleanProperty("pt_assistant.stop-area-tests", false);
+	public static final BooleanProperty TRANSFER_DETAILS = new BooleanProperty("pt_assistant.transfer-details-action", false);
+	public static final BooleanProperty NUMERICAL_OPTIONS = new BooleanProperty("pt_assistant.keep-options-numerical-in-mend-action", false);
+	public static final BooleanProperty SUBSTITUTE_PLATFORM_RELATION = new BooleanProperty("pt_assistant.substitute-platformway-relation", true);
+	public static final BooleanProperty TRANSFER_STOP_POSITION = new BooleanProperty("pt_assistant.transfer-stopposition-tag", true);
+	public static final BooleanProperty TRANSFER_PLATFORMWAY = new BooleanProperty("pt_assistant.transfer-platformway-tag", true);
+	public static final BooleanProperty COMPARE_FROM_TAG = new BooleanProperty("pt_assistant.compare-name-from-tag", false);
+	public static final BooleanProperty COMPARE_TO_TAG = new BooleanProperty("pt_assistant.compare-name-to-tag", false);
+	public static final BooleanProperty CHECK_START_END = new BooleanProperty("pt_assistant.check-route-relation-start-end", false);
+	public static final BooleanProperty ADD_MODE_OF_TRANSPORT = new BooleanProperty("pt_assistant.add-mode-of-transport-to-stop", false);
+	public static final BooleanProperty SPLITWAY_1 = new BooleanProperty("pt_assistant.split-way-1", true);
+	public static final BooleanProperty SPLITWAY_2 = new BooleanProperty("pt_assistant.split-way-2", false);
 
 	public PTAssistantPluginPreferences() {
 		super("bus", tr("PTAssistantPlugin settings"),
 				tr("Here you can change some preferences of PTAssistant functions"));
-	}
-
-	@Override
-	public void addGui(PreferenceTabbedPane gui) {
-		JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 5));
-		initialiseKeys();
 
 		downloadIncompleteMembers = new JCheckBox(I18n.tr("Download incomplete route relation members"));
 		stopArea = new JCheckBox(I18n.tr("Include stop_area tests"));
@@ -57,6 +60,13 @@ public class PTAssistantPluginPreferences extends DefaultTabPreferenceSetting {
 		modeOfTransportToStop = new JCheckBox(I18n.tr("Don’t add public_transport=platform and mode of transport to node representing the stop (suffice with highway=bus_stop or railway=tram_stop)"));
 		splitWay1 = new JCheckBox(I18n.tr("Add public_transport=stop_position + mode of transport on these nodes"));
 		splitWay2 = new JCheckBox(I18n.tr("Always split ways, even if they are not at the end of the itinerary"));
+	}
+
+	@Override
+	public void addGui(PreferenceTabbedPane gui) {
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 5));
 
 		markCheckBoxes();
 
@@ -92,77 +102,48 @@ public class PTAssistantPluginPreferences extends DefaultTabPreferenceSetting {
 	 */
 	@Override
 	public boolean ok() {
-		Main.pref.putBoolean("pt_assistant.download-incomplete", this.downloadIncompleteMembers.isSelected());
-		Main.pref.putBoolean("pt_assistant.stop-area-tests", this.stopArea.isSelected());
-		Main.pref.putBoolean("pt_assistant.transfer-details-action", this.transferDetails.isSelected());
-		Main.pref.putBoolean("pt_assistant.keep-options-numerical-in-mend-action", this.optionsForMendAction.isSelected());
-		Main.pref.putBoolean("pt_assistant.substitute-platformway-relation", this.substitutePlatformRelation.isSelected());
-		Main.pref.putBoolean("pt_assistant.transfer-stopposition-tag", this.stopPositionNodeTag.isSelected());
-		Main.pref.putBoolean("pt_assistant.transfer-platformway-tag", this.platformWayDetailsTag.isSelected());
-		Main.pref.putBoolean("pt_assistant.compare-name-from-tag", this.compareNameWithFirstStop.isSelected());
-		Main.pref.putBoolean("pt_assistant.compare-name-to-tag", this.compareNameWithLastStop.isSelected());
-		Main.pref.putBoolean("pt_assistant.check-route-relation-start-end", this.checkStartEndIsStopPosition.isSelected());
-		Main.pref.putBoolean("pt_assistant.add-mode-of-transport-to-stop", this.modeOfTransportToStop.isSelected());
-		Main.pref.putBoolean("pt_assistant.split-way-1", this.splitWay1.isSelected());
-		Main.pref.putBoolean("pt_assistant.split-way-2", this.splitWay2.isSelected());
+		DOWNLOAD_INCOMPLETE.put(this.downloadIncompleteMembers.isSelected());
+		STOP_AREA_TEST.put(this.stopArea.isSelected());
+		TRANSFER_DETAILS.put(this.transferDetails.isSelected());
+		NUMERICAL_OPTIONS.put(this.optionsForMendAction.isSelected());
+		SUBSTITUTE_PLATFORM_RELATION.put(this.substitutePlatformRelation.isSelected());
+		TRANSFER_STOP_POSITION.put(this.stopPositionNodeTag.isSelected());
+		TRANSFER_PLATFORMWAY.put(this.platformWayDetailsTag.isSelected());
+		COMPARE_FROM_TAG.put(this.compareNameWithFirstStop.isSelected());
+		COMPARE_TO_TAG.put(this.compareNameWithLastStop.isSelected());
+		CHECK_START_END.put(this.checkStartEndIsStopPosition.isSelected());
+		ADD_MODE_OF_TRANSPORT.put(this.modeOfTransportToStop.isSelected());
+		SPLITWAY_1.put(this.splitWay1.isSelected());
+		SPLITWAY_2.put(this.splitWay2.isSelected());
 
 		return false;
 	}
 
-	private void initialiseKeys () {
-		// check if the preference contains the key or not, if not open up a dialog box
-		Set<String> keySet = Main.pref.getKeySet();
-		if (!keySet.contains("pt_assistant.substitute-platformway-relation"))
-			Main.pref.putBoolean("pt_assistant.substitute-platformway-relation", true);
-
-		if (!keySet.contains("pt_assistant.transfer-stopposition-tag"))
-			Main.pref.putBoolean("pt_assistant.transfer-stopposition-tag", true);
-
-		if (!keySet.contains("pt_assistant.transfer-platformway-tag"))
-			Main.pref.putBoolean("pt_assistant.transfer-platformway-tag", true);
-
-		if (!keySet.contains("pt_assistant.split-way-1"))
-			Main.pref.putBoolean("pt_assistant.split-way-1", true);
-	}
-
 	private void markCheckBoxes() {
-		if (Main.pref.getBoolean("pt_assistant.download-incomplete"))
-			downloadIncompleteMembers.setSelected(true);
+		downloadIncompleteMembers.setSelected(DOWNLOAD_INCOMPLETE.get());
 
-		if (Main.pref.getBoolean("pt_assistant.stop-area-tests"))
-			stopArea.setSelected(true);
+		stopArea.setSelected(STOP_AREA_TEST.get());
 
-		if (Main.pref.getBoolean("pt_assistant.transfer-details-action"))
-			transferDetails.setSelected(true);
+		transferDetails.setSelected(TRANSFER_DETAILS.get());
 
-		if (Main.pref.getBoolean("pt_assistant.keep-options-numerical-in-mend-action"))
-			optionsForMendAction.setSelected(true);
+		optionsForMendAction.setSelected(NUMERICAL_OPTIONS.get());
 
-		if (Main.pref.getBoolean("pt_assistant.substitute-platformway-relation"))
-			substitutePlatformRelation.setSelected(true);
+		substitutePlatformRelation.setSelected(SUBSTITUTE_PLATFORM_RELATION.get());
 
-		if (Main.pref.getBoolean("pt_assistant.transfer-stopposition-tag"))
-			stopPositionNodeTag.setSelected(true);
+		stopPositionNodeTag.setSelected(TRANSFER_STOP_POSITION.get());
 
-		if (Main.pref.getBoolean("pt_assistant.transfer-platformway-tag"))
-			platformWayDetailsTag.setSelected(true);
+		platformWayDetailsTag.setSelected(TRANSFER_PLATFORMWAY.get());
 
-		if (Main.pref.getBoolean("pt_assistant.compare-name-from-tag"))
-			compareNameWithFirstStop.setSelected(true);
+		compareNameWithFirstStop.setSelected(COMPARE_FROM_TAG.get());
 
-		if (Main.pref.getBoolean("pt_assistant.compare-name-to-tag"))
-			compareNameWithLastStop.setSelected(true);
+		compareNameWithLastStop.setSelected(COMPARE_TO_TAG.get());
 
-		if (Main.pref.getBoolean("pt_assistant.check-route-relation-start-end"))
-			checkStartEndIsStopPosition.setSelected(true);
+		checkStartEndIsStopPosition.setSelected(CHECK_START_END.get());
 
-		if (Main.pref.getBoolean("pt_assistant.add-mode-of-transport-to-stop"))
-			modeOfTransportToStop.setSelected(true);
+		modeOfTransportToStop.setSelected(ADD_MODE_OF_TRANSPORT.get());
 
-		if (Main.pref.getBoolean("pt_assistant.split-way-1"))
-			splitWay1.setSelected(true);
+		splitWay1.setSelected(SPLITWAY_1.get());
 
-		if (Main.pref.getBoolean("pt_assistant.split-way-2"))
-			splitWay2.setSelected(true);
+		splitWay2.setSelected(SPLITWAY_2.get());
 	}
 }
