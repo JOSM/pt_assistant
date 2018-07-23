@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.JoinNodeWayAction;
 import org.openstreetmap.josm.actions.mapmode.MapMode;
 import org.openstreetmap.josm.command.AddCommand;
@@ -32,6 +31,7 @@ import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.WaySegment;
 import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.ImageProvider;
@@ -144,13 +144,9 @@ public class AddStopPositionAction extends MapMode {
             joinNodeWayAction.actionPerformed(null);
         }
 
-        // by default it is true
-        if (!Main.pref.getKeySet().contains("pt_assistant.split-way-1"))
-			Main.pref.putBoolean("pt_assistant.split-way-1", true);
-
         //add the tags of the stop position
         HashMap<String, String> tagsForNode = new HashMap<>(newStopPos.getKeys());
-        if (Main.pref.getBoolean("pt_assistant.split-way-1")) {
+        if (PTAssistantPluginPreferences.SPLITWAY_1.get()) {
         		for (Way w : newStopPos.getParentWays()) {
         			for (Relation r : getPTRouteParents(w)) {
         				if (r.hasKey("route"))
@@ -166,7 +162,7 @@ public class AddStopPositionAction extends MapMode {
 
         Way affected = newStopPos.getParentWays().get(0);
 
-        Map<Relation, Boolean> needPostProcess = getAffectedRelation(affected, Main.pref.getBoolean("pt_assistant.split-way-2"));
+        Map<Relation, Boolean> needPostProcess = getAffectedRelation(affected, PTAssistantPluginPreferences.SPLITWAY_2.get());
 
         if (needPostProcess.isEmpty())
             return;

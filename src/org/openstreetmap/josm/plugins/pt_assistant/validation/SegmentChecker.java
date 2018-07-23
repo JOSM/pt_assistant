@@ -13,7 +13,6 @@ import java.util.Map.Entry;
 
 import javax.swing.SwingUtilities;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.Command;
@@ -33,6 +32,7 @@ import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPlugin;
+import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteDataManager;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
@@ -126,7 +126,7 @@ public class SegmentChecker extends Checker {
          * first or last node of its parent ways which belong to this route.
          */
 
-        if (!Main.pref.getBoolean("pt_assistant.check-route-relation-start-end")) {
+        if (!PTAssistantPluginPreferences.CHECK_START_END.get()) {
         		if (endStop.getStopPosition() == null) {
 
             		List<Node> potentialStopPositionList = endStop.findPotentialStopPositions();

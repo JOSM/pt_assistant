@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.data.osm.Node;
@@ -26,6 +25,7 @@ import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionType;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionType.Direction;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionTypeCalculator;
+import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersAction;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteDataManager;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
@@ -158,7 +158,7 @@ public class RouteChecker extends Checker {
 
         boolean foundError = false;
 
-        if (!Main.pref.getBoolean("pt_assistant.compare-name-from-tag")) {
+        if (!PTAssistantPluginPreferences.COMPARE_FROM_TAG.get()) {
         		String from = relation.get("from");
             if (from != null) {
                 from = from.toLowerCase();
@@ -177,7 +177,7 @@ public class RouteChecker extends Checker {
             }
         }
 
-        if (!Main.pref.getBoolean("pt_assistant.compare-name-to-tag")) {
+        if (!PTAssistantPluginPreferences.COMPARE_TO_TAG.get()) {
         		String to = relation.get("to");
             if (to != null) {
                 to = to.toLowerCase();

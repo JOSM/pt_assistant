@@ -28,6 +28,7 @@ import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.data.validation.TestError.Builder;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPlugin;
+import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.FixTask;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.IncompleteMembersDownloadThread;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteDataManager;
@@ -83,7 +84,7 @@ public class PTAssistantValidatorTest extends Test {
             // check if stop positions are on a way:
             nodeChecker.performSolitaryStopPositionTest();
 
-            if (Main.pref.getBoolean("pt_assistant.stop-area-tests", false) == true) {
+            if (PTAssistantPluginPreferences.STOP_AREA_TEST.get()) {
                 // check if stop positions are in any stop_area relation:
                 nodeChecker.performNodePartOfStopAreaTest();
             }
@@ -96,7 +97,7 @@ public class PTAssistantValidatorTest extends Test {
             // check that platforms are not part of any way:
             nodeChecker.performPlatformPartOfWayTest();
 
-            if (Main.pref.getBoolean("pt_assistant.stop-area-tests", false) == true) {
+            if (PTAssistantPluginPreferences.STOP_AREA_TEST.get()) {
                 // check if platforms are in any stop_area relation:
                 nodeChecker.performNodePartOfStopAreaTest();
             }
@@ -124,7 +125,7 @@ public class PTAssistantValidatorTest extends Test {
         }
 
         // Do some testing on stop area relations
-        if (Main.pref.getBoolean("pt_assistant.stop-area-tests", false) == true && StopUtils.isStopArea(r)) {
+        if (PTAssistantPluginPreferences.STOP_AREA_TEST.get() && StopUtils.isStopArea(r)) {
 
             StopChecker stopChecker = new StopChecker(r, this);
 

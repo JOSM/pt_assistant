@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
 import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
@@ -58,6 +57,7 @@ import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
 import org.openstreetmap.josm.gui.layer.MapViewPaintable;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.gui.layer.validation.PaintVisitor;
+import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
@@ -1067,7 +1067,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     void displayFixVariants(List<Way> fixVariants) {
         // find the letters of the fix variants:
         char alphabet = 'A';
-        boolean numeric = Main.pref.getBoolean("pt_assistant.keep-options-numerical-in-mend-action");
+        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
 		if (numeric)
 			alphabet = '1';
 
@@ -1165,7 +1165,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     void displayFixVariantsWithOverlappingWays(List<List<Way>> fixVariants) {
         // find the letters of the fix variants:
     		char alphabet = 'A';
-    		boolean numeric = Main.pref.getBoolean("pt_assistant.keep-options-numerical-in-mend-action");
+    		boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
     		if (numeric) alphabet = '1';
         wayListColoring = new HashMap<>();
         final List<Character> allowedCharacters = new ArrayList<>();
@@ -1264,7 +1264,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         // find the letters of the fix variants:
         char alphabet = 'A';
-        boolean numeric = Main.pref.getBoolean("pt_assistant.keep-options-numerical-in-mend-action");
+        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
         if (numeric) alphabet = '1';
         wayColoring = new HashMap<>();
         final List<Character> allowedCharacters = new ArrayList<>();
@@ -1645,7 +1645,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             double letterX = MainApplication.getMap().mapView.getBounds().getMinX() + 20;
             double letterY = MainApplication.getMap().mapView.getBounds().getMinY() + 100;
 
-            boolean numeric = Main.pref.getBoolean("pt_assistant.keep-options-numerical-in-mend-action");
+            boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
             Character chr = 'A';
             if (numeric) chr = '1';
 
@@ -1665,7 +1665,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         void drawOptionsToRemoveWays() {
             drawFixVariantsWithParallelLinesWhileRemove();
-            boolean numeric = Main.pref.getBoolean("pt_assistant.keep-options-numerical-in-mend-action");
+            boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
 
             Color[] colors = { new Color(255, 0, 0, 150), new Color(0, 255, 0, 150), new Color(255, 255, 0, 150),
                     new Color(0, 255, 255, 200) };

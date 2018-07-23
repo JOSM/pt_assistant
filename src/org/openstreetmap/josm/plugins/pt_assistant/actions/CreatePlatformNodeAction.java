@@ -42,6 +42,7 @@ import org.openstreetmap.josm.data.validation.routines.RegexValidator;
 import org.openstreetmap.josm.gui.ExtendedDialog;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.conflict.tags.CombinePrimitiveResolverDialog;
+import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.Logging;
@@ -117,7 +118,7 @@ public class CreatePlatformNodeAction extends JosmAction {
 
 		if (platformWay != null && platformNode != null) {
 			List<Command> cmdList = new ArrayList<>();
-			if (Main.pref.getBoolean("pt_assistant.transfer-platformway-tag")) {
+			if (PTAssistantPluginPreferences.TRANSFER_PLATFORMWAY.get()) {
 				HashMap<String, String> tagsForWay = new HashMap<>();
 				HashMap<String, String> tagsForNode = new HashMap<>(platformNode.getKeys());
 
@@ -128,7 +129,7 @@ public class CreatePlatformNodeAction extends JosmAction {
 				wayTagsRemove.replaceAll((key, value) -> null);
 
 				tagsForNode.putAll(platformWay.getKeys());
-				if (!Main.pref.getBoolean("pt_assistant.add-mode-of-transport-to-stop")) {
+				if (!PTAssistantPluginPreferences.ADD_MODE_OF_TRANSPORT.get()) {
 					tagsForNode.replace("public_transport", "platform");
 				} else {
 					tagsForNode.remove("public_transport", "platform");
@@ -155,7 +156,7 @@ public class CreatePlatformNodeAction extends JosmAction {
 					tagsForWay.put("wheelchair", platformWay.get("wheelchair"));
 
 				// if the user has wants to keep the tag
-				if (!Main.pref.getBoolean("pt_assistant.transfer-details-action"))
+				if (!PTAssistantPluginPreferences.TRANSFER_DETAILS.get())
 					tagsForWay.put("public_transport", "platform");
 				else
 					tagsForWay.remove("public_transport", "platform");
@@ -173,7 +174,7 @@ public class CreatePlatformNodeAction extends JosmAction {
 			}
 
 			// based on the user's response decide whether to transfer the relations or not
-			if (Main.pref.getBoolean("pt_assistant.substitute-platformway-relation")) {
+			if (PTAssistantPluginPreferences.SUBSTITUTE_PLATFORM_RELATION.get()) {
 				Map<Relation, List<Integer>> savedPositions = getSavedPositions(platformWay);
 				List<Relation> parentStopAreaRelation = removeWayFromRelationsCommand(platformWay);
 				cmdList.addAll(updateRelation(savedPositions, platformNode, platformWay, parentStopAreaRelation));
@@ -181,7 +182,7 @@ public class CreatePlatformNodeAction extends JosmAction {
 			}
 		}
 
-		if (platformNode != null && stopPositionNode != null && Main.pref.getBoolean("pt_assistant.transfer-stopposition-tag")) {
+		if (platformNode != null && stopPositionNode != null && PTAssistantPluginPreferences.TRANSFER_STOP_POSITION.get()) {
 			dummy1 = new Node(platformNode.getEastNorth());
 			dummy2 = new Node(platformNode.getEastNorth());
 			dummy3 = new Node(platformNode.getEastNorth());
@@ -204,7 +205,7 @@ public class CreatePlatformNodeAction extends JosmAction {
 				platformNode.put("route_ref", getRefs(refs));
 			}
 
-			if (Main.pref.getBoolean("pt_assistant.add-mode-of-transport-to-stop")) {
+			if (PTAssistantPluginPreferences.ADD_MODE_OF_TRANSPORT.get()) {
 				stopPositionNode.remove("public_transport");
 				if (stopPositionNode.hasTag("bus")) {
 					stopPositionNode.remove("bus");
@@ -372,7 +373,7 @@ public class CreatePlatformNodeAction extends JosmAction {
 	}
 
 	private void addToPreferences() {
-		Main.pref.putBoolean("pt_assistant.transfer-details-action", this.transferDetails.isSelected());
+		PTAssistantPluginPreferences.TRANSFER_DETAILS.put(this.transferDetails.isSelected());
 		action();
 	}
 
