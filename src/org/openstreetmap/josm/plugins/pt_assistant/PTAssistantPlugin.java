@@ -8,6 +8,7 @@ import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JMenu;
@@ -20,6 +21,10 @@ import org.openstreetmap.josm.gui.IconToggleButton;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MainMenu;
 import org.openstreetmap.josm.gui.MapFrame;
+import org.openstreetmap.josm.gui.dialogs.relation.RelationEditorHooks;
+import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
+import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
+import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionGroup;
 import org.openstreetmap.josm.gui.preferences.PreferenceSetting;
 import org.openstreetmap.josm.plugins.Plugin;
 import org.openstreetmap.josm.plugins.PluginInformation;
@@ -30,6 +35,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.actions.CreatePlatformShortcu
 import org.openstreetmap.josm.plugins.pt_assistant.actions.DoubleSplitAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.EdgeSelectionAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.ExtractPlatformNodeAction;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.MendRelationAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.PTWizardAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SplitRoundaboutAction;
@@ -80,7 +86,7 @@ public class PTAssistantPlugin extends Plugin {
 		addToPTAssistantmenu(PublicTransportMenu);
 		initialiseWizard();
 		initialiseShorcutsForCreatePlatformNode();
-//		addButtonsToRelationEditor();
+		addButtonsToRelationEditor();
 	}
 
 	/**
@@ -156,7 +162,6 @@ public class PTAssistantPlugin extends Plugin {
 //		editHighlightedRelationsMenu = MainMenu.add(PublicTransportMenu, editHighlightedRelationsAction);
 		MainMenu.add(PublicTransportMenu, new SplitRoundaboutAction());
 		MainMenu.add(PublicTransportMenu, new CreatePlatformNodeAction());
-		MainMenu.add(PublicTransportMenu, new SortPTRouteMembersAction());
 		Component sep = new JPopupMenu.Separator();
 		PublicTransportMenu.add(sep);
 		MainMenu.add(PublicTransportMenu, new PTWizardAction());
@@ -174,13 +179,28 @@ public class PTAssistantPlugin extends Plugin {
 		ExtractPlatformNodeAction shortcut3 = new ExtractPlatformNodeAction();
 	}
 
-//	private void addButtonsToRelationEditor() {
-//
-//		IRelationEditorActionGroup group = new IRelationEditorActionGroup() {
-//			@Override
-//			public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
-//				return Arrays.asList(new MendRelationAction(editorAccess));
-//			}};
-//		RelationEditorHooks.addActionsToSelectio(group);
-//	}
+	private void addButtonsToRelationEditor() {
+
+		IRelationEditorActionGroup group1 = new IRelationEditorActionGroup() {
+			@Override
+			public int order() {
+    				return 10;
+    			}
+			@Override
+			public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
+				return Arrays.asList(new MendRelationAction(editorAccess));
+			}};
+
+		IRelationEditorActionGroup group2 = new IRelationEditorActionGroup() {
+			@Override
+			public int order() {
+    				return 30;
+    			}
+			@Override
+			public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
+				return Arrays.asList(new SortPTRouteMembersAction(editorAccess));
+			}};
+		RelationEditorHooks.addActionsToMembers(group1);
+		RelationEditorHooks.addActionsToMembers(group2);
+	}
 }

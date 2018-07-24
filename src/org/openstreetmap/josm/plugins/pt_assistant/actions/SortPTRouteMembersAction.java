@@ -5,7 +5,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,6 @@ import java.util.concurrent.Future;
 import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.Main;
-import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.data.coor.EastNorth;
@@ -28,10 +26,15 @@ import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.dialogs.relation.DownloadRelationMemberTask;
+import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
+import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
+import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
+import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
+import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
@@ -42,55 +45,64 @@ import org.openstreetmap.josm.tools.Utils;
  * @author giacomo
  *
  */
-public class SortPTRouteMembersAction extends JosmAction {
+public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
     private static final String ACTION_NAME = "Sort PT Route Members";
+    private GenericRelationEditor editor = null;
 
     /**
      * Creates a new SortPTRouteMembersAction
      */
-    public SortPTRouteMembersAction() {
-        super(ACTION_NAME, "icons/sortptroutemembers", ACTION_NAME, null, true);
+    public SortPTRouteMembersAction(IRelationEditorActionAccess editorAccess) {
+    		super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
+    		putValue(ACTION_NAME, tr(ACTION_NAME));
+            new ImageProvider("icons", "sortptroutemembers").getResource().attachImageIcon(this, true);
+
+        editor = (GenericRelationEditor) editorAccess.getEditor();
+        updateEnabledState();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        for (Relation rel : getLayerManager().getEditDataSet().getSelectedRelations()) {
-            if (rel.hasIncompleteMembers()) {
-                if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(Main.parent,
-                    tr("The relation has incomplete members. Do you want to download them and continue with the sorting?"),
-                    tr("Incomplete Members"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                    null, null, null)) {
+    		Relation rel = editor.getRelation();
+    		editor.apply();
 
-                    List<Relation> incomplete = Collections.singletonList(rel);
-                    Future<?> future = MainApplication.worker.submit(new DownloadRelationMemberTask(
-                            incomplete,
-                            Utils.filteredCollection(
-                                    DownloadSelectedIncompleteMembersAction.buildSetOfIncompleteMembers(
-                                            Collections.singletonList(rel)), OsmPrimitive.class),
-                            MainApplication.getLayerManager().getEditLayer()));
+        if (rel.hasIncompleteMembers()) {
+            if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(Main.parent,
+                tr("The relation has incomplete members. Do you want to download them and continue with the sorting?"),
+                tr("Incomplete Members"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, null, null)) {
 
-                        MainApplication.worker.submit(() -> {
-                            try {
-                                future.get();
-                                continueAfterDownload(rel);
-                            } catch (InterruptedException | ExecutionException e1) {
-                                Logging.error(e1);
-                                return;
-                            }
-                        });
-                } else
-                    return;
+                List<Relation> incomplete = Collections.singletonList(rel);
+                Future<?> future = MainApplication.worker.submit(new DownloadRelationMemberTask(
+                        incomplete,
+                        Utils.filteredCollection(
+                                DownloadSelectedIncompleteMembersAction.buildSetOfIncompleteMembers(
+                                        Collections.singletonList(rel)), OsmPrimitive.class),
+                        MainApplication.getLayerManager().getEditLayer()));
+
+                MainApplication.worker.submit(() -> {
+                		try {
+                            future.get();
+                            continueAfterDownload(rel);
+                        } catch (InterruptedException | ExecutionException e1) {
+                            Logging.error(e1);
+                            return;
+                        }
+                 });
             } else
-                continueAfterDownload(rel);
-        }
+                return;
+        } else
+            continueAfterDownload(rel);
+
     }
 
     private void continueAfterDownload(Relation rel) {
         Relation newRel = new Relation(rel);
         sortPTRouteMembers(newRel);
         MainApplication.undoRedo.add(new ChangeCommand(rel, newRel));
+        editor.reloadDataFromRelation();
     }
 
     /***
@@ -167,7 +179,9 @@ public class SortPTRouteMembersAction extends JosmAction {
         //the stop to the relation since it is not possible to reason on the order
         StopToWayAssigner assigner = new StopToWayAssigner(ways);
         List<PTStop> ptstops = new ArrayList<>();
+        removeWrongSideStops(ptstops, wayMembers);
         stopsByName.values().forEach(ptstops::addAll);
+
         Map<Way, List<PTStop>> wayStop = new HashMap<>();
         ptstops.forEach(stop -> {
             Way way = assigner.get(stop);
@@ -330,21 +344,57 @@ public class SortPTRouteMembersAction extends JosmAction {
         return p.getName();
     }
 
-    @Override
-    protected void updateEnabledState(
-            Collection<? extends OsmPrimitive> selection) {
-        if (selection.isEmpty()) {
+    private static void removeWrongSideStops(List<PTStop> ptstop, List<RelationMember> wayMembers) {
+    		for (int i=0; i<wayMembers.size(); i++) {
+    			RelationMember wm = wayMembers.get(i);
+    	        Way prev = null;
+    	        Way next = null;
+    	        if (i > 0) {
+    	            RelationMember wmp = wayMembers.get(i-1);
+    	            if (wmp.getType() == OsmPrimitiveType.WAY)
+    	                prev = wmp.getWay();
+    	        }
+    	        if (i < wayMembers.size() - 1) {
+    	            RelationMember wmn = wayMembers.get(i+1);
+    	            if (wmn.getType() == OsmPrimitiveType.WAY)
+    	                next = wmn.getWay();
+    	        }
+    	        if (wm.getType() == OsmPrimitiveType.WAY) {
+    	            Way curr = wm.getWay();
+    	            Node firstNode = findCommonNode(curr, prev);
+    	            Node lastNode = findCommonNode(curr, next);
+    	            System.out.println(i);
+    	            	if (firstNode != null && firstNode.equals(curr.getNode(0))) {
+    	            		System.out.println("Front Way 1 == " + curr.getName());
+    	            	} else if (firstNode != null && firstNode.equals(curr.getNode(curr.getNodesCount() - 1))) {
+    	            		System.out.println("Back Way 2 == " + curr.getName());
+    	            	} else if (lastNode != null && lastNode.equals(curr.getNode(0))) {
+    	            		System.out.println("Back Way 3 == " + curr.getName());
+    	            	} else if (lastNode != null && lastNode.equals(curr.getNode(curr.getNodesCount() - 1))) {
+    	            		System.out.println("Front Way 4 == " + curr.getName());
+    	            	}
+    	        }
+    		}
+    }
+
+    private static Node findCommonNode(Way w1, Way w2) {
+    		if (w1 == null || w2 == null)
+    			return null;
+    		for (int i = 0; i< w1.getNodes().size(); i++) {
+    			for (int j = 0; j<w2.getNodes().size(); j++) {
+    				if (w1.getNodes().get(i).equals(w2.getNodes().get(j)))
+    					return w1.getNodes().get(i);
+    			}
+    		}
+    		return null;
+    }
+
+	@Override
+	protected void updateEnabledState() {
+		if (editor != null && !RouteUtils.isPTRoute(editor.getRelation())) {
             setEnabled(false);
             return;
         }
-
-        for (OsmPrimitive sel : selection) {
-            if (sel.getType() != OsmPrimitiveType.RELATION || !RouteUtils.isPTRoute((Relation) sel)) {
-                setEnabled(false);
-                return;
-            }
-        }
-
-        setEnabled(true);
-    }
+		setEnabled(true);
+	}
 }
