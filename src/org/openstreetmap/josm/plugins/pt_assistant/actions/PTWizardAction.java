@@ -45,7 +45,6 @@ import org.openstreetmap.josm.data.preferences.sources.SourceEntry;
 import org.openstreetmap.josm.data.preferences.sources.SourceType;
 import org.openstreetmap.josm.gui.ExtendedDialog;
 import org.openstreetmap.josm.gui.MainApplication;
-import org.openstreetmap.josm.gui.MainMenu;
 import org.openstreetmap.josm.gui.Notification;
 import org.openstreetmap.josm.gui.download.UserQueryList.SelectorItem;
 import org.openstreetmap.josm.gui.io.CustomConfigurator;
@@ -426,8 +425,8 @@ public final class PTWizardAction extends JosmAction {
 		for(String fv : finalValues) {
 			System.out.println(fv);
 		}
-		if(finalValues.contains("Sort stops in route relation"))
-			MainMenu.add(MainApplication.getMenu().toolsMenu, new SortPTRouteMembersAction());
+//		if(finalValues.contains("Sort stops in route relation"))
+//			MainMenu.add(MainApplication.getMenu().toolsMenu, new SortPTRouteMembersAction());
 
 		List<String> current = Config.getPref().getList("toolbar");
 
