@@ -58,6 +58,7 @@ import org.openstreetmap.josm.gui.layer.MapViewPaintable;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.gui.layer.validation.PaintVisitor;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
@@ -462,7 +463,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 					}
 				}
 				if (del) {
-					System.out.println("Pallellola");
 					int[] x = { i };
 					memberTableModel.remove(x);
 					members.remove(i);
@@ -504,7 +504,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			displayFixVariants(parentWays);
 		} else {
 			nextIndex = true;
-			System.out.println("zero");
 			if (currentIndex >= members.size() - 1) {
 				deleteExtraWays();
 			} else {
@@ -535,7 +534,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		// check if the way equals the next way, if so then don't add any new ways to
 		// the list
 		if (way == nextWay) {
-			System.out.println("assa" + wayList.size());
 			lst.add(wayList);
 			displayFixVariantsWithOverlappingWays(lst);
 			return;
@@ -555,7 +553,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 		// if next way turns out to be a roundabout
 		if (nextWay.containsNode(node) && nextWay.hasTag("junction", "roundabout")) {
-			System.out.println("kassa" + wayList.size());
 			lst.add(wayList);
 			displayFixVariantsWithOverlappingWays(lst);
 			return;
@@ -794,10 +791,18 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 		// check mode of transport, also check if there is no loop
 		for (Way w : parentWays) {
-			if (!isWaySuitableForBuses(w)) {
-				waysToBeRemoved.add(w);
+			if (	relation.hasTag("route", "bus")) {
+				if (!isWaySuitableForBuses(w)) {
+					waysToBeRemoved.add(w);
+				}
+			} else if (RouteUtils.isPTRoute(relation)) {
+				if (!isWaySuitableForRailways(w)) {
+					waysToBeRemoved.add(w);
+				}
 			}
+		}
 
+		for (Way w: parentWays) {
 			if (w.equals(previousWay)) {
 				waysToBeRemoved.add(w);
 			}
@@ -1009,6 +1014,13 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		}
 
 		return false;
+	}
+
+	boolean isWaySuitableForRailways(Way way) {
+		String[] acceptedRailwayTags = new String[] {
+                "tram", "subway", "light_rail", "rail"};
+
+		return way.hasTag("railway", acceptedRailwayTags);
 	}
 
 	void addAlreadyExistingWay(Way w) {
@@ -1570,13 +1582,11 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		} else {
 			currentNode = null;
 		}
-		System.out.println("palt");
 		previousWay = currentWay;
 		if (currentIndex < members.size() - 1) {
 			callNextWay(++currentIndex);
 		} else
 			deleteExtraWays();
-		System.out.println("palt");
 	}
 
 	void removeTemporarylayers() {
