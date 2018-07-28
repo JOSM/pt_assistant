@@ -20,6 +20,12 @@ josm.i18n {
   pathTransformer = getPathTransformer("github.com/JOSM/pt_assistant/blob")
 }
 
+test {
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
+
 sourceSets {
   main {
     java {
@@ -35,9 +41,6 @@ sourceSets {
     }
     resources {
       srcDirs = ["test/data"]
-    }
-    testLogging {
-        exceptionFormat = 'full'
     }
   }
 }
