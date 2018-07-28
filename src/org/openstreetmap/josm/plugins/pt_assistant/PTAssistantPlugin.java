@@ -162,6 +162,7 @@ public class PTAssistantPlugin extends Plugin {
 //		editHighlightedRelationsMenu = MainMenu.add(PublicTransportMenu, editHighlightedRelationsAction);
 		MainMenu.add(PublicTransportMenu, new SplitRoundaboutAction());
 		MainMenu.add(PublicTransportMenu, new CreatePlatformNodeAction());
+
 		Component sep = new JPopupMenu.Separator();
 		PublicTransportMenu.add(sep);
 		MainMenu.add(PublicTransportMenu, new PTWizardAction());

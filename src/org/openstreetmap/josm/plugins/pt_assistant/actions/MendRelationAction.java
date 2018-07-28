@@ -120,8 +120,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 	@Override
 	protected void updateEnabledState() {
-		if (relation != null
-				&& !(relation.hasTag("route", "bus") && relation.hasTag("public_transport:version", "2"))) {
+		if (relation != null && !((relation.hasTag("route", "bus") && relation.hasTag("public_transport:version", "2"))
+				|| ((RouteUtils.isPTRoute(relation) && !relation.hasTag("route", "bus"))))) {
 			setEnabled(false);
 			return;
 		}
@@ -670,7 +670,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		if (abort)
 			return null;
 		List<Way> waysToBeRemoved = new ArrayList<>();
-
 		// check if any of the way is joining with its intermediate nodes
 		List<Way> waysToBeAdded = new ArrayList<>();
 		for (Way w : parentWays) {
@@ -756,7 +755,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			}
 		}
 		parentWays.addAll(waysToBeAdded);
-
 		// one way direction doesn't match
 		for (Way w : parentWays) {
 			if (w.isOneway() != 0) {
@@ -767,7 +765,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				}
 			}
 		}
-
 		parentWays.removeAll(waysToBeRemoved);
 		waysToBeRemoved.clear();
 
@@ -791,18 +788,18 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 		// check mode of transport, also check if there is no loop
 		for (Way w : parentWays) {
-			if (	relation.hasTag("route", "bus")) {
+			if (relation.hasTag("route", "bus")) {
 				if (!isWaySuitableForBuses(w)) {
 					waysToBeRemoved.add(w);
 				}
 			} else if (RouteUtils.isPTRoute(relation)) {
-				if (!isWaySuitableForRailways(w)) {
+				if (!isWaySuitableForOtherModes(w)) {
 					waysToBeRemoved.add(w);
 				}
 			}
 		}
 
-		for (Way w: parentWays) {
+		for (Way w : parentWays) {
 			if (w.equals(previousWay)) {
 				waysToBeRemoved.add(w);
 			}
@@ -1016,11 +1013,28 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		return false;
 	}
 
-	boolean isWaySuitableForRailways(Way way) {
-		String[] acceptedRailwayTags = new String[] {
-                "tram", "subway", "light_rail", "rail"};
+	boolean isWaySuitableForOtherModes(Way way) {
+		String[] acceptedRailwayTags = new String[] { "tram", "subway", "light_rail", "rail" };
 
-		return way.hasTag("railway", acceptedRailwayTags);
+		if (relation.hasTag("route", "tram"))
+			return way.hasTag("railway", "tram");
+
+		if (relation.hasTag("route", "subway"))
+			return way.hasTag("railway", "subway");
+
+		if (relation.hasTag("route", "light_rail"))
+			return way.hasTag("railway", "light_rail");
+
+		if (relation.hasTag("route", "rail"))
+			return way.hasTag("railway", "rail");
+
+		if (relation.hasTag("route", "train"))
+			return way.hasTag("railway", "train");
+
+		if (relation.hasTag("route", "trolleybus"))
+			return way.hasTag("trolley_wire", "yes");
+
+		return false;
 	}
 
 	void addAlreadyExistingWay(Way w) {
@@ -1365,6 +1379,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 					nextIndex = true;
 					MainApplication.getMap().mapView.removeKeyListener(this);
 					MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+					System.out.println(typedKeyUpperCase);
 					if (typedKeyUpperCase.charValue() == 'R' || typedKeyUpperCase.charValue() == '3') {
 						wayIndices.add(0, currentIndex);
 					}
