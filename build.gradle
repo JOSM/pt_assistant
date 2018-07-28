@@ -36,6 +36,9 @@ sourceSets {
     resources {
       srcDirs = ["test/data"]
     }
+    testLogging {
+        exceptionFormat = 'full'
+    }
   }
 }
 tasks.withType(ProcessResources.class).getByName(sourceSets.main.getProcessResourcesTaskName()) {
