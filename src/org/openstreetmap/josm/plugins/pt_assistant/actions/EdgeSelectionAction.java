@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
 
-import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.actions.mapmode.MapMode;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
@@ -219,9 +218,9 @@ public class EdgeSelectionAction extends MapMode {
 				edgeList = sortEdgeWays(new ArrayList<>(edgeSet));
 				new Notification(
 						tr("Mode of Travel -> {0} \n total ways selected -> {1}", modeOfTravel, edgeList.size()))
-								.setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(1200).show();
+								.setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(4800).show();
 				ds.setSelected(edgeList);
-				AutoScaleAction.autoScale("selection");
+//				AutoScaleAction.autoScale("selection");
 			}
 
 		} else if (!shift && ctrl && initial != null) {
@@ -262,7 +261,7 @@ public class EdgeSelectionAction extends MapMode {
 			new Notification(tr("Mode of Travel -> {0} \n total ways selected -> {1}", modeOfTravel, edgeList.size()))
 					.setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(900).show();
 			ds.setSelected(edgeList);
-			AutoScaleAction.autoScale("selection");
+//			AutoScaleAction.autoScale("selection");
 
 		} else if (shift && !ctrl && initial != null) {
 			/*
@@ -298,7 +297,7 @@ public class EdgeSelectionAction extends MapMode {
 						tr("Mode of Travel -> {0} \n total ways selected -> {1}", modeOfTravel, edgeList.size()))
 								.setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(900).show();
 				ds.setSelected(edgeList);
-				AutoScaleAction.autoScale("selection");
+//				AutoScaleAction.autoScale("selection");
 			}
 		}
 
