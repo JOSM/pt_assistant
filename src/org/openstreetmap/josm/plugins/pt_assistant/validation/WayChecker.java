@@ -122,7 +122,7 @@ public class WayChecker extends Checker {
                     primitives.add(relation);
                     List<Way> highlighted = new ArrayList<>(1);
                     highlighted.add(way);
-                    Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_CONSTRUCTION);
+                    Builder builder = TestError.builder(this.test, Severity.OTHER, PTAssistantValidatorTest.ERROR_CODE_CONSTRUCTION);
                     builder.message(tr("PT: Road is under construction"));
                     builder.primitives(primitives);
                     builder.highlight(highlighted);
