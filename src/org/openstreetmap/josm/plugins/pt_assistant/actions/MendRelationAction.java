@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -805,6 +806,13 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			}
 		}
 
+		// check restrictions
+		for (Way w : parentWays) {
+			if (isRestricted(w, way)) {
+				waysToBeRemoved.add(w);
+			}
+		}
+
 		parentWays.removeAll(waysToBeRemoved);
 		return parentWays;
 	}
@@ -994,6 +1002,59 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		});
 	}
 
+	boolean isRestricted(Way currentWay, Way previousWay) {
+		List<Relation> parentRelation = OsmPrimitive.getFilteredList(currentWay.getReferrers(), Relation.class);
+		String[] restrictions = new String[] { "restriction", "restriction:bus", "restriction:trolleybus",
+				"restriction:tram", "restriction:subway", "restriction:light_rail", "restriction:rail",
+				"restriction:train", "restriction:trolleybus" };
+
+		parentRelation.removeIf(rel -> {
+			if (rel.hasKey("except")) {
+				String[] val = rel.get("except").split(";");
+				for (String s : val) {
+					if (relation.hasTag("route", s)) return true;
+				}
+			}
+
+			if (!rel.hasTag("type", restrictions))
+				return true;
+			else if (rel.hasTag("type", "restriction") && rel.hasKey("restriction"))
+				return false;
+			else {
+				boolean remove = true;
+				String routeValue = relation.get("route");
+				for (String s : restrictions) {
+					String sub = s.substring(12);
+					if (routeValue.equals(sub) && rel.hasTag("type", s)) remove = false;
+					else if (routeValue.equals(sub) && rel.hasKey("restriction:" + sub)) remove = false;
+				}
+				return remove;
+			}
+		});
+
+		for (Relation r : parentRelation) {
+			Collection<RelationMember> curMemberList = r.getMembersFor(Arrays.asList(currentWay));
+			Collection<RelationMember> prevMemberList = r.getMembersFor(Arrays.asList(previousWay));
+
+			if (curMemberList.isEmpty() || prevMemberList.isEmpty()) continue;
+
+			RelationMember curMember = curMemberList.stream().collect(Collectors.toList()).get(0);
+			RelationMember prevMember = prevMemberList.stream().collect(Collectors.toList()).get(0);
+
+			final String curRole = curMember.getRole();
+			final String prevRole = prevMember.getRole();
+
+			if (curRole.equals("to") && prevRole.equals("from")) {
+				String[] acceptedTags = new String[] { "no_right_turn", "no_left_turn", "no_u_turn", "no_straight_on",
+						"no_entry", "no_exit" };
+				for (String s : restrictions)
+					if (r.hasTag(s, acceptedTags))
+						return true;
+			}
+		}
+		return false;
+	}
+
 	boolean isWaySuitableForBuses(Way way) {
 
 		String[] acceptedHighwayTags = new String[] { "motorway", "trunk", "primary", "secondary", "tertiary",
@@ -1014,7 +1075,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 	}
 
 	boolean isWaySuitableForOtherModes(Way way) {
-		String[] acceptedRailwayTags = new String[] { "tram", "subway", "light_rail", "rail" };
 
 		if (relation.hasTag("route", "tram"))
 			return way.hasTag("railway", "tram");
