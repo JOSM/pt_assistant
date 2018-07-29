@@ -200,7 +200,7 @@ public class NodeChecker extends Checker {
 		if (route_ref != null) {
 			String[] splitted = route_ref.split("[|;]");
 			if (splitted.length != parentsLabelList.size()) {
-				Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_ROUTE_REF);
+				Builder builder = TestError.builder(this.test, Severity.OTHER, PTAssistantValidatorTest.ERROR_CODE_ROUTE_REF);
             builder.message(tr("PT: Refs of the routes do not match with the route_ref tag of the primitive"));
             builder.primitives(primitive);
             TestError e = builder.build();
@@ -209,7 +209,7 @@ public class NodeChecker extends Checker {
 			} else {
 				for(String s : splitted) {
 					if (!parentsLabelList.contains(s)) {
-						Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_ROUTE_REF);
+						Builder builder = TestError.builder(this.test, Severity.OTHER, PTAssistantValidatorTest.ERROR_CODE_ROUTE_REF);
 		                builder.message(tr("Refs of the routes do not match with the route_ref tag of the primitive"));
 		                builder.primitives(primitive);
 		                TestError e = builder.build();
