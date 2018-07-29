@@ -184,8 +184,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			}
 
 			Way way = members.get(i).getWay();
-			Way nextWay = members.get(j).getWay();
-			this.nextWay = nextWay;
+			this.nextWay = members.get(j).getWay();
 
 			// if some ways are invalid then remove them
 			Node node = checkValidityOfWays(way, j);
@@ -367,6 +366,16 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		return j;
 	}
 
+	int getPreviousWayIndex(int idx) {
+		int j;
+
+		for (j = idx - 1; j >= 0; j--) {
+			if (members.get(j).isWay())
+				return j;
+		}
+		return -1;
+	}
+
 	void sortBelow(List<RelationMember> members, int index) {
 		RelationSorter relationSorter = new RelationSorter();
 		final List<RelationMember> subList = members.subList(Math.max(0, index), members.size());
@@ -410,6 +419,20 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		}
 
 		return count++;
+	}
+
+	Node findCommonFirstLastNode(Way way, Way previousWay) {
+		Node node1 = previousWay.firstNode();
+		Node node2 = previousWay.lastNode();
+
+		if (way.firstNode().equals(node1) || way.firstNode().equals(node2)) {
+			return way.firstNode();
+		}
+		if (way.lastNode().equals(node1) || way.lastNode().equals(node2)) {
+			return way.lastNode();
+		}
+
+		return null;
 	}
 
 	Node findCommonFirstLastNode(Way way, Way prevWay, Node currentNode) {
@@ -805,8 +828,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				waysToBeRemoved.add(w);
 			}
 		}
-
 		// check restrictions
+		int count = 1;
 		for (Way w : parentWays) {
 			if (isRestricted(w, way)) {
 				waysToBeRemoved.add(w);
@@ -883,7 +906,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		Bounds area = new Bounds(rbbox.getBottomRightLat() - 10 * latOffset, rbbox.getTopLeftLon() - 10 * lonOffset,
 				rbbox.getTopLeftLat() + 10 * latOffset, rbbox.getBottomRightLon() + 10 * lonOffset);
 		Future<?> future = task.download(false, area, null);
-
 		MainApplication.worker.submit(() -> {
 			try {
 				future.get();
@@ -950,7 +972,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		Bounds area = new Bounds(rbbox.getBottomRightLat() - 3 * latOffset, rbbox.getTopLeftLon() - 3 * lonOffset,
 				rbbox.getTopLeftLat() + 3 * latOffset, rbbox.getBottomRightLon() + 3 * lonOffset);
 		Future<?> future = task.download(false, area, null);
-
 		MainApplication.worker.submit(() -> {
 			try {
 				future.get();
@@ -1003,7 +1024,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 	}
 
 	boolean isRestricted(Way currentWay, Way previousWay) {
-		List<Relation> parentRelation = OsmPrimitive.getFilteredList(currentWay.getReferrers(), Relation.class);
+		List<Relation> parentRelation = OsmPrimitive.getFilteredList(previousWay.getReferrers(), Relation.class);
 		String[] restrictions = new String[] { "restriction", "restriction:bus", "restriction:trolleybus",
 				"restriction:tram", "restriction:subway", "restriction:light_rail", "restriction:rail",
 				"restriction:train", "restriction:trolleybus" };
@@ -1052,6 +1073,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 						return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -1168,17 +1190,23 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		// find the letters of the fix variants:
 		char alphabet = 'A';
 		boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
-		if (numeric)
-			alphabet = '1';
-
 		wayColoring = new HashMap<>();
 		final List<Character> allowedCharacters = new ArrayList<>();
+
+		if (numeric) {
+			alphabet = '1';
+			allowedCharacters.add('7');
+			allowedCharacters.add('9');
+		} else {
+			allowedCharacters.add('S');
+			allowedCharacters.add('Q');
+		}
+
 		for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
 			allowedCharacters.add(alphabet);
 			wayColoring.put(fixVariants.get(i), alphabet);
 			alphabet++;
 		}
-		allowedCharacters.add('S');
 
 		if (abort)
 			return;
@@ -1233,10 +1261,14 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 							idx = typedKeyUpperCase.charValue() - 97;
 					}
 					nextIndex = true;
-					if (typedKeyUpperCase.charValue() == 'S') {
+					if (typedKeyUpperCase.charValue() == 'S' || typedKeyUpperCase.charValue() == '7') {
 						MainApplication.getMap().mapView.removeKeyListener(this);
 						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
 						getNextWayAfterSelection(null);
+					} else if (typedKeyUpperCase.charValue() == 'Q' || typedKeyUpperCase.charValue() == '9') {
+						MainApplication.getMap().mapView.removeKeyListener(this);
+						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+						removeCurrentEdge();
 					} else {
 						MainApplication.getMap().mapView.removeKeyListener(this);
 						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
@@ -1266,16 +1298,23 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		// find the letters of the fix variants:
 		char alphabet = 'A';
 		boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
-		if (numeric)
-			alphabet = '1';
 		wayListColoring = new HashMap<>();
 		final List<Character> allowedCharacters = new ArrayList<>();
+
+		if (numeric) {
+			alphabet = '1';
+			allowedCharacters.add('7');
+			allowedCharacters.add('9');
+		} else {
+			allowedCharacters.add('S');
+			allowedCharacters.add('Q');
+		}
+
 		for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
 			allowedCharacters.add(alphabet);
 			wayListColoring.put(alphabet, fixVariants.get(i));
 			alphabet++;
 		}
-		allowedCharacters.add('S');
 
 		if (abort)
 			return;
@@ -1324,6 +1363,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				Character typedKeyUpperCase = typedKey.toString().toUpperCase().toCharArray()[0];
 				if (allowedCharacters.contains(typedKeyUpperCase)) {
 					int idx = typedKeyUpperCase.charValue() - 65;
+					System.out.println(typedKey);
 					if (numeric) {
 						// for numpad numerics and the plain numerics
 						if (typedKeyUpperCase.charValue() <= 57)
@@ -1332,11 +1372,15 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 							idx = typedKeyUpperCase.charValue() - 97;
 					}
 					nextIndex = true;
-					if (typedKeyUpperCase.charValue() == 'S') {
+					if (typedKeyUpperCase.charValue() == 'S' || typedKeyUpperCase.charValue() == '7') {
 						MainApplication.getMap().mapView.removeKeyListener(this);
 						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
 						getNextWayAfterSelection(null);
-					} else {
+					} else if (typedKeyUpperCase.charValue() == 'Q' || typedKeyUpperCase.charValue() == '9') {
+						MainApplication.getMap().mapView.removeKeyListener(this);
+						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+						removeCurrentEdge();
+					}else {
 						MainApplication.getMap().mapView.removeKeyListener(this);
 						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
 						getNextWayAfterSelection(fixVariants.get(idx));
@@ -1554,7 +1598,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				Way w1 = null;
 				List<Node> breakNode = null;
 				boolean brk = false;
-				System.out.println("rt");
+
 				if (w.isNew()) {
 
 					if (prev != null) {
@@ -1619,7 +1663,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 						}
 					}
 
-					System.out.println("nt");
 					if (w1 != null && brk == false) {
 						SplitWayCommand result = SplitWayCommand.split(w1, breakNode, Collections.emptyList());
 						if (result != null) {
@@ -1662,6 +1705,77 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			callNextWay(++currentIndex);
 		} else
 			deleteExtraWays();
+	}
+
+	List<Way> findCurrentEdge (){
+		List<Way> lst = new ArrayList<>();
+		lst.add(currentWay);
+		int j = currentIndex;
+		Way curr = currentWay;
+		while (true) {
+			int i = getPreviousWayIndex(j);
+			if (i == -1) break;
+
+			Way prevWay = members.get(i).getWay();
+
+			if (prevWay == null) break;
+
+			Node n = findCommonFirstLastNode(curr, prevWay);
+
+			if (n == null) break;
+			if (n.getParentWays().size() > 2) break;
+
+			lst.add(prevWay);
+			curr = prevWay;
+			j = i;
+		}
+		return lst;
+	}
+
+	void removeCurrentEdge() {
+		List<Integer> lst = new ArrayList<>();
+		lst.add(currentIndex);
+		int j = currentIndex;
+		Way curr = currentWay;
+		Node n = null;
+
+		while (true) {
+			int i = getPreviousWayIndex(j);
+			if (i == -1) break;
+
+			Way prevWay = members.get(i).getWay();
+
+			if (prevWay == null) break;
+
+			n = findCommonFirstLastNode(curr, prevWay);
+
+			if (n == null) break;
+			if (n.getParentWays().size() > 2) break;
+
+			lst.add(i);
+			curr = prevWay;
+			j = i;
+		}
+
+		int prevInd = getPreviousWayIndex(j);
+
+		Collections.reverse(lst);
+		int[] ind = lst.stream().mapToInt(Integer::intValue).toArray();
+		memberTableModel.remove(ind);
+		for (int i = 0; i < ind.length; i++) {
+			members.remove(ind[i] - i);
+		}
+
+		save();
+
+		if (prevInd >= 0) {
+			currentNode = n;
+			currentIndex = prevInd;
+			callNextWay(currentIndex);
+		} else {
+			notice = null;
+			deleteExtraWays();
+		}
 	}
 
 	void removeTemporarylayers() {
@@ -1763,7 +1877,16 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			// display the "Esc", "Skip" label:
 			drawFixVariantLetter("Esc", Color.WHITE, letterX, letterY, 40);
 			letterY = letterY + 60;
-			drawFixVariantLetter("S : Skip", Color.WHITE, letterX, letterY, 25);
+			if (numeric) {
+				drawFixVariantLetter("7 : Skip", Color.WHITE, letterX, letterY, 25);
+				letterY = letterY + 60;
+				drawFixVariantLetter("9 : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
+			}
+			else {
+				drawFixVariantLetter("S : Skip", Color.WHITE, letterX, letterY, 25);
+				letterY = letterY + 60;
+				drawFixVariantLetter("Q : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
+			}
 		}
 
 		void drawOptionsToRemoveWays() {
@@ -1828,10 +1951,22 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				}
 			}
 
+			boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
+
 			// display the "Esc", "Skip" label:
 			drawFixVariantLetter("Esc", Color.WHITE, letterX, letterY, 40);
 			letterY = letterY + 60;
-			drawFixVariantLetter("S : Skip", Color.WHITE, letterX, letterY, 25);
+			if (numeric) {
+				drawFixVariantLetter("7 : Skip", Color.WHITE, letterX, letterY, 25);
+				letterY = letterY + 60;
+				drawFixVariantLetter("9 : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
+			}
+			else {
+				drawFixVariantLetter("S : Skip", Color.WHITE, letterX, letterY, 25);
+				letterY = letterY + 60;
+				drawFixVariantLetter("Q : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
+			}
+
 		}
 
 		protected void drawFixVariantsWithParallelLines() {
@@ -1889,8 +2024,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				}
 			}
 
-			for (Pair<Node, Node> nodePair : currentWay.getNodePairs(false)) {
-				drawSegmentWithParallelLines(nodePair.a, nodePair.b, Arrays.asList(new Color(255, 255, 255, 190)));
+			List<Way> currentEdge = findCurrentEdge();
+
+			for (Way w : currentEdge) {
+				for (Pair<Node, Node> nodePair : w.getNodePairs(false)) {
+					drawSegmentWithParallelLines(nodePair.a, nodePair.b, Arrays.asList(new Color(255, 255, 255, 190)));
+				}
 			}
 
 			for (Pair<Node, Node> nodePair : nextWay.getNodePairs(false)) {
