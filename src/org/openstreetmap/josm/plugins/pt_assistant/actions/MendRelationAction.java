@@ -11,6 +11,8 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -116,7 +118,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		memberTableModel = editorAccess.getMemberTableModel();
 		OsmDataLayer layer = editor.getLayer();
 		this.relation = editor.getRelation();
-		// OK = new OKActionPTEditor(editorAccess);
+		editor.addWindowListener(new WindowEventHandler());
+
 	}
 
 	@Override
@@ -2161,4 +2164,13 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 		}
 	}
+
+	class WindowEventHandler extends WindowAdapter {
+        @Override
+        public void windowClosing(WindowEvent e) {
+           editor.cancel();
+           System.out.println("close");
+           stop();
+        }
+    }
 }
