@@ -2095,7 +2095,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				int[] yPoints = { (int) (p1.y - sinT), (int) (p2.y - sinT), (int) (p2.y + sinT), (int) (p1.y + sinT) };
 				g.setColor(currentColor);
 				g.fillPolygon(xPoints, yPoints, 4);
-			} else {
+			} else if (colors.size() > 1){
 				boolean iterate = true;
 				while (iterate) {
 					currentColor = colors.get(i % colors.size());
