@@ -4,7 +4,6 @@ package org.openstreetmap.josm.plugins.pt_assistant.validation;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
@@ -21,10 +20,14 @@ import org.openstreetmap.josm.data.validation.Severity;
 import org.openstreetmap.josm.data.validation.Test;
 import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.data.validation.TestError.Builder;
+import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
+import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionType;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionType.Direction;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionTypeCalculator;
+import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersAction;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteDataManager;
@@ -212,11 +215,25 @@ public class RouteChecker extends Checker {
             Builder builder = TestError.builder(this.test, Severity.WARNING,
                     PTAssistantValidatorTest.ERROR_CODE_FIRST_LAST_STOP_WAY_TAG);
             builder.message(tr("PT: The first stop of the route does not match the first way"));
-            List<OsmPrimitive> prims = new ArrayList<>(Arrays.asList(way, relation));
-            if (stop.getPlatform() != null)
-                prims.add(stop.getPlatform());
-            if (stop.getStopPosition() != null)
-                prims.add(stop.getStopPosition());
+            List<OsmPrimitive> wayList = new ArrayList<>();
+            boolean addWays = true;
+            wayList.add(relation);
+            for (int i=0; i<relation.getMembers().size(); i++) {
+        		RelationMember r = relation.getMembers().get(i);
+        		if (r.isWay()) {
+        			if (r.getWay().equals(assigner.get(stop))) {
+        					addWays = false;
+        					break;
+        				} else if (addWays) {
+        					wayList.add(r.getWay());
+        				}
+        			}
+            }
+            List<OsmPrimitive> prims = new ArrayList<>(wayList);
+//            if (stop.getPlatform() != null)
+//                prims.add(stop.getPlatform());
+//            if (stop.getStopPosition() != null)
+//                prims.add(stop.getStopPosition());
             builder.primitives(prims);
             TestError e = builder.build();
             this.errors.add(e);
@@ -228,11 +245,25 @@ public class RouteChecker extends Checker {
             Builder builder = TestError.builder(this.test, Severity.WARNING,
                     PTAssistantValidatorTest.ERROR_CODE_FIRST_LAST_STOP_WAY_TAG);
             builder.message(tr("PT: The last stop of the route does not match the last way"));
-            List<OsmPrimitive> prims = new ArrayList<>(Arrays.asList(way, relation));
-            if (stop.getPlatform() != null)
-                prims.add(stop.getPlatform());
-            if (stop.getStopPosition() != null)
-                prims.add(stop.getStopPosition());
+            List<OsmPrimitive> wayList = new ArrayList<>();
+            wayList.add(relation);
+            boolean addWays = false;
+            for (int i=0; i<relation.getMembers().size(); i++) {
+            		RelationMember r = relation.getMembers().get(i);
+            		if (r.isWay()) {
+            			if (r.getWay().equals(assigner.get(stop))) {
+            				addWays = true;
+            			} else if (addWays) {
+            				wayList.add(r.getWay());
+            			}
+            		}
+            }
+
+            List<OsmPrimitive> prims = new ArrayList<>(wayList);
+//            if (stop.getPlatform() != null)
+//                prims.add(stop.getPlatform());
+//            if (stop.getStopPosition() != null)
+//                prims.add(stop.getStopPosition());
             builder.primitives(prims);
             TestError e = builder.build();
             this.errors.add(e);
@@ -373,6 +404,42 @@ public class RouteChecker extends Checker {
         fixedRelation.addMember(index + 1, new RelationMember(null, fix));
 
         return new ChangeCommand(originalRelation, fixedRelation);
+    }
+
+    protected static void fixFirstLastWayError(TestError testError) {
+    		List<? extends OsmPrimitive> primitiveList = new ArrayList<>(testError.getPrimitives());
+    		List<OsmPrimitive> ways = new ArrayList<>();
+    		Relation originalRelation = null;
+		for(OsmPrimitive r : primitiveList) {
+    			if (r.getType().toString().equals("relation")) {
+    				originalRelation = (Relation) r;
+    			}
+    			if (r.getType().toString().equals("way")) {
+    				ways.add(r);
+    			}
+    		}
+
+    		if (originalRelation == null) {
+    			System.out.println("no relation");
+    			return;
+    		}
+
+    	    // get layer:
+    	    OsmDataLayer layer = null;
+    	    List<OsmDataLayer> listOfLayers = MainApplication.getLayerManager().getLayersOfType(OsmDataLayer.class);
+    	    for (OsmDataLayer osmDataLayer : listOfLayers) {
+    	        if (osmDataLayer.data == originalRelation.getDataSet()) {
+    	            layer = osmDataLayer;
+    	            break;
+    	        }
+    	    }
+
+    	    // create editor:
+    	    GenericRelationEditor editor = (GenericRelationEditor) RelationEditor.getEditor(layer, originalRelation,
+    	             originalRelation.getMembersFor(ways));
+
+    	    // open editor:
+    	    editor.setVisible(true);
     }
 
     public PTRouteDataManager getManager() {
