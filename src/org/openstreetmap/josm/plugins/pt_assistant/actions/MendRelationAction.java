@@ -258,7 +258,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		int numberOfNodes = findNumberOfCommonFirstLastNode(nextWay, way);
 		if (numberOfNodes > 1) {
 			nextWayDelete = true;
-			notice = "2 or more Common nodes found between current and next way";
+			notice = "Multiple common nodes found between current and next way";
 		} else if (numberOfNodes == 1) {
 			// the method only checks at the first last nodes
 			node = findCommonFirstLastNode(nextWay, way, currentNode);
@@ -1211,6 +1211,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			alphabet++;
 		}
 
+		// remove any existing temporary layer
+		removeTemporarylayers();
+
 		if (abort)
 			return;
 
@@ -1318,6 +1321,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			wayListColoring.put(alphabet, fixVariants.get(i));
 			alphabet++;
 		}
+
+		// remove any existing temporary layer
+		removeTemporarylayers();
 
 		if (abort)
 			return;
@@ -1439,6 +1445,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				allowedCharacters.add('C');
 			}
 		}
+
+		// remove any existing temporary layer
+		removeTemporarylayers();
 
 		if (abort)
 			return;
