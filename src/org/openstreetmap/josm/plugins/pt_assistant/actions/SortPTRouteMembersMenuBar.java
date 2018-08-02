@@ -1,0 +1,103 @@
+// License: GPL. For details, see LICENSE file.
+package org.openstreetmap.josm.plugins.pt_assistant.actions;
+
+import static org.openstreetmap.josm.tools.I18n.tr;
+
+import java.awt.event.ActionEvent;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import javax.swing.JOptionPane;
+
+import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.actions.JosmAction;
+import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
+import org.openstreetmap.josm.command.ChangeCommand;
+import org.openstreetmap.josm.data.osm.OsmPrimitive;
+import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
+import org.openstreetmap.josm.data.osm.Relation;
+import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.gui.dialogs.relation.DownloadRelationMemberTask;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.tools.Logging;
+import org.openstreetmap.josm.tools.Utils;
+
+/**
+ * Sorts the members of a PT route. It orders first the ways, then the stops
+ * according to the assigned ways
+ *
+ * @author giacomo
+ *
+ */
+public class SortPTRouteMembersMenuBar extends JosmAction {
+
+    private static final String ACTION_NAME = "Sort PT Route Members";
+
+    /**
+     * Creates a new SortPTRouteMembersAction
+     */
+    public SortPTRouteMembersMenuBar() {
+        super(ACTION_NAME, "icons/sortptroutemembers", ACTION_NAME, null, true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+    		for (Relation rel : getLayerManager().getEditDataSet().getSelectedRelations()) {
+    			if (rel.hasIncompleteMembers()) {
+    				if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(Main.parent,
+    						tr("The relation has incomplete members. Do you want to download them and continue with the sorting?"),
+    						tr("Incomplete Members"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+    						null, null, null)) {
+
+    					List<Relation> incomplete = Collections.singletonList(rel);
+    					Future<?> future = MainApplication.worker.submit(new DownloadRelationMemberTask(
+    							incomplete,
+    							Utils.filteredCollection(
+    									DownloadSelectedIncompleteMembersAction.buildSetOfIncompleteMembers(
+                                        Collections.singletonList(rel)), OsmPrimitive.class),
+    							MainApplication.getLayerManager().getEditLayer()));
+
+    					MainApplication.worker.submit(() -> {
+    						try {
+                            future.get();
+                            continueAfterDownload(rel);
+    						} catch (InterruptedException | ExecutionException e1) {
+                            Logging.error(e1);
+                            return;
+                        }
+    					});
+    				} else
+    					return;
+    			} else
+    				continueAfterDownload(rel);
+    		}
+
+    }
+
+    private void continueAfterDownload(Relation rel) {
+        Relation newRel = new Relation(rel);
+        SortPTRouteMembersAction.sortPTRouteMembers(newRel);
+        MainApplication.undoRedo.add(new ChangeCommand(rel, newRel));
+    }
+
+	@Override
+	protected void updateEnabledState(Collection<? extends OsmPrimitive> selection) {
+		if (selection.isEmpty()) {
+			setEnabled(false);
+            return;
+        }
+
+        for (OsmPrimitive sel : selection) {
+            if (sel.getType() != OsmPrimitiveType.RELATION || !RouteUtils.isPTRoute((Relation) sel)) {
+                setEnabled(false);
+                return;
+            }
+        }
+
+        setEnabled(true);
+	}
+}

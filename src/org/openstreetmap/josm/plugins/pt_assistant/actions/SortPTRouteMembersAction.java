@@ -47,7 +47,7 @@ import org.openstreetmap.josm.tools.Utils;
  */
 public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
-    private static final String ACTION_NAME = "Sort PT Route Members";
+    private static final String ACTION_NAME = "Sort PT Route Members Relation Editor";
     private GenericRelationEditor editor = null;
 
     /**

@@ -38,6 +38,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.actions.ExtractPlatformNodeAc
 import org.openstreetmap.josm.plugins.pt_assistant.actions.MendRelationAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.PTWizardAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersAction;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersMenuBar;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SplitRoundaboutAction;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
@@ -162,7 +163,7 @@ public class PTAssistantPlugin extends Plugin {
 //		editHighlightedRelationsMenu = MainMenu.add(PublicTransportMenu, editHighlightedRelationsAction);
 		MainMenu.add(PublicTransportMenu, new SplitRoundaboutAction());
 		MainMenu.add(PublicTransportMenu, new CreatePlatformNodeAction());
-
+		MainMenu.add(PublicTransportMenu, new SortPTRouteMembersMenuBar());
 		Component sep = new JPopupMenu.Separator();
 		PublicTransportMenu.add(sep);
 		MainMenu.add(PublicTransportMenu, new PTWizardAction());
