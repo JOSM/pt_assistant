@@ -117,10 +117,10 @@ public final class PTWizardAction extends JosmAction {
 	        JScrollPane scrollPanel = new JScrollPane(panel);
 	        wizardDialog.setContent(scrollPanel, false);
 	        nextAct(0, panel);
-	        String pages = Main.pref.get("pt_assistant.wizard.pages");
+
 	        int lastCheck = -1;
 	        try {
-	        		for(int i=1;i<=Integer.parseInt(pages)+1;i++) {
+	        		for(int i=1;i<=4;i++) {
 	        			if (lastCheck == closeCheck)
 		        			return;
 	        			else
