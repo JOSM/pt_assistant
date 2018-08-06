@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"POT-Creation-Date: 2018-07-25 07:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: English (United Kingdom) (https://www.transifex.com/josm/teams/2544/en_GB/)\n"
 "MIME-Version: 1.0\n"
@@ -36,10 +36,6 @@ msgstr "Do you want to make the roundabout round?"
 
 msgid "Download incomplete route relation members"
 msgstr "Download incomplete route relation members"
-
-#, java-format
-msgid "Edit: {0}"
-msgstr "Edit: {0}"
 
 msgid "Fix error"
 msgstr "Fix error"
@@ -172,7 +168,6 @@ msgstr "PT_Assistant Proceed Request"
 msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr "PT_Assistant plugin found that this relation (id={0}) has errors:"
 
-#. I18N: mnemonic: F
 msgctxt "menu"
 msgid "Public Transport"
 msgstr "Public Transport"
@@ -204,10 +199,6 @@ msgid ""
 msgstr ""
 "The relation has incomplete members. Do you want to download them and "
 "continue with the sorting?"
-
-#, java-format
-msgid "Tool: {0}"
-msgstr "Tool: {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr "Type letter to select the fix variant or press Escape for no fix"

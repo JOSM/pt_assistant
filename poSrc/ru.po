@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"POT-Creation-Date: 2018-07-25 07:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: Russian (https://www.transifex.com/josm/teams/2544/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -16,6 +16,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+msgid "Add public_transport=stop_position + mode of transport on these nodes"
+msgstr "Добавить public_transport=stop_position и вид транспорта на эти точки"
 
 msgid "Bicycle and foot routes Tests"
 msgstr "Тесты велосипедных и пеших маршрутов"
@@ -35,8 +38,50 @@ msgstr "Вы хотите скачать связанные платформы �
 msgid "Do you want to make the roundabout round?"
 msgstr "Сделать круговой перекрёсток круглым?"
 
+msgid ""
+"Don’t add public_transport=platform and mode of transport to node "
+"representing the stop (suffice with highway=bus_stop or railway=tram_stop)"
+msgstr ""
+"Не добавлять public_transport=platform и вид транспорта на точки "
+"представляющие остановки (достаточно highway=bus_stop или railway=tram_stop)"
+
+msgid ""
+"Don’t check whether route relation starts and ends on stop_position node"
+msgstr ""
+"Не проверять, что отношение маршрута начинается и заканчивается точкой "
+"stop_position"
+
+msgid "Don’t compare name of first stop with from tag in route relation"
+msgstr ""
+"Не сравнивать название первой остановки с тегом \"from\" в отношении "
+"маршрута"
+
+msgid "Don’t compare name of last stop with to tag in route relation"
+msgstr ""
+"Не сравнивать название последней остановки с тегом \"to\" в отношении "
+"маршрута"
+
 msgid "Download incomplete route relation members"
 msgstr "Скачать недостающих участников отношения маршрута"
+
+msgid "Downloading Data"
+msgstr "Загрузка данных"
+
+msgid ""
+"Downloading incomplete relation members. Kindly wait till download gets "
+"over."
+msgstr ""
+"Загрузка недостающих участников отношений. Подождите, пока загрузка не "
+"закончится."
+
+msgid "Extract node from line"
+msgstr "Извлечь точку из линии"
+
+msgid "Extract platform node"
+msgstr "Извлечь точку платформы"
+
+msgid "Extracts platform node from a node"
+msgstr "Извлекает точку платформы из точки"
 
 msgid "Fix error"
 msgstr "Исправить ошибку"
@@ -47,6 +92,9 @@ msgstr "Исправление ({0}/{1}): ''{2}''"
 
 msgid "Fixing errors ..."
 msgstr "Исправление ошибок ..."
+
+msgid "Here you can change some preferences of PTAssistant functions"
+msgstr "Здесь вы можете изменить некоторые настройки работы PTAssistant"
 
 msgid "How do you want to proceed?"
 msgstr "Что вы выберете для продолжения?"
@@ -67,6 +115,9 @@ msgstr "Нет"
 msgid "Ok"
 msgstr "Ok"
 
+msgid "PT Wizard"
+msgstr "Мастер ОТ"
+
 msgid "PT: First or last way needs to be split"
 msgstr "ОТ:  Первую или последнюю линию требуется разделить"
 
@@ -78,6 +129,10 @@ msgstr "ОТ: Проблема в сегменте маршрута без ав�
 
 msgid "PT: Problem in the route segment with one automatic fix"
 msgstr "ОТ: Проблема в сегменте маршрута с одним автоматическим исправлением"
+
+msgid ""
+"PT: Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr "ОТ: Номера маршрутов не совпадают с тегом \"route_ref\" примитива"
 
 msgid "PT: Relation member roles do not match tags"
 msgstr "ОТ: Роли участника отношения не соответствуют тегам"
@@ -156,8 +211,15 @@ msgstr ""
 "ОТ: Название последней остановки не совпадает с тегом \"to\" в отношении "
 "маршрута"
 
+#, java-format
+msgid "PT: There is a gap in the {0} route"
+msgstr "ОТ: Существует разрыв в маршруте {0}"
+
 msgid "PT: dummy test warning"
 msgstr "PT: тестовое предупреждение"
+
+msgid "PTAssistantPlugin settings"
+msgstr "Настройки PTAssistantPlugin"
 
 msgid "PT_Assistant Fetch Request"
 msgstr "Запрос загрузки PT_Assistant"
@@ -174,7 +236,6 @@ msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr ""
 "Модуль PT_Assistant обнаружил, что в этом отношении (id={0}) есть ошибки:"
 
-#. I18N: mnemonic: F
 msgctxt "menu"
 msgid "Public Transport"
 msgstr "Общественный транспорт"
@@ -182,11 +243,34 @@ msgstr "Общественный транспорт"
 msgid "Public Transport Assistant tests"
 msgstr "Тесты помощника создания маршрутов ОТ"
 
+msgid ""
+"Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr "Номера маршрутов не совпадают с тегом \"route_ref\" примитива"
+
 msgid "Remember my choice and do not ask me again in this session"
 msgstr "Запомнить мой выбор и больше не спрашивать в этом сеансе"
 
+msgid ""
+"Remove public_transport=platform from platform WAYS when transfering details"
+" to platform NODE."
+msgstr ""
+"Удалить public_transport=platform с ЛИНИЙ платформы при переносе параметров "
+"на ТОЧКУ платформы."
+
+msgid "Remove public_transport=platform from platform ways"
+msgstr "Удалить public_transport=platform с линий платформ"
+
 msgid "Repeat last fix"
 msgstr "Повторить последнее исправление"
+
+msgid "Replace Membership"
+msgstr "Заменить участие"
+
+msgid ""
+"Replace platform way in the route relations by node representing the stop"
+msgstr ""
+"Заменить линии платформ в отношении маршрута точками, представляющими "
+"остановки"
 
 msgid "Roundabout round"
 msgstr "Круговой перекрёсток"
@@ -200,23 +284,28 @@ msgstr ""
 "Они должны быть загружены, чтобы продолжить проверку.\n"
 "Вы хотите загрузить их?"
 
+msgid "Set up PT Assistant for more convenient use"
+msgstr "Настройка PT Assistant для более удобного использования"
+
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
 "continue with the sorting?"
 msgstr ""
 "У отношения есть неполные участники. Скачать их и продолжить сортировку?"
 
+msgid ""
+"Transfer details from stop_position nodes to node representing the stop"
+msgstr ""
+"Перенести параметры с точек stop_position на точку представляющую остановку"
+
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
 "Введите букву, чтобы выбрать вариант исправления или нажмите Escape, чтобы "
 "пропустить"
 
-msgid ""
-"Unable to connect to "
-"https://josm.openstreetmap.de/wiki/Plugin/PT_Assistant/Wizard"
-msgstr ""
-"Не удалось подключиться к "
-"https://josm.openstreetmap.de/wiki/Plugin/PT_Assistant/Wizard"
+#, java-format
+msgid "Unable to connect to {0}"
+msgstr "Не удалось подключиться к {0}"
 
 msgid "Updating map ..."
 msgstr "Обновление карты ..."
@@ -237,6 +326,9 @@ msgstr "требуется, чтобы была выбрана одна точк
 
 msgid "suggested value : "
 msgstr "предлагаемое значение:"
+
+msgid "transfering details to platform NODE."
+msgstr "перенос параметров на ТОЧКУ платформы."
 
 #, java-format
 msgid "{0} direction error"

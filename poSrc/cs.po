@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"POT-Creation-Date: 2018-07-25 07:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: Czech (https://www.transifex.com/josm/teams/2544/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -37,10 +37,6 @@ msgstr "Chcete udělat kruhový objezd kulatým?"
 
 msgid "Download incomplete route relation members"
 msgstr "Stáhnout nekompletní členy relace route"
-
-#, java-format
-msgid "Edit: {0}"
-msgstr "Úpravy: {0}"
 
 msgid "Extract node from line"
 msgstr "Vyjme bod z cesty"
@@ -171,7 +167,6 @@ msgstr "PT_Assistant Požadavek na pokračování"
 msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr "Doplněk PT_Assistant zjistil, že tato relace (id={0}) obsahuje chyby:"
 
-#. I18N: mnemonic: F
 msgctxt "menu"
 msgid "Public Transport"
 msgstr "Hromadná doprava"
@@ -197,16 +192,15 @@ msgstr ""
 "Před pokračováním kontroly musí být staženy.\n"
 "Chcete je stáhnout?"
 
+msgid "Select objects for selected relation members"
+msgstr "Vybrat objekty vybraných členů relace"
+
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
 "continue with the sorting?"
 msgstr ""
 "Relace obsahuje nekompletní členy. Chcete je stáhnout a pokračovat v "
 "třídění?"
-
-#, java-format
-msgid "Tool: {0}"
-msgstr "Nástroj: {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""

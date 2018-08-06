@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"POT-Creation-Date: 2018-07-25 07:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: Slovak (https://www.transifex.com/josm/teams/2544/sk/)\n"
 "MIME-Version: 1.0\n"
@@ -30,10 +30,6 @@ msgstr ""
 
 msgid "Download incomplete route relation members"
 msgstr "Stiahnuť nekompletné členy relácií"
-
-#, java-format
-msgid "Edit: {0}"
-msgstr "Úpravy: {0}"
 
 msgid "Extract node from line"
 msgstr "Extrahovať bod z čiary"
@@ -121,7 +117,6 @@ msgstr "PT: testovacie varovanie"
 msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr "PT_Assistant plugin zistil, že táto relácia (id={0}) má chyby:"
 
-#. I18N: mnemonic: F
 msgctxt "menu"
 msgid "Public Transport"
 msgstr "Hromadná doprava"
@@ -141,9 +136,8 @@ msgstr ""
 "Musia byť stiahnuté, aby sa dalo pokračovať v kontrole.\n"
 "Chcete ich teraz stiahnuť?"
 
-#, java-format
-msgid "Tool: {0}"
-msgstr "Nástroj: {0}"
+msgid "Select objects for selected relation members"
+msgstr "Výber objektov pre vybrané členy relácie"
 
 msgid "Updating map ..."
 msgstr "Aktualizujem mapu ..."

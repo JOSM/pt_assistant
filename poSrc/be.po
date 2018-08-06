@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"POT-Creation-Date: 2018-07-25 07:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: Belarusian (https://www.transifex.com/josm/teams/2544/be/)\n"
 "MIME-Version: 1.0\n"
@@ -31,10 +31,6 @@ msgstr "Жадаеце сцягнуць аб''екты, якія спасыла�
 
 msgid "Download incomplete route relation members"
 msgstr "Спампаваць патрэбных удзельнікаў дачынення маршруту"
-
-#, java-format
-msgid "Edit: {0}"
-msgstr "Змяніць: {0}"
 
 msgid "Fix error"
 msgstr "Выправіць памылку"
@@ -150,10 +146,6 @@ msgstr ""
 "Дачыненні маршрутаў маюць няпоўных удзельнікаў.\n"
 "Яны павінны быць загружаны, каб працягнуць праверку.\n"
 "Вы хочаце загрузіць іх?"
-
-#, java-format
-msgid "Tool: {0}"
-msgstr "Інструмент: {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr "ГТ: Праблема ў сегменце маршруту з адным аўтаматычным выпраўленнем"

@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"POT-Creation-Date: 2018-07-25 07:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: Portuguese (https://www.transifex.com/josm/teams/2544/pt/)\n"
 "MIME-Version: 1.0\n"
@@ -34,10 +34,6 @@ msgstr "Quer tornar a rotunda circular?"
 
 msgid "Download incomplete route relation members"
 msgstr "Descarregar membros incompletos da relação de rota"
-
-#, java-format
-msgid "Edit: {0}"
-msgstr "Editar: {0}"
 
 msgid "Extract node from line"
 msgstr "Extrair nó de uma linha"
@@ -180,7 +176,6 @@ msgstr "Pedido de Continuação do Assistente_TP"
 msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr "O módulo Assistente_TP descobriu que esta relação (id={0}) tem erros:"
 
-#. I18N: mnemonic: F
 msgctxt "menu"
 msgid "Public Transport"
 msgstr "Transporte Público"
@@ -206,9 +201,8 @@ msgstr ""
 "Eles têm de ser descarregados para continuar com a validação.\n"
 "Quer descarregá-los?"
 
-#, java-format
-msgid "Tool: {0}"
-msgstr "Ferramenta: {0}"
+msgid "Select objects for selected relation members"
+msgstr "Selecionar objetos para os membros selecionados da relação"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
