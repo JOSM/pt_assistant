@@ -5,7 +5,7 @@ jdk:
   - oraclejdk8
   - oraclejdk9
 
-script: ./gradlew build compileJava_minJosm compileJava_latestJosm
+script: ./gradlew build compileJava_minJosm compileJava_latestJosm --stacktrace
 
 deploy:
   provider: releases
