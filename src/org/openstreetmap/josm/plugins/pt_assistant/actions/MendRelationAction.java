@@ -71,7 +71,7 @@ import org.openstreetmap.josm.tools.Utils;
  * Mend the relations by going through each way, sorting them and proposing
  * fixes for the gaps that are found
  *
- * @since xxx
+ * @author Biswesh
  */
 public class MendRelationAction extends AbstractRelationEditorAction {
 	Relation relation = null;
@@ -114,7 +114,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 	 */
 	public MendRelationAction(IRelationEditorActionAccess editorAccess) {
 		super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
-		putValue(SHORT_DESCRIPTION, tr("Select objects for selected relation members"));
+		putValue(SHORT_DESCRIPTION, tr("Routing Helper"));
 		new ImageProvider("dialogs/relation", "routing_assistance").getResource().attachImageIcon(this, true);
 		updateEnabledState();
 		editor = (GenericRelationEditor) editorAccess.getEditor();
