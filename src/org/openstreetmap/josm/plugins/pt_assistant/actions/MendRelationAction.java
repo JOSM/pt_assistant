@@ -92,6 +92,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 	boolean firstCall = true;
 	boolean halt = false;
 	boolean abort = false;
+	boolean shorterRoutes = false;
+	boolean showOption8 = false;
 	HashMap<Way, Character> wayColoring;
 	HashMap<Character, List<Way>> wayListColoring;
 
@@ -120,44 +122,28 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		OsmDataLayer layer = editor.getLayer();
 		this.relation = editor.getRelation();
 		editor.addWindowListener(new WindowEventHandler());
-		QUERY = "[out:xml][timeout:180][bbox:{{bbox}}];\n" +
-				"(\n" +
-				" (\n" +
-				"   way[\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n" +
-				" );\n" +
-				" ._;<;\n" +
-				");\n" +
-				"(._;>>;>;);\n" +
-				"out meta;";
+		QUERY = "[out:xml][timeout:180][bbox:{{bbox}}];\n" + "(\n" + " (\n"
+				+ "   way[\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n"
+				+ " );\n" + " ._;<;\n" + ");\n" + "(._;>>;>;);\n" + "out meta;";
 	}
 
 	private String getQuery() {
-		String str = "[out:xml][timeout:200];\n" +
-					"(\n" +
-					" (\n" ;
+		String str = "[out:xml][timeout:200];\n" + "(\n" + " (\n";
 
-		String str2 = "   [\"highway\"]\n" +
-				"   [\"highway\"!=\"footway\"]\n" +
-				"   [\"highway\"!=\"path\"]\n" +
-				"   [\"highway\"!=\"cycleway\"]\n" +
-				"   [\"highway\"!=\"service\"];\n" +
-				"\n";
+		String str2 = "   [\"highway\"]\n" + "   [\"highway\"!=\"footway\"]\n" + "   [\"highway\"!=\"path\"]\n"
+				+ "   [\"highway\"!=\"cycleway\"]\n" + "   [\"highway\"!=\"service\"];\n" + "\n";
 
-		String str3 = " );\n" +
-				" ._;<;\n" +
-				");\n" +
-				"(._;>>;>;);\n" +
-				"out meta;";
+		String str3 = " );\n" + " ._;<;\n" + ");\n" + "(._;>>;>;);\n" + "out meta;";
 
 		List<Node> nodeList = getBrokenNodes();
 
-		for (int i=0; i<members.size(); i++) {
+		for (int i = 0; i < members.size(); i++) {
 			if (members.get(i).isNode()) {
 				nodeList.add(members.get(i).getNode());
 			}
 		}
 
-		for (int i=0; i<nodeList.size(); i++) {
+		for (int i = 0; i < nodeList.size(); i++) {
 			Node n = nodeList.get(i);
 			double maxLat = n.getBBox().getTopLeftLat() + 0.001, minLat = n.getBBox().getBottomRightLat() - 0.001;
 			double maxLon = n.getBBox().getBottomRightLon() + 0.001, minLon = n.getBBox().getTopLeftLon() - 0.001;
@@ -170,7 +156,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 	List<Node> getBrokenNodes() {
 		List<Node> lst = new ArrayList<>();
-		for (int i=0;i<members.size(); i++) {
+		for (int i = 0; i < members.size(); i++) {
 			if (members.get(i).isWay()) {
 				int j = getNextWayIndex(i);
 				if (j < members.size()) {
@@ -231,6 +217,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			nextWay = null;
 			noLinkToPreviousWay = true;
 			nextIndex = true;
+			shorterRoutes = true;
+			showOption8 = false;
 			currentIndex = 0;
 			downloadEntireArea();
 		} else {
@@ -266,12 +254,13 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		double latOffset = (maxLat - minLat) / 10;
 		double lonOffset = (maxLon - minLon) / 10;
 
-		Bounds area = new Bounds(minLat - latOffset, minLon - lonOffset, maxLat + latOffset,
-				maxLon + lonOffset);
+		Bounds area = new Bounds(minLat - latOffset, minLon - lonOffset, maxLat + latOffset, maxLon + lonOffset);
 		String query = getQuery();
 		System.out.println(query);
 
-		Future<?> future = task.download(new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query),false, area, null);
+		Future<?> future = task.download(
+				new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query), false, area,
+				null);
 
 		MainApplication.worker.submit(() -> {
 			try {
@@ -542,7 +531,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		int count = 0;
 		for (Node n1 : way.getNodes()) {
 			for (Node n2 : previousWay.getNodes()) {
-				if (n1.equals(n2)) count++;
+				if (n1.equals(n2))
+					count++;
 			}
 		}
 		return count;
@@ -649,9 +639,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			parentWays.addAll(findNextWay(way, node2));
 
 		List<List<Way>> directRoute = getDirectRouteBetweenWays(currentWay, nextWay);
-		System.out.println("eaa");
-		if (directRoute != null && directRoute.size() > 0) {
-			System.out.println("faa");
+		if (directRoute == null || directRoute.size() == 0)
+			showOption8 = false;
+		else
+			showOption8 = true;
+
+		if (directRoute != null && directRoute.size() > 0 && !shorterRoutes) {
 			displayFixVariantsWithOverlappingWays(directRoute);
 			return null;
 		}
@@ -685,7 +678,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		String value = relation.get("route");
 
 		for (Relation R1 : r1) {
-			if (r2.contains(R1) && value.equals(R1.get("route"))) rel.add(R1);
+			if (r2.contains(R1) && value.equals(R1.get("route")))
+				rel.add(R1);
 		}
 		rel.remove(relation);
 
@@ -724,7 +718,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		List<Way> lst = new ArrayList<>();
 		boolean canAdd = false;
 		Way prev = null;
-		for (int i=0; i<member.size(); i++) {
+		for (int i = 0; i < member.size(); i++) {
 			if (member.get(i).isWay()) {
 				Way w = member.get(i).getWay();
 				if (w.equals(current)) {
@@ -737,9 +731,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 					if (findNumberOfCommonNode(w, prev) != 0) {
 						lst.add(w);
 						prev = w;
-					}
-					else
-						break;;
+					} else
+						break;
+					;
 				}
 			}
 		}
@@ -751,7 +745,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		List<Way> lst = new ArrayList<>();
 		boolean canAdd = false;
 		Way prev = null;
-		for (int i=0; i<member.size(); i++) {
+		for (int i = 0; i < member.size(); i++) {
 			if (member.get(i).isWay()) {
 				Way w = member.get(i).getWay();
 				if (w.equals(next)) {
@@ -763,12 +757,13 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 					return lst;
 				} else if (canAdd) {
 					// not valid in reverse if it is oneway or part of roundabout
-					if (findNumberOfCommonNode(w, prev) != 0 && w.isOneway() == 0 && !w.hasTag("junction", "roundabout")) {
+					if (findNumberOfCommonNode(w, prev) != 0 && w.isOneway() == 0
+							&& !w.hasTag("junction", "roundabout")) {
 						lst.add(w);
 						prev = w;
-					}
-					else
-						break;;
+					} else
+						break;
+					;
 				}
 			}
 		}
@@ -1136,7 +1131,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			downloadCounter = 0;
 
 			DownloadOsmTask task = new DownloadOsmTask();
-			new Notification(tr("Downloading Data...")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+			new Notification(tr("Downloading Data...")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200)
+					.show();
 
 			BBox rbbox = way.getBBox();
 			double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 10;
@@ -1144,12 +1140,15 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			Bounds area = new Bounds(rbbox.getBottomRightLat() - latOffset, rbbox.getTopLeftLon() - lonOffset,
 					rbbox.getTopLeftLat() + latOffset, rbbox.getBottomRightLon() + lonOffset);
 
-			Future<?> future = task.download(new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), QUERY),false, area, null);
+			Future<?> future = task.download(
+					new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), QUERY), false, area,
+					null);
 
 			MainApplication.worker.submit(() -> {
 				try {
 					future.get();
-					new Notification(tr("Download over...")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+					new Notification(tr("Download over...")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200)
+							.show();
 					findNextWayAfterDownload(way, node1, node2);
 				} catch (InterruptedException | ExecutionException e1) {
 					Logging.error(e1);
@@ -1175,12 +1174,15 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			Bounds area = new Bounds(rbbox.getBottomRightLat() - latOffset, rbbox.getTopLeftLon() - lonOffset,
 					rbbox.getTopLeftLat() + latOffset, rbbox.getBottomRightLon() + lonOffset);
 			new Notification(tr("Download ")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
-			Future<?> future = task.download(new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), QUERY), false, area, null);
+			Future<?> future = task.download(
+					new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), QUERY), false, area,
+					null);
 
 			MainApplication.worker.submit(() -> {
 				try {
 					future.get();
-					new Notification(tr("Download O")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+					new Notification(tr("Download O")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200)
+							.show();
 					if (currentIndex >= members.size() - 1) {
 						deleteExtraWays();
 					} else {
@@ -1208,18 +1210,22 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			downloadCounter = 0;
 
 			DownloadOsmTask task = new DownloadOsmTask();
-			new Notification(tr("Downloading Data???")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+			new Notification(tr("Downloading Data???")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200)
+					.show();
 
 			BBox rbbox = way.getBBox();
 			double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 20;
 			double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 20;
 			Bounds area = new Bounds(rbbox.getBottomRightLat() - latOffset, rbbox.getTopLeftLon() - lonOffset,
 					rbbox.getTopLeftLat() + latOffset, rbbox.getBottomRightLon() + lonOffset);
-			Future<?> future = task.download(new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), QUERY), false, area, null);
+			Future<?> future = task.download(
+					new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), QUERY), false, area,
+					null);
 			MainApplication.worker.submit(() -> {
 				try {
 					future.get();
-					new Notification(tr("Download over???")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+					new Notification(tr("Download over???")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200)
+							.show();
 					goToNextWays(way, prevWay, ways);
 				} catch (InterruptedException | ExecutionException e1) {
 					Logging.error(e1);
@@ -1235,43 +1241,40 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		if (abort)
 			return;
 
-		if (downloadCounter > 120) {
-			downloadCounter = 0;
+		downloadCounter = 0;
 
-			DownloadOsmTask task = new DownloadOsmTask();
-			new Notification(tr("Downloading Data")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+		DownloadOsmTask task = new DownloadOsmTask();
+		new Notification(tr("Downloading Data")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
 
-			double maxLat = wayList.get(0).getBBox().getTopLeftLat(), minLat = wayList.get(0).getBBox().getBottomRightLat();
-			double maxLon = wayList.get(0).getBBox().getBottomRightLon(), minLon = wayList.get(0).getBBox().getTopLeftLon();
+		double maxLat = wayList.get(0).getBBox().getTopLeftLat(), minLat = wayList.get(0).getBBox().getBottomRightLat();
+		double maxLon = wayList.get(0).getBBox().getBottomRightLon(), minLon = wayList.get(0).getBBox().getTopLeftLon();
 
-			for (Way way : wayList) {
-				BBox rbbox = way.getBBox();
-				maxLat = maxLat > rbbox.getTopLeftLat() ? maxLat : rbbox.getTopLeftLat();
-				minLat = minLat < rbbox.getBottomRightLat() ? minLat : rbbox.getBottomRightLat();
-				maxLon = maxLon > rbbox.getBottomRightLon() ? maxLon : rbbox.getBottomRightLon();
-				minLon = minLon < rbbox.getTopLeftLon() ? minLon : rbbox.getTopLeftLon();
-			}
-
-			double latOffset = (maxLat - minLat) / 10;
-			double lonOffset = (maxLon - minLon) / 10;
-
-			Bounds area = new Bounds(minLat - 7 * latOffset, minLon - 7 * lonOffset, maxLat + 7 * latOffset,
-					maxLon + 7 * lonOffset);
-			Future<?> future = task.download(false, area, null);
-
-			MainApplication.worker.submit(() -> {
-				try {
-					future.get();
-					new Notification(tr("Download over")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
-					displayWaysToRemove(Int);
-				} catch (InterruptedException | ExecutionException e1) {
-					Logging.error(e1);
-					return;
-				}
-			});
-		} else {
-			displayWaysToRemove(Int);
+		for (Way way : wayList) {
+			BBox rbbox = way.getBBox();
+			maxLat = maxLat > rbbox.getTopLeftLat() ? maxLat : rbbox.getTopLeftLat();
+			minLat = minLat < rbbox.getBottomRightLat() ? minLat : rbbox.getBottomRightLat();
+			maxLon = maxLon > rbbox.getBottomRightLon() ? maxLon : rbbox.getBottomRightLon();
+			minLon = minLon < rbbox.getTopLeftLon() ? minLon : rbbox.getTopLeftLon();
 		}
+
+		double latOffset = (maxLat - minLat) / 10;
+		double lonOffset = (maxLon - minLon) / 10;
+
+		Bounds area = new Bounds(minLat - 7 * latOffset, minLon - 7 * lonOffset, maxLat + 7 * latOffset,
+				maxLon + 7 * lonOffset);
+		Future<?> future = task.download(false, area, null);
+
+		MainApplication.worker.submit(() -> {
+			try {
+				future.get();
+				new Notification(tr("Download over")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+				displayWaysToRemove(Int);
+			} catch (InterruptedException | ExecutionException e1) {
+				Logging.error(e1);
+				return;
+			}
+		});
+
 	}
 
 	boolean isRestricted(Way currentWay, Way previousWay) {
@@ -1284,7 +1287,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			if (rel.hasKey("except")) {
 				String[] val = rel.get("except").split(";");
 				for (String s : val) {
-					if (relation.hasTag("route", s)) return true;
+					if (relation.hasTag("route", s))
+						return true;
 				}
 			}
 
@@ -1297,8 +1301,10 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				String routeValue = relation.get("route");
 				for (String s : restrictions) {
 					String sub = s.substring(12);
-					if (routeValue.equals(sub) && rel.hasTag("type", s)) remove = false;
-					else if (routeValue.equals(sub) && rel.hasKey("restriction:" + sub)) remove = false;
+					if (routeValue.equals(sub) && rel.hasTag("type", s))
+						remove = false;
+					else if (routeValue.equals(sub) && rel.hasKey("restriction:" + sub))
+						remove = false;
 				}
 				return remove;
 			}
@@ -1308,7 +1314,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			Collection<RelationMember> curMemberList = r.getMembersFor(Arrays.asList(currentWay));
 			Collection<RelationMember> prevMemberList = r.getMembersFor(Arrays.asList(previousWay));
 
-			if (curMemberList.isEmpty() || prevMemberList.isEmpty()) continue;
+			if (curMemberList.isEmpty() || prevMemberList.isEmpty())
+				continue;
 
 			RelationMember curMember = curMemberList.stream().collect(Collectors.toList()).get(0);
 			RelationMember prevMember = prevMemberList.stream().collect(Collectors.toList()).get(0);
@@ -1447,9 +1454,13 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		if (numeric) {
 			alphabet = '1';
 			allowedCharacters.add('7');
+			if (showOption8)
+				allowedCharacters.add('8');
 			allowedCharacters.add('9');
 		} else {
 			allowedCharacters.add('S');
+			if (showOption8)
+				allowedCharacters.add('W');
 			allowedCharacters.add('Q');
 		}
 
@@ -1472,7 +1483,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			waysToZoom.add(variant);
 
 		AutoScaleAction.zoomTo(waysToZoom);
-
 
 		// display the fix variants:
 		temporaryLayer = new MendRelationAddLayer();
@@ -1511,14 +1521,22 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 					if (typedKeyUpperCase.charValue() == 'S' || typedKeyUpperCase.charValue() == '7') {
 						MainApplication.getMap().mapView.removeKeyListener(this);
 						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+						shorterRoutes = true;
 						getNextWayAfterSelection(null);
 					} else if (typedKeyUpperCase.charValue() == 'Q' || typedKeyUpperCase.charValue() == '9') {
 						MainApplication.getMap().mapView.removeKeyListener(this);
 						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+						shorterRoutes = true;
 						removeCurrentEdge();
+					} else if (typedKeyUpperCase.charValue() == 'W' || typedKeyUpperCase.charValue() == '8') {
+						shorterRoutes = shorterRoutes ? false : true;
+						MainApplication.getMap().mapView.removeKeyListener(this);
+						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+						callNextWay(currentIndex);
 					} else {
 						MainApplication.getMap().mapView.removeKeyListener(this);
 						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+						shorterRoutes = true;
 						getNextWayAfterSelection(Arrays.asList(fixVariants.get(idx)));
 					}
 
@@ -1527,6 +1545,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 					MainApplication.getMap().mapView.removeKeyListener(this);
 					System.out.println("ESC");
 					nextIndex = false;
+					shorterRoutes = true;
 					setEnable = true;
 					halt = true;
 					setEnabled(true);
@@ -1551,9 +1570,13 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		if (numeric) {
 			alphabet = '1';
 			allowedCharacters.add('7');
+			if (showOption8)
+				allowedCharacters.add('8');
 			allowedCharacters.add('9');
 		} else {
 			allowedCharacters.add('S');
+			if (showOption8)
+				allowedCharacters.add('W');
 			allowedCharacters.add('Q');
 		}
 
@@ -1617,14 +1640,22 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 					if (typedKeyUpperCase.charValue() == 'S' || typedKeyUpperCase.charValue() == '7') {
 						MainApplication.getMap().mapView.removeKeyListener(this);
 						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+						shorterRoutes = true;
 						getNextWayAfterSelection(null);
 					} else if (typedKeyUpperCase.charValue() == 'Q' || typedKeyUpperCase.charValue() == '9') {
 						MainApplication.getMap().mapView.removeKeyListener(this);
 						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+						shorterRoutes = true;
 						removeCurrentEdge();
-					}else {
+					} else if (typedKeyUpperCase.charValue() == 'W' || typedKeyUpperCase.charValue() == '8') {
+						shorterRoutes = shorterRoutes ? false : true;
 						MainApplication.getMap().mapView.removeKeyListener(this);
 						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+						callNextWay(currentIndex);
+					} else {
+						MainApplication.getMap().mapView.removeKeyListener(this);
+						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+						shorterRoutes = true;
 						getNextWayAfterSelection(fixVariants.get(idx));
 					}
 
@@ -1634,6 +1665,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 					System.out.println("ESC");
 					nextIndex = false;
 					setEnable = true;
+					shorterRoutes = true;
 					halt = true;
 					setEnabled(true);
 					MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
@@ -1944,23 +1976,27 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			deleteExtraWays();
 	}
 
-	List<Way> findCurrentEdge (){
+	List<Way> findCurrentEdge() {
 		List<Way> lst = new ArrayList<>();
 		lst.add(currentWay);
 		int j = currentIndex;
 		Way curr = currentWay;
 		while (true) {
 			int i = getPreviousWayIndex(j);
-			if (i == -1) break;
+			if (i == -1)
+				break;
 
 			Way prevWay = members.get(i).getWay();
 
-			if (prevWay == null) break;
+			if (prevWay == null)
+				break;
 
 			Node n = findCommonFirstLastNode(curr, prevWay);
 
-			if (n == null) break;
-			if (n.getParentWays().size() > 2) break;
+			if (n == null)
+				break;
+			if (n.getParentWays().size() > 2)
+				break;
 
 			lst.add(prevWay);
 			curr = prevWay;
@@ -1978,16 +2014,20 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 		while (true) {
 			int i = getPreviousWayIndex(j);
-			if (i == -1) break;
+			if (i == -1)
+				break;
 
 			Way prevWay = members.get(i).getWay();
 
-			if (prevWay == null) break;
+			if (prevWay == null)
+				break;
 
 			n = findCommonFirstLastNode(curr, prevWay);
 
-			if (n == null) break;
-			if (n.getParentWays().size() > 2) break;
+			if (n == null)
+				break;
+			if (n.getParentWays().size() > 2)
+				break;
 
 			lst.add(i);
 			curr = prevWay;
@@ -2117,11 +2157,19 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			if (numeric) {
 				drawFixVariantLetter("7 : Skip", Color.WHITE, letterX, letterY, 25);
 				letterY = letterY + 60;
+				if (!shorterRoutes && showOption8)
+					drawFixVariantLetter("8 : shorter routes", Color.WHITE, letterX, letterY, 25);
+				else if (showOption8)
+					drawFixVariantLetter("8 : Longer routes", Color.WHITE, letterX, letterY, 25);
+				letterY = letterY + 60;
 				drawFixVariantLetter("9 : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
-			}
-			else {
+			} else {
 				drawFixVariantLetter("S : Skip", Color.WHITE, letterX, letterY, 25);
 				letterY = letterY + 60;
+				if (!shorterRoutes && showOption8)
+					drawFixVariantLetter("W : shorter routes", Color.WHITE, letterX, letterY, 25);
+				else if (showOption8)
+					drawFixVariantLetter("W : Longer routes", Color.WHITE, letterX, letterY, 25);
 				drawFixVariantLetter("Q : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
 			}
 		}
@@ -2196,11 +2244,19 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			if (numeric) {
 				drawFixVariantLetter("7 : Skip", Color.WHITE, letterX, letterY, 25);
 				letterY = letterY + 60;
+				if (!shorterRoutes && showOption8)
+					drawFixVariantLetter("8 : shorter routes", Color.WHITE, letterX, letterY, 25);
+				else if (showOption8)
+					drawFixVariantLetter("8 : Longer routes", Color.WHITE, letterX, letterY, 25);
+				letterY = letterY + 60;
 				drawFixVariantLetter("9 : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
-			}
-			else {
+			} else {
 				drawFixVariantLetter("S : Skip", Color.WHITE, letterX, letterY, 25);
 				letterY = letterY + 60;
+				if (!shorterRoutes && showOption8)
+					drawFixVariantLetter("W : shorter routes", Color.WHITE, letterX, letterY, 25);
+				else if (showOption8)
+					drawFixVariantLetter("W : Longer routes", Color.WHITE, letterX, letterY, 25);
 				drawFixVariantLetter("Q : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
 			}
 
@@ -2329,7 +2385,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				int[] yPoints = { (int) (p1.y - sinT), (int) (p2.y - sinT), (int) (p2.y + sinT), (int) (p1.y + sinT) };
 				g.setColor(currentColor);
 				g.fillPolygon(xPoints, yPoints, 4);
-			} else if (colors.size() > 1){
+			} else if (colors.size() > 1) {
 				boolean iterate = true;
 				while (iterate) {
 					currentColor = colors.get(i % colors.size());
@@ -2400,11 +2456,11 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 	}
 
 	class WindowEventHandler extends WindowAdapter {
-        @Override
-        public void windowClosing(WindowEvent e) {
-           editor.cancel();
-           System.out.println("close");
-           stop();
-        }
-    }
+		@Override
+		public void windowClosing(WindowEvent e) {
+			editor.cancel();
+			System.out.println("close");
+			stop();
+		}
+	}
 }
