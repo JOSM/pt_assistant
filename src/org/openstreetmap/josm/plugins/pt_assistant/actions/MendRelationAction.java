@@ -27,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
@@ -60,6 +59,7 @@ import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
 import org.openstreetmap.josm.gui.layer.MapViewPaintable;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.gui.layer.validation.PaintVisitor;
+import org.openstreetmap.josm.io.OverpassDownloadReader;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.ImageProvider;
@@ -97,6 +97,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 	AbstractMapViewPaintable temporaryLayer = null;
 	String notice = null;
+	final String QUERY;
 
 	/**
 	 * Constructs a new {@code RemoveSelectedAction}.
@@ -119,7 +120,70 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		OsmDataLayer layer = editor.getLayer();
 		this.relation = editor.getRelation();
 		editor.addWindowListener(new WindowEventHandler());
+		QUERY = "[out:xml][timeout:180][bbox:{{bbox}}];\n" +
+				"(\n" +
+				" (\n" +
+				"   way[\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n" +
+				" );\n" +
+				" ._;<;\n" +
+				");\n" +
+				"(._;>>;>;);\n" +
+				"out meta;";
+	}
 
+	private String getQuery() {
+		String str = "[out:xml][timeout:200];\n" +
+					"(\n" +
+					" (\n" ;
+
+		String str2 = "   [\"highway\"]\n" +
+				"   [\"highway\"!=\"footway\"]\n" +
+				"   [\"highway\"!=\"path\"]\n" +
+				"   [\"highway\"!=\"cycleway\"]\n" +
+				"   [\"highway\"!=\"service\"];\n" +
+				"\n";
+
+		String str3 = " );\n" +
+				" ._;<;\n" +
+				");\n" +
+				"(._;>>;>;);\n" +
+				"out meta;";
+
+		List<Node> nodeList = getBrokenNodes();
+
+		for (int i=0; i<members.size(); i++) {
+			if (members.get(i).isNode()) {
+				nodeList.add(members.get(i).getNode());
+			}
+		}
+
+		for (int i=0; i<nodeList.size(); i++) {
+			Node n = nodeList.get(i);
+			double maxLat = n.getBBox().getTopLeftLat() + 0.001, minLat = n.getBBox().getBottomRightLat() - 0.001;
+			double maxLon = n.getBBox().getBottomRightLon() + 0.001, minLon = n.getBBox().getTopLeftLon() - 0.001;
+			str = str + "   way (" + minLat + "," + minLon + "," + maxLat + "," + maxLon + ")\n" + str2;
+		}
+
+		str = str + str3;
+		return str;
+	}
+
+	List<Node> getBrokenNodes() {
+		List<Node> lst = new ArrayList<>();
+		for (int i=0;i<members.size(); i++) {
+			if (members.get(i).isWay()) {
+				int j = getNextWayIndex(i);
+				if (j < members.size()) {
+					Way w = members.get(i).getWay();
+					Way v = members.get(j).getWay();
+					if (findNumberOfCommonNode(w, v) != 1) {
+						lst.add(w.firstNode());
+						lst.add(w.lastNode());
+					}
+				}
+			}
+		}
+		return lst;
 	}
 
 	@Override
@@ -153,6 +217,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		save();
 		sortBelow(relation.getMembers(), 0);
 		members = editor.getRelation().getMembers();
+
+		// halt is true indicates the action was paused
 		if (halt == false) {
 			downloadCounter = 0;
 			firstCall = false;
@@ -166,15 +232,61 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			noLinkToPreviousWay = true;
 			nextIndex = true;
 			currentIndex = 0;
+			downloadEntireArea();
 		} else {
 			halt = false;
+			callNextWay(currentIndex);
+		}
+	}
+
+	void downloadEntireArea() {
+		if (abort)
+			return;
+
+		DownloadOsmTask task = new DownloadOsmTask();
+		new Notification(tr("Downloading Data")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(3000).show();
+		List<Way> wayList = getListOfAllWays();
+
+		if (wayList.isEmpty()) {
+			callNextWay(currentIndex);
+			return;
 		}
 
-		callNextWay(currentIndex);
+		double maxLat = wayList.get(0).getBBox().getTopLeftLat(), minLat = wayList.get(0).getBBox().getBottomRightLat();
+		double maxLon = wayList.get(0).getBBox().getBottomRightLon(), minLon = wayList.get(0).getBBox().getTopLeftLon();
+
+		for (Way way : wayList) {
+			BBox rbbox = way.getBBox();
+			maxLat = maxLat > rbbox.getTopLeftLat() ? maxLat : rbbox.getTopLeftLat();
+			minLat = minLat < rbbox.getBottomRightLat() ? minLat : rbbox.getBottomRightLat();
+			maxLon = maxLon > rbbox.getBottomRightLon() ? maxLon : rbbox.getBottomRightLon();
+			minLon = minLon < rbbox.getTopLeftLon() ? minLon : rbbox.getTopLeftLon();
+		}
+
+		double latOffset = (maxLat - minLat) / 10;
+		double lonOffset = (maxLon - minLon) / 10;
+
+		Bounds area = new Bounds(minLat - latOffset, minLon - lonOffset, maxLat + latOffset,
+				maxLon + lonOffset);
+		String query = getQuery();
+		System.out.println(query);
+
+		Future<?> future = task.download(new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query),false, area, null);
+
+		MainApplication.worker.submit(() -> {
+			try {
+				future.get();
+				callNextWay(currentIndex);
+			} catch (InterruptedException | ExecutionException e1) {
+				Logging.error(e1);
+				return;
+			}
+		});
 	}
 
 	void callNextWay(int i) {
 		System.out.println("Index + " + i);
+		downloadCounter++;
 		if (i < members.size() && members.get(i).isWay()) {
 			if (currentNode == null)
 				noLinkToPreviousWay = true;
@@ -239,7 +351,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		if (i >= members.size() - 1) {
 			deleteExtraWays();
 		} else if (nextIndex) {
-			downloadCounter++;
 			callNextWay(++currentIndex);
 		}
 	}
@@ -351,12 +462,15 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		downloadAreaBeforeRemovalOption(lst, Int);
 	}
 
-	void getListOfAllWays() {
-		for (int i = 0; i < members.size() - 1; i++) {
+	List<Way> getListOfAllWays() {
+		List<Way> ways = new ArrayList<>();
+		for (int i = 0; i < members.size(); i++) {
 			if (members.get(i).isWay()) {
 				waysAlreadyPresent.put(members.get(i).getWay(), 1);
+				ways.add(members.get(i).getWay());
 			}
 		}
+		return ways;
 	}
 
 	int getNextWayIndex(int idx) {
@@ -422,6 +536,16 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		}
 
 		return count++;
+	}
+
+	int findNumberOfCommonNode(Way way, Way previousWay) {
+		int count = 0;
+		for (Node n1 : way.getNodes()) {
+			for (Node n2 : previousWay.getNodes()) {
+				if (n1.equals(n2)) count++;
+			}
+		}
+		return count;
 	}
 
 	Node findCommonFirstLastNode(Way way, Way previousWay) {
@@ -524,6 +648,14 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		if (node2 != null)
 			parentWays.addAll(findNextWay(way, node2));
 
+		List<List<Way>> directRoute = getDirectRouteBetweenWays(currentWay, nextWay);
+		System.out.println("eaa");
+		if (directRoute != null && directRoute.size() > 0) {
+			System.out.println("faa");
+			displayFixVariantsWithOverlappingWays(directRoute);
+			return null;
+		}
+
 		if (parentWays.size() == 1) {
 			goToNextWays(parentWays.get(0), way, new ArrayList<>());
 		} else if (parentWays.size() > 1) {
@@ -536,6 +668,108 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			} else {
 				callNextWay(++currentIndex);
 				return null;
+			}
+		}
+		return null;
+	}
+
+	List<List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
+		List<List<Way>> list = new ArrayList<>();
+		List<Relation> r1 = OsmPrimitive.getFilteredList(current.getReferrers(), Relation.class);
+		List<Relation> r2 = OsmPrimitive.getFilteredList(next.getReferrers(), Relation.class);
+
+		if (r1 == null || r2 == null)
+			return list;
+
+		List<Relation> rel = new ArrayList<>();
+		String value = relation.get("route");
+
+		for (Relation R1 : r1) {
+			if (r2.contains(R1) && value.equals(R1.get("route"))) rel.add(R1);
+		}
+		rel.remove(relation);
+
+		System.out.println("Number of rels: " + rel.size());
+
+		for (Relation r : rel) {
+			List<Way> lst = searchWayFromOtherRelations(r, current, next);
+			boolean alreadyPresent = false;
+			if (lst != null) {
+				for (List<Way> l : list) {
+					if (l.containsAll(lst))
+						alreadyPresent = true;
+				}
+				if (!alreadyPresent)
+					list.add(lst);
+			}
+			lst = searchWayFromOtherRelationsReversed(r, current, next);
+
+			if (lst != null) {
+				alreadyPresent = false;
+				for (List<Way> l : list) {
+					if (l.containsAll(lst))
+						alreadyPresent = true;
+				}
+				if (!alreadyPresent)
+					list.add(lst);
+			}
+		}
+		System.out.println(list.size());
+
+		return list;
+	}
+
+	List<Way> searchWayFromOtherRelations(Relation r, Way current, Way next) {
+		List<RelationMember> member = r.getMembers();
+		List<Way> lst = new ArrayList<>();
+		boolean canAdd = false;
+		Way prev = null;
+		for (int i=0; i<member.size(); i++) {
+			if (member.get(i).isWay()) {
+				Way w = member.get(i).getWay();
+				if (w.equals(current)) {
+					lst.clear();
+					canAdd = true;
+					prev = w;
+				} else if (w.equals(next) && lst.size() > 0) {
+					return lst;
+				} else if (canAdd) {
+					if (findNumberOfCommonNode(w, prev) != 0) {
+						lst.add(w);
+						prev = w;
+					}
+					else
+						break;;
+				}
+			}
+		}
+		return null;
+	}
+
+	List<Way> searchWayFromOtherRelationsReversed(Relation r, Way current, Way next) {
+		List<RelationMember> member = r.getMembers();
+		List<Way> lst = new ArrayList<>();
+		boolean canAdd = false;
+		Way prev = null;
+		for (int i=0; i<member.size(); i++) {
+			if (member.get(i).isWay()) {
+				Way w = member.get(i).getWay();
+				if (w.equals(next)) {
+					lst.clear();
+					canAdd = true;
+					prev = w;
+				} else if (w.equals(current) && lst.size() > 0) {
+					Collections.reverse(lst);
+					return lst;
+				} else if (canAdd) {
+					// not valid in reverse if it is oneway or part of roundabout
+					if (findNumberOfCommonNode(w, prev) != 0 && w.isOneway() == 0 && !w.hasTag("junction", "roundabout")) {
+						lst.add(w);
+						prev = w;
+					}
+					else
+						break;;
+				}
 			}
 		}
 		return null;
@@ -898,47 +1132,55 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		if (abort)
 			return;
 
-		downloadCounter = 0;
+		if (downloadCounter > 120) {
+			downloadCounter = 0;
 
-		DownloadOsmTask task = new DownloadOsmTask();
-		new Notification(tr("Downloading Data")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+			DownloadOsmTask task = new DownloadOsmTask();
+			new Notification(tr("Downloading Data...")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
 
-		BBox rbbox = way.getBBox();
-		double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 10;
-		double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 10;
-		Bounds area = new Bounds(rbbox.getBottomRightLat() - 10 * latOffset, rbbox.getTopLeftLon() - 10 * lonOffset,
-				rbbox.getTopLeftLat() + 10 * latOffset, rbbox.getBottomRightLon() + 10 * lonOffset);
-		Future<?> future = task.download(false, area, null);
-		MainApplication.worker.submit(() -> {
-			try {
-				future.get();
-				new Notification(tr("Download over")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
-				findNextWayAfterDownload(way, node1, node2);
-			} catch (InterruptedException | ExecutionException e1) {
-				Logging.error(e1);
-				return;
-			}
-		});
+			BBox rbbox = way.getBBox();
+			double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 10;
+			double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 10;
+			Bounds area = new Bounds(rbbox.getBottomRightLat() - latOffset, rbbox.getTopLeftLon() - lonOffset,
+					rbbox.getTopLeftLat() + latOffset, rbbox.getBottomRightLon() + lonOffset);
+
+			Future<?> future = task.download(new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), QUERY),false, area, null);
+
+			MainApplication.worker.submit(() -> {
+				try {
+					future.get();
+					new Notification(tr("Download over...")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+					findNextWayAfterDownload(way, node1, node2);
+				} catch (InterruptedException | ExecutionException e1) {
+					Logging.error(e1);
+					return;
+				}
+			});
+		} else {
+			findNextWayAfterDownload(way, node1, node2);
+		}
 	}
 
 	void downloadAreaAroundWay(Way way) {
 		if (abort)
 			return;
 
-		if (downloadCounter > 70) {
+		if (downloadCounter > 120) {
 			downloadCounter = 0;
 
 			DownloadOsmTask task = new DownloadOsmTask();
 			BBox rbbox = way.getBBox();
 			double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 10;
 			double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 10;
-			Bounds area = new Bounds(rbbox.getBottomRightLat() - 3 * latOffset, rbbox.getTopLeftLon() - 3 * lonOffset,
-					rbbox.getTopLeftLat() + 3 * latOffset, rbbox.getBottomRightLon() + 3 * lonOffset);
-			Future<?> future = task.download(false, area, null);
+			Bounds area = new Bounds(rbbox.getBottomRightLat() - latOffset, rbbox.getTopLeftLon() - lonOffset,
+					rbbox.getTopLeftLat() + latOffset, rbbox.getBottomRightLon() + lonOffset);
+			new Notification(tr("Download ")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+			Future<?> future = task.download(new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), QUERY), false, area, null);
 
 			MainApplication.worker.submit(() -> {
 				try {
 					future.get();
+					new Notification(tr("Download O")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
 					if (currentIndex >= members.size() - 1) {
 						deleteExtraWays();
 					} else {
@@ -952,10 +1194,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		} else {
 			if (currentIndex >= members.size() - 1) {
 				deleteExtraWays();
-				downloadCounter++;
 			} else {
 				callNextWay(++currentIndex);
-				downloadCounter++;
 			}
 		}
 	}
@@ -964,66 +1204,74 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		if (abort)
 			return;
 
-		downloadCounter = 0;
+		if (downloadCounter > 120) {
+			downloadCounter = 0;
 
-		DownloadOsmTask task = new DownloadOsmTask();
-		new Notification(tr("Downloading Data")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+			DownloadOsmTask task = new DownloadOsmTask();
+			new Notification(tr("Downloading Data???")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
 
-		BBox rbbox = way.getBBox();
-		double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 10;
-		double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 10;
-		Bounds area = new Bounds(rbbox.getBottomRightLat() - 3 * latOffset, rbbox.getTopLeftLon() - 3 * lonOffset,
-				rbbox.getTopLeftLat() + 3 * latOffset, rbbox.getBottomRightLon() + 3 * lonOffset);
-		Future<?> future = task.download(false, area, null);
-		MainApplication.worker.submit(() -> {
-			try {
-				future.get();
-				new Notification(tr("Download over")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
-				goToNextWays(way, prevWay, ways);
-			} catch (InterruptedException | ExecutionException e1) {
-				Logging.error(e1);
-				return;
-			}
-		});
+			BBox rbbox = way.getBBox();
+			double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 20;
+			double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 20;
+			Bounds area = new Bounds(rbbox.getBottomRightLat() - latOffset, rbbox.getTopLeftLon() - lonOffset,
+					rbbox.getTopLeftLat() + latOffset, rbbox.getBottomRightLon() + lonOffset);
+			Future<?> future = task.download(new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), QUERY), false, area, null);
+			MainApplication.worker.submit(() -> {
+				try {
+					future.get();
+					new Notification(tr("Download over???")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+					goToNextWays(way, prevWay, ways);
+				} catch (InterruptedException | ExecutionException e1) {
+					Logging.error(e1);
+					return;
+				}
+			});
+		} else {
+			goToNextWays(way, prevWay, ways);
+		}
 	}
 
 	void downloadAreaBeforeRemovalOption(List<Way> wayList, List<Integer> Int) {
 		if (abort)
 			return;
 
-		downloadCounter = 0;
+		if (downloadCounter > 120) {
+			downloadCounter = 0;
 
-		DownloadOsmTask task = new DownloadOsmTask();
-		new Notification(tr("Downloading Data")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+			DownloadOsmTask task = new DownloadOsmTask();
+			new Notification(tr("Downloading Data")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
 
-		double maxLat = wayList.get(0).getBBox().getTopLeftLat(), minLat = wayList.get(0).getBBox().getBottomRightLat();
-		double maxLon = wayList.get(0).getBBox().getBottomRightLon(), minLon = wayList.get(0).getBBox().getTopLeftLon();
+			double maxLat = wayList.get(0).getBBox().getTopLeftLat(), minLat = wayList.get(0).getBBox().getBottomRightLat();
+			double maxLon = wayList.get(0).getBBox().getBottomRightLon(), minLon = wayList.get(0).getBBox().getTopLeftLon();
 
-		for (Way way : wayList) {
-			BBox rbbox = way.getBBox();
-			maxLat = maxLat > rbbox.getTopLeftLat() ? maxLat : rbbox.getTopLeftLat();
-			minLat = minLat < rbbox.getBottomRightLat() ? minLat : rbbox.getBottomRightLat();
-			maxLon = maxLon > rbbox.getBottomRightLon() ? maxLon : rbbox.getBottomRightLon();
-			minLon = minLon < rbbox.getTopLeftLon() ? minLon : rbbox.getTopLeftLon();
-		}
-
-		double latOffset = (maxLat - minLat) / 10;
-		double lonOffset = (maxLon - minLon) / 10;
-
-		Bounds area = new Bounds(minLat - 7 * latOffset, minLon - 7 * lonOffset, maxLat + 7 * latOffset,
-				maxLon + 7 * lonOffset);
-		Future<?> future = task.download(false, area, null);
-
-		MainApplication.worker.submit(() -> {
-			try {
-				future.get();
-				new Notification(tr("Download over")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
-				displayWaysToRemove(Int);
-			} catch (InterruptedException | ExecutionException e1) {
-				Logging.error(e1);
-				return;
+			for (Way way : wayList) {
+				BBox rbbox = way.getBBox();
+				maxLat = maxLat > rbbox.getTopLeftLat() ? maxLat : rbbox.getTopLeftLat();
+				minLat = minLat < rbbox.getBottomRightLat() ? minLat : rbbox.getBottomRightLat();
+				maxLon = maxLon > rbbox.getBottomRightLon() ? maxLon : rbbox.getBottomRightLon();
+				minLon = minLon < rbbox.getTopLeftLon() ? minLon : rbbox.getTopLeftLon();
 			}
-		});
+
+			double latOffset = (maxLat - minLat) / 10;
+			double lonOffset = (maxLon - minLon) / 10;
+
+			Bounds area = new Bounds(minLat - 7 * latOffset, minLon - 7 * lonOffset, maxLat + 7 * latOffset,
+					maxLon + 7 * lonOffset);
+			Future<?> future = task.download(false, area, null);
+
+			MainApplication.worker.submit(() -> {
+				try {
+					future.get();
+					new Notification(tr("Download over")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+					displayWaysToRemove(Int);
+				} catch (InterruptedException | ExecutionException e1) {
+					Logging.error(e1);
+					return;
+				}
+			});
+		} else {
+			displayWaysToRemove(Int);
+		}
 	}
 
 	boolean isRestricted(Way currentWay, Way previousWay) {
@@ -1223,16 +1471,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		for (Way variant : fixVariants)
 			waysToZoom.add(variant);
 
-		if (SwingUtilities.isEventDispatchThread()) {
-			AutoScaleAction.zoomTo(waysToZoom);
-		} else {
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					AutoScaleAction.zoomTo(waysToZoom);
-				}
-			});
-		}
+		AutoScaleAction.zoomTo(waysToZoom);
+
 
 		// display the fix variants:
 		temporaryLayer = new MendRelationAddLayer();
@@ -1249,6 +1489,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
+				downloadCounter = 0;
 				if (abort) {
 					MainApplication.getMap().mapView.removeKeyListener(this);
 					MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
@@ -1337,16 +1578,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			}
 		}
 
-		if (SwingUtilities.isEventDispatchThread()) {
-			AutoScaleAction.zoomTo(waysToZoom);
-		} else {
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					AutoScaleAction.zoomTo(waysToZoom);
-				}
-			});
-		}
+		AutoScaleAction.zoomTo(waysToZoom);
 
 		// display the fix variants:
 		temporaryLayer = new MendRelationAddMultipleLayer();
@@ -1363,6 +1595,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
+				downloadCounter = 0;
 				if (abort) {
 					MainApplication.getMap().mapView.removeKeyListener(this);
 					MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
@@ -1458,16 +1691,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		for (Integer i : wayIndices)
 			waysToZoom.add(members.get(i.intValue()).getWay());
 
-		if (SwingUtilities.isEventDispatchThread()) {
-			AutoScaleAction.zoomTo(waysToZoom);
-		} else {
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					AutoScaleAction.zoomTo(waysToZoom);
-				}
-			});
-		}
+		AutoScaleAction.zoomTo(waysToZoom);
 
 		// display the fix variants:
 		temporaryLayer = new MendRelationRemoveLayer();
@@ -1484,6 +1708,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
+				downloadCounter = 0;
 				if (abort) {
 					MainApplication.getMap().mapView.removeKeyListener(this);
 					MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
