@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"POT-Creation-Date: 2018-07-25 07:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: Indonesian (https://www.transifex.com/josm/teams/2544/id/)\n"
 "MIME-Version: 1.0\n"
@@ -35,10 +35,6 @@ msgstr "Apakah Anda mau membuat bundaran lalu lintas?"
 
 msgid "Download incomplete route relation members"
 msgstr "Download anggota relasi rute yang belum lengkap"
-
-#, java-format
-msgid "Edit: {0}"
-msgstr "Ubah: {0}"
 
 msgid "Extract node from line"
 msgstr "Ekstrak node/titik dari garis"
@@ -178,7 +174,6 @@ msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr ""
 "Plugin PT_Assistant menemukan bahwa relasi ini (id={0}) memiliki kesalahan:"
 
-#. I18N: mnemonic: F
 msgctxt "menu"
 msgid "Public Transport"
 msgstr "Transportasi Publik"
@@ -204,16 +199,15 @@ msgstr ""
 "Perlu diunduh untuk melanjutkan validasi.\n"
 "Anda ingin mengunduhnya?"
 
+msgid "Select objects for selected relation members"
+msgstr "memilih objek yang dipilih  relasi member"
+
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
 "continue with the sorting?"
 msgstr ""
 "Relasi memiliki anggota yang tidak lengkap. Apakah Anda mau mengunduhnya dan"
 " melanjutkan dengan penyortiran?"
-
-#, java-format
-msgid "Tool: {0}"
-msgstr "Alat: {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""

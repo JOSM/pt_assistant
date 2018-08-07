@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"POT-Creation-Date: 2018-07-25 07:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: French (https://www.transifex.com/josm/teams/2544/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -37,10 +37,6 @@ msgstr "Voulez-vous arrondir le rond-point?"
 
 msgid "Download incomplete route relation members"
 msgstr "Télécharger les membres incomplets de la relation d’itinéraire"
-
-#, java-format
-msgid "Edit: {0}"
-msgstr "Modifier : {0}"
 
 msgid "Extract node from line"
 msgstr "Extraire un nœud de la ligne"
@@ -186,7 +182,6 @@ msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr ""
 "Le greffon PT_Assistant trouve que la relation (id={0}) a des erreurs:"
 
-#. I18N: mnemonic: F
 msgctxt "menu"
 msgid "Public Transport"
 msgstr "Transport public"
@@ -212,16 +207,15 @@ msgstr ""
 "Ils doivent être téléchargés pour procéder à la validation.\n"
 "Voulez-vous les télécharger?"
 
+msgid "Select objects for selected relation members"
+msgstr "Sélectionner les objets des membres"
+
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
 "continue with the sorting?"
 msgstr ""
 "La relation a des membres incomplets. Voulez-vous les télécharger et "
 "continuer avec le tri?"
-
-#, java-format
-msgid "Tool: {0}"
-msgstr "Outil : {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""

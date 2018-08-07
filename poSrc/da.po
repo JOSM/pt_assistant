@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant 6af76ff\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-03 11:45+0200\n"
+"POT-Creation-Date: 2018-07-25 07:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: Danish (https://www.transifex.com/josm/teams/2544/da/)\n"
 "MIME-Version: 1.0\n"
@@ -36,10 +36,6 @@ msgstr "Vil du lave rundkørslen rund?"
 
 msgid "Download incomplete route relation members"
 msgstr "Download ufuldstændige rute relations medlemmer"
-
-#, java-format
-msgid "Edit: {0}"
-msgstr "Rediger: {0}"
 
 msgid "Fix error"
 msgstr "Ret fejl"
@@ -176,7 +172,6 @@ msgstr "OT_Assistent fortsæt anmodning"
 msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr "OT_Assistent udvidelse fandt at denne relation (id={0}) har fejl:"
 
-#. I18N: mnemonic: F
 msgctxt "menu"
 msgid "Public Transport"
 msgstr "Offentlig transport"
@@ -202,16 +197,15 @@ msgstr ""
 "Der er brug for at de bliver hentet for at fortsætte med validering.\n"
 "Vil du downloade dem?"
 
+msgid "Select objects for selected relation members"
+msgstr "Vælg objekter for valgte relationsmedlemmer"
+
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
 "continue with the sorting?"
 msgstr ""
 "Relationen har ufuldstændige medlemmer. Vil du downloade dem og fortsætte "
 "med sorteringen?"
-
-#, java-format
-msgid "Tool: {0}"
-msgstr "Værktøj: {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""

@@ -9,11 +9,20 @@ repositories {
   jcenter()
 }
 dependencies {
-  testImplementation "org.openstreetmap.josm:josm-unittest:SNAPSHOT"
+  testImplementation("org.openstreetmap.josm:josm-unittest:SNAPSHOT"){changing=true}
   def junitVersion = "5.2.0"
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
   testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
   testImplementation "org.junit.vintage:junit-vintage-engine:$junitVersion"
+  testImplementation("com.github.tomakehurst:wiremock:2.18.0")
+  testImplementation("org.awaitility:awaitility:3.1.2")
+}
+
+tasks.withType(JavaCompile) {
+  options.compilerArgs += [
+    "-Xlint:all",
+    "-Xlint:-serial",
+  ]
 }
 
 josm.i18n {
@@ -21,9 +30,7 @@ josm.i18n {
 }
 
 test {
-    testLogging {
-        exceptionFormat = 'full'
-    }
+    testLogging.exceptionFormat = "full"
 }
 
 sourceSets {
