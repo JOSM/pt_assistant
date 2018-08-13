@@ -93,13 +93,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 	boolean halt = false;
 	boolean abort = false;
 	boolean shorterRoutes = false;
-	boolean showOption8 = false;
+	boolean showOption0 = false;
 	HashMap<Way, Character> wayColoring;
 	HashMap<Character, List<Way>> wayListColoring;
 
 	AbstractMapViewPaintable temporaryLayer = null;
 	String notice = null;
-	final String QUERY;
 
 	/**
 	 * Constructs a new {@code RemoveSelectedAction}.
@@ -122,9 +121,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		OsmDataLayer layer = editor.getLayer();
 		this.relation = editor.getRelation();
 		editor.addWindowListener(new WindowEventHandler());
-		QUERY = "[out:xml][timeout:180][bbox:{{bbox}}];\n" + "(\n" + " (\n"
-				+ "   way[\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n"
-				+ " );\n" + " ._;<;\n" + ");\n" + "(._;>>;>;);\n" + "out meta;";
+//		QUERY = "[out:xml][timeout:180][bbox:{{bbox}}];\n" + "(\n" + " (\n"
+//				+ "   way[\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n"
+//				+ " );\n" + " ._;<;\n" + ");\n" + "(._;>>;>;);\n" + "out meta;";
 	}
 
 	private String getQuery() {
@@ -218,13 +217,14 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			noLinkToPreviousWay = true;
 			nextIndex = true;
 			shorterRoutes = true;
-			showOption8 = false;
+			showOption0 = false;
 			currentIndex = 0;
 			downloadEntireArea();
 		} else {
 			halt = false;
 			callNextWay(currentIndex);
 		}
+//		callNextWay(currentIndex);
 	}
 
 	void downloadEntireArea() {
@@ -346,6 +346,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 	boolean isNonSplitRoundAbout(Way way) {
 		if (way.hasTag("junction", "roundabout") && way.firstNode().equals(way.lastNode()))
+			return true;
+		return false;
+	}
+
+	boolean isSplitRoundAbout(Way way) {
+		if (way.hasTag("junction", "roundabout") && !way.firstNode().equals(way.lastNode()))
 			return true;
 		return false;
 	}
@@ -640,9 +646,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 		List<List<Way>> directRoute = getDirectRouteBetweenWays(currentWay, nextWay);
 		if (directRoute == null || directRoute.size() == 0)
-			showOption8 = false;
+			showOption0 = false;
 		else
-			showOption8 = true;
+			showOption0 = true;
 
 		if (directRoute != null && directRoute.size() > 0 && !shorterRoutes) {
 			displayFixVariantsWithOverlappingWays(directRoute);
@@ -656,6 +662,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			displayFixVariants(parentWays);
 		} else {
 			nextIndex = true;
+			if (directRoute != null && directRoute.size() > 0 && !shorterRoutes) {
+				showOption0 = false;
+				shorterRoutes = false;
+				displayFixVariantsWithOverlappingWays(directRoute);
+				return null;
+			}
 			if (currentIndex >= members.size() - 1) {
 				deleteExtraWays();
 			} else {
@@ -668,8 +680,14 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 	List<List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
 		List<List<Way>> list = new ArrayList<>();
-		List<Relation> r1 = OsmPrimitive.getFilteredList(current.getReferrers(), Relation.class);
-		List<Relation> r2 = OsmPrimitive.getFilteredList(next.getReferrers(), Relation.class);
+		List<Relation> r1;
+		List<Relation> r2;
+		try {
+			r1 = OsmPrimitive.getFilteredList(current.getReferrers(), Relation.class);
+			r2 = OsmPrimitive.getFilteredList(next.getReferrers(), Relation.class);
+		} catch (Exception e) {
+			return list;
+		}
 
 		if (r1 == null || r2 == null)
 			return list;
@@ -757,8 +775,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 					return lst;
 				} else if (canAdd) {
 					// not valid in reverse if it is oneway or part of roundabout
-					if (findNumberOfCommonNode(w, prev) != 0 && w.isOneway() == 0
-							&& !w.hasTag("junction", "roundabout")) {
+					if (findNumberOfCommonNode(w, prev) != 0 && w.isOneway() == 0 && isOnewayForPublicTransport(w) == 0
+							&& !isSplitRoundAbout(w)) {
 						lst.add(w);
 						prev = w;
 					} else
@@ -1060,15 +1078,19 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				waysToBeRemoved.add(w);
 			}
 		}
+
+		parentWays.removeAll(waysToBeRemoved);
+		waysToBeRemoved.clear();
+
 		// check restrictions
-		int count = 1;
+		System.out.println("Hello");
 		for (Way w : parentWays) {
 			if (isRestricted(w, way)) {
 				waysToBeRemoved.add(w);
 			}
 		}
-
 		parentWays.removeAll(waysToBeRemoved);
+
 		return parentWays;
 	}
 
@@ -1127,7 +1149,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		if (abort)
 			return;
 
-		if (downloadCounter > 120) {
+		if (downloadCounter > 160 || way.isOutsideDownloadArea() || way.isNew()){
 			downloadCounter = 0;
 
 			DownloadOsmTask task = new DownloadOsmTask();
@@ -1137,12 +1159,10 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			BBox rbbox = way.getBBox();
 			double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 10;
 			double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 10;
-			Bounds area = new Bounds(rbbox.getBottomRightLat() - latOffset, rbbox.getTopLeftLon() - lonOffset,
-					rbbox.getTopLeftLat() + latOffset, rbbox.getBottomRightLon() + lonOffset);
+			Bounds area = new Bounds(rbbox.getBottomRightLat() - 4 * latOffset, rbbox.getTopLeftLon() - 4 * lonOffset,
+					rbbox.getTopLeftLat() + 4 * latOffset, rbbox.getBottomRightLon() + 4 * lonOffset);
 
-			Future<?> future = task.download(
-					new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), QUERY), false, area,
-					null);
+			Future<?> future = task.download(false, area, null);
 
 			MainApplication.worker.submit(() -> {
 				try {
@@ -1164,7 +1184,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		if (abort)
 			return;
 
-		if (downloadCounter > 120) {
+		if (downloadCounter > 160) {
 			downloadCounter = 0;
 
 			DownloadOsmTask task = new DownloadOsmTask();
@@ -1174,9 +1194,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			Bounds area = new Bounds(rbbox.getBottomRightLat() - latOffset, rbbox.getTopLeftLon() - lonOffset,
 					rbbox.getTopLeftLat() + latOffset, rbbox.getBottomRightLon() + lonOffset);
 			new Notification(tr("Download ")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
-			Future<?> future = task.download(
-					new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), QUERY), false, area,
-					null);
+			Future<?> future = task.download(false, area, null);
 
 			MainApplication.worker.submit(() -> {
 				try {
@@ -1206,7 +1224,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		if (abort)
 			return;
 
-		if (downloadCounter > 120) {
+		if (downloadCounter > 160 || way.isOutsideDownloadArea() || way.isNew()) {
 			downloadCounter = 0;
 
 			DownloadOsmTask task = new DownloadOsmTask();
@@ -1216,11 +1234,10 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			BBox rbbox = way.getBBox();
 			double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 20;
 			double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 20;
-			Bounds area = new Bounds(rbbox.getBottomRightLat() - latOffset, rbbox.getTopLeftLon() - lonOffset,
-					rbbox.getTopLeftLat() + latOffset, rbbox.getBottomRightLon() + lonOffset);
-			Future<?> future = task.download(
-					new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), QUERY), false, area,
-					null);
+			Bounds area = new Bounds(rbbox.getBottomRightLat() - 4 * latOffset, rbbox.getTopLeftLon() - 4 * lonOffset,
+					rbbox.getTopLeftLat() + 4 * latOffset, rbbox.getBottomRightLon() + 4 * lonOffset);
+			Future<?> future = task.download(false, area, null);
+
 			MainApplication.worker.submit(() -> {
 				try {
 					future.get();
@@ -1260,8 +1277,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		double latOffset = (maxLat - minLat) / 10;
 		double lonOffset = (maxLon - minLon) / 10;
 
-		Bounds area = new Bounds(minLat - 7 * latOffset, minLon - 7 * lonOffset, maxLat + 7 * latOffset,
-				maxLon + 7 * lonOffset);
+		Bounds area = new Bounds(minLat - 4 * latOffset, minLon - 4 * lonOffset, maxLat + 4 * latOffset,
+				maxLon + 4 * lonOffset);
 		Future<?> future = task.download(false, area, null);
 
 		MainApplication.worker.submit(() -> {
@@ -1282,6 +1299,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		String[] restrictions = new String[] { "restriction", "restriction:bus", "restriction:trolleybus",
 				"restriction:tram", "restriction:subway", "restriction:light_rail", "restriction:rail",
 				"restriction:train", "restriction:trolleybus" };
+		System.out.println("parentRelation " + parentRelation.size() );
 
 		parentRelation.removeIf(rel -> {
 			if (rel.hasKey("except")) {
@@ -1454,12 +1472,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		if (numeric) {
 			alphabet = '1';
 			allowedCharacters.add('7');
-			if (showOption8)
-				allowedCharacters.add('8');
+			if (showOption0)
+				allowedCharacters.add('0');
 			allowedCharacters.add('9');
 		} else {
 			allowedCharacters.add('S');
-			if (showOption8)
+			if (showOption0)
 				allowedCharacters.add('W');
 			allowedCharacters.add('Q');
 		}
@@ -1528,7 +1546,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
 						shorterRoutes = true;
 						removeCurrentEdge();
-					} else if (typedKeyUpperCase.charValue() == 'W' || typedKeyUpperCase.charValue() == '8') {
+					} else if (typedKeyUpperCase.charValue() == 'W' || typedKeyUpperCase.charValue() == '0') {
 						shorterRoutes = shorterRoutes ? false : true;
 						MainApplication.getMap().mapView.removeKeyListener(this);
 						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
@@ -1570,12 +1588,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		if (numeric) {
 			alphabet = '1';
 			allowedCharacters.add('7');
-			if (showOption8)
-				allowedCharacters.add('8');
+			if (showOption0)
+				allowedCharacters.add('0');
 			allowedCharacters.add('9');
 		} else {
 			allowedCharacters.add('S');
-			if (showOption8)
+			if (showOption0)
 				allowedCharacters.add('W');
 			allowedCharacters.add('Q');
 		}
@@ -1647,7 +1665,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
 						shorterRoutes = true;
 						removeCurrentEdge();
-					} else if (typedKeyUpperCase.charValue() == 'W' || typedKeyUpperCase.charValue() == '8') {
+					} else if (typedKeyUpperCase.charValue() == 'W' || typedKeyUpperCase.charValue() == '0') {
 						shorterRoutes = shorterRoutes ? false : true;
 						MainApplication.getMap().mapView.removeKeyListener(this);
 						MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
@@ -2143,33 +2161,38 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			if (numeric)
 				chr = '1';
 
+			if (showOption0 && numeric) {
+				if (!shorterRoutes)
+					drawFixVariantLetter("0 : turn-by-turn at next intersection", Color.ORANGE, letterX, letterY, 25);
+				else
+					drawFixVariantLetter("0 : solutions based on other route relations", Color.PINK, letterX, letterY, 25);
+				letterY = letterY + 60;
+			} else if (showOption0) {
+				if (!shorterRoutes)
+					drawFixVariantLetter("W : turn-by-turn at next intersection", Color.ORANGE, letterX, letterY, 25);
+				else
+					drawFixVariantLetter("W : solutions based on other route relations", Color.PINK, letterX, letterY, 25);
+				letterY = letterY + 60;
+			}
+
 			for (int i = 0; i < 5; i++) {
 				if (wayColoring.containsValue(chr)) {
-					drawFixVariantLetter(chr.toString(), colors[i], letterX, letterY, 50);
+					drawFixVariantLetter(chr.toString(), colors[i], letterX, letterY, 35);
 					letterY = letterY + 60;
 				}
 				chr++;
 			}
 
 			// display the "Esc", "Skip" label:
-			drawFixVariantLetter("Esc", Color.WHITE, letterX, letterY, 40);
+			drawFixVariantLetter("Esc : Close the options", Color.WHITE, letterX, letterY, 25);
 			letterY = letterY + 60;
 			if (numeric) {
 				drawFixVariantLetter("7 : Skip", Color.WHITE, letterX, letterY, 25);
-				letterY = letterY + 60;
-				if (!shorterRoutes && showOption8)
-					drawFixVariantLetter("8 : shorter routes", Color.WHITE, letterX, letterY, 25);
-				else if (showOption8)
-					drawFixVariantLetter("8 : Longer routes", Color.WHITE, letterX, letterY, 25);
 				letterY = letterY + 60;
 				drawFixVariantLetter("9 : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
 			} else {
 				drawFixVariantLetter("S : Skip", Color.WHITE, letterX, letterY, 25);
 				letterY = letterY + 60;
-				if (!shorterRoutes && showOption8)
-					drawFixVariantLetter("W : shorter routes", Color.WHITE, letterX, letterY, 25);
-				else if (showOption8)
-					drawFixVariantLetter("W : Longer routes", Color.WHITE, letterX, letterY, 25);
 				drawFixVariantLetter("Q : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
 			}
 		}
@@ -2211,7 +2234,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			}
 
 			letterY = letterY + 60;
-			drawFixVariantLetter("Esc", Color.WHITE, letterX, letterY, 30);
+			drawFixVariantLetter("Esc : Close the options", Color.WHITE, letterX, letterY, 30);
 		}
 
 		void drawMultipleVariants(HashMap<Character, List<Way>> fixVariants) {
@@ -2227,36 +2250,41 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			double letterX = MainApplication.getMap().mapView.getBounds().getMinX() + 20;
 			double letterY = MainApplication.getMap().mapView.getBounds().getMinY() + 100;
 
+			boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
+
+			if (showOption0 && numeric) {
+				if (!shorterRoutes)
+					drawFixVariantLetter("0 : turn-by-turn at next intersection", Color.ORANGE, letterX, letterY, 25);
+				else
+					drawFixVariantLetter("0 : solutions based on other route relations", Color.PINK, letterX, letterY, 25);
+				letterY = letterY + 60;
+			} else if (showOption0) {
+				if (!shorterRoutes)
+					drawFixVariantLetter("W : turn-by-turn at next intersection", Color.ORANGE, letterX, letterY, 25);
+				else
+					drawFixVariantLetter("W : solutions based on other route relations", Color.PINK, letterX, letterY, 25);
+				letterY = letterY + 60;
+			}
+
 			for (Entry<Character, List<Way>> entry : fixVariants.entrySet()) {
 				Character c = entry.getKey();
 				if (fixVariants.get(c) != null) {
-					drawFixVariantLetter(c.toString(), colors[colorIndex % 5], letterX, letterY, 50);
+					drawFixVariantLetter(c.toString(), colors[colorIndex % 5], letterX, letterY, 35);
 					colorIndex++;
 					letterY = letterY + 60;
 				}
 			}
 
-			boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
-
 			// display the "Esc", "Skip" label:
-			drawFixVariantLetter("Esc", Color.WHITE, letterX, letterY, 40);
+			drawFixVariantLetter("Esc : Close the options", Color.WHITE, letterX, letterY, 25);
 			letterY = letterY + 60;
 			if (numeric) {
 				drawFixVariantLetter("7 : Skip", Color.WHITE, letterX, letterY, 25);
-				letterY = letterY + 60;
-				if (!shorterRoutes && showOption8)
-					drawFixVariantLetter("8 : shorter routes", Color.WHITE, letterX, letterY, 25);
-				else if (showOption8)
-					drawFixVariantLetter("8 : Longer routes", Color.WHITE, letterX, letterY, 25);
 				letterY = letterY + 60;
 				drawFixVariantLetter("9 : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
 			} else {
 				drawFixVariantLetter("S : Skip", Color.WHITE, letterX, letterY, 25);
 				letterY = letterY + 60;
-				if (!shorterRoutes && showOption8)
-					drawFixVariantLetter("W : shorter routes", Color.WHITE, letterX, letterY, 25);
-				else if (showOption8)
-					drawFixVariantLetter("W : Longer routes", Color.WHITE, letterX, letterY, 25);
 				drawFixVariantLetter("Q : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
 			}
 
