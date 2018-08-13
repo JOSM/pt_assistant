@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -360,6 +361,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		boolean nextWayDelete = false;
 		Node node = null;
 		nextIndex = false;
+		notice = null;
 
 		int numberOfNodes = findNumberOfCommonFirstLastNode(nextWay, way);
 		if (numberOfNodes > 1) {
@@ -375,6 +377,13 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 					node = n;
 					currentNode = n;
 				}
+			}
+		}
+
+		// check if there is a restricted relation that doesn't allow both the ways together
+		if (node != null) {
+			if (isRestricted(nextWay, way, node)) {
+				nextWayDelete = true;
 			}
 		}
 
@@ -1085,7 +1094,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		// check restrictions
 		System.out.println("Hello");
 		for (Way w : parentWays) {
-			if (isRestricted(w, way)) {
+			if (isRestricted(w, way, node)) {
 				waysToBeRemoved.add(w);
 			}
 		}
@@ -1294,12 +1303,14 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 	}
 
-	boolean isRestricted(Way currentWay, Way previousWay) {
-		List<Relation> parentRelation = OsmPrimitive.getFilteredList(previousWay.getReferrers(), Relation.class);
+	boolean isRestricted(Way currentWay, Way previousWay, Node commonNode) {
+		Set<Relation> parentSet = previousWay.getParentRelations(previousWay.getNodes());
+		if (parentSet == null || parentSet.isEmpty()) return false;
+		List<Relation> parentRelation = new ArrayList<>(parentSet);
+
 		String[] restrictions = new String[] { "restriction", "restriction:bus", "restriction:trolleybus",
 				"restriction:tram", "restriction:subway", "restriction:light_rail", "restriction:rail",
 				"restriction:train", "restriction:trolleybus" };
-		System.out.println("parentRelation " + parentRelation.size() );
 
 		parentRelation.removeIf(rel -> {
 			if (rel.hasKey("except")) {
@@ -1328,6 +1339,34 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			}
 		});
 
+		// check for "only" kind of restrictions
+		for (Relation r : parentRelation) {
+			Collection<RelationMember> prevMemberList = r.getMembersFor(Arrays.asList(previousWay));
+			Collection<RelationMember> commonNodeList = r.getMembersFor(Arrays.asList(commonNode));
+			// commonNode is not the node involved in the restriction relation then just continue
+			if (prevMemberList.isEmpty() || commonNodeList.isEmpty())
+				continue;
+
+			RelationMember prevMember = prevMemberList.stream().collect(Collectors.toList()).get(0);
+			final String prevRole = prevMember.getRole();
+
+			if (prevRole.equals("from")) {
+				String[] acceptedTags = new String[] { "only_right_turn", "only_left_turn", "only_u_turn", "only_straight_on",
+						"only_entry", "only_exit" };
+				for (String s : restrictions) {
+					// if we have any "only" type restrictions then the current way should be in the relation else it is restricted
+					if (r.hasTag(s, acceptedTags)) {
+						if (r.getMembersFor(Arrays.asList(currentWay)).isEmpty()) {
+							for (String str : acceptedTags) {
+								if (r.hasTag(s,str)) notice = str + " restriction violated";
+							}
+							return true;
+						}
+					}
+				}
+			}
+		}
+
 		for (Relation r : parentRelation) {
 			Collection<RelationMember> curMemberList = r.getMembersFor(Arrays.asList(currentWay));
 			Collection<RelationMember> prevMemberList = r.getMembersFor(Arrays.asList(previousWay));
@@ -1345,8 +1384,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				String[] acceptedTags = new String[] { "no_right_turn", "no_left_turn", "no_u_turn", "no_straight_on",
 						"no_entry", "no_exit" };
 				for (String s : restrictions)
-					if (r.hasTag(s, acceptedTags))
+					if (r.hasTag(s, acceptedTags)) {
+						for (String str : acceptedTags) {
+							if (r.hasTag(s,str)) notice = str + " restriction violated";
+						}
 						return true;
+					}
 			}
 		}
 
