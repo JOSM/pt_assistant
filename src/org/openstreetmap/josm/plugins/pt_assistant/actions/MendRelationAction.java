@@ -1041,9 +1041,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		// one way direction doesn't match
 		for (Way w : parentWays) {
 			if (w.isOneway() != 0) {
-				if (w.isOneway() == 1 && w.lastNode().equals(node)) {
-					waysToBeRemoved.add(w);
-				} else if (w.isOneway() == -1 && w.firstNode().equals(node)) {
+				if (checkOneWaySatisfiability(w, node)) {
 					waysToBeRemoved.add(w);
 				}
 			}
@@ -1092,7 +1090,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		waysToBeRemoved.clear();
 
 		// check restrictions
-		System.out.println("Hello");
 		for (Way w : parentWays) {
 			if (isRestricted(w, way, node)) {
 				waysToBeRemoved.add(w);
@@ -1113,9 +1110,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		// one way direction doesn't match
 		for (Way w : parentWays) {
 			if (w.isOneway() != 0) {
-				if (w.isOneway() == 1 && w.lastNode().equals(node)) {
-					waysToBeRemoved.add(w);
-				} else if (w.isOneway() == -1 && w.firstNode().equals(node)) {
+				if (checkOneWaySatisfiability(w, node)) {
 					waysToBeRemoved.add(w);
 				}
 			}
@@ -1460,7 +1455,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		String[] acceptedTags = new String[] { "yes", "designated" };
 
 		if ((way.hasTag("oneway:bus", acceptedTags) || way.hasTag("oneway:psv", acceptedTags))
-				&& way.lastNode().equals(node))
+				&& way.lastNode().equals(node) && relation.hasTag("route", "bus"))
 			return false;
 
 		if (!isNonSplitRoundAbout(way) && way.hasTag("junction", "roundabout")) {
