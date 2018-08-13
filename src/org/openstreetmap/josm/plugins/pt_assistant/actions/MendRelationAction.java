@@ -1041,7 +1041,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		// one way direction doesn't match
 		for (Way w : parentWays) {
 			if (w.isOneway() != 0) {
-				if (checkOneWaySatisfiability(w, node)) {
+				if (!checkOneWaySatisfiability(w, node)) {
 					waysToBeRemoved.add(w);
 				}
 			}
@@ -1110,7 +1110,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		// one way direction doesn't match
 		for (Way w : parentWays) {
 			if (w.isOneway() != 0) {
-				if (checkOneWaySatisfiability(w, node)) {
+				if (!checkOneWaySatisfiability(w, node)) {
 					waysToBeRemoved.add(w);
 				}
 			}
