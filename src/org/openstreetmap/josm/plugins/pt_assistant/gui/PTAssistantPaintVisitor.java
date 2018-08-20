@@ -104,7 +104,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
 	}
 
 	private void showRefs(Relation r) {
-		// in the end, draw labels:
+		// in the end, draw labels of the given route r:
 		HashMap<Long, String> stopOrderMap = new HashMap<>();
 		int stopCount = 1;
 
@@ -131,15 +131,18 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
 			}
 		}
 
+		// show the magenta ref value of all the routes
+
 		Collection<Relation> allRelations = null;
 		if (MainApplication.getLayerManager().getEditLayer() != null
 				&& MainApplication.getLayerManager().getEditLayer().getDataSet() != null)
 			allRelations = MainApplication.getLayerManager().getEditLayer().getDataSet().getRelations();
 		Double scale = MainApplication.getMap().mapView.getScale();
 
-		if (allRelations != null && scale < 0.7) {
-			for (Relation rel : allRelations) {
-				for (RelationMember rm : rel.getMembers()) {
+		if (allRelations != null && scale < 0.7 ) {
+//			for (Relation rel : allRelations) {
+			{
+				for (RelationMember rm : r.getMembers()) {
 					if (PTStop.isPTStop(rm) || (rm.getMember().isIncomplete()
 							&& (rm.isNode() || rm.hasRole("PUBLIC_TRANSPORT_NODE_ROLES")))) {
 
