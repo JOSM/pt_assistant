@@ -140,9 +140,9 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
 		Double scale = MainApplication.getMap().mapView.getScale();
 
 		if (allRelations != null && scale < 0.7 ) {
-//			for (Relation rel : allRelations) {
-			{
-				for (RelationMember rm : r.getMembers()) {
+			for (Relation rel : allRelations) {
+//			{
+				for (RelationMember rm : rel.getMembers()) {
 					if (PTStop.isPTStop(rm) || (rm.getMember().isIncomplete()
 							&& (rm.isNode() || rm.hasRole("PUBLIC_TRANSPORT_NODE_ROLES")))) {
 
