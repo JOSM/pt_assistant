@@ -122,18 +122,19 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		OsmDataLayer layer = editor.getLayer();
 		this.relation = editor.getRelation();
 		editor.addWindowListener(new WindowEventHandler());
-//		QUERY = "[out:xml][timeout:180][bbox:{{bbox}}];\n" + "(\n" + " (\n"
-//				+ "   way[\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n"
-//				+ " );\n" + " ._;<;\n" + ");\n" + "(._;>>;>;);\n" + "out meta;";
+		// QUERY = "[out:xml][timeout:180][bbox:{{bbox}}];\n" + "(\n" + " (\n"
+		// + "
+		// way[\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n"
+		// + " );\n" + " ._;<;\n" + ");\n" + "(._;>>;>;);\n" + "out meta;";
 	}
 
 	private String getQuery() {
-		String str = "[out:xml][timeout:200];\n" + "(\n" + " (\n";
+		String str = "[timeout:100];\n" + "(\n" + " (\n";
 
-		String str2 = "   [\"highway\"]\n" + "   [\"highway\"!=\"footway\"]\n" + "   [\"highway\"!=\"path\"]\n"
-				+ "   [\"highway\"!=\"cycleway\"]\n" + "   [\"highway\"!=\"service\"];\n" + "\n";
+		String str2 = "   [\"highway\"]" + "[\"highway\"!=\"footway\"]" + "[\"highway\"!=\"path\"]"
+				+ "[\"highway\"!=\"cycleway\"]" + "\n";
 
-		String str3 = " );\n" + " ._;<;\n" + ");\n" + "(._;>>;>;);\n" + "out meta;";
+		String str3 = ");\n" + ");\n" + "(._;<;);\n" + "(._;>;);\n" + "out meta;";
 
 		List<Node> nodeList = getBrokenNodes();
 
@@ -225,7 +226,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			halt = false;
 			callNextWay(currentIndex);
 		}
-//		callNextWay(currentIndex);
+		// callNextWay(currentIndex);
 	}
 
 	void downloadEntireArea() {
@@ -380,7 +381,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			}
 		}
 
-		// check if there is a restricted relation that doesn't allow both the ways together
+		// check if there is a restricted relation that doesn't allow both the ways
+		// together
 		if (node != null) {
 			if (isRestricted(nextWay, way, node)) {
 				nextWayDelete = true;
@@ -1153,7 +1155,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		if (abort)
 			return;
 
-		if (downloadCounter > 160 || way.isOutsideDownloadArea() || way.isNew()){
+		if (downloadCounter > 160 || way.isOutsideDownloadArea() || way.isNew()) {
 			downloadCounter = 0;
 
 			DownloadOsmTask task = new DownloadOsmTask();
@@ -1300,7 +1302,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 	boolean isRestricted(Way currentWay, Way previousWay, Node commonNode) {
 		Set<Relation> parentSet = previousWay.getParentRelations(previousWay.getNodes());
-		if (parentSet == null || parentSet.isEmpty()) return false;
+		if (parentSet == null || parentSet.isEmpty())
+			return false;
 		List<Relation> parentRelation = new ArrayList<>(parentSet);
 
 		String[] restrictions = new String[] { "restriction", "restriction:bus", "restriction:trolleybus",
@@ -1338,7 +1341,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		for (Relation r : parentRelation) {
 			Collection<RelationMember> prevMemberList = r.getMembersFor(Arrays.asList(previousWay));
 			Collection<RelationMember> commonNodeList = r.getMembersFor(Arrays.asList(commonNode));
-			// commonNode is not the node involved in the restriction relation then just continue
+			// commonNode is not the node involved in the restriction relation then just
+			// continue
 			if (prevMemberList.isEmpty() || commonNodeList.isEmpty())
 				continue;
 
@@ -1346,14 +1350,16 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			final String prevRole = prevMember.getRole();
 
 			if (prevRole.equals("from")) {
-				String[] acceptedTags = new String[] { "only_right_turn", "only_left_turn", "only_u_turn", "only_straight_on",
-						"only_entry", "only_exit" };
+				String[] acceptedTags = new String[] { "only_right_turn", "only_left_turn", "only_u_turn",
+						"only_straight_on", "only_entry", "only_exit" };
 				for (String s : restrictions) {
-					// if we have any "only" type restrictions then the current way should be in the relation else it is restricted
+					// if we have any "only" type restrictions then the current way should be in the
+					// relation else it is restricted
 					if (r.hasTag(s, acceptedTags)) {
 						if (r.getMembersFor(Arrays.asList(currentWay)).isEmpty()) {
 							for (String str : acceptedTags) {
-								if (r.hasTag(s,str)) notice = str + " restriction violated";
+								if (r.hasTag(s, str))
+									notice = str + " restriction violated";
 							}
 							return true;
 						}
@@ -1381,7 +1387,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				for (String s : restrictions)
 					if (r.hasTag(s, acceptedTags)) {
 						for (String str : acceptedTags) {
-							if (r.hasTag(s,str)) notice = str + " restriction violated";
+							if (r.hasTag(s, str))
+								notice = str + " restriction violated";
 						}
 						return true;
 					}
@@ -2203,13 +2210,15 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				if (!shorterRoutes)
 					drawFixVariantLetter("0 : turn-by-turn at next intersection", Color.ORANGE, letterX, letterY, 25);
 				else
-					drawFixVariantLetter("0 : solutions based on other route relations", Color.PINK, letterX, letterY, 25);
+					drawFixVariantLetter("0 : solutions based on other route relations", Color.PINK, letterX, letterY,
+							25);
 				letterY = letterY + 60;
 			} else if (showOption0) {
 				if (!shorterRoutes)
 					drawFixVariantLetter("W : turn-by-turn at next intersection", Color.ORANGE, letterX, letterY, 25);
 				else
-					drawFixVariantLetter("W : solutions based on other route relations", Color.PINK, letterX, letterY, 25);
+					drawFixVariantLetter("W : solutions based on other route relations", Color.PINK, letterX, letterY,
+							25);
 				letterY = letterY + 60;
 			}
 
@@ -2294,13 +2303,15 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				if (!shorterRoutes)
 					drawFixVariantLetter("0 : turn-by-turn at next intersection", Color.ORANGE, letterX, letterY, 25);
 				else
-					drawFixVariantLetter("0 : solutions based on other route relations", Color.PINK, letterX, letterY, 25);
+					drawFixVariantLetter("0 : solutions based on other route relations", Color.PINK, letterX, letterY,
+							25);
 				letterY = letterY + 60;
 			} else if (showOption0) {
 				if (!shorterRoutes)
 					drawFixVariantLetter("W : turn-by-turn at next intersection", Color.ORANGE, letterX, letterY, 25);
 				else
-					drawFixVariantLetter("W : solutions based on other route relations", Color.PINK, letterX, letterY, 25);
+					drawFixVariantLetter("W : solutions based on other route relations", Color.PINK, letterX, letterY,
+							25);
 				letterY = letterY + 60;
 			}
 
