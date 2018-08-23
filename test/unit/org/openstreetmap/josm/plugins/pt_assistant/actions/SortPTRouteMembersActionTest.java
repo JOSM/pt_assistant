@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
@@ -17,7 +16,6 @@ import org.openstreetmap.josm.data.osm.SimplePrimitiveId;
 import org.openstreetmap.josm.io.IllegalDataException;
 import org.openstreetmap.josm.io.OsmReader;
 import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 /**
  * Unit tests for class {@link SortPTRouteMembersAction}.
@@ -27,11 +25,6 @@ import org.openstreetmap.josm.testutils.JOSMTestRules;
  */
 public class SortPTRouteMembersActionTest extends AbstractTest {
 
-    /**
-     * Setup test.
-     */
-    @Rule
-    public JOSMTestRules rules = new JOSMTestRules().preferences().platform();
 
     private DataSet ds;
 
