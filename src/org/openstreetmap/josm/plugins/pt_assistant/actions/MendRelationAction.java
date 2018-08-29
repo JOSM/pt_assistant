@@ -132,7 +132,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		String str = "[timeout:100];\n" + "(\n" + " (\n";
 
 		String str2 = "   [\"highway\"]" + "[\"highway\"!=\"footway\"]" + "[\"highway\"!=\"path\"]"
-				+ "[\"highway\"!=\"cycleway\"]" + "\n";
+				+ "[\"highway\"!=\"cycleway\"];" + "\n";
 
 		String str3 = ");\n" + ");\n" + "(._;<;);\n" + "(._;>;);\n" + "out meta;";
 
