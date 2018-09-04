@@ -7,16 +7,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -45,8 +42,9 @@ import org.openstreetmap.josm.tools.Pair;
 public class PTAssistantPaintVisitor extends PaintVisitor {
 
 	private static final String Node = null;
-	private final static Set<String> PUBLIC_TRANSPORT_NODE_ROLES = new HashSet<>(Arrays.asList("stop",
-			"stop_entry_only", "stop_exit_only", "platform", "platform_entry_only", "platform_exit_only"));
+	private final static String[] PUBLIC_TRANSPORT_NODE_ROLES = {
+		"stop", "stop_entry_only", "stop_exit_only", "platform", "platform_entry_only", "platform_exit_only"
+	};
 	/** The graphics */
 	private final Graphics g;
 	/** The MapView */
@@ -110,7 +108,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
 
 		for (RelationMember rm : r.getMembers()) {
 			if (PTStop.isPTStop(rm)
-					|| (rm.getMember().isIncomplete() && (rm.isNode() || rm.hasRole("PUBLIC_TRANSPORT_NODE_ROLES")))) {
+					|| (rm.getMember().isIncomplete() && (rm.isNode() || rm.hasRole(PUBLIC_TRANSPORT_NODE_ROLES)))) {
 
 				StringBuilder sb = new StringBuilder();
 
@@ -141,10 +139,9 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
 
 		if (allRelations != null && scale < 0.7 ) {
 			for (Relation rel : allRelations) {
-//			{
 				for (RelationMember rm : rel.getMembers()) {
 					if (PTStop.isPTStop(rm) || (rm.getMember().isIncomplete()
-							&& (rm.isNode() || rm.hasRole("PUBLIC_TRANSPORT_NODE_ROLES")))) {
+							&& (rm.isNode() || rm.hasRole(PUBLIC_TRANSPORT_NODE_ROLES)))) {
 
 						if (PTStop.isPTStopPosition(rm)) {
 							drawStopLabel(rm.getMember(), false);
