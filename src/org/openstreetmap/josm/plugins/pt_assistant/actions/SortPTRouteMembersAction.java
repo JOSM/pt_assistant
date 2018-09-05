@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
 import org.openstreetmap.josm.command.ChangeCommand;
+import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -101,7 +102,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
     private void continueAfterDownload(Relation rel) {
         Relation newRel = new Relation(rel);
         sortPTRouteMembers(newRel);
-        MainApplication.undoRedo.add(new ChangeCommand(rel, newRel));
+        UndoRedoHandler.getInstance().add(new ChangeCommand(rel, newRel));
         editor.reloadDataFromRelation();
     }
 

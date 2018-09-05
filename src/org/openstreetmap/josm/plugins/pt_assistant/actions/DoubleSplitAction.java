@@ -30,7 +30,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.JoinNodeWayAction;
 import org.openstreetmap.josm.actions.mapmode.MapMode;
 import org.openstreetmap.josm.command.AddCommand;
@@ -40,6 +39,7 @@ import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.command.SplitWayCommand;
 import org.openstreetmap.josm.data.Bounds;
+import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.coor.ILatLon;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.DataSet;
@@ -98,8 +98,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 	}
 
 	private static Cursor getCursor() {
-		Cursor cursor = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
-		return cursor;
+		return Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
 	}
 
 	@Override
@@ -346,7 +345,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 		List<TagMap> affectedKeysList = new ArrayList<>();
 		Way selectedWay = null;
 
-		MainApplication.undoRedo.add(new SequenceCommand("Add Nodes", commandList));
+		UndoRedoHandler.getInstance().add(new SequenceCommand("Add Nodes", commandList));
 		commandList.clear();
 
 		addParentWay(atNodes.get(0));
@@ -354,13 +353,13 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
 		SplitWayCommand result = SplitWayCommand.split(affected, atNodes, Collections.emptyList());
 		if (result == null) {
-			MainApplication.undoRedo.undo();
+			UndoRedoHandler.getInstance().undo();
 			resetLayer();
 			return;
 		}
 
 		commandList.add(result);
-		MainApplication.undoRedo.add(new SequenceCommand("Split Way", commandList));
+		UndoRedoHandler.getInstance().add(new SequenceCommand("Split Way", commandList));
 
 		// Find the middle way after split
 		List<Way> affectedWayList = result.getNewWays();
@@ -378,8 +377,8 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 			affectedKeysList.add(affected.getKeys());
 			addTags(affectedKeysList, Arrays.asList(selectedWay), keys, values, 0);
 		} else {
-			MainApplication.undoRedo.undo();
-			MainApplication.undoRedo.undo();
+			UndoRedoHandler.getInstance().undo();
+			UndoRedoHandler.getInstance().undo();
 			resetLayer();
 			return;
 		}
@@ -390,7 +389,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 			JComboBox<String> keys, JComboBox<String> values) {
 		List<TagMap> affectedKeysList = new ArrayList<>();
 
-		MainApplication.undoRedo.add(new SequenceCommand("Add Nodes", commandList));
+		UndoRedoHandler.getInstance().add(new SequenceCommand("Add Nodes", commandList));
 		commandList.clear();
 
 		// join newly created nodes to parent ways
@@ -411,19 +410,19 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 		if (result1 != null)
 			commandList.add(result1);
 		else {
-			MainApplication.undoRedo.undo();
+			UndoRedoHandler.getInstance().undo();
 			resetLayer();
 			return;
 		}
 		if (result2 != null)
 			commandList.add(result2);
 		else {
-			MainApplication.undoRedo.undo();
+			UndoRedoHandler.getInstance().undo();
 			resetLayer();
 			return;
 		}
 
-		MainApplication.undoRedo.add(new SequenceCommand("Split Way", commandList));
+		UndoRedoHandler.getInstance().add(new SequenceCommand("Split Way", commandList));
 
 		// add newly split way to relations
 		List<Relation> referrers1 = OsmPrimitive.getFilteredList(previousAffectedWay.getReferrers(), Relation.class);
@@ -484,8 +483,8 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 			List<Way> selectedWays = Arrays.asList(way1, way2);
 			addTags(affectedKeysList, selectedWays, keys, values, 1);
 		} else {
-			MainApplication.undoRedo.undo();
-			MainApplication.undoRedo.undo();
+			UndoRedoHandler.getInstance().undo();
+			UndoRedoHandler.getInstance().undo();
 			resetLayer();
 		}
 	}
@@ -612,10 +611,11 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 					}
 				}
 			}
-			MainApplication.undoRedo
-					.add(new ChangePropertyCommand(Collections.singleton(selectedWay.get(1)), newKeys2));
+			UndoRedoHandler.getInstance().add(
+				new ChangePropertyCommand(Collections.singleton(selectedWay.get(1)), newKeys2)
+			);
 		}
-		MainApplication.undoRedo.add(new ChangePropertyCommand(Collections.singleton(selectedWay.get(0)), newKeys1));
+		UndoRedoHandler.getInstance().add(new ChangePropertyCommand(Collections.singleton(selectedWay.get(0)), newKeys1));
 		resetLayer();
 	}
 
@@ -796,8 +796,12 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
 		SelectFromOptionDialog(int type, Node commonNode, Way affected, Way previousAffectedWay,
 				List<Command> commandList, List<Node> atNode) {
-			super(Main.parent, tr("What do you want the segment to be?"), new String[] { tr("Ok"), tr("Cancel") },
-					true);
+			super(
+				MainApplication.getMainFrame(),
+				tr("What do you want the segment to be?"),
+				new String[] { tr("Ok"), tr("Cancel") },
+				true
+			);
 			this.affected = affected;
 			this.previousAffectedWay = previousAffectedWay;
 			this.commandList = commandList;

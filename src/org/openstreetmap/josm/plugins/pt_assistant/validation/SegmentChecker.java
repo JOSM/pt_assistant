@@ -16,6 +16,7 @@ import javax.swing.SwingUtilities;
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.Command;
+import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -943,8 +944,8 @@ public class SegmentChecker extends Checker {
         Relation modifiedRelation = new Relation(originalRelation);
         modifiedRelation.setMembers(getModifiedRelationMembers(testError, fix));
         ChangeCommand changeCommand = new ChangeCommand(originalRelation, modifiedRelation);
-        MainApplication.undoRedo.addNoRedraw(changeCommand);
-        MainApplication.undoRedo.afterAdd(changeCommand);
+        UndoRedoHandler.getInstance().addNoRedraw(changeCommand);
+        UndoRedoHandler.getInstance().afterAdd(changeCommand);
         PTRouteSegment wrongSegment = wrongSegments.get(testError);
         wrongSegments.remove(testError);
         wrongSegment.setPTWays(fix);
@@ -1078,8 +1079,8 @@ public class SegmentChecker extends Checker {
                 Relation modifiedRelation = new Relation(originalRelation);
                 modifiedRelation.setMembers(getModifiedRelationMembers(testError, segment.getPTWays()));
                 ChangeCommand changeCommand = new ChangeCommand(originalRelation, modifiedRelation);
-                MainApplication.undoRedo.addNoRedraw(changeCommand);
-                MainApplication.undoRedo.afterAdd(changeCommand);
+                UndoRedoHandler.getInstance().addNoRedraw(changeCommand);
+                UndoRedoHandler.getInstance().afterAdd(changeCommand);
                 wrongSegmentsToRemove.add(testError);
             }
         }

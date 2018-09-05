@@ -7,10 +7,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.gui.preferences.PreferenceTabbedPane;
 import org.openstreetmap.josm.gui.preferences.SubPreferenceSetting;
 import org.openstreetmap.josm.gui.preferences.TabPreferenceSetting;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.PTProperties;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 
@@ -37,8 +37,8 @@ public class PTAssistantPreferenceSetting implements SubPreferenceSetting {
         mainPanel.add(downloadIncompleteMembers);
         mainPanel.add(stopArea);
 
-        downloadIncompleteMembers.setSelected(Main.pref.getBoolean("pt_assistant.download-incomplete", false));
-        stopArea.setSelected(Main.pref.getBoolean("pt_assistant.stop-area-tests", false));
+        downloadIncompleteMembers.setSelected(PTProperties.DOWNLOAD_INCOMPLETE.get());
+        stopArea.setSelected(PTProperties.STOP_AREA_TESTS.get());
 
         synchronized (gui.getDisplayPreference().getTabPane()) {
             gui.getValidatorPreference().addSubTab(this, "PT_Assistant", new JScrollPane(mainPanel));
@@ -59,8 +59,8 @@ public class PTAssistantPreferenceSetting implements SubPreferenceSetting {
      */
     @Override
     public boolean ok() {
-        Main.pref.putBoolean("pt_assistant.download-incomplete", this.downloadIncompleteMembers.isSelected());
-        Main.pref.putBoolean("pt_assistant.stop-area-tests", this.stopArea.isSelected());
+        PTProperties.DOWNLOAD_INCOMPLETE.put(downloadIncompleteMembers.isSelected());
+        PTProperties.STOP_AREA_TESTS.put(this.stopArea.isSelected());
         return false;
     }
 

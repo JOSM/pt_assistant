@@ -24,6 +24,7 @@ import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.MoveCommand;
 import org.openstreetmap.josm.command.RemoveNodesCommand;
 import org.openstreetmap.josm.command.SequenceCommand;
+import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -93,33 +94,33 @@ public class ExtractPlatformNodeAction extends JosmAction {
 			for (OsmPrimitive pr : refs) {
 				if (pr instanceof Way) {
 					Way w = (Way) pr;
-					MainApplication.undoRedo.add(new RemoveNodesCommand(w, Arrays.asList(nd)));
+					UndoRedoHandler.getInstance().add(new RemoveNodesCommand(w, Arrays.asList(nd)));
 				}
 			}
 		} else {
 			Node newNode = new Node(MainApplication.getMap().mapView.getLatLon(p.x, p.y));
-			MainApplication.undoRedo.add(new AddCommand(getLayerManager().getEditDataSet(), newNode));
-			MainApplication.undoRedo
+			UndoRedoHandler.getInstance().add(new AddCommand(getLayerManager().getEditDataSet(), newNode));
+			UndoRedoHandler.getInstance()
 					.add(new ChangePropertyCommand(Collections.singleton(newNode), new HashMap<>(nd.getKeys())));
 			CreatePlatformNodeThroughReplaceAction cpsa = new CreatePlatformNodeThroughReplaceAction();
 			cpsa.modify(newNode, nd);
 			return;
 		}
 
-		MainApplication.undoRedo.add(new SequenceCommand(tr("Extract node from line"), cmds));
+		UndoRedoHandler.getInstance().add(new SequenceCommand(tr("Extract node from line"), cmds));
 
 		if (nd.hasTag("railway")) {
 			ArrayList<Command> undoCommands = new ArrayList<>();
 			undoCommands.add(new ChangePropertyCommand(nd, "public_transport", "platform"));
 			undoCommands.add(new ChangePropertyCommand(nd, "tram", "yes"));
 			undoCommands.add(new ChangePropertyCommand(nd, "railway", "tram_stop"));
-			MainApplication.undoRedo.add(new SequenceCommand("tag", undoCommands));
+			UndoRedoHandler.getInstance().add(new SequenceCommand("tag", undoCommands));
 		} else if (nd.hasTag("highway")) {
 			ArrayList<Command> undoCommands = new ArrayList<>();
 			undoCommands.add(new ChangePropertyCommand(nd, "public_transport", "platform"));
 			undoCommands.add(new ChangePropertyCommand(nd, "bus", "yes"));
 			undoCommands.add(new ChangePropertyCommand(nd, "highway", "bus_stop"));
-			MainApplication.undoRedo.add(new SequenceCommand("tag", undoCommands));
+			UndoRedoHandler.getInstance().add(new SequenceCommand("tag", undoCommands));
 		}
 	}
 

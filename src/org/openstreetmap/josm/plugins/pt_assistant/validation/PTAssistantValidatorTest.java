@@ -12,11 +12,11 @@ import java.util.Map.Entry;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SelectCommand;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.OsmDataManager;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
@@ -28,16 +28,14 @@ import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.data.validation.TestError.Builder;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPlugin;
-import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.FixTask;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.IncompleteMembersDownloadThread;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteDataManager;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTWay;
-import org.openstreetmap.josm.plugins.pt_assistant.gui.IncompleteMembersDownloadDialog;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
-import org.openstreetmap.josm.plugins.pt_assistant.gui.ProceedDialog;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.PTProperties;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
@@ -84,7 +82,7 @@ public class PTAssistantValidatorTest extends Test {
             // check if stop positions are on a way:
             nodeChecker.performSolitaryStopPositionTest();
 
-            if (PTAssistantPluginPreferences.STOP_AREA_TEST.get()) {
+            if (PTProperties.STOP_AREA_TESTS.get()) {
                 // check if stop positions are in any stop_area relation:
                 nodeChecker.performNodePartOfStopAreaTest();
             }
@@ -97,7 +95,7 @@ public class PTAssistantValidatorTest extends Test {
             // check that platforms are not part of any way:
             nodeChecker.performPlatformPartOfWayTest();
 
-            if (PTAssistantPluginPreferences.STOP_AREA_TEST.get()) {
+            if (PTProperties.STOP_AREA_TESTS.get()) {
                 // check if platforms are in any stop_area relation:
                 nodeChecker.performNodePartOfStopAreaTest();
             }
@@ -125,7 +123,7 @@ public class PTAssistantValidatorTest extends Test {
         }
 
         // Do some testing on stop area relations
-        if (PTAssistantPluginPreferences.STOP_AREA_TEST.get() && StopUtils.isStopArea(r)) {
+        if (PTProperties.STOP_AREA_TESTS.get() && StopUtils.isStopArea(r)) {
 
             StopChecker stopChecker = new StopChecker(r, this);
 
@@ -228,18 +226,11 @@ public class PTAssistantValidatorTest extends Test {
      *             if interrupted
      */
     private int showIncompleteMembersDownloadDialog() throws InterruptedException {
+        return PTProperties.DOWNLOAD_INCOMPLETE.get() ? JOptionPane.YES_OPTION : JOptionPane.NO_OPTION;
 
-        if (Main.pref.getBoolean("pt_assistant.download-incomplete", false) == true) {
-            return JOptionPane.YES_OPTION;
-        }
-
-        if (Main.pref.getBoolean("pt_assistant.download-incomplete", false) == false) {
-            return JOptionPane.NO_OPTION;
-        }
-
-        IncompleteMembersDownloadDialog incompleteMembersDownloadDialog = new IncompleteMembersDownloadDialog();
-        return incompleteMembersDownloadDialog.getUserSelection();
-
+        // TODO: The following is dead code! Either revive it or throw it away.
+        // IncompleteMembersDownloadDialog incompleteMembersDownloadDialog = new IncompleteMembersDownloadDialog();
+        // return incompleteMembersDownloadDialog.getUserSelection();
     }
 
     /**
@@ -314,16 +305,11 @@ public class PTAssistantValidatorTest extends Test {
             return 2;
         }
 
-        if (Main.pref.getBoolean("pt_assistant.proceed-without-fix", true) == false) {
-            return 0;
-        }
+        return PTProperties.PROCEED_WITHOUT_FIX.get() ? 2 : 0;
 
-        if (Main.pref.getBoolean("pt_assistant.proceed-without-fix", true) == true) {
-            return 2;
-        }
-
-        ProceedDialog proceedDialog = new ProceedDialog(id, numberOfDirectionErrors, numberOfRoadTypeErrors);
-        return proceedDialog.getUserSelection();
+        // TODO: The following is dead code! Either revive it or throw it away.
+        // ProceedDialog proceedDialog = new ProceedDialog(id, numberOfDirectionErrors, numberOfRoadTypeErrors);
+        // return proceedDialog.getUserSelection();
 
     }
 
@@ -506,7 +492,7 @@ public class PTAssistantValidatorTest extends Test {
         }
 
         if (testError.getCode() == ERROR_CODE_FIRST_LAST_STOP_WAY_TAG) {
-    			RouteChecker.fixFirstLastWayError(testError);
+            RouteChecker.fixFirstLastWayError(testError);
         }
 
         if (testError.getCode() == ERROR_CODE_SOLITARY_STOP_POSITION
@@ -521,8 +507,8 @@ public class PTAssistantValidatorTest extends Test {
             for (Object obj : testError.getPrimitives()) {
                 primitivesToSelect.add((OsmPrimitive) obj);
             }
-            SelectCommand selectCommand = new SelectCommand(Main.main.getEditDataSet(), primitivesToSelect);
-            SwingUtilities.invokeLater(() -> selectCommand.executeCommand());
+            SelectCommand selectCommand = new SelectCommand(OsmDataManager.getInstance().getEditDataSet(), primitivesToSelect);
+            SwingUtilities.invokeLater(selectCommand::executeCommand);
         }
 
         if (commands.isEmpty()) {

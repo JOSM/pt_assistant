@@ -11,6 +11,7 @@ import java.util.Collection;
 import javax.swing.SwingUtilities;
 
 import org.openstreetmap.josm.command.Command;
+import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.PleaseWaitRunnable;
@@ -51,7 +52,7 @@ public class FixTask extends PleaseWaitRunnable {
                 SwingUtilities.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
-                        MainApplication.undoRedo.addNoRedraw(fixCommand);
+                        UndoRedoHandler.getInstance().addNoRedraw(fixCommand);
                     }
                 });
             }
@@ -85,7 +86,7 @@ public class FixTask extends PleaseWaitRunnable {
             }
             monitor.subTask(tr("Updating map ..."));
             SwingUtilities.invokeAndWait(() -> {
-                MainApplication.undoRedo.afterAdd(null);
+                UndoRedoHandler.getInstance().afterAdd(null);
                 MainApplication.getMap().repaint();
             });
         } catch (InterruptedException | InvocationTargetException e) {

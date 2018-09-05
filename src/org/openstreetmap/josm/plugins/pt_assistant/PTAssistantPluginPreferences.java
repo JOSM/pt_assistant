@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import org.openstreetmap.josm.data.preferences.BooleanProperty;
 import org.openstreetmap.josm.gui.preferences.DefaultTabPreferenceSetting;
 import org.openstreetmap.josm.gui.preferences.PreferenceTabbedPane;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.PTProperties;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
 
@@ -29,13 +30,8 @@ public class PTAssistantPluginPreferences extends DefaultTabPreferenceSetting {
 	private final JCheckBox modeOfTransportToStop;
 	private final JCheckBox splitWay1;
 	private final JCheckBox splitWay2;
-	public static final BooleanProperty DOWNLOAD_INCOMPLETE = new BooleanProperty("pt_assistant.download-incomplete", false);
-	public static final BooleanProperty STOP_AREA_TEST = new BooleanProperty("pt_assistant.stop-area-tests", false);
 	public static final BooleanProperty TRANSFER_DETAILS = new BooleanProperty("pt_assistant.transfer-details-action", false);
 	public static final BooleanProperty NUMERICAL_OPTIONS = new BooleanProperty("pt_assistant.keep-options-numerical-in-mend-action", false);
-	public static final BooleanProperty SUBSTITUTE_PLATFORM_RELATION = new BooleanProperty("pt_assistant.substitute-platformway-relation", true);
-	public static final BooleanProperty TRANSFER_STOP_POSITION = new BooleanProperty("pt_assistant.transfer-stopposition-tag", true);
-	public static final BooleanProperty TRANSFER_PLATFORMWAY = new BooleanProperty("pt_assistant.transfer-platformway-tag", true);
 	public static final BooleanProperty COMPARE_FROM_TAG = new BooleanProperty("pt_assistant.compare-name-from-tag", false);
 	public static final BooleanProperty COMPARE_TO_TAG = new BooleanProperty("pt_assistant.compare-name-to-tag", false);
 	public static final BooleanProperty CHECK_START_END = new BooleanProperty("pt_assistant.check-route-relation-start-end", false);
@@ -98,17 +94,18 @@ public class PTAssistantPluginPreferences extends DefaultTabPreferenceSetting {
 	}
 
 	/**
-	 * Action to be performed when the OK button is pressed
+	 * Action to be performed when the OK button is pressed.
+	 * Saves the checkbox state in properties.
 	 */
 	@Override
 	public boolean ok() {
-		DOWNLOAD_INCOMPLETE.put(this.downloadIncompleteMembers.isSelected());
-		STOP_AREA_TEST.put(this.stopArea.isSelected());
+		PTProperties.DOWNLOAD_INCOMPLETE.put(this.downloadIncompleteMembers.isSelected());
+		PTProperties.STOP_AREA_TESTS.put(this.stopArea.isSelected());
 		TRANSFER_DETAILS.put(this.transferDetails.isSelected());
 		NUMERICAL_OPTIONS.put(this.optionsForMendAction.isSelected());
-		SUBSTITUTE_PLATFORM_RELATION.put(this.substitutePlatformRelation.isSelected());
-		TRANSFER_STOP_POSITION.put(this.stopPositionNodeTag.isSelected());
-		TRANSFER_PLATFORMWAY.put(this.platformWayDetailsTag.isSelected());
+		PTProperties.SUBSTITUTE_PLATFORMWAY_RELATION.put(this.substitutePlatformRelation.isSelected());
+		PTProperties.TRANSFER_STOPPOSITION_TAG.put(this.stopPositionNodeTag.isSelected());
+		PTProperties.TRANSFER_PLATFORMWAY_TAG.put(this.platformWayDetailsTag.isSelected());
 		COMPARE_FROM_TAG.put(this.compareNameWithFirstStop.isSelected());
 		COMPARE_TO_TAG.put(this.compareNameWithLastStop.isSelected());
 		CHECK_START_END.put(this.checkStartEndIsStopPosition.isSelected());
@@ -120,19 +117,19 @@ public class PTAssistantPluginPreferences extends DefaultTabPreferenceSetting {
 	}
 
 	private void markCheckBoxes() {
-		downloadIncompleteMembers.setSelected(DOWNLOAD_INCOMPLETE.get());
+		downloadIncompleteMembers.setSelected(PTProperties.DOWNLOAD_INCOMPLETE.get());
 
-		stopArea.setSelected(STOP_AREA_TEST.get());
+		stopArea.setSelected(PTProperties.STOP_AREA_TESTS.get());
 
 		transferDetails.setSelected(TRANSFER_DETAILS.get());
 
 		optionsForMendAction.setSelected(NUMERICAL_OPTIONS.get());
 
-		substitutePlatformRelation.setSelected(SUBSTITUTE_PLATFORM_RELATION.get());
+		substitutePlatformRelation.setSelected(PTProperties.SUBSTITUTE_PLATFORMWAY_RELATION.get());
 
-		stopPositionNodeTag.setSelected(TRANSFER_STOP_POSITION.get());
+		stopPositionNodeTag.setSelected(PTProperties.TRANSFER_STOPPOSITION_TAG.get());
 
-		platformWayDetailsTag.setSelected(TRANSFER_PLATFORMWAY.get());
+		platformWayDetailsTag.setSelected(PTProperties.TRANSFER_PLATFORMWAY_TAG.get());
 
 		compareNameWithFirstStop.setSelected(COMPARE_FROM_TAG.get());
 

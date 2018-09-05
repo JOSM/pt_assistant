@@ -23,6 +23,7 @@ import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.command.SplitWayCommand;
+import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
@@ -130,9 +131,9 @@ public class AddStopPositionAction extends MapMode {
         }
 
         if (newNode) {
-            MainApplication.undoRedo.add(new AddCommand(getLayerManager().getEditDataSet(), newStopPos));
+            UndoRedoHandler.getInstance().add(new AddCommand(getLayerManager().getEditDataSet(), newStopPos));
         } else {
-            MainApplication.undoRedo.add(new ChangeCommand(n, newStopPos));
+            UndoRedoHandler.getInstance().add(new ChangeCommand(n, newStopPos));
             newStopPos = n;
         }
 
@@ -147,14 +148,15 @@ public class AddStopPositionAction extends MapMode {
         //add the tags of the stop position
         HashMap<String, String> tagsForNode = new HashMap<>(newStopPos.getKeys());
         if (PTAssistantPluginPreferences.SPLITWAY_1.get()) {
-        		for (Way w : newStopPos.getParentWays()) {
-        			for (Relation r : getPTRouteParents(w)) {
-        				if (r.hasKey("route"))
-        					tagsForNode.put(r.get("route"), "yes");
-        			}
-        		}
-        		tagsForNode.put("public_transport", "stop_position");
-        		MainApplication.undoRedo.add(new ChangePropertyCommand(Collections.singleton(newStopPos), tagsForNode));
+            for (Way w : newStopPos.getParentWays()) {
+                for (Relation r : getPTRouteParents(w)) {
+                    if (r.hasKey("route")) {
+                        tagsForNode.put(r.get("route"), "yes");
+                    }
+                }
+            }
+            tagsForNode.put("public_transport", "stop_position");
+            UndoRedoHandler.getInstance().add(new ChangePropertyCommand(Collections.singleton(newStopPos), tagsForNode));
         }
 
         if (newStopPos.getParentWays().isEmpty())
@@ -171,21 +173,22 @@ public class AddStopPositionAction extends MapMode {
                 affected, Collections.singletonList(newStopPos), Collections.emptyList());
         if (result == null) //if the way is already split, return
             return;
-        MainApplication.undoRedo.add(result);
+        UndoRedoHandler.getInstance().add(result);
 
         List<Command> cmds = new ArrayList<>();
         for (Entry<Relation, Boolean> route : needPostProcess.entrySet()) {
             Relation r = new Relation(route.getKey());
             if (route.getValue() != null) {
-            		if (route.getValue())
-            			deleteFirstWay(r);
-            		else
-            			deleteLastWay(r);
-            		cmds.add(new ChangeCommand(route.getKey(), r));
+                if (route.getValue()) {
+                    deleteFirstWay(r);
+                } else {
+                    deleteLastWay(r);
+                }
+                cmds.add(new ChangeCommand(route.getKey(), r));
             }
 
         }
-        MainApplication.undoRedo.add(new SequenceCommand("Update PT Relations", cmds));
+        UndoRedoHandler.getInstance().add(new SequenceCommand("Update PT Relations", cmds));
     }
 
     private void deleteLastWay(Relation r) {
@@ -215,23 +218,23 @@ public class AddStopPositionAction extends MapMode {
     }
 
     private Map<Relation, Boolean> getAffectedRelation(Way affected, boolean bool) {
-    		if (bool == false) {
-    			Map<Relation, Boolean> ret = new HashMap<>();
-    	        for (Relation route : getPTRouteParents(affected)) {
-    	            if (isFirstMember(affected, route)) {
-    	                ret.put(route, true);
-    	            } else if (isLastMember(affected, route)) {
-    	                ret.put(route, false);
-    	            }
-    	        }
-    	        return ret;
-    		} else {
-    			Map<Relation, Boolean> ret = new HashMap<>();
-    			for (Relation route : getPTRouteParents(affected)) {
-    				ret.put(route, null);
-    			}
-    			return ret;
-    		}
+        if (bool == false) {
+            Map<Relation, Boolean> ret = new HashMap<>();
+            for (Relation route : getPTRouteParents(affected)) {
+                if (isFirstMember(affected, route)) {
+                    ret.put(route, true);
+                } else if (isLastMember(affected, route)) {
+                    ret.put(route, false);
+                }
+            }
+            return ret;
+        } else {
+            Map<Relation, Boolean> ret = new HashMap<>();
+            for (Relation route : getPTRouteParents(affected)) {
+                ret.put(route, null);
+            }
+            return ret;
+        }
     }
 
     private boolean isFirstMember(Way affected, Relation route) {

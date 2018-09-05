@@ -22,6 +22,7 @@ import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
+import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -136,12 +137,12 @@ public class CreatePlatformNodeThroughReplaceAction extends JosmAction {
 
 			List<Command> commands = getReplaceGeometryCommand(stopPositionNode, newNode);
 			if (commands.size() > 0) {
-				MainApplication.undoRedo.add(new SequenceCommand(tr("Replace Membership"), commands));
+				UndoRedoHandler.getInstance().add(new SequenceCommand(tr("Replace Membership"), commands));
 			}
 
 			HashMap<String, String> tags = new HashMap<>(stopPositionNode.getKeys());
 			tags.replaceAll((key, value) -> null);
-			MainApplication.undoRedo.add(new ChangePropertyCommand(Collections.singleton(stopPositionNode), tags));
+			UndoRedoHandler.getInstance().add(new ChangePropertyCommand(Collections.singleton(stopPositionNode), tags));
 
 		} else if (stopPositionNode.hasTag("highway")) {
 			newNode.put("bus", "yes");
@@ -151,12 +152,12 @@ public class CreatePlatformNodeThroughReplaceAction extends JosmAction {
 
 			List<Command> commands = getReplaceGeometryCommand(stopPositionNode, newNode);
 			if (commands.size() > 0) {
-				MainApplication.undoRedo.add(new SequenceCommand(tr("Replace Membership"), commands));
+				UndoRedoHandler.getInstance().add(new SequenceCommand(tr("Replace Membership"), commands));
 			}
 
 			HashMap<String, String> tags = new HashMap<>(stopPositionNode.getKeys());
 			tags.replaceAll((key, value) -> null);
-			MainApplication.undoRedo.add(new ChangePropertyCommand(Collections.singleton(stopPositionNode), tags));
+			UndoRedoHandler.getInstance().add(new ChangePropertyCommand(Collections.singleton(stopPositionNode), tags));
 		}
 
 	}

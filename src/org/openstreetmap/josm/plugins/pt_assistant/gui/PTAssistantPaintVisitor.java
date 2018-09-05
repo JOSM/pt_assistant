@@ -112,7 +112,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
 
 				StringBuilder sb = new StringBuilder();
 
-				final Integer innerCount = new Integer(stopCount);
+				final Integer innerCount = stopCount;
 				stopOrderMap.computeIfPresent(rm.getUniqueId(),
 						(x, y) -> (sb.append(y).append(";").append(innerCount)).toString());
 				stopOrderMap.computeIfAbsent(rm.getUniqueId(), y -> (sb

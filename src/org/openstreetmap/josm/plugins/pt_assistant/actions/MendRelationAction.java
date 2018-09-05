@@ -30,12 +30,14 @@ import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
+import org.openstreetmap.josm.actions.downloadtasks.DownloadParams;
 import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
 import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.command.SplitWayCommand;
 import org.openstreetmap.josm.data.Bounds;
+import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
@@ -74,6 +76,8 @@ import org.openstreetmap.josm.tools.Utils;
  * @author Biswesh
  */
 public class MendRelationAction extends AbstractRelationEditorAction {
+	private static final DownloadParams DEFAULT_DOWNLOAD_PARAMS = new DownloadParams();
+
 	Relation relation = null;
 	MemberTableModel memberTableModel = null;
 	GenericRelationEditor editor = null;
@@ -259,9 +263,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		String query = getQuery();
 		Logging.debug(query);
 
-		Future<?> future = task.download(
-				new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query), false, area,
-				null);
+		final Future future = task.download(
+			new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query),
+			DEFAULT_DOWNLOAD_PARAMS,
+			area,
+			null
+		);
 
 		MainApplication.worker.submit(() -> {
 			try {
@@ -1160,7 +1167,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			Bounds area = new Bounds(rbbox.getBottomRightLat() - 4 * latOffset, rbbox.getTopLeftLon() - 4 * lonOffset,
 					rbbox.getTopLeftLat() + 4 * latOffset, rbbox.getBottomRightLon() + 4 * lonOffset);
 
-			Future<?> future = task.download(false, area, null);
+			Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
 
 			MainApplication.worker.submit(() -> {
 				try {
@@ -1189,7 +1196,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 10;
 			Bounds area = new Bounds(rbbox.getBottomRightLat() - latOffset, rbbox.getTopLeftLon() - lonOffset,
 					rbbox.getTopLeftLat() + latOffset, rbbox.getBottomRightLon() + lonOffset);
-			Future<?> future = task.download(false, area, null);
+			Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
 
 			MainApplication.worker.submit(() -> {
 				try {
@@ -1227,7 +1234,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 20;
 			Bounds area = new Bounds(rbbox.getBottomRightLat() - 4 * latOffset, rbbox.getTopLeftLon() - 4 * lonOffset,
 					rbbox.getTopLeftLat() + 4 * latOffset, rbbox.getBottomRightLon() + 4 * lonOffset);
-			Future<?> future = task.download(false, area, null);
+			Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
 
 			MainApplication.worker.submit(() -> {
 				try {
@@ -1267,7 +1274,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 		Bounds area = new Bounds(minLat - 4 * latOffset, minLon - 4 * lonOffset, maxLat + 4 * latOffset,
 				maxLon + 4 * lonOffset);
-		Future<?> future = task.download(false, area, null);
+		Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
 
 		MainApplication.worker.submit(() -> {
 			try {
@@ -1854,7 +1861,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 				newKeys.put("oneway", "bus=no");
 				cmdlst.add(new ChangePropertyCommand(Collections.singleton(w), newKeys));
 			}
-			MainApplication.undoRedo.add(new SequenceCommand("Add tags", cmdlst));
+			UndoRedoHandler.getInstance().add(new SequenceCommand("Add tags", cmdlst));
 			// OK.actionPerformed(null);
 			save();
 			if (currentIndex < members.size() - 1) {
@@ -1978,7 +1985,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 					if (w1 != null && brk == false) {
 						SplitWayCommand result = SplitWayCommand.split(w1, breakNode, Collections.emptyList());
 						if (result != null) {
-							MainApplication.undoRedo.add(result);
+							UndoRedoHandler.getInstance().add(result);
 							if (result.getOriginalWay().getNodes().contains(w.firstNode())
 									&& result.getOriginalWay().getNodes().contains(w.lastNode()))
 								w = result.getOriginalWay();

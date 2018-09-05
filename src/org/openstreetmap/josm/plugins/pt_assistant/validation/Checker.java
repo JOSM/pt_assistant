@@ -7,11 +7,11 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SelectCommand;
 import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.OsmDataManager;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
@@ -144,7 +144,7 @@ public abstract class Checker {
             primitivesToZoom.add((OsmPrimitive) primitiveToZoom);
         }
 
-        SelectCommand command = new SelectCommand(Main.main.getEditDataSet(), primitivesToZoom);
+        SelectCommand command = new SelectCommand(OsmDataManager.getInstance().getEditDataSet(), primitivesToZoom);
 
         List<OsmDataLayer> listOfLayers = MainApplication.getLayerManager().getLayersOfType(OsmDataLayer.class);
         for (OsmDataLayer osmDataLayer : listOfLayers) {

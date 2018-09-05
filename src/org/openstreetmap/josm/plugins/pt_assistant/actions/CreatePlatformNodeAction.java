@@ -22,7 +22,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.command.AddCommand;
 import org.openstreetmap.josm.command.ChangeCommand;
@@ -30,6 +29,7 @@ import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.DeleteCommand;
 import org.openstreetmap.josm.command.SequenceCommand;
+import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -43,6 +43,7 @@ import org.openstreetmap.josm.gui.ExtendedDialog;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.conflict.tags.CombinePrimitiveResolverDialog;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.PTProperties;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.Logging;
@@ -72,7 +73,6 @@ public class CreatePlatformNodeAction extends JosmAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		initialiseKeys();
 		JPanel panel = new JPanel(new GridBagLayout());
 		transferDetailsDialog transferDialog = new transferDetailsDialog();
 		transferDialog.setPreferredSize(new Dimension(500, 300));
@@ -118,7 +118,7 @@ public class CreatePlatformNodeAction extends JosmAction {
 
 		if (platformWay != null && platformNode != null) {
 			List<Command> cmdList = new ArrayList<>();
-			if (PTAssistantPluginPreferences.TRANSFER_PLATFORMWAY.get()) {
+			if (PTProperties.TRANSFER_PLATFORMWAY_TAG.get()) {
 				HashMap<String, String> tagsForWay = new HashMap<>();
 				HashMap<String, String> tagsForNode = new HashMap<>(platformNode.getKeys());
 
@@ -163,33 +163,33 @@ public class CreatePlatformNodeAction extends JosmAction {
 
 				cmdList.add(new ChangePropertyCommand(Collections.singleton(platformNode), nodeTagsRemove));
 				cmdList.add(new ChangePropertyCommand(Collections.singleton(platformWay), wayTagsRemove));
-				MainApplication.undoRedo.add(new SequenceCommand("Remove Tags", cmdList));
+				UndoRedoHandler.getInstance().add(new SequenceCommand("Remove Tags", cmdList));
 				cmdList.clear();
 
 				cmdList.add(new ChangePropertyCommand(Collections.singleton(platformNode), tagsForNode));
 				cmdList.add(new ChangePropertyCommand(Collections.singleton(platformWay), tagsForWay));
-				MainApplication.undoRedo.add(new SequenceCommand("Change Tags", cmdList));
+				UndoRedoHandler.getInstance().add(new SequenceCommand("Change Tags", cmdList));
 				cmdList.clear();
 
 			}
 
 			// based on the user's response decide whether to transfer the relations or not
-			if (PTAssistantPluginPreferences.SUBSTITUTE_PLATFORM_RELATION.get()) {
+			if (PTProperties.SUBSTITUTE_PLATFORMWAY_RELATION.get()) {
 				Map<Relation, List<Integer>> savedPositions = getSavedPositions(platformWay);
 				List<Relation> parentStopAreaRelation = removeWayFromRelationsCommand(platformWay);
 				cmdList.addAll(updateRelation(savedPositions, platformNode, platformWay, parentStopAreaRelation));
-				MainApplication.undoRedo.add(new SequenceCommand("Update Relations", cmdList));
+				UndoRedoHandler.getInstance().add(new SequenceCommand("Update Relations", cmdList));
 			}
 		}
 
-		if (platformNode != null && stopPositionNode != null && PTAssistantPluginPreferences.TRANSFER_STOP_POSITION.get()) {
+		if (platformNode != null && stopPositionNode != null && PTProperties.TRANSFER_STOPPOSITION_TAG.get()) {
 			dummy1 = new Node(platformNode.getEastNorth());
 			dummy2 = new Node(platformNode.getEastNorth());
 			dummy3 = new Node(platformNode.getEastNorth());
 
-			MainApplication.undoRedo.add(new AddCommand(ds, dummy1));
-			MainApplication.undoRedo.add(new AddCommand(ds, dummy2));
-			MainApplication.undoRedo.add(new AddCommand(ds, dummy3));
+			UndoRedoHandler.getInstance().add(new AddCommand(ds, dummy1));
+			UndoRedoHandler.getInstance().add(new AddCommand(ds, dummy2));
+			UndoRedoHandler.getInstance().add(new AddCommand(ds, dummy3));
 
 			refs.addAll(populateMap(stopPositionNode));
 			refs.addAll(populateMap(platformNode));
@@ -227,13 +227,13 @@ public class CreatePlatformNodeAction extends JosmAction {
 				TagCollection tagColl = TagCollection.unionOfAllPrimitives(prims);
 				List<Command> cmds = CombinePrimitiveResolverDialog.launchIfNecessary(tagColl, prims,
 						Collections.singleton(platformNode));
-				MainApplication.undoRedo.add(new SequenceCommand("merging", cmds));
+				UndoRedoHandler.getInstance().add(new SequenceCommand("merging", cmds));
 			} catch (UserCancelException ex) {
 				Logging.trace(ex);
 			} finally {
-				MainApplication.undoRedo.add(new DeleteCommand(dummy1));
-				MainApplication.undoRedo.add(new DeleteCommand(dummy2));
-				MainApplication.undoRedo.add(new DeleteCommand(dummy3));
+				UndoRedoHandler.getInstance().add(new DeleteCommand(dummy1));
+				UndoRedoHandler.getInstance().add(new DeleteCommand(dummy2));
+				UndoRedoHandler.getInstance().add(new DeleteCommand(dummy3));
 			}
 		}
 	}
@@ -300,7 +300,7 @@ public class CreatePlatformNodeAction extends JosmAction {
 			commands.add(new ChangeCommand(r, c));
 		});
 
-		MainApplication.undoRedo.add(new SequenceCommand("Remove way from relations", commands));
+		UndoRedoHandler.getInstance().add(new SequenceCommand("Remove way from relations", commands));
 
 		return parentStopAreaRelation;
 	}
@@ -380,7 +380,7 @@ public class CreatePlatformNodeAction extends JosmAction {
 	private class transferDetailsDialog extends ExtendedDialog {
 
 		public transferDetailsDialog() {
-			super(Main.parent, tr("transfering details to platform NODE."), new String[] { tr("Ok"), tr("Cancel") },
+			super(MainApplication.getMainFrame(), tr("transfering details to platform NODE."), new String[] { tr("Ok"), tr("Cancel") },
 					true);
 		}
 
@@ -389,18 +389,5 @@ public class CreatePlatformNodeAction extends JosmAction {
 			super.buttonAction(buttonIndex, evt);
 
 		}
-	}
-
-	private void initialiseKeys () {
-		// check if the preference contains the key or not, if not open up a dialog box
-		Set<String> keySet = Main.pref.getKeySet();
-		if (!keySet.contains("pt_assistant.substitute-platformway-relation"))
-			Main.pref.putBoolean("pt_assistant.substitute-platformway-relation", true);
-
-		if (!keySet.contains("pt_assistant.transfer-stopposition-tag"))
-			Main.pref.putBoolean("pt_assistant.transfer-stopposition-tag", true);
-
-		if (!keySet.contains("pt_assistant.transfer-platformway-tag"))
-			Main.pref.putBoolean("pt_assistant.transfer-platformway-tag", true);
 	}
 }

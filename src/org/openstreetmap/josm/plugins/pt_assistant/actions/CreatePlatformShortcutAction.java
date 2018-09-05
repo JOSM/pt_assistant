@@ -22,6 +22,7 @@ import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
+import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -56,10 +57,10 @@ public class CreatePlatformShortcutAction extends JosmAction {
         super(ACTION_NAME, null, ACTION_NAME, Shortcut.registerShortcut("tools:createplatformshortcut", "Tool: CreatePlatformNodeShortcut", KeyEvent.VK_G, Shortcut.CTRL), false);
         transferHandler = new OsmTransferHandler();
         MainApplication.registerActionShortcut(this,
-        		Shortcut.registerShortcut("tools:createplatformshortcut", "Tool: CreatePlatformNodeShortcut", KeyEvent.VK_G, Shortcut.CTRL));
+                Shortcut.registerShortcut("tools:createplatformshortcut", "Tool: CreatePlatformNodeShortcut", KeyEvent.VK_G, Shortcut.CTRL));
     }
 
-	@Override
+    @Override
     public void actionPerformed(ActionEvent e) {
         Collection<OsmPrimitive> selection = getLayerManager().getEditDataSet().getSelected();
         Node stopPositionNode = null;
@@ -68,34 +69,35 @@ public class CreatePlatformShortcutAction extends JosmAction {
         for (OsmPrimitive item: selection) {
             if (item.getType() == OsmPrimitiveType.NODE) {
                 if (item.hasTag("highway") && (item.hasTag("highway", "bus_stop") || item.hasTag("public_transport", "stop_position"))) {
-                		stopPositionNode = (Node) item;
-				} else if (item.hasTag("railway")
-						&& (item.hasTag("railway", "tram_stop") || item.hasTag("public_transport", "stop_position"))) {
-                		stopPositionNode = (Node) item;
+                    stopPositionNode = (Node) item;
+                } else if (item.hasTag("railway")
+                        && (item.hasTag("railway", "tram_stop") || item.hasTag("public_transport", "stop_position"))) {
+                    stopPositionNode = (Node) item;
                 }
             }
         }
 
         if (stopPositionNode != null && selection.size() == 1) {
-        		PrimitiveTransferData data = PrimitiveTransferData.getDataWithReferences(selection);
-        		transferHandler.pasteOn(getLayerManager().getEditLayer(), computePastePosition(e), new PrimitiveTransferable(data));
-        		Collection<OsmPrimitive> newSelection = getLayerManager().getEditDataSet().getSelected();
+            PrimitiveTransferData data = PrimitiveTransferData.getDataWithReferences(selection);
+            transferHandler.pasteOn(getLayerManager().getEditLayer(), computePastePosition(e), new PrimitiveTransferable(data));
+            Collection<OsmPrimitive> newSelection = getLayerManager().getEditDataSet().getSelected();
 
-        		for (OsmPrimitive item: newSelection) {
-        			newNode = (Node) item;
-        		}
+            for (OsmPrimitive item: newSelection) {
+                newNode = (Node) item;
+            }
         }
 
-        if (stopPositionNode == null)
-        		return;
+        if (stopPositionNode == null) {
+            return;
+        }
 
         HashMap<String, String> tagList = new HashMap<>();
         for (String key : stopPositionNode.keySet()) {
-        		tagList.put(key, stopPositionNode.get(key));
+            tagList.put(key, stopPositionNode.get(key));
         }
 
         if (newNode != null) {
-    			modify(newNode, stopPositionNode);
+            modify(newNode, stopPositionNode);
         }
     }
 
@@ -121,45 +123,46 @@ public class CreatePlatformShortcutAction extends JosmAction {
     }
 
     public void modify(Node newNode, Node stopPositionNode) {
+        if (stopPositionNode.hasTag("railway")) {
+            newNode.put("tram","yes");
+            newNode.put("railway","tram_stop");
+            newNode.remove("public_transport");
+            newNode.put("public_transport", "platform");
 
-    		if (stopPositionNode.hasTag("railway")) {
-    			newNode.put("tram","yes");
-        		newNode.put("railway","tram_stop");
-        		newNode.remove("public_transport");
-        		newNode.put("public_transport", "platform");
-
-        		List<Command> commands = getReplaceGeometryCommand(stopPositionNode, newNode);
-                if (commands.size() > 0)
-                        MainApplication.undoRedo.add(new SequenceCommand(tr("Replace Membership"), commands));
-
-            HashMap<String, String> tags = new HashMap<>(stopPositionNode.getKeys());
-            tags.replaceAll((key, value) -> null);
-        		MainApplication.undoRedo.add(new ChangePropertyCommand(Collections.singleton(stopPositionNode), tags));
-
-        		ArrayList<Command> undoCommands = new ArrayList<>();
-    			undoCommands.add(new ChangePropertyCommand(stopPositionNode, "public_transport", "stop_position"));
-			undoCommands.add(new ChangePropertyCommand(stopPositionNode, "tram", "yes"));
-			MainApplication.undoRedo.add(new SequenceCommand("tag", undoCommands));
-
-    		} else if (stopPositionNode.hasTag("highway")) {
-    			newNode.put("bus","yes");
-        		newNode.put("highway","bus_stop");
-        		newNode.remove("public_transport");
-        		newNode.put("public_transport", "platform");
-
-        		List<Command> commands = getReplaceGeometryCommand(stopPositionNode, newNode);
-                if (commands.size() > 0)
-                        MainApplication.undoRedo.add(new SequenceCommand(tr("Replace Membership"), commands));
+            List<Command> commands = getReplaceGeometryCommand(stopPositionNode, newNode);
+            if (commands.size() > 0) {
+                UndoRedoHandler.getInstance().add(new SequenceCommand(tr("Replace Membership"), commands));
+            }
 
             HashMap<String, String> tags = new HashMap<>(stopPositionNode.getKeys());
             tags.replaceAll((key, value) -> null);
-        		MainApplication.undoRedo.add(new ChangePropertyCommand(Collections.singleton(stopPositionNode), tags));
+            UndoRedoHandler.getInstance().add(new ChangePropertyCommand(Collections.singleton(stopPositionNode), tags));
 
-        		ArrayList<Command> undoCommands = new ArrayList<>();
-        		undoCommands.add(new ChangePropertyCommand(stopPositionNode, "bus", "yes"));
-        		undoCommands.add(new ChangePropertyCommand(stopPositionNode, "public_transport", "stop_position"));
-    			MainApplication.undoRedo.add(new SequenceCommand("tag", undoCommands));
-    		}
+            ArrayList<Command> undoCommands = new ArrayList<>();
+            undoCommands.add(new ChangePropertyCommand(stopPositionNode, "public_transport", "stop_position"));
+            undoCommands.add(new ChangePropertyCommand(stopPositionNode, "tram", "yes"));
+            UndoRedoHandler.getInstance().add(new SequenceCommand("tag", undoCommands));
+
+        } else if (stopPositionNode.hasTag("highway")) {
+            newNode.put("bus","yes");
+            newNode.put("highway","bus_stop");
+            newNode.remove("public_transport");
+            newNode.put("public_transport", "platform");
+
+            List<Command> commands = getReplaceGeometryCommand(stopPositionNode, newNode);
+            if (commands.size() > 0) {
+                UndoRedoHandler.getInstance().add(new SequenceCommand(tr("Replace Membership"), commands));
+            }
+
+            HashMap<String, String> tags = new HashMap<>(stopPositionNode.getKeys());
+            tags.replaceAll((key, value) -> null);
+            UndoRedoHandler.getInstance().add(new ChangePropertyCommand(Collections.singleton(stopPositionNode), tags));
+
+            ArrayList<Command> undoCommands = new ArrayList<>();
+            undoCommands.add(new ChangePropertyCommand(stopPositionNode, "bus", "yes"));
+            undoCommands.add(new ChangePropertyCommand(stopPositionNode, "public_transport", "stop_position"));
+            UndoRedoHandler.getInstance().add(new SequenceCommand("tag", undoCommands));
+        }
 
     }
 

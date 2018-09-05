@@ -28,6 +28,7 @@ import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.command.SplitWayCommand;
 import org.openstreetmap.josm.data.Bounds;
+import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -108,13 +109,13 @@ public class SplitRoundaboutAction extends JosmAction {
 		Map<Relation, List<Integer>> savedPositions = getSavedPositions(roundabout);
 
 		// remove the roundabout from each relation
-		MainApplication.undoRedo.add(getRemoveRoundaboutFromRelationsCommand(roundabout));
+		UndoRedoHandler.getInstance().add(getRemoveRoundaboutFromRelationsCommand(roundabout));
 
 		// split the roundabout on the designated nodes
 		List<Node> splitNodes = getSplitNodes(roundabout);
 
 		SplitWayCommand result = SplitWayCommand.split(roundabout, splitNodes, Collections.emptyList());
-		MainApplication.undoRedo.add(result);
+		UndoRedoHandler.getInstance().add(result);
 
 		Collection<Way> splitWays = result.getNewWays();
 		splitWays.add(result.getOriginalWay());
@@ -122,7 +123,7 @@ public class SplitRoundaboutAction extends JosmAction {
 		changingRelations = new HashMap<>();
 
 		// update the relations.
-		MainApplication.undoRedo.add(getUpdateRelationsCommand(savedPositions, splitNodes, splitWays));
+		UndoRedoHandler.getInstance().add(getUpdateRelationsCommand(savedPositions, splitNodes, splitWays));
 
 		// look at the editors which are already open and refresh them
 		changingRelations.forEach((oldR, newR) -> {
