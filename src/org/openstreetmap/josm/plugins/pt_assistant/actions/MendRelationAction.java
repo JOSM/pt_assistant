@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
 
@@ -101,17 +100,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 	AbstractMapViewPaintable temporaryLayer = null;
 	String notice = null;
 
-	/**
-	 * Constructs a new {@code RemoveSelectedAction}.
-	 *
-	 * @param memberTable
-	 *            member table
-	 * @param memberTableModel
-	 *            member table model
-	 * @param layer
-	 *            OSM data layer
-	 * @param relation
-	 */
 	public MendRelationAction(IRelationEditorActionAccess editorAccess) {
 		super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
 		putValue(SHORT_DESCRIPTION, tr("Routing Helper"));
@@ -126,6 +114,18 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		// + "
 		// way[\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n"
 		// + " );\n" + " ._;<;\n" + ");\n" + "(._;>>;>;);\n" + "out meta;";
+	}
+
+	private void downloadWithNotifications(final Future<?> downloadFuture, final String translatedLabel) throws ExecutionException, InterruptedException {
+		new Notification(tr("Download started: {0}", translatedLabel))
+			.setIcon(JOptionPane.INFORMATION_MESSAGE)
+			.setDuration(Notification.TIME_SHORT)
+			.show();
+		downloadFuture.get();
+		new Notification(tr("Download finished: {0}", translatedLabel))
+			.setIcon(JOptionPane.INFORMATION_MESSAGE)
+			.setDuration(Notification.TIME_SHORT)
+			.show();
 	}
 
 	private String getQuery() {
@@ -234,7 +234,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			return;
 
 		DownloadOsmTask task = new DownloadOsmTask();
-		new Notification(tr("Downloading Data")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(3000).show();
 		List<Way> wayList = getListOfAllWays();
 
 		if (wayList.isEmpty()) {
@@ -258,7 +257,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 		Bounds area = new Bounds(minLat - latOffset, minLon - lonOffset, maxLat + latOffset, maxLon + lonOffset);
 		String query = getQuery();
-		System.out.println(query);
+		Logging.debug(query);
 
 		Future<?> future = task.download(
 				new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query), false, area,
@@ -266,7 +265,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 		MainApplication.worker.submit(() -> {
 			try {
-				future.get();
+				downloadWithNotifications(future, tr("Entire area"));
 				callNextWay(currentIndex);
 			} catch (InterruptedException | ExecutionException e1) {
 				Logging.error(e1);
@@ -346,16 +345,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		}
 	}
 
-	boolean isNonSplitRoundAbout(Way way) {
-		if (way.hasTag("junction", "roundabout") && way.firstNode().equals(way.lastNode()))
-			return true;
-		return false;
+	private boolean isNonSplitRoundAbout(final Way way) {
+		return way.hasTag("junction", "roundabout") && way.firstNode().equals(way.lastNode());
 	}
 
-	boolean isSplitRoundAbout(Way way) {
-		if (way.hasTag("junction", "roundabout") && !way.firstNode().equals(way.lastNode()))
-			return true;
-		return false;
+	private boolean isSplitRoundAbout(final Way way) {
+		return way.hasTag("junction", "roundabout") && !way.firstNode().equals(way.lastNode());
 	}
 
 	Node checkValidityOfWays(Way way, int nextWayIndex) {
@@ -520,8 +515,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 		MainApplication.worker.submit(() -> {
 			try {
-				future.get();
-				new Notification(tr("Download over")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(3000).show();
+				downloadWithNotifications(future, tr("Incomplete relations"));
 				initialise();
 			} catch (InterruptedException | ExecutionException e1) {
 				Logging.error(e1);
@@ -1159,8 +1153,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			downloadCounter = 0;
 
 			DownloadOsmTask task = new DownloadOsmTask();
-			new Notification(tr("Downloading Data...")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200)
-					.show();
 
 			BBox rbbox = way.getBBox();
 			double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 10;
@@ -1172,9 +1164,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 			MainApplication.worker.submit(() -> {
 				try {
-					future.get();
-					new Notification(tr("Download over...")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200)
-							.show();
+					downloadWithNotifications(future, tr("Area around way") + " (1)");
 					findNextWayAfterDownload(way, node1, node2);
 				} catch (InterruptedException | ExecutionException e1) {
 					Logging.error(e1);
@@ -1199,14 +1189,11 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 10;
 			Bounds area = new Bounds(rbbox.getBottomRightLat() - latOffset, rbbox.getTopLeftLon() - lonOffset,
 					rbbox.getTopLeftLat() + latOffset, rbbox.getBottomRightLon() + lonOffset);
-			new Notification(tr("Download ")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
 			Future<?> future = task.download(false, area, null);
 
 			MainApplication.worker.submit(() -> {
 				try {
-					future.get();
-					new Notification(tr("Download O")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200)
-							.show();
+					downloadWithNotifications(future, tr("Area around way") + " (2)");
 					if (currentIndex >= members.size() - 1) {
 						deleteExtraWays();
 					} else {
@@ -1234,8 +1221,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			downloadCounter = 0;
 
 			DownloadOsmTask task = new DownloadOsmTask();
-			new Notification(tr("Downloading Data???")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200)
-					.show();
 
 			BBox rbbox = way.getBBox();
 			double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 20;
@@ -1246,9 +1231,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 			MainApplication.worker.submit(() -> {
 				try {
-					future.get();
-					new Notification(tr("Download over???")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200)
-							.show();
+					downloadWithNotifications(future, tr("Area around way") + " (3)");
 					goToNextWays(way, prevWay, ways);
 				} catch (InterruptedException | ExecutionException e1) {
 					Logging.error(e1);
@@ -1267,7 +1250,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		downloadCounter = 0;
 
 		DownloadOsmTask task = new DownloadOsmTask();
-		new Notification(tr("Downloading Data")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
 
 		double maxLat = wayList.get(0).getBBox().getTopLeftLat(), minLat = wayList.get(0).getBBox().getBottomRightLat();
 		double maxLon = wayList.get(0).getBBox().getBottomRightLon(), minLon = wayList.get(0).getBBox().getTopLeftLon();
@@ -1289,8 +1271,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
 		MainApplication.worker.submit(() -> {
 			try {
-				future.get();
-				new Notification(tr("Download over")).setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(2200).show();
+				downloadWithNotifications(future, tr("Area before removal"));
 				displayWaysToRemove(Int);
 			} catch (InterruptedException | ExecutionException e1) {
 				Logging.error(e1);
@@ -1346,12 +1327,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			if (prevMemberList.isEmpty() || commonNodeList.isEmpty())
 				continue;
 
-			RelationMember prevMember = prevMemberList.stream().collect(Collectors.toList()).get(0);
-			final String prevRole = prevMember.getRole();
+			final String prevRole = prevMemberList.stream().findFirst().map(RelationMember::getRole).orElse(null);
 
 			if (prevRole.equals("from")) {
-				String[] acceptedTags = new String[] { "only_right_turn", "only_left_turn", "only_u_turn",
-						"only_straight_on", "only_entry", "only_exit" };
+				String[] acceptedTags = {
+					"only_right_turn", "only_left_turn", "only_u_turn", "only_straight_on", "only_entry", "only_exit"
+				};
 				for (String s : restrictions) {
 					// if we have any "only" type restrictions then the current way should be in the
 					// relation else it is restricted
@@ -1375,16 +1356,14 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 			if (curMemberList.isEmpty() || prevMemberList.isEmpty())
 				continue;
 
-			RelationMember curMember = curMemberList.stream().collect(Collectors.toList()).get(0);
-			RelationMember prevMember = prevMemberList.stream().collect(Collectors.toList()).get(0);
+			final String curRole = curMemberList.stream().findFirst().map(RelationMember::getRole).orElse(null);
+			final String prevRole = prevMemberList.stream().findFirst().map(RelationMember::getRole).orElse(null);
 
-			final String curRole = curMember.getRole();
-			final String prevRole = prevMember.getRole();
-
-			if (curRole.equals("to") && prevRole.equals("from")) {
-				String[] acceptedTags = new String[] { "no_right_turn", "no_left_turn", "no_u_turn", "no_straight_on",
-						"no_entry", "no_exit" };
-				for (String s : restrictions)
+			if ("to".equals(curRole) && "from".equals(prevRole)) {
+				final String[] acceptedTags = {
+					"no_right_turn", "no_left_turn", "no_u_turn", "no_straight_on", "no_entry", "no_exit"
+				};
+				for (String s : restrictions) {
 					if (r.hasTag(s, acceptedTags)) {
 						for (String str : acceptedTags) {
 							if (r.hasTag(s, str))
@@ -1392,6 +1371,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 						}
 						return true;
 					}
+				}
 			}
 		}
 

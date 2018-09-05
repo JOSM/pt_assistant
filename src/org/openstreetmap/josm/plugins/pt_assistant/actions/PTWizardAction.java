@@ -55,7 +55,7 @@ import org.openstreetmap.josm.io.CachedFile;
 import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.spi.preferences.StringSetting;
 import org.openstreetmap.josm.tools.GBC;
-import org.openstreetmap.josm.tools.Logging;;
+import org.openstreetmap.josm.tools.Logging;
 
 /**
  * A wizard that helps users in working with key features of PT Assistant

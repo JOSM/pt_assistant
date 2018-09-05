@@ -1,6 +1,7 @@
 // License: GPL. For details, see LICENSE file.
 
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
+
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.MouseInfo;
