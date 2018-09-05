@@ -65,9 +65,9 @@ import org.openstreetmap.josm.tools.Logging;
 
 public final class PTWizardAction extends JosmAction {
 
-	public boolean noDialogBox;
-	private int closeCheck = 0;
-	/**
+    public boolean noDialogBox;
+    private int closeCheck = 0;
+    /**
      * Constructs a new {@code PTWizardAction}
      */
     public PTWizardAction() {
@@ -82,206 +82,205 @@ public final class PTWizardAction extends JosmAction {
         MainApplication.getToolbar().register(this);
     }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
+    @Override
+    public void actionPerformed(ActionEvent e) {
 
-		boolean defaultAction = false;
-		boolean action = false;
-		if (this.noDialogBox) {
-			Set<String> keySet = Main.pref.getKeySet();
-			if (!keySet.contains("pt_assistant.wizard.pages")) {
-				defaultAction = true;
-			} else {
-				String pages = Main.pref.get("pt_assistant.wizard.pages");
-				if (pages.isEmpty()) {
-					defaultAction = true;
-				}
-			}
+        boolean defaultAction = false;
+        boolean action = false;
+        if (this.noDialogBox) {
+            Set<String> keySet = Main.pref.getKeySet();
+            if (!keySet.contains("pt_assistant.wizard.pages")) {
+                defaultAction = true;
+            } else {
+                String pages = Main.pref.get("pt_assistant.wizard.pages");
+                if (pages.isEmpty()) {
+                    defaultAction = true;
+                }
+            }
 
-			if (defaultAction) {
-				action = false;
-				readPreferencesFromXML();
-				addDefaultValues();
-			}
-			this.noDialogBox = false;
-		} else {
-			action = true;
-			String pages = Main.pref.get("pt_assistant.wizard.pages");
-			if (pages.isEmpty()) {
-				readPreferencesFromXML();
-				addDefaultValues();
-			}
-		}
+            if (defaultAction) {
+                action = false;
+                readPreferencesFromXML();
+                addDefaultValues();
+            }
+            this.noDialogBox = false;
+        } else {
+            action = true;
+            String pages = Main.pref.get("pt_assistant.wizard.pages");
+            if (pages.isEmpty()) {
+                readPreferencesFromXML();
+                addDefaultValues();
+            }
+        }
 
-		if (action) {
+        if (action) {
+            JPanel panel = new JPanel(new GridBagLayout());
+            panel.setBorder(BorderFactory.createEmptyBorder(0,10,10,10));
 
-	        JPanel panel = new JPanel(new GridBagLayout());
-	        panel.setBorder(BorderFactory.createEmptyBorder(0,10,10,10));
+            PTWizardDialog wizardDialog = new PTWizardDialog();
+            wizardDialog.setPreferredSize(new Dimension(250, 300));
+            wizardDialog.setButtonIcons("ok", "cancel");
+            JScrollPane scrollPanel = new JScrollPane(panel);
+            wizardDialog.setContent(scrollPanel, false);
+            nextAct(0, panel);
 
-	        PTWizardDialog wizardDialog = new PTWizardDialog();
-	        wizardDialog.setPreferredSize(new Dimension(250, 300));
-	        wizardDialog.setButtonIcons("ok", "cancel");
-	        JScrollPane scrollPanel = new JScrollPane(panel);
-	        wizardDialog.setContent(scrollPanel, false);
-	        nextAct(0, panel);
-
-	        int lastCheck = -1;
-	        try {
-	        		for(int i=1;i<=4;i++) {
-	        			if (lastCheck == closeCheck)
-		        			return;
-	        			else
-	        				lastCheck = closeCheck;
-	        			ExtendedDialog dialog = wizardDialog.showDialog();
-	        			switch (dialog.getValue()) {
-	        				case 1: nextAct(i, panel); break;
-	        				default: return; // Do nothing
-	        			}
-	        		}
-	        } catch (Exception excp) {
-	        			excp.printStackTrace();
-	        	}
-		}
-	}
-
-	private void readPreferencesFromXML() {
-		try {
-			CachedFile cf = getCachedFile();
-			if (cf == null)
-				return;
-			List<String> lines = new ArrayList<>();
-			try (BufferedReader in = cf.getContentReader()) {
-				String line;
-				while ((line = in.readLine()) != null) {
-	                if (!line.contains("{{{") && !line.contains("}}}")) {
-	                		lines.add(line);
-	                }
-	            }
-
-	            in.close();
-	            File f = new File(".tempfile.xml");
-	            try (BufferedWriter out = Files.newBufferedWriter(f.toPath(), StandardCharsets.UTF_8)) {
-    	            for (String s : lines) {
-    	                out.write(s);
-    	            }
-	            }
-
-				InputStream is = Files.newInputStream(f.toPath());
-				new CustomConfigurator.XMLCommandProcessor(Main.pref).openAndReadXML(is);
-				f.delete();
-			}
-		} catch (IOException e) {
-			Logging.error(e);
-		}
+            int lastCheck = -1;
+            try {
+                    for(int i=1;i<=4;i++) {
+                        if (lastCheck == closeCheck)
+                            return;
+                        else
+                            lastCheck = closeCheck;
+                        ExtendedDialog dialog = wizardDialog.showDialog();
+                        switch (dialog.getValue()) {
+                            case 1: nextAct(i, panel); break;
+                            default: return; // Do nothing
+                        }
+                    }
+            } catch (Exception excp) {
+                        excp.printStackTrace();
+                }
+        }
     }
 
-	@SuppressWarnings("resource")
+    private void readPreferencesFromXML() {
+        try {
+            CachedFile cf = getCachedFile();
+            if (cf == null)
+                return;
+            List<String> lines = new ArrayList<>();
+            try (BufferedReader in = cf.getContentReader()) {
+                String line;
+                while ((line = in.readLine()) != null) {
+                    if (!line.contains("{{{") && !line.contains("}}}")) {
+                            lines.add(line);
+                    }
+                }
+
+                in.close();
+                File f = new File(".tempfile.xml");
+                try (BufferedWriter out = Files.newBufferedWriter(f.toPath(), StandardCharsets.UTF_8)) {
+                    for (String s : lines) {
+                        out.write(s);
+                    }
+                }
+
+                InputStream is = Files.newInputStream(f.toPath());
+                new CustomConfigurator.XMLCommandProcessor(Main.pref).openAndReadXML(is);
+                f.delete();
+            }
+        } catch (IOException e) {
+            Logging.error(e);
+        }
+    }
+
+    @SuppressWarnings("resource")
     public CachedFile getCachedFile() {
-		try {
-			return new CachedFile("https://josm.openstreetmap.de/wiki/Plugin/PT_Assistant/Wizard?format=txt").setHttpAccept("text");
-		} catch (Exception e) {
-			new Notification(tr("Unable to connect to {0}",
-			        "https://josm.openstreetmap.de/wiki/Plugin/PT_Assistant/Wizard")).setIcon(JOptionPane.WARNING_MESSAGE).show();
-		}
-		return null;
+        try {
+            return new CachedFile("https://josm.openstreetmap.de/wiki/Plugin/PT_Assistant/Wizard?format=txt").setHttpAccept("text");
+        } catch (Exception e) {
+            new Notification(tr("Unable to connect to {0}",
+                    "https://josm.openstreetmap.de/wiki/Plugin/PT_Assistant/Wizard")).setIcon(JOptionPane.WARNING_MESSAGE).show();
+        }
+        return null;
     }
 
 
-	private void addDefaultValues() {
-		String value1 = Main.pref.get("pt_assistant.wizard.1.suggestion");
-		question1ChangeValues(value1);
+    private void addDefaultValues() {
+        String value1 = Main.pref.get("pt_assistant.wizard.1.suggestion");
+        question1ChangeValues(value1);
 
-		List<List<String>> question2Suggestion = Main.pref.getListOfLists("pt_assistant.wizard.2.suggestion");
-		List<String> value2 = new ArrayList<>();
-		for(int i=0;i<question2Suggestion.size();i++) {
-			value2.add(question2Suggestion.get(i).get(0));
-		}
-		question2ChangeValues(value2);
+        List<List<String>> question2Suggestion = Main.pref.getListOfLists("pt_assistant.wizard.2.suggestion");
+        List<String> value2 = new ArrayList<>();
+        for(int i=0;i<question2Suggestion.size();i++) {
+            value2.add(question2Suggestion.get(i).get(0));
+        }
+        question2ChangeValues(value2);
 
-		List<List<String>> question3Suggestion = Main.pref.getListOfLists("pt_assistant.wizard.3.suggestion");
-		List<String> value3 = new ArrayList<>();
-		for(int i=0;i<question3Suggestion.size();i++) {
-			if (question3Suggestion.get(i).get(1) == "Default")
-				value3.add(question3Suggestion.get(i).get(0));
-		}
-		question3ChangeValues(value3);
+        List<List<String>> question3Suggestion = Main.pref.getListOfLists("pt_assistant.wizard.3.suggestion");
+        List<String> value3 = new ArrayList<>();
+        for(int i=0;i<question3Suggestion.size();i++) {
+            if (question3Suggestion.get(i).get(1) == "Default")
+                value3.add(question3Suggestion.get(i).get(0));
+        }
+        question3ChangeValues(value3);
 
-		List<List<String>> question4Suggestion = Main.pref.getListOfLists("pt_assistant.wizard.4.suggestion");
-		List<String> value4 = new ArrayList<>();
-		for(int i=0;i<question4Suggestion.size();i++) {
-			if (question4Suggestion.get(i).get(1) == "Default")
-				value4.add(question4Suggestion.get(i).get(0));
-		}
-		question4ChangeValues(value4);
+        List<List<String>> question4Suggestion = Main.pref.getListOfLists("pt_assistant.wizard.4.suggestion");
+        List<String> value4 = new ArrayList<>();
+        for(int i=0;i<question4Suggestion.size();i++) {
+            if (question4Suggestion.get(i).get(1) == "Default")
+                value4.add(question4Suggestion.get(i).get(0));
+        }
+        question4ChangeValues(value4);
 
-	}
-
-
-	private void addLabel(JPanel panel, int questionNumber, boolean Title, boolean Question, boolean Suggestion) {
-
-		if (Title) {
-			String title = Main.pref.get("pt_assistant.wizard."+ questionNumber +".title");
-			JTextArea j = new JTextArea(tr(title));
-			j.setLineWrap(true);
-			j.setWrapStyleWord(true);
-			j.setEditable(false);
-			j.setOpaque(false);
-	        j.setFont(new java.awt.Font("Serif", Font.BOLD, 18));
-	        panel.add(j, GBC.eol().fill(GBC.HORIZONTAL));
-		}
-
-		if (Question) {
-			String question = Main.pref.get("pt_assistant.wizard."+ questionNumber +".question");
-			JTextArea j = new JTextArea(tr(question));
-			j.setLineWrap(true);
-			j.setWrapStyleWord(true);
-			j.setEditable(false);
-			j.setOpaque(false);
-			panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
-	        panel.add(j, GBC.eol().fill(GBC.HORIZONTAL));
-		}
-
-		if (Suggestion) {
-	        String suggestion = Main.pref.get("pt_assistant.wizard."+ questionNumber +".suggestion");
-	        JTextArea j = new JTextArea(tr("suggested value : "+ suggestion));
-			j.setLineWrap(true);
-			j.setWrapStyleWord(true);
-			j.setEditable(false);
-			j.setOpaque(false);
-			panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
-	        panel.add(j, GBC.eol().fill(GBC.HORIZONTAL));
-		}
-	}
+    }
 
 
-	private void introduction(JPanel panel) {
-		addLabel(panel, 0, true, false, false);
+    private void addLabel(JPanel panel, int questionNumber, boolean Title, boolean Question, boolean Suggestion) {
 
-		String information = Main.pref.get("pt_assistant.wizard.0.information");
-		JTextArea j = new JTextArea(tr(information));
-		j.setLineWrap(true);
-		j.setWrapStyleWord(true);
-		j.setEditable(false);
-		j.setOpaque(false);
-		panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
+        if (Title) {
+            String title = Main.pref.get("pt_assistant.wizard."+ questionNumber +".title");
+            JTextArea j = new JTextArea(tr(title));
+            j.setLineWrap(true);
+            j.setWrapStyleWord(true);
+            j.setEditable(false);
+            j.setOpaque(false);
+            j.setFont(new java.awt.Font("Serif", Font.BOLD, 18));
+            panel.add(j, GBC.eol().fill(GBC.HORIZONTAL));
+        }
+
+        if (Question) {
+            String question = Main.pref.get("pt_assistant.wizard."+ questionNumber +".question");
+            JTextArea j = new JTextArea(tr(question));
+            j.setLineWrap(true);
+            j.setWrapStyleWord(true);
+            j.setEditable(false);
+            j.setOpaque(false);
+            panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
+            panel.add(j, GBC.eol().fill(GBC.HORIZONTAL));
+        }
+
+        if (Suggestion) {
+            String suggestion = Main.pref.get("pt_assistant.wizard."+ questionNumber +".suggestion");
+            JTextArea j = new JTextArea(tr("suggested value : "+ suggestion));
+            j.setLineWrap(true);
+            j.setWrapStyleWord(true);
+            j.setEditable(false);
+            j.setOpaque(false);
+            panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
+            panel.add(j, GBC.eol().fill(GBC.HORIZONTAL));
+        }
+    }
+
+
+    private void introduction(JPanel panel) {
+        addLabel(panel, 0, true, false, false);
+
+        String information = Main.pref.get("pt_assistant.wizard.0.information");
+        JTextArea j = new JTextArea(tr(information));
+        j.setLineWrap(true);
+        j.setWrapStyleWord(true);
+        j.setEditable(false);
+        j.setOpaque(false);
+        panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
         panel.add(j, GBC.eol().fill(GBC.HORIZONTAL));
-	}
+    }
 
 
-	private void question1(JPanel panel) {
+    private void question1(JPanel panel) {
 
-		addLabel(panel, 1, true, true, false);
+        addLabel(panel, 1, true, true, false);
 
         String currentValue = Main.pref.get("properties.recently-added-tags");
         SpinnerModel model = new SpinnerNumberModel(Integer.parseInt(currentValue), 0, 30, 1);
         JSpinner tagsArea = new JSpinner(model);
         panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
         panel.add(tagsArea, GBC.eol().fill(GBC.HORIZONTAL));
-	}
+    }
 
-	private void question2(JPanel panel) {
+    private void question2(JPanel panel) {
 
-		addLabel(panel, 2, true, true, false);
+        addLabel(panel, 2, true, true, false);
 
         Box checkBoxPanel = Box.createVerticalBox();
         checkBoxPanel.setOpaque(true);
@@ -296,11 +295,11 @@ public final class PTWizardAction extends JosmAction {
                 String value = suggestionLists.get(i).get(1);
                 JCheckBox con = new JCheckBox(content);
                 if (currentList.contains(value))
-                		con.setSelected(true);
+                        con.setSelected(true);
                 checkBoxPanel.add(con);
             }
         } catch (Exception e) {
-        	     e.printStackTrace();
+                 e.printStackTrace();
         }
 
         checkBoxPanel.setBackground(Color.white);
@@ -308,32 +307,32 @@ public final class PTWizardAction extends JosmAction {
 
         panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
         panel.add(checkBoxPanel, GBC.eol().fill(GBC.HORIZONTAL));
-	}
+    }
 
-	private void question3(JPanel panel) {
+    private void question3(JPanel panel) {
 
-		addLabel(panel, 3, true, true, false);
+        addLabel(panel, 3, true, true, false);
 
-		Box checkBoxPanel = Box.createVerticalBox();
-		checkBoxPanel.setOpaque(true);
-		checkBoxPanel.setBackground(Color.white);
+        Box checkBoxPanel = Box.createVerticalBox();
+        checkBoxPanel.setOpaque(true);
+        checkBoxPanel.setBackground(Color.white);
 
-		List<List<String>> suggestionLists = Main.pref.getListOfLists("pt_assistant.wizard.3.suggestion");
-		List<StyleSource> styleList = MapPaintStyles.getStyles().getStyleSources();
+        List<List<String>> suggestionLists = Main.pref.getListOfLists("pt_assistant.wizard.3.suggestion");
+        List<StyleSource> styleList = MapPaintStyles.getStyles().getStyleSources();
         try {
             for(int i=0;i<suggestionLists.size();i++) {
-            	    String paintStyle = suggestionLists.get(i).get(0);
+                    String paintStyle = suggestionLists.get(i).get(0);
                 JCheckBox con = new JCheckBox(paintStyle);
                 for(StyleSource style : styleList) {
-	    				if (style.title.equals(paintStyle)) {
-	    					con.setSelected(true);
-	    					break;
-	    				}
-	    			}
+                        if (style.title.equals(paintStyle)) {
+                            con.setSelected(true);
+                            break;
+                        }
+                    }
                 checkBoxPanel.add(con);
             }
         } catch (Exception e) {
-        	     e.printStackTrace();
+                 e.printStackTrace();
         }
 
         checkBoxPanel.setBackground(Color.white);
@@ -341,31 +340,31 @@ public final class PTWizardAction extends JosmAction {
 
         panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
         panel.add(checkBoxPanel, GBC.eol().fill(GBC.HORIZONTAL));
-	}
+    }
 
-	private void question4(JPanel panel) {
+    private void question4(JPanel panel) {
 
-    		addLabel(panel, 4, true, true, false);
+            addLabel(panel, 4, true, true, false);
 
-    		Box checkBoxPanel = Box.createVerticalBox();
-    		checkBoxPanel.setOpaque(true);
-    		checkBoxPanel.setBackground(Color.white);
+            Box checkBoxPanel = Box.createVerticalBox();
+            checkBoxPanel.setOpaque(true);
+            checkBoxPanel.setBackground(Color.white);
 
         List<List<String>> suggestionLists = Main.pref.getListOfLists("pt_assistant.wizard.4.suggestion");
 
         Map<String, SelectorItem> items;
-	    items = restorePreferences();
+        items = restorePreferences();
 
         try {
             for(int i=0;i<suggestionLists.size();i++) {
                 String content = suggestionLists.get(i).get(0);
                 JCheckBox con = new JCheckBox(content);
                 if (items.containsKey(content))
-                		con.setSelected(true);
+                        con.setSelected(true);
                 checkBoxPanel.add(con);
             }
         } catch (Exception e) {
-        	     e.printStackTrace();
+                 e.printStackTrace();
         }
 
         checkBoxPanel.setBackground(Color.white);
@@ -373,192 +372,192 @@ public final class PTWizardAction extends JosmAction {
 
         panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
         panel.add(checkBoxPanel, GBC.eol().fill(GBC.HORIZONTAL));
-	}
+    }
 
-	private void question1Action(JPanel panel) {
-		String value = new String();
-		Component[] components = panel.getComponents();panel.getComponents();
-		for (Component comp : components) {
-			if (comp instanceof JSpinner) {
-				JSpinner textField = (JSpinner) comp;
+    private void question1Action(JPanel panel) {
+        String value = new String();
+        Component[] components = panel.getComponents();panel.getComponents();
+        for (Component comp : components) {
+            if (comp instanceof JSpinner) {
+                JSpinner textField = (JSpinner) comp;
                 Integer intValue = (Integer) textField.getValue();
                 value = Integer.toString(intValue);
             }
-		}
+        }
 
-		question1ChangeValues(value);
-	}
+        question1ChangeValues(value);
+    }
 
-	/*
-	 * the following function is common action for questions 2 to 4
-	 */
-	private void question1ChangeValues(String value) {
-		StringSetting valueSetting = new StringSetting(value);
-		System.out.println(valueSetting.getValue());
+    /*
+     * the following function is common action for questions 2 to 4
+     */
+    private void question1ChangeValues(String value) {
+        StringSetting valueSetting = new StringSetting(value);
+        System.out.println(valueSetting.getValue());
 
-		Main.pref.putSetting("properties.recently-added-tags", valueSetting);
-	}
+        Main.pref.putSetting("properties.recently-added-tags", valueSetting);
+    }
 
-	private void question2to4Action(JPanel panel, int questionNumber) {
+    private void question2to4Action(JPanel panel, int questionNumber) {
 
-		List<String> finalValues = new ArrayList<>();
-		Component[] components = panel.getComponents();
-		for (Component comp : components) {
-			if (comp instanceof Box) {
-				Box checkBox = (Box) comp;
-				Component[] checkBoxComponents = checkBox.getComponents();
-				for (Component checkComponent : checkBoxComponents) {
-					if (checkComponent instanceof JCheckBox) {
-					    JCheckBox checks = (JCheckBox) checkComponent;
-					    if (checks.isSelected()) {
-					        finalValues.add(checks.getText());
-					    }
-					}
-				}
+        List<String> finalValues = new ArrayList<>();
+        Component[] components = panel.getComponents();
+        for (Component comp : components) {
+            if (comp instanceof Box) {
+                Box checkBox = (Box) comp;
+                Component[] checkBoxComponents = checkBox.getComponents();
+                for (Component checkComponent : checkBoxComponents) {
+                    if (checkComponent instanceof JCheckBox) {
+                        JCheckBox checks = (JCheckBox) checkComponent;
+                        if (checks.isSelected()) {
+                            finalValues.add(checks.getText());
+                        }
+                    }
+                }
 
             }
-		}
+        }
 
-		switch (questionNumber) {
+        switch (questionNumber) {
             case 2: question2ChangeValues(finalValues);break;
             case 3: question3ChangeValues(finalValues);break;
             case 4: question4ChangeValues(finalValues);break;
             default : // Do nothing
         }
-	}
+    }
 
 
-	private void question2ChangeValues(List<String> finalValues) {
-		for(String fv : finalValues) {
-			System.out.println(fv);
-		}
-		if(finalValues.contains("Sort stops in route relation"))
-			MainMenu.add(MainApplication.getMenu().toolsMenu, new SortPTRouteMembersMenuBar());
+    private void question2ChangeValues(List<String> finalValues) {
+        for(String fv : finalValues) {
+            System.out.println(fv);
+        }
+        if(finalValues.contains("Sort stops in route relation"))
+            MainMenu.add(MainApplication.getMenu().toolsMenu, new SortPTRouteMembersMenuBar());
 
-		List<String> current = Config.getPref().getList("toolbar");
+        List<String> current = Config.getPref().getList("toolbar");
 
-		List<String> newList = new ArrayList<>();
-		for ( String k : current){
-			newList.add(k);
-		}
+        List<String> newList = new ArrayList<>();
+        for ( String k : current){
+            newList.add(k);
+        }
 
-		if (current.size() == 0) {
-			String [] def = defaultToolBar();
-			for ( String deftool : def){
-				newList.add(deftool);
-			}
-		}
+        if (current.size() == 0) {
+            String [] def = defaultToolBar();
+            for ( String deftool : def){
+                newList.add(deftool);
+            }
+        }
 
-		List<List<String>> suggestionLists = Main.pref.getListOfLists("pt_assistant.wizard.2.suggestion");
-		try {
+        List<List<String>> suggestionLists = Main.pref.getListOfLists("pt_assistant.wizard.2.suggestion");
+        try {
             for(int i=0;i<suggestionLists.size();i++) {
                 String content = suggestionLists.get(i).get(0);
                 String value = suggestionLists.get(i).get(1);
                 if (finalValues.contains(content) && !newList.contains(value))
-        			newList.add(value);
-        			else if (!finalValues.contains(content)){
-        			    if (newList.contains(value))
-        				    newList.remove(value);
-        			}
+                    newList.add(value);
+                    else if (!finalValues.contains(content)){
+                        if (newList.contains(value))
+                            newList.remove(value);
+                    }
             }
         } catch (Exception e) {
-        	     e.printStackTrace();
+                 e.printStackTrace();
         }
 
-		List<String> t = new LinkedList<>(newList);
-		try {
-			Config.getPref().putList("toolbar", t);
-			MainApplication.getToolbar().refreshToolbarControl();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+        List<String> t = new LinkedList<>(newList);
+        try {
+            Config.getPref().putList("toolbar", t);
+            MainApplication.getToolbar().refreshToolbarControl();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	private void question3ChangeValues(List<String> finalValues) {
-    	    List<StyleSource> styleList = MapPaintStyles.getStyles().getStyleSources();
-    	    List<List<String>> suggestionLists = Main.pref.getListOfLists("pt_assistant.wizard.3.suggestion");
+    private void question3ChangeValues(List<String> finalValues) {
+            List<StyleSource> styleList = MapPaintStyles.getStyles().getStyleSources();
+            List<List<String>> suggestionLists = Main.pref.getListOfLists("pt_assistant.wizard.3.suggestion");
 
-    	    try {
+            try {
                 for(int i=0;i<suggestionLists.size();i++) {
-                	    String paintStyle = suggestionLists.get(i).get(0);
-                	    String url = suggestionLists.get(i).get(2);
+                        String paintStyle = suggestionLists.get(i).get(0);
+                        String url = suggestionLists.get(i).get(2);
 
-                	    if (finalValues.contains(paintStyle)) {
-                	        	boolean exists = false;
-                	    		for(StyleSource style : styleList) {
-                	    			if (style.title.equals(paintStyle)) {
-                	    				exists = true;
-                	    				break;
-                	    			}
-                	    		}
+                        if (finalValues.contains(paintStyle)) {
+                                boolean exists = false;
+                                for(StyleSource style : styleList) {
+                                    if (style.title.equals(paintStyle)) {
+                                        exists = true;
+                                        break;
+                                    }
+                                }
 
-                	    		if (!exists) {
-                	    			SourceEntry source = new SourceEntry(SourceType.MAP_PAINT_STYLE, url, null, paintStyle, true);
-                	        	    MapPaintStyles.addStyle(source);
-                	    		}
+                                if (!exists) {
+                                    SourceEntry source = new SourceEntry(SourceType.MAP_PAINT_STYLE, url, null, paintStyle, true);
+                                    MapPaintStyles.addStyle(source);
+                                }
 
-                	    } else {
-                	    		for(StyleSource style : styleList) {
-                	    			if (style.title.equals(paintStyle)) {
-                	    				SourceEntry source = new SourceEntry(SourceType.MAP_PAINT_STYLE, url, null, paintStyle, true);
-                	    				MapPaintStyles.removeStyle(source);
-                	    				break;
-            	    			    }
-            	    		    }
-                	    }
+                        } else {
+                                for(StyleSource style : styleList) {
+                                    if (style.title.equals(paintStyle)) {
+                                        SourceEntry source = new SourceEntry(SourceType.MAP_PAINT_STYLE, url, null, paintStyle, true);
+                                        MapPaintStyles.removeStyle(source);
+                                        break;
+                                    }
+                                }
+                        }
                 }
             } catch (Exception e) {
-            	     e.printStackTrace();
+                     e.printStackTrace();
             }
-	}
+    }
 
 
 
-	private void question4ChangeValues(List<String> finalValues) {
-    	    List<List<String>> suggestionLists = Main.pref.getListOfLists("pt_assistant.wizard.4.suggestion");
-    	    List<SelectorItem> itemList = new ArrayList<>();
-    	    List<String> unmarkedKeyList = new ArrayList<>();
+    private void question4ChangeValues(List<String> finalValues) {
+            List<List<String>> suggestionLists = Main.pref.getListOfLists("pt_assistant.wizard.4.suggestion");
+            List<SelectorItem> itemList = new ArrayList<>();
+            List<String> unmarkedKeyList = new ArrayList<>();
 
-    	    Map<String, SelectorItem> items;
-    	    items = restorePreferences();
+            Map<String, SelectorItem> items;
+            items = restorePreferences();
 
-    	    for(List<String> keys : suggestionLists) {
-    		    String Key = keys.get(0);
-    		    if (!finalValues.contains(Key))
-    		    		unmarkedKeyList.add(Key);
-    	    }
+            for(List<String> keys : suggestionLists) {
+                String Key = keys.get(0);
+                if (!finalValues.contains(Key))
+                        unmarkedKeyList.add(Key);
+            }
 
-    	    for (String fv : finalValues) {
-    	    	    if (!items.containsKey(fv)) {
-    	    	    	    for(List<String> suggestions : suggestionLists) {
-    	    	    		    String key = suggestions.get(0);
-    	    	    		    if (key == fv) {
-    	    	        	        String Value = "";
-    	    	        	        for (int i=2;i<suggestions.size();i++) {
-    	    	        	    		    Value = Value + suggestions.get(i);
-    	    	        	        }
-    	    	        	        SelectorItem item = new SelectorItem(key, Value);
-    	    	        	        itemList.add(item);
-    	    	        	        break;
-    	    	    		    }
-    			    }
-    	    	    }
+            for (String fv : finalValues) {
+                    if (!items.containsKey(fv)) {
+                            for(List<String> suggestions : suggestionLists) {
+                                String key = suggestions.get(0);
+                                if (key == fv) {
+                                    String Value = "";
+                                    for (int i=2;i<suggestions.size();i++) {
+                                            Value = Value + suggestions.get(i);
+                                    }
+                                    SelectorItem item = new SelectorItem(key, Value);
+                                    itemList.add(item);
+                                    break;
+                                }
+                    }
+                    }
 
-    	    }
+            }
 
-    	    for (String unmarkedKey : unmarkedKeyList) {
-    	    		if (items.containsKey(unmarkedKey)) {
-    	    			items.remove(unmarkedKey);
-    	    		}
-    	    }
+            for (String unmarkedKey : unmarkedKeyList) {
+                    if (items.containsKey(unmarkedKey)) {
+                        items.remove(unmarkedKey);
+                    }
+            }
 
-    	    for (SelectorItem item : itemList)
-    	    		items.put(item.getKey(), item);
-    	    try {
-    	    		savePreferences(items);
-    	    }  catch (Exception e) {
-    	    		e.printStackTrace();
-    	    }
+            for (SelectorItem item : itemList)
+                    items.put(item.getKey(), item);
+            try {
+                    savePreferences(items);
+            }  catch (Exception e) {
+                    e.printStackTrace();
+            }
     }
 
 
@@ -582,7 +581,7 @@ public final class PTWizardAction extends JosmAction {
 
                 result.put(key, new SelectorItem(key, query, lastEdit));
             } catch (Exception e) {
-            		e.printStackTrace();
+                    e.printStackTrace();
             }
         }
 
@@ -594,7 +593,7 @@ public final class PTWizardAction extends JosmAction {
      * Saves all elements from the list to {@link Main#pref}.
      */
     private void savePreferences(Map<String, SelectorItem> items) {
-    	    final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss, dd-MM-yyyy");
+            final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss, dd-MM-yyyy");
         List<Map<String, String>> toSave = new ArrayList<>(items.size());
         for (SelectorItem item : items.values()) {
             Map<String, String> it = new HashMap<>();
@@ -614,22 +613,22 @@ public final class PTWizardAction extends JosmAction {
 
 
     private String[] defaultToolBar() {
-    		String[] deftoolbar = {"open", "save", "download", "upload", "|",
-    			    "undo", "redo", "|", "dialogs/search", "preference", "|", "splitway", "combineway",
-    			    "wayflip", "|", "imagery-offset", "|", "tagginggroup_Highways/Streets",
-    			    "tagginggroup_Highways/Ways", "tagginggroup_Highways/Waypoints",
-    			    "tagginggroup_Highways/Barriers", "|", "tagginggroup_Transport/Car",
-    			    "tagginggroup_Transport/Public Transport", "|", "tagginggroup_Facilities/Tourism",
-    			    "tagginggroup_Facilities/Food+Drinks", "|", "tagginggroup_Man Made/Historic Places", "|",
-    			    "tagginggroup_Man Made/Man Made"};
-    		return deftoolbar;
+            String[] deftoolbar = {"open", "save", "download", "upload", "|",
+                    "undo", "redo", "|", "dialogs/search", "preference", "|", "splitway", "combineway",
+                    "wayflip", "|", "imagery-offset", "|", "tagginggroup_Highways/Streets",
+                    "tagginggroup_Highways/Ways", "tagginggroup_Highways/Waypoints",
+                    "tagginggroup_Highways/Barriers", "|", "tagginggroup_Transport/Car",
+                    "tagginggroup_Transport/Public Transport", "|", "tagginggroup_Facilities/Tourism",
+                    "tagginggroup_Facilities/Food+Drinks", "|", "tagginggroup_Man Made/Historic Places", "|",
+                    "tagginggroup_Man Made/Man Made"};
+            return deftoolbar;
     }
 
 
 
     private void nextAct(int pageNumber, JPanel panel) {
 
-		switch (pageNumber) {
+        switch (pageNumber) {
             case 2: question1Action(panel);break;
             case 3: question2to4Action(panel, 2);break;
             case 4: question2to4Action(panel, 3);break;
@@ -637,30 +636,30 @@ public final class PTWizardAction extends JosmAction {
             default : // Do nothing
         }
 
-	    panel.removeAll();
+        panel.removeAll();
 
-	    switch (pageNumber) {
-	        case 0: introduction(panel);break;
-	        case 1: question1(panel);break;
-	        case 2: question2(panel);break;
-	        case 3: question3(panel);break;
-	        case 4: question4(panel);break;
-	        default : // Do nothing
-	    }
-	}
+        switch (pageNumber) {
+            case 0: introduction(panel);break;
+            case 1: question1(panel);break;
+            case 2: question2(panel);break;
+            case 3: question3(panel);break;
+            case 4: question4(panel);break;
+            default : // Do nothing
+        }
+    }
 
     private class PTWizardDialog extends ExtendedDialog {
 
-		public PTWizardDialog() {
-			super(Main.parent, tr("PT Wizard"), new String[] { tr("Ok"), tr("Cancel") },
-					true);
-		}
+        public PTWizardDialog() {
+            super(Main.parent, tr("PT Wizard"), new String[] { tr("Ok"), tr("Cancel") },
+                    true);
+        }
 
-		@Override
-		protected void buttonAction(int buttonIndex, ActionEvent evt) {
-			closeCheck++;
-			super.buttonAction(buttonIndex, evt);
-		}
+        @Override
+        protected void buttonAction(int buttonIndex, ActionEvent evt) {
+            closeCheck++;
+            super.buttonAction(buttonIndex, evt);
+        }
 
     }
 }
