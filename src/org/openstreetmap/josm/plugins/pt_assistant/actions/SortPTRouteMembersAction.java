@@ -35,6 +35,7 @@ import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
@@ -337,7 +338,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
     private static String getStopName(OsmPrimitive p) {
         for (Relation ref : Utils.filteredCollection(p.getReferrers(), Relation.class)) {
             if (ref.hasTag("type", "public_transport")
-                    && ref.hasTag("public_transport", "stop_area")
+                    && StopUtils.isStopArea(ref)
                     && ref.getName() != null) {
                 return ref.getName();
             }

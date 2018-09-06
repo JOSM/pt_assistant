@@ -11,6 +11,7 @@ import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.RelationMember;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 
 /**
  * Model a stop with one or two elements (platform and/or stop_position)
@@ -177,7 +178,7 @@ public class PTStop extends RelationMember {
         for (Node currentNode : allNodes) {
             String nodeName = currentNode.get("name");
             if (platformBBox.bounds(currentNode.getBBox())
-                    && currentNode.hasTag("public_transport", "stop_position")
+                    && StopUtils.isStopPosition(currentNode)
                     && (platName == null
                         || nodeName == null
                         || platName.equals(nodeName))) {
@@ -230,7 +231,7 @@ public class PTStop extends RelationMember {
      * @return true if it matches, false otherwise
      */
     public static boolean isPTStopPosition(RelationMember rm) {
-        return rm.getMember().hasTag("public_transport", "stop_position")
+        return StopUtils.isStopPosition(rm.getMember())
                 && rm.getType().equals(OsmPrimitiveType.NODE);
     }
 

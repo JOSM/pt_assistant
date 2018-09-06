@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import org.openstreetmap.josm.actions.JosmAction;
@@ -26,7 +28,6 @@ import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
-import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.RelationToChildReference;
@@ -35,6 +36,7 @@ import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.datatransfer.OsmTransferHandler;
 import org.openstreetmap.josm.gui.datatransfer.PrimitiveTransferable;
 import org.openstreetmap.josm.gui.datatransfer.data.PrimitiveTransferData;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 import org.openstreetmap.josm.tools.MultiMap;
 import org.openstreetmap.josm.tools.Shortcut;
 
@@ -63,42 +65,30 @@ public class CreatePlatformShortcutAction extends JosmAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         Collection<OsmPrimitive> selection = getLayerManager().getEditDataSet().getSelected();
-        Node stopPositionNode = null;
-        Node newNode = null;
 
-        for (OsmPrimitive item: selection) {
-            if (item.getType() == OsmPrimitiveType.NODE) {
-                if (item.hasTag("highway") && (item.hasTag("highway", "bus_stop") || item.hasTag("public_transport", "stop_position"))) {
-                    stopPositionNode = (Node) item;
-                } else if (item.hasTag("railway")
-                        && (item.hasTag("railway", "tram_stop") || item.hasTag("public_transport", "stop_position"))) {
-                    stopPositionNode = (Node) item;
-                }
-            }
-        }
+        final Optional<Node> stopPositionNode = selection.stream()
+            .map(it -> it instanceof Node ? (Node) it : null)
+            .filter(StopUtils::isHighwayOrRailwayStopPosition)
+            .reduce((a, b) -> b); // equivalent to a `findLast()` method if that would exist
 
-        if (stopPositionNode != null && selection.size() == 1) {
+        if (stopPositionNode.isPresent() && selection.size() == 1) {
             PrimitiveTransferData data = PrimitiveTransferData.getDataWithReferences(selection);
-            transferHandler.pasteOn(getLayerManager().getEditLayer(), computePastePosition(e), new PrimitiveTransferable(data));
+            transferHandler.pasteOn(
+                getLayerManager().getEditLayer(),
+                computePastePosition(e),
+                new PrimitiveTransferable(data)
+            );
             Collection<OsmPrimitive> newSelection = getLayerManager().getEditDataSet().getSelected();
 
-            for (OsmPrimitive item: newSelection) {
-                newNode = (Node) item;
-            }
+            final Optional<Node> newNode = newSelection.stream()
+                .map(it -> it instanceof Node ? (Node) it : null)
+                .filter(Objects::nonNull)
+                .reduce((a, b) -> b);
+
+            newNode.ifPresent(node -> modify(node, stopPositionNode.get()));
         }
 
-        if (stopPositionNode == null) {
-            return;
-        }
 
-        HashMap<String, String> tagList = new HashMap<>();
-        for (String key : stopPositionNode.keySet()) {
-            tagList.put(key, stopPositionNode.get(key));
-        }
-
-        if (newNode != null) {
-            modify(newNode, stopPositionNode);
-        }
     }
 
     protected EastNorth computePastePosition(ActionEvent e) {

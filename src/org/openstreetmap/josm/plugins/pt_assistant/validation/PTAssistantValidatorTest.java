@@ -77,7 +77,7 @@ public class PTAssistantValidatorTest extends Test {
         NodeChecker nodeChecker = new NodeChecker(n, this);
 
         // select only stop_positions
-        if (n.hasTag("public_transport", "stop_position")) {
+        if (StopUtils.isStopPosition(n)) {
 
             // check if stop positions are on a way:
             nodeChecker.performSolitaryStopPositionTest();

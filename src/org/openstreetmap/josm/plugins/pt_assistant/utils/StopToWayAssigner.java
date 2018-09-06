@@ -87,9 +87,9 @@ public class StopToWayAssigner {
         }
         Set<Relation> parents = Node.getParentRelations(stopElements);
         for (Relation parentRelation : parents) {
-            if (parentRelation.hasTag("public_transport", "stop_area")) {
+            if (StopUtils.isStopArea(parentRelation)) {
                 for (RelationMember rm : parentRelation.getMembers()) {
-                    if (rm.getMember().hasTag("public_transport", "stop_position")) {
+                    if (StopUtils.isStopPosition(rm.getMember())) {
                         Way rmWay = this.findWayForNode(rm.getNode());
                         if (rmWay != null) {
                             addAssignedWayToMap(stop, rmWay);
@@ -302,7 +302,7 @@ public class StopToWayAssigner {
      * area. Does not differentiate between acute, right and obtuse triangles
      *
      * @param node node
-     * @param waySegment way segment
+     * @param segment segment
      * @return the distance from point to line
      */
     private double calculateDistanceToLine(Node node, Pair<Node, Node> segment) {

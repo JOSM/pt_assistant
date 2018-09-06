@@ -5,7 +5,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -639,10 +638,10 @@ public class SplitRoundaboutAction extends JosmAction {
 				n = curr.firstNode();
 			List<Way> parent = n.getParentWays();
 			parent.remove(curr);
-			for (int i = 0; i < parent.size(); i++) {
-				Collection<RelationMember> p = oldrelation.getMembersFor(Arrays.asList(parent.get(i)));
+			for (Way w : parent) {
+				Collection<RelationMember> p = oldrelation.getMembersFor(Collections.singletonList(w));
 				if (p != null && p.size() != 0) {
-					curr = parent.get(i);
+					curr = w;
 					break;
 				}
 			}
@@ -672,13 +671,13 @@ public class SplitRoundaboutAction extends JosmAction {
 			parent.remove(curr);
 			curr = null;
 			List<Way> possibleways = new ArrayList<>();
-			for (int i = 0; i < parent.size(); i++) {
-				Collection<RelationMember> p = oldrelation.getMembersFor(Arrays.asList(parent.get(i)));
+			for (Way w : parent) {
+				Collection<RelationMember> p = oldrelation.getMembersFor(Collections.singletonList(w));
 				if (p != null && p.size() != 0) {
-					if (!parent.get(i).hasTag("junction", "roundabout"))
-						possibleways.add(parent.get(i));
+					if (!w.hasTag("junction", "roundabout"))
+						possibleways.add(w);
 
-					if (parent.get(i).equals(middleWay)) {
+					if (w.equals(middleWay)) {
 						curr = middleWay;
 						break;
 					}

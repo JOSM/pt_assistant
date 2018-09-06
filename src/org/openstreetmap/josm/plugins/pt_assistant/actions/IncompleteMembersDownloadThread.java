@@ -13,6 +13,7 @@ import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.io.DownloadPrimitivesWithReferrersTask;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 import org.openstreetmap.josm.tools.Logging;
 
 /**
@@ -60,7 +61,7 @@ public class IncompleteMembersDownloadThread extends Thread {
                 // add all stop_positions:
                 Collection<Node> allNodes = MainApplication.getLayerManager().getEditDataSet().getNodes();
                 for (Node currentNode : allNodes) {
-                    if (currentNode.hasTag("public_transport", "stop_position")) {
+                    if (StopUtils.isStopPosition(currentNode)) {
                         List<OsmPrimitive> referrers = currentNode.getReferrers();
                         boolean parentWayExists = false;
                         for (OsmPrimitive referrer : referrers) {

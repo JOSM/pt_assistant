@@ -18,9 +18,6 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 
 /**
  * Performs tests of the stop area relations
- *
- * @author
- *
  */
 public class StopChecker extends Checker {
 
@@ -39,7 +36,7 @@ public class StopChecker extends Checker {
 
         // No errors if there is a member tagged as stop position.
         for (OsmPrimitive member : members) {
-            if (StopUtils.verifyStopAreaStopPosition(member)) {
+            if (StopUtils.isStopPosition(member)) {
                 return;
             }
         }
@@ -90,7 +87,7 @@ public class StopChecker extends Checker {
         for (OsmPrimitive member : members) {
 
             // For stop positions...
-            if (StopUtils.verifyStopAreaStopPosition(member)) {
+            if (StopUtils.isStopPosition(member)) {
 
                 // Create a list of assigned route relations
                 for (Relation referrer : OsmPrimitive.getFilteredList(member.getReferrers(), Relation.class)) {

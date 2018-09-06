@@ -677,9 +677,6 @@ public class SegmentChecker extends Checker {
      * This method assumes that the first and the second ways of the route
      * segment are correctly connected. If they are not, the error will be
      * marked as not fixable.
-     *
-     * @param testError
-     *            test error
      */
     private void findFix(Builder builder) {
 

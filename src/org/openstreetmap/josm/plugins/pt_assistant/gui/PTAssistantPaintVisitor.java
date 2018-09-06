@@ -8,7 +8,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -433,9 +432,10 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
 	 * stop in the route and the ref numbers of other routes that use this stop
 	 *
 	 * @param primitive
-	 *            primitive
-	 * @param label
-	 *            label
+	 *     primitive
+	 * @param platform
+	 *     for a stop position ({@link PTStop#isPTStopPosition(RelationMember)}) this is false
+	 *     for a platform ({@link PTStop#isPTPlatform(RelationMember)}) this is true
 	 */
 	protected void drawStopLabel(OsmPrimitive primitive, Boolean platform) {
 		// find the point to which the stop visualization will be linked:
@@ -466,7 +466,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
 			}
 		}
 
-		Collections.sort(parentsLabelList, new RefTagComparator());
+		parentsLabelList.sort(new RefTagComparator());
 
 		StringBuilder sb = new StringBuilder();
 		for (String s : parentsLabelList) {

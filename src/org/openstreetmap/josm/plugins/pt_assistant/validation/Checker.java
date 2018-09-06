@@ -22,6 +22,7 @@ import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 
 /**
  * Represents tests and fixed of the PT_Assistant plugin
@@ -75,7 +76,7 @@ public abstract class Checker {
 
             if (PTStop.isPTStop(rm)) {
 
-                if (rm.getMember().hasTag("public_transport", "stop_position")) {
+                if (StopUtils.isStopPosition(rm.getMember())) {
                     if (!rm.hasRole("stop") && !rm.hasRole("stop_entry_only") && !rm.hasRole("stop_exit_only")) {
                         RelationMember newMember = new RelationMember("stop", rm.getMember());
                         resultList.add(newMember);

@@ -8,7 +8,6 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +30,7 @@ import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.Notification;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 import org.openstreetmap.josm.tools.Shortcut;
 
 /**
@@ -55,21 +55,19 @@ public class ExtractPlatformNodeAction extends JosmAction {
 		Collection<OsmPrimitive> selection = ds.getSelected();
 		List<Node> selectedNodes = OsmPrimitive.getFilteredList(selection, Node.class);
 		if (selectedNodes.size() != 1) {
-			new Notification(tr("requires single node to be selected.")).setIcon(JOptionPane.WARNING_MESSAGE).show();
+			new Notification(tr("This action requires single node to be selected."))
+				.setIcon(JOptionPane.WARNING_MESSAGE)
+				.show();
 			return;
 		}
-		Node nd = selectedNodes.get(0);
-		boolean isNodeSuitable = false;
-		if (nd.hasTag("highway")
-				&& (nd.hasTag("highway", "bus_stop") || nd.hasTag("public_transport", "stop_position"))) {
-			isNodeSuitable = true;
-		} else if (nd.hasTag("railway")
-				&& (nd.hasTag("railway", "tram_stop") || nd.hasTag("public_transport", "stop_position"))) {
-			isNodeSuitable = true;
-		}
+		final Node nd = selectedNodes.get(0);
 
-		if (!isNodeSuitable)
+		if (!StopUtils.isHighwayOrRailwayStopPosition(nd)) {
+			new Notification(tr("The selected node is not a stop position for public transport!"))
+				.setIcon(JOptionPane.WARNING_MESSAGE)
+				.show();
 			return;
+		}
 
 		List<Command> cmds = new LinkedList<>();
 
@@ -94,7 +92,7 @@ public class ExtractPlatformNodeAction extends JosmAction {
 			for (OsmPrimitive pr : refs) {
 				if (pr instanceof Way) {
 					Way w = (Way) pr;
-					UndoRedoHandler.getInstance().add(new RemoveNodesCommand(w, Arrays.asList(nd)));
+					UndoRedoHandler.getInstance().add(new RemoveNodesCommand(w, Collections.singletonList(nd)));
 				}
 			}
 		} else {

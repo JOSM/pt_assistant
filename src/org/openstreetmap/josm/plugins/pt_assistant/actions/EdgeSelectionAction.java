@@ -26,6 +26,7 @@ import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayer;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Shortcut;
 
@@ -71,7 +72,7 @@ public class EdgeSelectionAction extends MapMode {
 		Way curr = initial;
 		while (true) {
 			List<Way> options = curr.firstNode(true).getParentWays();
-			if (curr.firstNode().hasTag("public_transport", "stop_position")) {
+			if (StopUtils.isStopPosition(curr.firstNode())) {
 				break;
 			}
 			options.remove(curr);
@@ -85,7 +86,7 @@ public class EdgeSelectionAction extends MapMode {
 		curr = initial;
 		while (true) {
 			List<Way> options = curr.lastNode(true).getParentWays();
-			if (curr.lastNode().hasTag("public_transport", "stop_position")) {
+			if (StopUtils.isStopPosition(curr.lastNode())) {
 				break;
 			}
 			options.remove(curr);

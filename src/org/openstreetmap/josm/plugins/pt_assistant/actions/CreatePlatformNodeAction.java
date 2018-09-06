@@ -104,10 +104,11 @@ public class CreatePlatformNodeAction extends JosmAction {
 
 		for (OsmPrimitive item : selection) {
 			if (item.getType() == OsmPrimitiveType.NODE) {
-				if (item.hasTag("public_transport", "stop_position"))
+				if (StopUtils.isStopPosition(item)) {
 					stopPositionNode = (Node) item;
-				else
+				} else {
 					platformNode = (Node) item;
+				}
 			} else if (item.getType() == OsmPrimitiveType.WAY && item.hasTag("public_transport", "platform")) {
 				platformWay = (Way) item;
 			}
