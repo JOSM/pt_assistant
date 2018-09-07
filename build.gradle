@@ -25,8 +25,14 @@ tasks.withType(JavaCompile) {
   ]
 }
 
-josm.i18n {
-  pathTransformer = getPathTransformer("github.com/JOSM/pt_assistant/blob")
+josm {
+  manifest {
+    oldVersionDownloadLink(14027, "v2.1.4", new URL("https://github.com/JOSM/pt_assistant/releases/download/v2.1.4/pt_assistant.jar"))
+    oldVersionDownloadLink(13957, "v2.0.0", new URL("https://github.com/JOSM/pt_assistant/releases/download/v2.0.0/pt_assistant.jar"))
+  }
+  i18n {
+    pathTransformer = getPathTransformer("github.com/JOSM/pt_assistant/blob")
+  }
 }
 
 test {
