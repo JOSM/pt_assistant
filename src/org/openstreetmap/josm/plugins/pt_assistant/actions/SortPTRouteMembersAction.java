@@ -56,9 +56,9 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
      * Creates a new SortPTRouteMembersAction
      */
     public SortPTRouteMembersAction(IRelationEditorActionAccess editorAccess) {
-    		super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
-    		putValue(ACTION_NAME, tr(ACTION_NAME));
-            new ImageProvider("icons", "sortptroutemembers").getResource().attachImageIcon(this, true);
+        super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
+        putValue(ACTION_NAME, tr(ACTION_NAME));
+        new ImageProvider("icons", "sortptroutemembers").getResource().attachImageIcon(this, true);
 
         editor = (GenericRelationEditor) editorAccess.getEditor();
         updateEnabledState();
@@ -67,11 +67,11 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-    		Relation rel = editor.getRelation();
-    		editor.apply();
+        Relation rel = editor.getRelation();
+        editor.apply();
 
         if (rel.hasIncompleteMembers()) {
-            if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(Main.parent,
+            if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
                 tr("The relation has incomplete members. Do you want to download them and continue with the sorting?"),
                 tr("Incomplete Members"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, null, null)) {
@@ -85,19 +85,20 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                         MainApplication.getLayerManager().getEditLayer()));
 
                 MainApplication.worker.submit(() -> {
-                		try {
-                            future.get();
-                            continueAfterDownload(rel);
-                        } catch (InterruptedException | ExecutionException e1) {
-                            Logging.error(e1);
-                            return;
-                        }
+                    try {
+                        future.get();
+                        continueAfterDownload(rel);
+                    } catch (InterruptedException | ExecutionException e1) {
+                        Logging.error(e1);
+                        return;
+                    }
                  });
-            } else
+            } else {
                 return;
-        } else
+            }
+        } else {
             continueAfterDownload(rel);
-
+        }
     }
 
     private void continueAfterDownload(Relation rel) {
@@ -347,56 +348,56 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
     }
 
     private static void removeWrongSideStops(List<PTStop> ptstop, List<RelationMember> wayMembers) {
-    		for (int i=0; i<wayMembers.size(); i++) {
-    			RelationMember wm = wayMembers.get(i);
-    	        Way prev = null;
-    	        Way next = null;
-    	        if (i > 0) {
-    	            RelationMember wmp = wayMembers.get(i-1);
-    	            if (wmp.getType() == OsmPrimitiveType.WAY)
-    	                prev = wmp.getWay();
-    	        }
-    	        if (i < wayMembers.size() - 1) {
-    	            RelationMember wmn = wayMembers.get(i+1);
-    	            if (wmn.getType() == OsmPrimitiveType.WAY)
-    	                next = wmn.getWay();
-    	        }
-    	        if (wm.getType() == OsmPrimitiveType.WAY) {
-    	            Way curr = wm.getWay();
-    	            Node firstNode = findCommonNode(curr, prev);
-    	            Node lastNode = findCommonNode(curr, next);
-    	            System.out.println(i);
-    	            	if (firstNode != null && firstNode.equals(curr.getNode(0))) {
-    	            		System.out.println("Front Way 1 == " + curr.getName());
-    	            	} else if (firstNode != null && firstNode.equals(curr.getNode(curr.getNodesCount() - 1))) {
-    	            		System.out.println("Back Way 2 == " + curr.getName());
-    	            	} else if (lastNode != null && lastNode.equals(curr.getNode(0))) {
-    	            		System.out.println("Back Way 3 == " + curr.getName());
-    	            	} else if (lastNode != null && lastNode.equals(curr.getNode(curr.getNodesCount() - 1))) {
-    	            		System.out.println("Front Way 4 == " + curr.getName());
-    	            	}
-    	        }
-    		}
+        for (int i=0; i<wayMembers.size(); i++) {
+            RelationMember wm = wayMembers.get(i);
+            Way prev = null;
+            Way next = null;
+            if (i > 0) {
+                RelationMember wmp = wayMembers.get(i-1);
+                if (wmp.getType() == OsmPrimitiveType.WAY)
+                    prev = wmp.getWay();
+            }
+            if (i < wayMembers.size() - 1) {
+                RelationMember wmn = wayMembers.get(i+1);
+                if (wmn.getType() == OsmPrimitiveType.WAY)
+                    next = wmn.getWay();
+            }
+            if (wm.getType() == OsmPrimitiveType.WAY) {
+                Way curr = wm.getWay();
+                Node firstNode = findCommonNode(curr, prev);
+                Node lastNode = findCommonNode(curr, next);
+                System.out.println(i);
+                    if (firstNode != null && firstNode.equals(curr.getNode(0))) {
+                        System.out.println("Front Way 1 == " + curr.getName());
+                    } else if (firstNode != null && firstNode.equals(curr.getNode(curr.getNodesCount() - 1))) {
+                        System.out.println("Back Way 2 == " + curr.getName());
+                    } else if (lastNode != null && lastNode.equals(curr.getNode(0))) {
+                        System.out.println("Back Way 3 == " + curr.getName());
+                    } else if (lastNode != null && lastNode.equals(curr.getNode(curr.getNodesCount() - 1))) {
+                        System.out.println("Front Way 4 == " + curr.getName());
+                    }
+            }
+        }
     }
 
     private static Node findCommonNode(Way w1, Way w2) {
-    		if (w1 == null || w2 == null)
-    			return null;
-    		for (int i = 0; i< w1.getNodes().size(); i++) {
-    			for (int j = 0; j<w2.getNodes().size(); j++) {
-    				if (w1.getNodes().get(i).equals(w2.getNodes().get(j)))
-    					return w1.getNodes().get(i);
-    			}
-    		}
-    		return null;
+        if (w1 == null || w2 == null)
+            return null;
+        for (int i = 0; i < w1.getNodes().size(); i++) {
+            for (int j = 0; j < w2.getNodes().size(); j++) {
+                if (w1.getNodes().get(i).equals(w2.getNodes().get(j)))
+                    return w1.getNodes().get(i);
+            }
+        }
+        return null;
     }
 
-	@Override
-	protected void updateEnabledState() {
-		if (editor != null && !RouteUtils.isPTRoute(editor.getRelation())) {
+    @Override
+    protected void updateEnabledState() {
+        if (editor != null && !RouteUtils.isPTRoute(editor.getRelation())) {
             setEnabled(false);
             return;
         }
-		setEnabled(true);
-	}
+        setEnabled(true);
+    }
 }

@@ -21,6 +21,7 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.AlignInCircleAction;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
+import org.openstreetmap.josm.actions.downloadtasks.DownloadParams;
 import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.Command;
@@ -41,6 +42,7 @@ import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.RelationDialogManager;
 import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.PTProperties;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
@@ -82,7 +84,7 @@ public class SplitRoundaboutAction extends JosmAction {
 
 		Bounds area = new Bounds(rbbox.getBottomRightLat() - latOffset, rbbox.getTopLeftLon() - lonOffset,
 				rbbox.getTopLeftLat() + latOffset, rbbox.getBottomRightLon() + lonOffset);
-		Future<?> future = task.download(false, area, null);
+		Future<?> future = task.download(new DownloadParams(), area, null);
 
 		MainApplication.worker.submit(() -> {
 			try {
@@ -97,8 +99,8 @@ public class SplitRoundaboutAction extends JosmAction {
 
 	private void continueAfterDownload(Way roundabout) {
 		// make the roundabout round, if requested
-		if (Main.pref.getBoolean("pt_assistant.roundabout-splitter.alignalways")
-				|| JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(Main.parent,
+		if (PTProperties.ROUNDABOUT_SPLITTER_ALIGN_ALWAYS.get()
+				|| JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
 						tr("Do you want to make the roundabout round?"), tr("Roundabout round"),
 						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null)) {
 			new AlignInCircleAction().actionPerformed(null);

@@ -11,6 +11,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -128,29 +129,16 @@ public final class PTWizardAction extends JosmAction {
 
     private void readPreferencesFromXML() {
         try {
-            CachedFile cf = getCachedFile();
-            if (cf == null)
-                return;
-            List<String> lines = new ArrayList<>();
-            try (BufferedReader in = cf.getContentReader()) {
-                String line;
-                while ((line = in.readLine()) != null) {
-                    if (!line.contains("{{{") && !line.contains("}}}")) {
-                            lines.add(line);
-                    }
-                }
-
-                in.close();
-                File f = new File(".tempfile.xml");
-                try (BufferedWriter out = Files.newBufferedWriter(f.toPath(), StandardCharsets.UTF_8)) {
-                    for (String s : lines) {
-                        out.write(s);
-                    }
-                }
-
-                InputStream is = Files.newInputStream(f.toPath());
-                new CustomConfigurator.XMLCommandProcessor(Preferences.main()).openAndReadXML(is);
-                f.delete();
+            final CachedFile cf = getCachedFile();
+            if (cf != null) {
+                new CustomConfigurator.XMLCommandProcessor(Preferences.main()).openAndReadXML(
+                    new ByteArrayInputStream(
+                        cf.getContentReader().lines()
+                            .filter(line -> !line.contains("{{{") && !line.contains("}}}"))
+                            .collect(Collectors.joining("\n"))
+                            .getBytes(StandardCharsets.UTF_8)
+                    )
+                );
             }
         } catch (IOException e) {
             Logging.error(e);

@@ -19,6 +19,12 @@ public final class PTProperties {
         new BooleanProperty("pt_assistant.proceed-without-fix", true);
 
     /**
+     * Options for the roundabout splitter.
+     */
+    public static final BooleanProperty ROUNDABOUT_SPLITTER_ALIGN_ALWAYS =
+        new BooleanProperty("pt_assistant.roundabout-splitter.alignalways", false);
+
+    /**
      * Options used in {@link CreatePlatformNodeAction}.
      */
     public static final BooleanProperty SUBSTITUTE_PLATFORMWAY_RELATION =

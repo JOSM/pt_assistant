@@ -12,7 +12,6 @@ import java.util.concurrent.Future;
 
 import javax.swing.JOptionPane;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
 import org.openstreetmap.josm.command.ChangeCommand;
@@ -46,37 +45,37 @@ public class SortPTRouteMembersMenuBar extends JosmAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        for (Relation rel : getLayerManager().getEditDataSet().getSelectedRelations()) {
+            if (rel.hasIncompleteMembers()) {
+                if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                        tr("The relation has incomplete members. Do you want to download them and continue with the sorting?"),
+                        tr("Incomplete Members"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                        null, null, null)) {
 
-    		for (Relation rel : getLayerManager().getEditDataSet().getSelectedRelations()) {
-    			if (rel.hasIncompleteMembers()) {
-    				if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(Main.parent,
-    						tr("The relation has incomplete members. Do you want to download them and continue with the sorting?"),
-    						tr("Incomplete Members"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-    						null, null, null)) {
+                    List<Relation> incomplete = Collections.singletonList(rel);
+                    Future<?> future = MainApplication.worker.submit(new DownloadRelationMemberTask(
+                            incomplete,
+                            Utils.filteredCollection(
+                                    DownloadSelectedIncompleteMembersAction.buildSetOfIncompleteMembers(
+                                    Collections.singletonList(rel)), OsmPrimitive.class),
+                            MainApplication.getLayerManager().getEditLayer()));
 
-    					List<Relation> incomplete = Collections.singletonList(rel);
-    					Future<?> future = MainApplication.worker.submit(new DownloadRelationMemberTask(
-    							incomplete,
-    							Utils.filteredCollection(
-    									DownloadSelectedIncompleteMembersAction.buildSetOfIncompleteMembers(
-                                        Collections.singletonList(rel)), OsmPrimitive.class),
-    							MainApplication.getLayerManager().getEditLayer()));
-
-    					MainApplication.worker.submit(() -> {
-    						try {
+                    MainApplication.worker.submit(() -> {
+                        try {
                             future.get();
                             continueAfterDownload(rel);
-    						} catch (InterruptedException | ExecutionException e1) {
+                        } catch (InterruptedException | ExecutionException e1) {
                             Logging.error(e1);
                             return;
                         }
-    					});
-    				} else
-    					return;
-    			} else
-    				continueAfterDownload(rel);
-    		}
-
+                    });
+                } else {
+                    return;
+                }
+            } else {
+                continueAfterDownload(rel);
+            }
+        }
     }
 
     private void continueAfterDownload(Relation rel) {
@@ -85,10 +84,10 @@ public class SortPTRouteMembersMenuBar extends JosmAction {
         UndoRedoHandler.getInstance().add(new ChangeCommand(rel, newRel));
     }
 
-	@Override
-	protected void updateEnabledState(Collection<? extends OsmPrimitive> selection) {
-		if (selection.isEmpty()) {
-			setEnabled(false);
+    @Override
+    protected void updateEnabledState(Collection<? extends OsmPrimitive> selection) {
+        if (selection.isEmpty()) {
+            setEnabled(false);
             return;
         }
 
@@ -100,5 +99,5 @@ public class SortPTRouteMembersMenuBar extends JosmAction {
         }
 
         setEnabled(true);
-	}
+    }
 }

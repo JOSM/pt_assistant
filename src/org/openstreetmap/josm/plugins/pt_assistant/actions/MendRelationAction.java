@@ -263,7 +263,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 		String query = getQuery();
 		Logging.debug(query);
 
-		final Future future = task.download(
+		final Future<?> future = task.download(
 			new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query),
 			DEFAULT_DOWNLOAD_PARAMS,
 			area,
@@ -1289,7 +1289,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 	}
 
 	boolean isRestricted(Way currentWay, Way previousWay, Node commonNode) {
-		Set<Relation> parentSet = previousWay.getParentRelations(previousWay.getNodes());
+		Set<Relation> parentSet = OsmPrimitive.getParentRelations(previousWay.getNodes());
 		if (parentSet == null || parentSet.isEmpty())
 			return false;
 		List<Relation> parentRelation = new ArrayList<>(parentSet);
