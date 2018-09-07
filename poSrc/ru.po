@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.4-10-ged0ad68\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-25 07:23+0000\n"
+"POT-Creation-Date: 2018-09-07 15:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: Russian (https://www.transifex.com/josm/teams/2544/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -63,9 +63,6 @@ msgstr ""
 
 msgid "Download incomplete route relation members"
 msgstr "Скачать недостающих участников отношения маршрута"
-
-msgid "Downloading Data"
-msgstr "Загрузка данных"
 
 msgid ""
 "Downloading incomplete relation members. Kindly wait till download gets "
@@ -294,9 +291,16 @@ msgstr ""
 "У отношения есть неполные участники. Скачать их и продолжить сортировку?"
 
 msgid ""
+"Transfer details from platform way to node representing the stop (leave "
+"tactile_paving and wheelchair on the platform way)"
+msgstr ""
+"Перенести параметры с линии платформы на точку представляющую остановку "
+"(оставить tactile_paving и wheelchair на линии платформы)"
+
+msgid ""
 "Transfer details from stop_position nodes to node representing the stop"
 msgstr ""
-"Перенести параметры с точек stop_position на точку представляющую остановку"
+"Перенести параметры с точек stop_position на точку представляющую остановку"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
@@ -320,9 +324,6 @@ msgstr "Чем должен быть этот сегмент?"
 
 msgid "Yes"
 msgstr "Да"
-
-msgid "requires single node to be selected."
-msgstr "требуется, чтобы была выбрана одна точка"
 
 msgid "suggested value : "
 msgstr "предлагаемое значение:"

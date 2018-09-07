@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.4-10-ged0ad68\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-25 07:23+0000\n"
+"POT-Creation-Date: 2018-09-07 15:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: German (https://www.transifex.com/josm/teams/2544/de/)\n"
 "MIME-Version: 1.0\n"
@@ -16,6 +16,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Always split ways, even if they are not at the end of the itinerary"
+msgstr "Linien immer auftrennen, sogar wenn sie nicht am Ende der Route sind"
+
+msgid "Area around way"
+msgstr "Fläche um Linie herum"
 
 msgid "Bicycle and foot routes Tests"
 msgstr "Tests für Fahrrad- und Fußgängerrouten"
@@ -36,8 +42,36 @@ msgstr ""
 msgid "Do you want to make the roundabout round?"
 msgstr "Möchten Sie den Kreisverkehr rund machen?"
 
+msgid "Don’t compare name of first stop with from tag in route relation"
+msgstr ""
+"Nicht den Namen der ersten Haltestelle mit dem from-Tag der Routenrelation "
+"vergleichen"
+
+msgid "Don’t compare name of last stop with to tag in route relation"
+msgstr ""
+"Nicht den Namen der letzten Haltestelle mit dem to-Tag der Routenrelation "
+"vergleichen"
+
+#, java-format
+msgid "Download finished: {0}"
+msgstr "Herunterladen abgeschlossen: {0}"
+
 msgid "Download incomplete route relation members"
 msgstr "Unvollständige Routenrelationselemente herunterladen"
+
+#, java-format
+msgid "Download started: {0}"
+msgstr "Herunterladen gestartet: {0}"
+
+msgid ""
+"Downloading incomplete relation members. Kindly wait till download gets "
+"over."
+msgstr ""
+"Unvollständige Relationsmitglieder werden heruntergeladen. Bitte warte, bis "
+"das Herunterladen abgeschlossen ist."
+
+msgid "Entire area"
+msgstr "Kompletter Bereich"
 
 msgid "Extract node from line"
 msgstr "Punkt aus Linie extrahieren"
@@ -64,9 +98,15 @@ msgstr "Haltebereichprüfungen miteinbeziehen"
 msgid "Incomplete Members"
 msgstr "Unvollständige Elemente"
 
+msgid "Incomplete relations"
+msgstr "Unvollständige Relationen"
+
 #, java-format
 msgid "Mode: {0}"
 msgstr "Modus: {0}"
+
+msgid "NA"
+msgstr "n.v."
 
 msgid "No"
 msgstr "Nein"
@@ -221,9 +261,6 @@ msgstr ""
 "Sie müssen zum Fortsetzen der Validierung heruntergeladen werden.\n"
 "Möchten Sie sie herunterladen?"
 
-msgid "Select objects for selected relation members"
-msgstr "Wählen Sie Objekte für die ausgewählten Relationsmitglieder"
-
 msgid "Set up PT Assistant for more convenient use"
 msgstr "Den ÖV-Assistenten für bequemere Benutzung einrichten"
 
@@ -246,6 +283,11 @@ msgstr "Konnte nicht mit {0} verbinden"
 msgid "Updating map ..."
 msgstr "Karte wird aktualisiert …"
 
+msgid "Use 1/2/3/4 instead of A/B/C/D for selecting which way to follow"
+msgstr ""
+"1/2/3/4 statt A/B/C/D verwenden, um auszuwählen, welcher Linie man folgen "
+"möchte"
+
 msgid "Warning: the diplayed fix variants are based on less strict criteria"
 msgstr ""
 "Warnung: die angezeigten Korrekturvarianten basieren auf weniger strengen "
@@ -256,9 +298,6 @@ msgstr "Was soll mit dem Abschnitt geschehen?"
 
 msgid "Yes"
 msgstr "Ja"
-
-msgid "requires single node to be selected."
-msgstr "Es muss ein einzelner Punkt ausgewählt sein."
 
 msgid "suggested value : "
 msgstr "vorgeschlagener Wert"

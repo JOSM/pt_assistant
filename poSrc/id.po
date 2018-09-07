@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.4-10-ged0ad68\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-25 07:23+0000\n"
+"POT-Creation-Date: 2018-09-07 15:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: Indonesian (https://www.transifex.com/josm/teams/2544/id/)\n"
 "MIME-Version: 1.0\n"
@@ -198,9 +198,6 @@ msgstr ""
 "Relasi rute tidak memiliki member yang komplit. \n"
 "Perlu diunduh untuk melanjutkan validasi.\n"
 "Anda ingin mengunduhnya?"
-
-msgid "Select objects for selected relation members"
-msgstr "memilih objek yang dipilih  relasi member"
 
 msgid ""
 "The relation has incomplete members. Do you want to download them and "

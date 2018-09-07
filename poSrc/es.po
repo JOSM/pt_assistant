@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.4-10-ged0ad68\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-25 07:23+0000\n"
+"POT-Creation-Date: 2018-09-07 15:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: Spanish (https://www.transifex.com/josm/teams/2544/es/)\n"
 "MIME-Version: 1.0\n"
@@ -207,9 +207,6 @@ msgstr ""
 "Las relaciones de ruta tienen miembros incompletos.\n"
 "Necesitan ser descargados para proceder a la validación.\n"
 "¿Desea descargarlas?"
-
-msgid "Select objects for selected relation members"
-msgstr "Seleccionar los objetos para los miembros de la relación indicados"
 
 msgid ""
 "The relation has incomplete members. Do you want to download them and "

@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.4-10-ged0ad68\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-25 07:23+0000\n"
+"POT-Creation-Date: 2018-09-07 15:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: Portuguese (https://www.transifex.com/josm/teams/2544/pt/)\n"
 "MIME-Version: 1.0\n"
@@ -200,9 +200,6 @@ msgstr ""
 "As relações de rotas têm membros incompletos.\n"
 "Eles têm de ser descarregados para continuar com a validação.\n"
 "Quer descarregá-los?"
-
-msgid "Select objects for selected relation members"
-msgstr "Selecionar objetos para os membros selecionados da relação"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""

@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.4-10-ged0ad68\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-25 07:23+0000\n"
+"POT-Creation-Date: 2018-09-07 15:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: Polish (https://www.transifex.com/josm/teams/2544/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -36,6 +36,9 @@ msgstr ""
 "Sprawdź, czy relacje tras są kompatybilne z transportem publicznym w wersji "
 "2"
 
+msgid "Do you want to download referrers of platforms and stop positions?"
+msgstr "Czy chcesz pobrać odniesienia dla przystanków i miejsc zatrzymania?"
+
 msgid "Do you want to make the roundabout round?"
 msgstr "Czy chcesz zaokrąglić rondo?"
 
@@ -60,12 +63,6 @@ msgstr "Nie porównuj nazwy ostatniego przystanku ze znacznikiem \"do\" trasy"
 
 msgid "Download incomplete route relation members"
 msgstr "Pobierz niekompletnych członków relacji tras"
-
-msgid "Download over"
-msgstr "Pobieranie ukończone"
-
-msgid "Downloading Data"
-msgstr "Pobieranie danych"
 
 msgid ""
 "Downloading incomplete relation members. Kindly wait till download gets "
@@ -117,6 +114,9 @@ msgstr ""
 msgid "Mode: {0}"
 msgstr "Tryb: {0}"
 
+msgid "NA"
+msgstr "nd."
+
 msgid "No"
 msgstr "Nie"
 
@@ -137,6 +137,10 @@ msgstr "TP: Problem w segmencie trasy bez automatycznego rozwiązania"
 
 msgid "PT: Problem in the route segment with one automatic fix"
 msgstr "TP: Problem w segmencie trasy z jednym automatycznym rozwiązaniem"
+
+msgid ""
+"PT: Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr "TP: Odniesienia trasy nie odpowiadają tagowi route_ref elementu"
 
 msgid "PT: Relation member roles do not match tags"
 msgstr "TP: Role członków relacji nie pasują do znaczników"
@@ -247,6 +251,10 @@ msgstr "Transport publiczny"
 msgid "Public Transport Assistant tests"
 msgstr "Testy asystenta transportu publicznego"
 
+msgid ""
+"Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr "Odniesienia trasy nie odpowiadają tagowi route_ref elementu"
+
 msgid "Remember my choice and do not ask me again in this session"
 msgstr "Zapamiętaj mój wybór i nie pytaj ponownie w tej sesji"
 
@@ -283,8 +291,8 @@ msgstr ""
 "Trzeba pobrać brakujące informacje, aby kontynuować weryfikację.\n"
 "Czy chcesz pobrać brakujące dane?"
 
-msgid "Select objects for selected relation members"
-msgstr "Zaznacz obiekty dla zaznaczonych członków relacji"
+msgid "Routing Helper"
+msgstr "Pomoc w wyznaczaniu trasy"
 
 msgid "Set up PT Assistant for more convenient use"
 msgstr "Ustaw Asystenta TP dla wygodniejszej obsługi"
@@ -295,6 +303,13 @@ msgid ""
 msgstr ""
 "Relacja ma niekompletnych członków. Czy chcesz ich pobrać i kontynuować "
 "sortowanie?"
+
+msgid ""
+"Transfer details from platform way to node representing the stop (leave "
+"tactile_paving and wheelchair on the platform way)"
+msgstr ""
+"Przenieś szczegóły z odcinka przystanku do węzła reprezentującego przystanek"
+" (pozostaw tagi tactile_paving i wheelchair przy odcinku)"
 
 msgid ""
 "Transfer details from stop_position nodes to node representing the stop"
@@ -326,9 +341,6 @@ msgstr "Czym ma być ten segment?"
 
 msgid "Yes"
 msgstr "Tak"
-
-msgid "requires single node to be selected."
-msgstr "wymaga wybrania pojedynczego węzła."
 
 msgid "suggested value : "
 msgstr "sugerowana wartość : "
