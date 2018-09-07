@@ -17,7 +17,6 @@ import java.util.concurrent.Future;
 
 import javax.swing.JOptionPane;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.AlignInCircleAction;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
