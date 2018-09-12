@@ -11,11 +11,16 @@ import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.validation.Severity;
 import org.openstreetmap.josm.data.validation.Test;
 import org.openstreetmap.josm.data.validation.TestError;
-import org.openstreetmap.josm.data.validation.TestError.Builder;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionType;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionTypeCalculator;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 
+/**
+ * Performs tests for bicycle and foot routes.
+ *
+ * @author giackserva
+ *
+ */
 public class BicycleFootRouteValidatorTest extends Test {
 
     public static final int ERROR_CODE_CONTINUITY = 3701;
@@ -43,7 +48,7 @@ public class BicycleFootRouteValidatorTest extends Test {
         List<WayConnectionType> links = connectionTypeCalculator.updateLinks(members);
 
         for (Integer i : getGaps(links)) {
-            Builder builder = TestError.builder(this, Severity.WARNING,
+            TestError.Builder builder = TestError.builder(this, Severity.WARNING,
                     ERROR_CODE_CONTINUITY);
             builder.message(tr("PT: There is a gap in the {0} route", r.get("route")));
             builder.primitives(members.get(i).getWay(), members.get(i+1).getWay(), r);

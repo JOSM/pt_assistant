@@ -48,134 +48,134 @@ import org.openstreetmap.josm.tools.Shortcut;
  */
 public class CreatePlatformNodeThroughReplaceAction extends JosmAction {
 
-	private static final String ACTION_NAME = "Shortcut action to Transfer details of stop to platform node";
-	protected final OsmTransferHandler transferHandler;
+    private static final String ACTION_NAME = "Shortcut action to Transfer details of stop to platform node";
+    protected final OsmTransferHandler transferHandler;
 
-	/**
-	 * Creates a new PlatformAction
-	 */
-	public CreatePlatformNodeThroughReplaceAction() {
-		super(ACTION_NAME, null, ACTION_NAME,
-				Shortcut.registerShortcut("tools:createplatformthruoghreplace",
-						"Tool: CreatePlatformNodeThroughReplaceAction", KeyEvent.VK_G, Shortcut.SHIFT),
-				false);
-		transferHandler = new OsmTransferHandler();
-		MainApplication.registerActionShortcut(this,
-				Shortcut.registerShortcut("tools:createplatformthruoghreplace",
-						"Tool: CreatePlatformNodeThroughReplaceAction", KeyEvent.VK_G, Shortcut.SHIFT));
-	}
+    /**
+     * Creates a new PlatformAction
+     */
+    public CreatePlatformNodeThroughReplaceAction() {
+        super(ACTION_NAME, null, ACTION_NAME,
+                Shortcut.registerShortcut("tools:createplatformthruoghreplace",
+                        "Tool: CreatePlatformNodeThroughReplaceAction", KeyEvent.VK_G, Shortcut.SHIFT),
+                false);
+        transferHandler = new OsmTransferHandler();
+        MainApplication.registerActionShortcut(this,
+                Shortcut.registerShortcut("tools:createplatformthruoghreplace",
+                        "Tool: CreatePlatformNodeThroughReplaceAction", KeyEvent.VK_G, Shortcut.SHIFT));
+    }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Collection<OsmPrimitive> selection = getLayerManager().getEditDataSet().getSelected();
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Collection<OsmPrimitive> selection = getLayerManager().getEditDataSet().getSelected();
 
-		final Optional<Node> stopPositionNode = selection.stream()
-			.map(it -> it instanceof Node ? (Node) it : null)
-			.filter(StopUtils::isHighwayOrRailwayStopPosition)
-			.reduce((a, b) -> b); // equivalent to a `findLast()` method if that would exist
+        final Optional<Node> stopPositionNode = selection.stream()
+            .map(it -> it instanceof Node ? (Node) it : null)
+            .filter(StopUtils::isHighwayOrRailwayStopPosition)
+            .reduce((a, b) -> b); // equivalent to a `findLast()` method if that would exist
 
-		if (stopPositionNode.isPresent() && selection.size() == 1) {
-			PrimitiveTransferData data = PrimitiveTransferData.getDataWithReferences(selection);
-			transferHandler.pasteOn(
-				getLayerManager().getEditLayer(),
-				computePastePosition(e),
-				new PrimitiveTransferable(data)
-			);
-			Collection<OsmPrimitive> newSelection = getLayerManager().getEditDataSet().getSelected();
+        if (stopPositionNode.isPresent() && selection.size() == 1) {
+            PrimitiveTransferData data = PrimitiveTransferData.getDataWithReferences(selection);
+            transferHandler.pasteOn(
+                getLayerManager().getEditLayer(),
+                computePastePosition(e),
+                new PrimitiveTransferable(data)
+            );
+            Collection<OsmPrimitive> newSelection = getLayerManager().getEditDataSet().getSelected();
 
-			final Optional<Node> newNode = newSelection.stream()
-				.map(it -> it instanceof Node ? (Node) it : null)
-				.filter(Objects::nonNull)
-				.reduce((a, b) -> b);
+            final Optional<Node> newNode = newSelection.stream()
+                .map(it -> it instanceof Node ? (Node) it : null)
+                .filter(Objects::nonNull)
+                .reduce((a, b) -> b);
 
-			newNode.ifPresent(node -> modify(node, stopPositionNode.get()));
-		}
+            newNode.ifPresent(node -> modify(node, stopPositionNode.get()));
+        }
 
 
 
-		// try {
-		// MainApplication.undoRedo.add(new DeleteCommand(stopPositionNode));
-		// } catch (Exception f) {
-		// f.printStackTrace();
-		// }
+        // try {
+        // MainApplication.undoRedo.add(new DeleteCommand(stopPositionNode));
+        // } catch (Exception f) {
+        // f.printStackTrace();
+        // }
 
-	}
+    }
 
-	protected EastNorth computePastePosition(ActionEvent e) {
-		// default to paste in center of map (pasted via menu or cursor not in MapView)
-		MapView mapView = MainApplication.getMap().mapView;
-		EastNorth mPosition = mapView.getCenter();
-		// We previously checked for modifier to know if the action has been trigerred
-		// via shortcut or via menu
-		// But this does not work if the shortcut is changed to a single key (see #9055)
-		// Observed behaviour: getActionCommand() returns Action.NAME when triggered via
-		// menu, but shortcut text when triggered with it
-		if (e != null && !getValue(NAME).equals(e.getActionCommand())) {
-			final PointerInfo pointerInfo = MouseInfo.getPointerInfo();
-			if (pointerInfo != null) {
-				final Point mp = pointerInfo.getLocation();
-				final Point tl = mapView.getLocationOnScreen();
-				final Point pos = new Point(mp.x - tl.x, mp.y - tl.y);
-				if (mapView.contains(pos)) {
-					mPosition = mapView.getEastNorth(pos.x, pos.y);
-				}
-			}
-		}
-		return mPosition;
-	}
+    protected EastNorth computePastePosition(ActionEvent e) {
+        // default to paste in center of map (pasted via menu or cursor not in MapView)
+        MapView mapView = MainApplication.getMap().mapView;
+        EastNorth mPosition = mapView.getCenter();
+        // We previously checked for modifier to know if the action has been trigerred
+        // via shortcut or via menu
+        // But this does not work if the shortcut is changed to a single key (see #9055)
+        // Observed behaviour: getActionCommand() returns Action.NAME when triggered via
+        // menu, but shortcut text when triggered with it
+        if (e != null && !getValue(NAME).equals(e.getActionCommand())) {
+            final PointerInfo pointerInfo = MouseInfo.getPointerInfo();
+            if (pointerInfo != null) {
+                final Point mp = pointerInfo.getLocation();
+                final Point tl = mapView.getLocationOnScreen();
+                final Point pos = new Point(mp.x - tl.x, mp.y - tl.y);
+                if (mapView.contains(pos)) {
+                    mPosition = mapView.getEastNorth(pos.x, pos.y);
+                }
+            }
+        }
+        return mPosition;
+    }
 
-	public void modify(Node newNode, Node stopPositionNode) {
+    public void modify(Node newNode, Node stopPositionNode) {
 
-		if (stopPositionNode.hasTag("railway")) {
-			newNode.put("tram", "yes");
-			newNode.put("railway", "tram_stop");
-			newNode.remove("public_transport");
-			newNode.put("public_transport", "platform");
+        if (stopPositionNode.hasTag("railway")) {
+            newNode.put("tram", "yes");
+            newNode.put("railway", "tram_stop");
+            newNode.remove("public_transport");
+            newNode.put("public_transport", "platform");
 
-			List<Command> commands = getReplaceGeometryCommand(stopPositionNode, newNode);
-			if (commands.size() > 0) {
-				UndoRedoHandler.getInstance().add(new SequenceCommand(tr("Replace Membership"), commands));
-			}
+            List<Command> commands = getReplaceGeometryCommand(stopPositionNode, newNode);
+            if (commands.size() > 0) {
+                UndoRedoHandler.getInstance().add(new SequenceCommand(tr("Replace Membership"), commands));
+            }
 
-			HashMap<String, String> tags = new HashMap<>(stopPositionNode.getKeys());
-			tags.replaceAll((key, value) -> null);
-			UndoRedoHandler.getInstance().add(new ChangePropertyCommand(Collections.singleton(stopPositionNode), tags));
+            HashMap<String, String> tags = new HashMap<>(stopPositionNode.getKeys());
+            tags.replaceAll((key, value) -> null);
+            UndoRedoHandler.getInstance().add(new ChangePropertyCommand(Collections.singleton(stopPositionNode), tags));
 
-		} else if (stopPositionNode.hasTag("highway")) {
-			newNode.put("bus", "yes");
-			newNode.put("highway", "bus_stop");
-			newNode.remove("public_transport");
-			newNode.put("public_transport", "platform");
+        } else if (stopPositionNode.hasTag("highway")) {
+            newNode.put("bus", "yes");
+            newNode.put("highway", "bus_stop");
+            newNode.remove("public_transport");
+            newNode.put("public_transport", "platform");
 
-			List<Command> commands = getReplaceGeometryCommand(stopPositionNode, newNode);
-			if (commands.size() > 0) {
-				UndoRedoHandler.getInstance().add(new SequenceCommand(tr("Replace Membership"), commands));
-			}
+            List<Command> commands = getReplaceGeometryCommand(stopPositionNode, newNode);
+            if (commands.size() > 0) {
+                UndoRedoHandler.getInstance().add(new SequenceCommand(tr("Replace Membership"), commands));
+            }
 
-			HashMap<String, String> tags = new HashMap<>(stopPositionNode.getKeys());
-			tags.replaceAll((key, value) -> null);
-			UndoRedoHandler.getInstance().add(new ChangePropertyCommand(Collections.singleton(stopPositionNode), tags));
-		}
+            HashMap<String, String> tags = new HashMap<>(stopPositionNode.getKeys());
+            tags.replaceAll((key, value) -> null);
+            UndoRedoHandler.getInstance().add(new ChangePropertyCommand(Collections.singleton(stopPositionNode), tags));
+        }
 
-	}
+    }
 
-	static List<Command> getReplaceGeometryCommand(OsmPrimitive firstObject, OsmPrimitive secondObject) {
-		final MultiMap<Relation, RelationToChildReference> byRelation = new MultiMap<>();
-		for (final RelationToChildReference i : RelationToChildReference.getRelationToChildReferences(firstObject)) {
-			byRelation.put(i.getParent(), i);
-		}
+    static List<Command> getReplaceGeometryCommand(OsmPrimitive firstObject, OsmPrimitive secondObject) {
+        final MultiMap<Relation, RelationToChildReference> byRelation = new MultiMap<>();
+        for (final RelationToChildReference i : RelationToChildReference.getRelationToChildReferences(firstObject)) {
+            byRelation.put(i.getParent(), i);
+        }
 
-		final List<Command> commands = new ArrayList<>();
-		for (final Map.Entry<Relation, Set<RelationToChildReference>> i : byRelation.entrySet()) {
-			final Relation oldRelation = i.getKey();
-			final Relation newRelation = new Relation(oldRelation);
-			for (final RelationToChildReference reference : i.getValue()) {
-				newRelation.setMember(reference.getPosition(), new RelationMember("platform", secondObject));
-			}
-			commands.add(new ChangeCommand(oldRelation, newRelation));
-		}
+        final List<Command> commands = new ArrayList<>();
+        for (final Map.Entry<Relation, Set<RelationToChildReference>> i : byRelation.entrySet()) {
+            final Relation oldRelation = i.getKey();
+            final Relation newRelation = new Relation(oldRelation);
+            for (final RelationToChildReference reference : i.getValue()) {
+                newRelation.setMember(reference.getPosition(), new RelationMember("platform", secondObject));
+            }
+            commands.add(new ChangeCommand(oldRelation, newRelation));
+        }
 
-		return commands;
-	}
+        return commands;
+    }
 
 }

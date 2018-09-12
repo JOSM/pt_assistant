@@ -13,6 +13,9 @@ import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPlugin;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 
+/**
+ * PT assistant layer manager.
+ */
 public class PTAssistantLayerManager
     implements DataSelectionListener, PropertyChangeListener {
 

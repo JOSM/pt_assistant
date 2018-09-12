@@ -26,7 +26,6 @@ import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.validation.Severity;
 import org.openstreetmap.josm.data.validation.Test;
 import org.openstreetmap.josm.data.validation.TestError;
-import org.openstreetmap.josm.data.validation.TestError.Builder;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.Notification;
 import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
@@ -40,6 +39,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTWay;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
+import org.openstreetmap.josm.tools.Logging;
 
 /**
  * Performs tests of a route at the level of route segments (the stop-by-stop
@@ -55,7 +55,7 @@ public class SegmentChecker extends Checker {
 
     /* PTRouteSegments that are wrong, stored in case the user calls the fix */
     protected static HashMap<TestError, PTRouteSegment> wrongSegments = new HashMap<>();
-    protected static HashMap<Builder, PTRouteSegment> wrongSegmentBuilders = new HashMap<>();
+    protected static HashMap<TestError.Builder, PTRouteSegment> wrongSegmentBuilders = new HashMap<>();
 
     /* Manager of the PTStops and PTWays of the current route */
     private PTRouteDataManager manager;
@@ -128,82 +128,81 @@ public class SegmentChecker extends Checker {
          */
 
         if (!PTAssistantPluginPreferences.CHECK_START_END.get()) {
-        		if (endStop.getStopPosition() == null) {
+                if (endStop.getStopPosition() == null) {
 
-            		List<Node> potentialStopPositionList = endStop.findPotentialStopPositions();
-            		List<Node> stopPositionsOfThisRoute = new ArrayList<>();
-            		boolean containsAtLeastOneStopPositionAsFirstOrLastNode = false;
+                    List<Node> potentialStopPositionList = endStop.findPotentialStopPositions();
+                    List<Node> stopPositionsOfThisRoute = new ArrayList<>();
+                    boolean containsAtLeastOneStopPositionAsFirstOrLastNode = false;
 
-            		for (Node potentialStopPosition : potentialStopPositionList) {
+                    for (Node potentialStopPosition : potentialStopPositionList) {
 
-                		int belongsToWay = belongsToAWayOfThisRoute(potentialStopPosition);
+                        int belongsToWay = belongsToAWayOfThisRoute(potentialStopPosition);
 
-                		if (belongsToWay == 0) {
-                    		stopPositionsOfThisRoute.add(potentialStopPosition);
-                    		containsAtLeastOneStopPositionAsFirstOrLastNode = true;
-                		}
+                        if (belongsToWay == 0) {
+                            stopPositionsOfThisRoute.add(potentialStopPosition);
+                            containsAtLeastOneStopPositionAsFirstOrLastNode = true;
+                        }
 
-                		if (belongsToWay == 1) {
-                    		stopPositionsOfThisRoute.add(potentialStopPosition);
-                		}
-            		}
+                        if (belongsToWay == 1) {
+                            stopPositionsOfThisRoute.add(potentialStopPosition);
+                        }
+                    }
 
-            		if (stopPositionsOfThisRoute.isEmpty()) {
-                		List<Relation> primitives = new ArrayList<>(1);
-                		primitives.add(relation);
-                		List<OsmPrimitive> highlighted = new ArrayList<>(1);
-                		highlighted.add(endStop.getPlatform());
-                		Builder builder = TestError.builder(this.test, Severity.WARNING,
-                			PTAssistantValidatorTest.ERROR_CODE_END_STOP);
-                		builder.message(tr("PT: Route should start and end with a stop_position"));
-                		builder.primitives(primitives);
-                		builder.highlight(highlighted);
-                		TestError e = builder.build();
-                		this.errors.add(e);
-                		return;
-            		}
+                    if (stopPositionsOfThisRoute.isEmpty()) {
+                        List<Relation> primitives = new ArrayList<>(1);
+                        primitives.add(relation);
+                        List<OsmPrimitive> highlighted = new ArrayList<>(1);
+                        highlighted.add(endStop.getPlatform());
+                        TestError.Builder builder = TestError.builder(this.test, Severity.WARNING,
+                            PTAssistantValidatorTest.ERROR_CODE_END_STOP);
+                        builder.message(tr("PT: Route should start and end with a stop_position"));
+                        builder.primitives(primitives);
+                        builder.highlight(highlighted);
+                        TestError e = builder.build();
+                        this.errors.add(e);
+                        return;
+                    }
 
-            		if (stopPositionsOfThisRoute.size() == 1) {
-                		endStop.setStopPosition(stopPositionsOfThisRoute.get(0));
-            		}
+                    if (stopPositionsOfThisRoute.size() == 1) {
+                        endStop.setStopPosition(stopPositionsOfThisRoute.get(0));
+                    }
 
-            		// At this point, there is at least one stop_position for this
-            		// endStop:
-            			if (!containsAtLeastOneStopPositionAsFirstOrLastNode) {
-                		List<Relation> primitives = new ArrayList<>(1);
-                		primitives.add(relation);
-                		List<OsmPrimitive> highlighted = new ArrayList<>();
-                		highlighted.addAll(stopPositionsOfThisRoute);
+                    // At this point, there is at least one stop_position for this endStop:
+                    if (!containsAtLeastOneStopPositionAsFirstOrLastNode) {
+                        List<Relation> primitives = new ArrayList<>(1);
+                        primitives.add(relation);
+                        List<OsmPrimitive> highlighted = new ArrayList<>();
+                        highlighted.addAll(stopPositionsOfThisRoute);
 
-                		Builder builder = TestError.builder(this.test, Severity.WARNING,
+                        TestError.Builder builder = TestError.builder(this.test, Severity.WARNING,
                         PTAssistantValidatorTest.ERROR_CODE_SPLIT_WAY);
-                		builder.message(tr("PT: First or last way needs to be split"));
-                		builder.primitives(primitives);
-                		builder.highlight(highlighted);
-                		TestError e = builder.build();
-                		this.errors.add(e);
-            		}
+                        builder.message(tr("PT: First or last way needs to be split"));
+                        builder.primitives(primitives);
+                        builder.highlight(highlighted);
+                        TestError e = builder.build();
+                        this.errors.add(e);
+                    }
 
-        		} else {
+                } else {
 
-            		// if the stop_position is known:
-            		int belongsToWay = this.belongsToAWayOfThisRoute(endStop.getStopPosition());
+                    // if the stop_position is known:
+                    int belongsToWay = this.belongsToAWayOfThisRoute(endStop.getStopPosition());
 
-            		if (belongsToWay == 1) {
+                    if (belongsToWay == 1) {
 
-                		List<Relation> primitives = new ArrayList<>(1);
-                		primitives.add(relation);
-                		List<OsmPrimitive> highlighted = new ArrayList<>();
-                		highlighted.add(endStop.getStopPosition());
-                		Builder builder = TestError.builder(this.test, Severity.WARNING,
+                        List<Relation> primitives = new ArrayList<>(1);
+                        primitives.add(relation);
+                        List<OsmPrimitive> highlighted = new ArrayList<>();
+                        highlighted.add(endStop.getStopPosition());
+                        TestError.Builder builder = TestError.builder(this.test, Severity.WARNING,
                         PTAssistantValidatorTest.ERROR_CODE_SPLIT_WAY);
-                		builder.message(tr("PT: First or last way needs to be split"));
-                		builder.primitives(primitives);
-                		builder.highlight(highlighted);
-                		TestError e = builder.build();
-                		this.errors.add(e);
-            		}
-        		}
+                        builder.message(tr("PT: First or last way needs to be split"));
+                        builder.primitives(primitives);
+                        builder.highlight(highlighted);
+                        TestError e = builder.build();
+                        this.errors.add(e);
+                    }
+                }
         }
 
     }
@@ -290,7 +289,7 @@ public class SegmentChecker extends Checker {
                     primitives.add(relation);
                     List<OsmPrimitive> highlighted = new ArrayList<>();
                     highlighted.add(startWay);
-                    Builder builder = TestError.builder(this.test, Severity.WARNING,
+                    TestError.Builder builder = TestError.builder(this.test, Severity.WARNING,
                             PTAssistantValidatorTest.ERROR_CODE_STOP_BY_STOP);
                     builder.primitives(primitives);
                     builder.highlight(highlighted);
@@ -309,7 +308,7 @@ public class SegmentChecker extends Checker {
                 List<OsmPrimitive> highlighted = new ArrayList<>();
                 highlighted.add(startStop.getStopPosition());
                 highlighted.add(endStop.getStopPosition());
-                Builder builder = TestError.builder(this.test, Severity.WARNING,
+                TestError.Builder builder = TestError.builder(this.test, Severity.WARNING,
                         PTAssistantValidatorTest.ERROR_CODE_STOP_BY_STOP);
                 builder.primitives(primitives);
                 builder.highlight(highlighted);
@@ -335,7 +334,7 @@ public class SegmentChecker extends Checker {
             stopPrimitive = stop.getStopPosition();
         }
         highlighted.add(stopPrimitive);
-        Builder builder = TestError.builder(this.test, Severity.WARNING,
+        TestError.Builder builder = TestError.builder(this.test, Severity.WARNING,
                 PTAssistantValidatorTest.ERROR_CODE_STOP_NOT_SERVED);
         builder.message(tr("PT: Stop not served"));
         builder.primitives(primitives);
@@ -620,7 +619,7 @@ public class SegmentChecker extends Checker {
      */
     protected void findFixes() {
 
-        for (Builder builder : wrongSegmentBuilders.keySet()) {
+        for (TestError.Builder builder : wrongSegmentBuilders.keySet()) {
             if (wrongSegmentBuilders.get(builder).getRelation() == this.relation) {
                 findFix(builder);
             }
@@ -632,10 +631,10 @@ public class SegmentChecker extends Checker {
      */
     protected static void modifyStopByStopErrorMessages() {
 
-        for (Entry<Builder, PTRouteSegment> entry : SegmentChecker.wrongSegmentBuilders.entrySet()) {
+        for (Entry<TestError.Builder, PTRouteSegment> entry : SegmentChecker.wrongSegmentBuilders.entrySet()) {
 
             // change the error code based on the availability of fixes:
-            Builder builder = entry.getKey();
+            TestError.Builder builder = entry.getKey();
             PTRouteSegment wrongSegment = entry.getValue();
             List<PTRouteSegment> correctSegmentsForThisError = new ArrayList<>();
             for (PTRouteSegment segment : correctSegments) {
@@ -677,8 +676,9 @@ public class SegmentChecker extends Checker {
      * This method assumes that the first and the second ways of the route
      * segment are correctly connected. If they are not, the error will be
      * marked as not fixable.
+     * @param builder error builder
      */
-    private void findFix(Builder builder) {
+    private void findFix(TestError.Builder builder) {
 
         PTRouteSegment wrongSegment = wrongSegmentBuilders.get(builder);
         PTWay startPTWay = wrongSegment.getFirstPTWay();
@@ -982,6 +982,7 @@ public class SegmentChecker extends Checker {
      *            test error
      * @param fix
      *            fix
+     * @return fix command
      */
     private static Command carryOutSingleFix(TestError testError, List<PTWay> fix) {
 
@@ -990,7 +991,7 @@ public class SegmentChecker extends Checker {
             try {
                 SegmentChecker.class.wait(1500);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Logging.error(e);
             }
         }
 
@@ -1015,7 +1016,7 @@ public class SegmentChecker extends Checker {
             try {
                 SegmentChecker.class.wait(1500);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Logging.error(e);
             }
         }
 

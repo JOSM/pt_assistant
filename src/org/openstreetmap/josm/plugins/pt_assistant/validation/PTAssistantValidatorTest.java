@@ -25,7 +25,6 @@ import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.validation.Severity;
 import org.openstreetmap.josm.data.validation.Test;
 import org.openstreetmap.josm.data.validation.TestError;
-import org.openstreetmap.josm.data.validation.TestError.Builder;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPlugin;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.FixTask;
@@ -39,7 +38,14 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.PTProperties;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
+import org.openstreetmap.josm.tools.Logging;
 
+/**
+ * Public Transport Assistant tests.
+ * Check if route relations are compatible with public transport version 2
+ *
+ * @author darya
+ */
 public class PTAssistantValidatorTest extends Test {
 
     public static final int ERROR_CODE_FROM_TO_ROUTE_TAG = 3701;
@@ -172,7 +178,7 @@ public class PTAssistantValidatorTest extends Test {
      */
     private boolean downloadIncompleteMembers() {
 
-        final int[] userSelection = { 0 };
+        final int[] userSelection = {0};
 
         try {
 
@@ -188,7 +194,7 @@ public class PTAssistantValidatorTest extends Test {
                         try {
                             userSelection[0] = showIncompleteMembersDownloadDialog();
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            Logging.error(e);
                         }
 
                     }
@@ -238,6 +244,7 @@ public class PTAssistantValidatorTest extends Test {
      * method is not used in the current implementation, it can be used to fix
      * errors from the previous testing stage and modify the route before the
      * second stage of testing is carried out.
+     * @param r relation
      */
     @SuppressWarnings("unused")
     private void proceedAfterWayCheckerErrors(Relation r) {
@@ -254,7 +261,7 @@ public class PTAssistantValidatorTest extends Test {
             }
         }
 
-        final int[] userInput = { 0 };
+        final int[] userInput = {0};
         final long idParameter = r.getId();
         final int directionErrorParameter = numberOfDirectionErrors;
         final int roadTypeErrorParameter = numberOfRoadTypeErrors;
@@ -274,7 +281,7 @@ public class PTAssistantValidatorTest extends Test {
                     }
                 });
             } catch (InvocationTargetException | InterruptedException e1) {
-                e1.printStackTrace();
+                Logging.error(e1);
             }
 
         }
@@ -329,7 +336,7 @@ public class PTAssistantValidatorTest extends Test {
             primitives.add(r);
             List<OsmPrimitive> highlighted = new ArrayList<>(1);
             highlighted.add(rm.getMember());
-            Builder builder = TestError.builder(this, Severity.WARNING,
+            TestError.Builder builder = TestError.builder(this, Severity.WARNING,
                     ERROR_CODE_RELATION_MEMBER_ROLES);
             builder.message(tr("PT: Relation member roles do not match tags"));
             builder.primitives(primitives);
@@ -399,7 +406,7 @@ public class PTAssistantValidatorTest extends Test {
         SegmentChecker.modifyStopByStopErrorMessages();
 
         // add the stop-by-stop errors with modified messages:
-        for (Entry<Builder, PTRouteSegment> entry : SegmentChecker.wrongSegmentBuilders.entrySet()) {
+        for (Entry<TestError.Builder, PTRouteSegment> entry : SegmentChecker.wrongSegmentBuilders.entrySet()) {
             TestError error = entry.getKey().build();
             SegmentChecker.wrongSegments.put(error, entry.getValue());
             this.errors.add(error);
@@ -415,6 +422,8 @@ public class PTAssistantValidatorTest extends Test {
      *
      * @param r
      *            route relation
+     * @param manager route data manager
+     * @param assigner stop to way assigner
      */
     public void storeCorrectRouteSegments(Relation r,
             PTRouteDataManager manager, StopToWayAssigner assigner) {
@@ -527,6 +536,7 @@ public class PTAssistantValidatorTest extends Test {
      * method. The fixError method is invoked from the core validator (e.g. when
      * user presses the "Fix" button in the validator). This method is invoken
      * when the fix is initiated from within the plugin (e.g. automated fixes).
+     * @param testErrors list of errors
      */
     private void fixErrorFromPlugin(List<TestError> testErrors) {
 
@@ -561,7 +571,7 @@ public class PTAssistantValidatorTest extends Test {
     private void performDummyTest(Relation r) {
         List<Relation> primitives = new ArrayList<>(1);
         primitives.add(r);
-        Builder builder = TestError.builder(this, Severity.WARNING, ERROR_CODE_DIRECTION);
+        TestError.Builder builder = TestError.builder(this, Severity.WARNING, ERROR_CODE_DIRECTION);
         builder.message(tr("PT: dummy test warning"));
         builder.primitives(primitives);
         errors.add(builder.build());

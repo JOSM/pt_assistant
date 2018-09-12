@@ -3,3 +3,6 @@
 /.settings/
 /build/
 .DS_Store
+/bin/
+/javadoc/
+/checkstyle-josm-pt_assistant.xml

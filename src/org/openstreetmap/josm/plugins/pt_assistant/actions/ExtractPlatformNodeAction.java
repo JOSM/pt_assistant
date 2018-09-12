@@ -38,88 +38,88 @@ import org.openstreetmap.josm.tools.Shortcut;
  */
 public class ExtractPlatformNodeAction extends JosmAction {
 
-	/**
-	 * Constructs a new {@code ExtractPointAction}.
-	 */
-	public ExtractPlatformNodeAction() {
-		super(tr("Extract platform node"), null, tr("Extracts platform node from a node"), Shortcut.registerShortcut(
-				"tools:extplatformnode", "Tool: Extract platform node", KeyEvent.VK_G, Shortcut.ALT_CTRL), false);
-		putValue("help", ht("/Action/ExtractPlatformNode"));
-		MainApplication.registerActionShortcut(this, Shortcut.registerShortcut("tools:extplatformnode",
-				"Tool: ExtractPlatformNodeAction", KeyEvent.VK_G, Shortcut.ALT_CTRL));
-	}
+    /**
+     * Constructs a new {@code ExtractPointAction}.
+     */
+    public ExtractPlatformNodeAction() {
+        super(tr("Extract platform node"), null, tr("Extracts platform node from a node"), Shortcut.registerShortcut(
+                "tools:extplatformnode", "Tool: Extract platform node", KeyEvent.VK_G, Shortcut.ALT_CTRL), false);
+        putValue("help", ht("/Action/ExtractPlatformNode"));
+        MainApplication.registerActionShortcut(this, Shortcut.registerShortcut("tools:extplatformnode",
+                "Tool: ExtractPlatformNodeAction", KeyEvent.VK_G, Shortcut.ALT_CTRL));
+    }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		DataSet ds = getLayerManager().getEditDataSet();
-		Collection<OsmPrimitive> selection = ds.getSelected();
-		List<Node> selectedNodes = OsmPrimitive.getFilteredList(selection, Node.class);
-		if (selectedNodes.size() != 1) {
-			new Notification(tr("This action requires single node to be selected."))
-				.setIcon(JOptionPane.WARNING_MESSAGE)
-				.show();
-			return;
-		}
-		final Node nd = selectedNodes.get(0);
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        DataSet ds = getLayerManager().getEditDataSet();
+        Collection<OsmPrimitive> selection = ds.getSelected();
+        List<Node> selectedNodes = OsmPrimitive.getFilteredList(selection, Node.class);
+        if (selectedNodes.size() != 1) {
+            new Notification(tr("This action requires single node to be selected."))
+                .setIcon(JOptionPane.WARNING_MESSAGE)
+                .show();
+            return;
+        }
+        final Node nd = selectedNodes.get(0);
 
-		if (!StopUtils.isHighwayOrRailwayStopPosition(nd)) {
-			new Notification(tr("The selected node is not a stop position for public transport!"))
-				.setIcon(JOptionPane.WARNING_MESSAGE)
-				.show();
-			return;
-		}
+        if (!StopUtils.isHighwayOrRailwayStopPosition(nd)) {
+            new Notification(tr("The selected node is not a stop position for public transport!"))
+                .setIcon(JOptionPane.WARNING_MESSAGE)
+                .show();
+            return;
+        }
 
-		List<Command> cmds = new LinkedList<>();
+        List<Command> cmds = new LinkedList<>();
 
-		Point p = MainApplication.getMap().mapView.getMousePosition();
-		if (p == null)
-			return;
+        Point p = MainApplication.getMap().mapView.getMousePosition();
+        if (p == null)
+            return;
 
-		List<OsmPrimitive> refs = nd.getReferrers();
-		boolean isFirstLastNode = false;
+        List<OsmPrimitive> refs = nd.getReferrers();
+        boolean isFirstLastNode = false;
 
-		for (OsmPrimitive pr : refs) {
-			if (pr instanceof Way) {
-				Way w = (Way) pr;
-				if (w.firstNode().equals(nd) || w.lastNode().equals(nd)) {
-					isFirstLastNode = true;
-				}
-			}
-		}
+        for (OsmPrimitive pr : refs) {
+            if (pr instanceof Way) {
+                Way w = (Way) pr;
+                if (w.firstNode().equals(nd) || w.lastNode().equals(nd)) {
+                    isFirstLastNode = true;
+                }
+            }
+        }
 
-		if (!isFirstLastNode) {
-			cmds.add(new MoveCommand(nd, MainApplication.getMap().mapView.getLatLon(p.x, p.y)));
-			for (OsmPrimitive pr : refs) {
-				if (pr instanceof Way) {
-					Way w = (Way) pr;
-					UndoRedoHandler.getInstance().add(new RemoveNodesCommand(w, Collections.singletonList(nd)));
-				}
-			}
-		} else {
-			Node newNode = new Node(MainApplication.getMap().mapView.getLatLon(p.x, p.y));
-			UndoRedoHandler.getInstance().add(new AddCommand(getLayerManager().getEditDataSet(), newNode));
-			UndoRedoHandler.getInstance()
-					.add(new ChangePropertyCommand(Collections.singleton(newNode), new HashMap<>(nd.getKeys())));
-			CreatePlatformNodeThroughReplaceAction cpsa = new CreatePlatformNodeThroughReplaceAction();
-			cpsa.modify(newNode, nd);
-			return;
-		}
+        if (!isFirstLastNode) {
+            cmds.add(new MoveCommand(nd, MainApplication.getMap().mapView.getLatLon(p.x, p.y)));
+            for (OsmPrimitive pr : refs) {
+                if (pr instanceof Way) {
+                    Way w = (Way) pr;
+                    UndoRedoHandler.getInstance().add(new RemoveNodesCommand(w, Collections.singletonList(nd)));
+                }
+            }
+        } else {
+            Node newNode = new Node(MainApplication.getMap().mapView.getLatLon(p.x, p.y));
+            UndoRedoHandler.getInstance().add(new AddCommand(getLayerManager().getEditDataSet(), newNode));
+            UndoRedoHandler.getInstance()
+                    .add(new ChangePropertyCommand(Collections.singleton(newNode), new HashMap<>(nd.getKeys())));
+            CreatePlatformNodeThroughReplaceAction cpsa = new CreatePlatformNodeThroughReplaceAction();
+            cpsa.modify(newNode, nd);
+            return;
+        }
 
-		UndoRedoHandler.getInstance().add(new SequenceCommand(tr("Extract node from line"), cmds));
+        UndoRedoHandler.getInstance().add(new SequenceCommand(tr("Extract node from line"), cmds));
 
-		if (nd.hasTag("railway")) {
-			ArrayList<Command> undoCommands = new ArrayList<>();
-			undoCommands.add(new ChangePropertyCommand(nd, "public_transport", "platform"));
-			undoCommands.add(new ChangePropertyCommand(nd, "tram", "yes"));
-			undoCommands.add(new ChangePropertyCommand(nd, "railway", "tram_stop"));
-			UndoRedoHandler.getInstance().add(new SequenceCommand("tag", undoCommands));
-		} else if (nd.hasTag("highway")) {
-			ArrayList<Command> undoCommands = new ArrayList<>();
-			undoCommands.add(new ChangePropertyCommand(nd, "public_transport", "platform"));
-			undoCommands.add(new ChangePropertyCommand(nd, "bus", "yes"));
-			undoCommands.add(new ChangePropertyCommand(nd, "highway", "bus_stop"));
-			UndoRedoHandler.getInstance().add(new SequenceCommand("tag", undoCommands));
-		}
-	}
+        if (nd.hasTag("railway")) {
+            ArrayList<Command> undoCommands = new ArrayList<>();
+            undoCommands.add(new ChangePropertyCommand(nd, "public_transport", "platform"));
+            undoCommands.add(new ChangePropertyCommand(nd, "tram", "yes"));
+            undoCommands.add(new ChangePropertyCommand(nd, "railway", "tram_stop"));
+            UndoRedoHandler.getInstance().add(new SequenceCommand("tag", undoCommands));
+        } else if (nd.hasTag("highway")) {
+            ArrayList<Command> undoCommands = new ArrayList<>();
+            undoCommands.add(new ChangePropertyCommand(nd, "public_transport", "platform"));
+            undoCommands.add(new ChangePropertyCommand(nd, "bus", "yes"));
+            undoCommands.add(new ChangePropertyCommand(nd, "highway", "bus_stop"));
+            UndoRedoHandler.getInstance().add(new SequenceCommand("tag", undoCommands));
+        }
+    }
 
 }

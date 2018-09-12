@@ -53,6 +53,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
     /**
      * Creates a new SortPTRouteMembersAction
+     * @param editorAccess access to relation editor
      */
     public SortPTRouteMembersAction(IRelationEditorActionAccess editorAccess) {
         super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
@@ -347,7 +348,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
     }
 
     private static void removeWrongSideStops(List<PTStop> ptstop, List<RelationMember> wayMembers) {
-        for (int i=0; i<wayMembers.size(); i++) {
+        for (int i = 0; i < wayMembers.size(); i++) {
             RelationMember wm = wayMembers.get(i);
             Way prev = null;
             Way next = null;

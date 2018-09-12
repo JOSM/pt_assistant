@@ -56,15 +56,16 @@ public abstract class Checker {
 
     /**
      * Returns errors
+     * @return list of errors
      */
     public List<TestError> getErrors() {
-
         return errors;
     }
 
     /**
      * Returns a list of stop-related route relation members with corrected
      * roles (if necessary)
+     * @param r relation
      *
      * @return list of stop-related route relation members
      */
@@ -102,6 +103,7 @@ public abstract class Checker {
     /**
      * Returns a list of other (not stop-related) route relation members with
      * corrected roles (if necessary)
+     * @param r relation
      *
      * @return list of other (not stop-related) route relation members
      */

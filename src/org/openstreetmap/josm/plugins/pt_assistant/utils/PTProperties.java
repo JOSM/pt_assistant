@@ -1,3 +1,4 @@
+// License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
 import java.util.List;
@@ -8,6 +9,9 @@ import org.openstreetmap.josm.data.preferences.IntegerProperty;
 import org.openstreetmap.josm.data.preferences.StringProperty;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.CreatePlatformNodeAction;
 
+/**
+ * PT assistant plugin properties.
+ */
 public final class PTProperties {
     private static final String EMPTY_STRING = "";
 

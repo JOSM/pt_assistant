@@ -53,156 +53,140 @@ import org.openstreetmap.josm.plugins.pt_assistant.validation.PTAssistantValidat
  */
 public class PTAssistantPlugin extends Plugin {
 
-	/*
-	 * last fix that was can be re-applied to all similar route segments, can be
-	 * null if unavailable
-	 */
-	private static PTRouteSegment lastFix;
+    /**
+     * last fix that was can be re-applied to all similar route segments, can be
+     * null if unavailable
+     */
+    private static PTRouteSegment lastFix;
 
-	/* list of relation currently highlighted by the layer */
-	private static List<Relation> highlightedRelations = new ArrayList<>();
+    /** list of relation currently highlighted by the layer */
+    private static List<Relation> highlightedRelations = new ArrayList<>();
 
-	/* item of the Tools menu for repeating the last fix */
-//	private static JMenuItem repeatLastFixMenu;
+    /**
+     * Main constructor.
+     *
+     * @param info
+     *            Required information of the plugin. Obtained from the jar file.
+     */
+    public PTAssistantPlugin(PluginInformation info) {
+        super(info);
+        OsmValidator.addTest(PTAssistantValidatorTest.class);
+        OsmValidator.addTest(BicycleFootRouteValidatorTest.class);
 
-	/* edit the currently highlighted relations */
-//	private static JMenuItem editHighlightedRelationsMenu;
+        MainMenu menu = MainApplication.getMenu();
+        JMenu PublicTransportMenu = menu.addMenu("File", trc("menu", "Public Transport"), KeyEvent.VK_P, 5, ht("/Menu/Public Transport"));
 
-	/**
-	 * Main constructor.
-	 *
-	 * @param info
-	 *            Required information of the plugin. Obtained from the jar file.
-	 */
-	public PTAssistantPlugin(PluginInformation info) {
-		super(info);
-		OsmValidator.addTest(PTAssistantValidatorTest.class);
-		OsmValidator.addTest(BicycleFootRouteValidatorTest.class);
+        SelectionEventManager.getInstance().addSelectionListener(PTAssistantLayerManager.PTLM);
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(PTAssistantLayerManager.PTLM);
+        addToPTAssistantmenu(PublicTransportMenu);
+        initialiseWizard();
+        initialiseShorcutsForCreatePlatformNode();
+        addButtonsToRelationEditor();
+    }
 
-		MainMenu menu = MainApplication.getMenu();
-		JMenu PublicTransportMenu = menu.addMenu("File", trc("menu", "Public Transport"), KeyEvent.VK_P, 5, ht("/Menu/Public Transport"));
+    /**
+     * Called when the JOSM map frame is created or destroyed.
+     */
+    @Override
+    public void mapFrameInitialized(MapFrame oldFrame, MapFrame newFrame) {
+        if (oldFrame == null && newFrame != null) {
+            MainApplication.getMap().addMapMode(new IconToggleButton(new AddStopPositionAction()));
+            MainApplication.getMap().addMapMode(new IconToggleButton(new EdgeSelectionAction()));
+            MainApplication.getMap().addMapMode(new IconToggleButton(new DoubleSplitAction()));
+        }
+    }
 
-		SelectionEventManager.getInstance().addSelectionListener(PTAssistantLayerManager.PTLM);
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(PTAssistantLayerManager.PTLM);
-		addToPTAssistantmenu(PublicTransportMenu);
-		initialiseWizard();
-		initialiseShorcutsForCreatePlatformNode();
-		addButtonsToRelationEditor();
-	}
+    /**
+     * Sets up the pt_assistant tab in JOSM Preferences
+     */
+    @Override
+    public PreferenceSetting getPreferenceSetting() {
+        return new PTAssistantPluginPreferences();
+    }
 
-	/**
-	 * Called when the JOSM map frame is created or destroyed.
-	 */
-	@Override
-	public void mapFrameInitialized(MapFrame oldFrame, MapFrame newFrame) {
-		if (oldFrame == null && newFrame != null) {
-//			repeatLastFixMenu.setEnabled(false);
-//			editHighlightedRelationsMenu.setEnabled(false);
-			MainApplication.getMap().addMapMode(new IconToggleButton(new AddStopPositionAction()));
-			MainApplication.getMap().addMapMode(new IconToggleButton(new EdgeSelectionAction()));
-			MainApplication.getMap().addMapMode(new IconToggleButton(new DoubleSplitAction()));
-		} else if (oldFrame != null && newFrame == null) {
-//			repeatLastFixMenu.setEnabled(false);
-//			editHighlightedRelationsMenu.setEnabled(false);
-		}
-	}
+    public static PTRouteSegment getLastFix() {
+        return lastFix;
+    }
 
-	/**
-	 * Sets up the pt_assistant tab in JOSM Preferences
-	 */
-	@Override
-	public PreferenceSetting getPreferenceSetting() {
-		return new PTAssistantPluginPreferences();
-	}
+    /**
+     * Remembers the last fix and enables/disables the Repeat last fix menu
+     *
+     * @param segment
+     *            The last fix, call be null to disable the Repeat last fix menu
+     */
+    public static void setLastFix(PTRouteSegment segment) {
+        lastFix = segment;
+    }
 
-	public static PTRouteSegment getLastFix() {
-		return lastFix;
-	}
+    /**
+     * Used in unit tests
+     *
+     * @param segment
+     *            route segment
+     */
+    public static void setLastFixNoGui(PTRouteSegment segment) {
+        lastFix = segment;
+    }
 
-	/**
-	 * Remembers the last fix and enables/disables the Repeat last fix menu
-	 *
-	 * @param segment
-	 *            The last fix, call be null to disable the Repeat last fix menu
-	 */
-	public static void setLastFix(PTRouteSegment segment) {
-		lastFix = segment;
-//		SwingUtilities.invokeLater(() -> repeatLastFixMenu.setEnabled(segment != null));
-	}
+    public static List<Relation> getHighlightedRelations() {
+        return new ArrayList<>(highlightedRelations);
+    }
 
-	/**
-	 * Used in unit tests
-	 *
-	 * @param segment
-	 *            route segment
-	 */
-	public static void setLastFixNoGui(PTRouteSegment segment) {
-		lastFix = segment;
-	}
+    public static void addHighlightedRelation(Relation highlightedRelation) {
+        highlightedRelations.add(highlightedRelation);
+    }
 
-	public static List<Relation> getHighlightedRelations() {
-		return new ArrayList<>(highlightedRelations);
-	}
+    public static void clearHighlightedRelations() {
+        highlightedRelations.clear();
+    }
 
-	public static void addHighlightedRelation(Relation highlightedRelation) {
-		highlightedRelations.add(highlightedRelation);
-//		if (!editHighlightedRelationsMenu.isEnabled()) {
-//			SwingUtilities.invokeLater(() -> editHighlightedRelationsMenu.setEnabled(true));
-//		}
-	}
+    private void addToPTAssistantmenu(JMenu PublicTransportMenu) {
+        MainMenu.add(PublicTransportMenu, new SplitRoundaboutAction());
+        MainMenu.add(PublicTransportMenu, new CreatePlatformNodeAction());
+        MainMenu.add(PublicTransportMenu, new SortPTRouteMembersMenuBar());
+        Component sep = new JPopupMenu.Separator();
+        PublicTransportMenu.add(sep);
+        MainMenu.add(PublicTransportMenu, new PTWizardAction());
+    }
 
-	public static void clearHighlightedRelations() {
-		highlightedRelations.clear();
-//		SwingUtilities.invokeLater(() -> editHighlightedRelationsMenu.setEnabled(false));
-	}
+    private static void initialiseWizard() {
+        PTWizardAction wizard = new PTWizardAction();
+        wizard.noDialogBox = true;
+        wizard.actionPerformed(null);
+    }
 
-	private void addToPTAssistantmenu(JMenu PublicTransportMenu) {
-//		RepeatLastFixAction repeatLastFixAction = new RepeatLastFixAction();
-//		EditHighlightedRelationsAction editHighlightedRelationsAction = new EditHighlightedRelationsAction();
-//		repeatLastFixMenu = MainMenu.add(PublicTransportMenu, repeatLastFixAction);
-//		editHighlightedRelationsMenu = MainMenu.add(PublicTransportMenu, editHighlightedRelationsAction);
-		MainMenu.add(PublicTransportMenu, new SplitRoundaboutAction());
-		MainMenu.add(PublicTransportMenu, new CreatePlatformNodeAction());
-		MainMenu.add(PublicTransportMenu, new SortPTRouteMembersMenuBar());
-		Component sep = new JPopupMenu.Separator();
-		PublicTransportMenu.add(sep);
-		MainMenu.add(PublicTransportMenu, new PTWizardAction());
-	}
+    private static void initialiseShorcutsForCreatePlatformNode() {
+        new CreatePlatformShortcutAction();
+        new CreatePlatformNodeThroughReplaceAction();
+        new ExtractPlatformNodeAction();
+    }
 
-	private static void initialiseWizard() {
-		PTWizardAction wizard = new PTWizardAction();
-		wizard.noDialogBox = true;
-		wizard.actionPerformed(null);
-	}
+    private void addButtonsToRelationEditor() {
 
-	private static void initialiseShorcutsForCreatePlatformNode() {
-		CreatePlatformShortcutAction shortcut1 = new CreatePlatformShortcutAction();
-		CreatePlatformNodeThroughReplaceAction shortcut2 = new CreatePlatformNodeThroughReplaceAction();
-		ExtractPlatformNodeAction shortcut3 = new ExtractPlatformNodeAction();
-	}
+        IRelationEditorActionGroup group1 = new IRelationEditorActionGroup() {
+            @Override
+            public int order() {
+                    return 10;
+               }
 
-	private void addButtonsToRelationEditor() {
+            @Override
+            public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
+                return Arrays.asList(new MendRelationAction(editorAccess));
+            }
+        };
 
-		IRelationEditorActionGroup group1 = new IRelationEditorActionGroup() {
-			@Override
-			public int order() {
-    				return 10;
-    			}
-			@Override
-			public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
-				return Arrays.asList(new MendRelationAction(editorAccess));
-			}};
+        IRelationEditorActionGroup group2 = new IRelationEditorActionGroup() {
+            @Override
+            public int order() {
+                    return 30;
+                }
 
-		IRelationEditorActionGroup group2 = new IRelationEditorActionGroup() {
-			@Override
-			public int order() {
-    				return 30;
-    			}
-			@Override
-			public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
-				return Arrays.asList(new SortPTRouteMembersAction(editorAccess));
-			}};
-		RelationEditorHooks.addActionsToMembers(group1);
-		RelationEditorHooks.addActionsToMembers(group2);
-	}
+            @Override
+            public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
+                return Arrays.asList(new SortPTRouteMembersAction(editorAccess));
+            }
+        };
+        RelationEditorHooks.addActionsToMembers(group1);
+        RelationEditorHooks.addActionsToMembers(group2);
+    }
 }

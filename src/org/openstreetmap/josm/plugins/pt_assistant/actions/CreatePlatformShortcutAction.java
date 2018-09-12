@@ -56,7 +56,9 @@ public class CreatePlatformShortcutAction extends JosmAction {
      * Creates a new PlatformAction
      */
     public CreatePlatformShortcutAction() {
-        super(ACTION_NAME, null, ACTION_NAME, Shortcut.registerShortcut("tools:createplatformshortcut", "Tool: CreatePlatformNodeShortcut", KeyEvent.VK_G, Shortcut.CTRL), false);
+        super(ACTION_NAME, null, ACTION_NAME,
+                Shortcut.registerShortcut("tools:createplatformshortcut", "Tool: CreatePlatformNodeShortcut", KeyEvent.VK_G, Shortcut.CTRL),
+                false);
         transferHandler = new OsmTransferHandler();
         MainApplication.registerActionShortcut(this,
                 Shortcut.registerShortcut("tools:createplatformshortcut", "Tool: CreatePlatformNodeShortcut", KeyEvent.VK_G, Shortcut.CTRL));
@@ -114,8 +116,8 @@ public class CreatePlatformShortcutAction extends JosmAction {
 
     public void modify(Node newNode, Node stopPositionNode) {
         if (stopPositionNode.hasTag("railway")) {
-            newNode.put("tram","yes");
-            newNode.put("railway","tram_stop");
+            newNode.put("tram", "yes");
+            newNode.put("railway", "tram_stop");
             newNode.remove("public_transport");
             newNode.put("public_transport", "platform");
 
@@ -134,8 +136,8 @@ public class CreatePlatformShortcutAction extends JosmAction {
             UndoRedoHandler.getInstance().add(new SequenceCommand("tag", undoCommands));
 
         } else if (stopPositionNode.hasTag("highway")) {
-            newNode.put("bus","yes");
-            newNode.put("highway","bus_stop");
+            newNode.put("bus", "yes");
+            newNode.put("highway", "bus_stop");
             newNode.remove("public_transport");
             newNode.put("public_transport", "platform");
 

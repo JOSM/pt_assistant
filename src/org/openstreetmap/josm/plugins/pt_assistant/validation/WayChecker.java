@@ -20,7 +20,6 @@ import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.validation.Severity;
 import org.openstreetmap.josm.data.validation.Test;
 import org.openstreetmap.josm.data.validation.TestError;
-import org.openstreetmap.josm.data.validation.TestError.Builder;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 
@@ -108,7 +107,7 @@ public class WayChecker extends Checker {
                     primitives.add(relation);
                     List<Way> highlighted = new ArrayList<>(1);
                     highlighted.add(way);
-                    Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_ROAD_TYPE);
+                    TestError.Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_ROAD_TYPE);
                     builder.message(tr("PT: Route type does not match the type of the road it passes on"));
                     builder.primitives(primitives);
                     builder.highlight(highlighted);
@@ -122,7 +121,7 @@ public class WayChecker extends Checker {
                     primitives.add(relation);
                     List<Way> highlighted = new ArrayList<>(1);
                     highlighted.add(way);
-                    Builder builder = TestError.builder(this.test, Severity.OTHER, PTAssistantValidatorTest.ERROR_CODE_CONSTRUCTION);
+                    TestError.Builder builder = TestError.builder(this.test, Severity.OTHER, PTAssistantValidatorTest.ERROR_CODE_CONSTRUCTION);
                     builder.message(tr("PT: Road is under construction"));
                     builder.primitives(primitives);
                     builder.highlight(highlighted);
@@ -212,7 +211,7 @@ public class WayChecker extends Checker {
         }
 
         for (Set<Way> currentSet : listOfSets) {
-            Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_DIRECTION);
+            TestError.Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_DIRECTION);
             builder.message(tr("PT: Route passes a oneway road in the wrong direction"));
             builder.primitives(primitives);
             builder.highlight(currentSet);

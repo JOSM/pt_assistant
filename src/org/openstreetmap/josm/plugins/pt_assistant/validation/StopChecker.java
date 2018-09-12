@@ -13,7 +13,6 @@ import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.validation.Severity;
 import org.openstreetmap.josm.data.validation.Test;
 import org.openstreetmap.josm.data.validation.TestError;
-import org.openstreetmap.josm.data.validation.TestError.Builder;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 
 /**
@@ -44,7 +43,7 @@ public class StopChecker extends Checker {
         // Throw error message
         List<OsmPrimitive> primitives = new ArrayList<>(1);
         primitives.add(relation);
-        Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_STOP_AREA_NO_STOPS);
+        TestError.Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_STOP_AREA_NO_STOPS);
         builder.message(tr("PT: Stop area relation has no stop position"));
         builder.primitives(primitives);
         TestError e = builder.build();
@@ -66,7 +65,7 @@ public class StopChecker extends Checker {
         // Throw error message
         List<OsmPrimitive> primitives = new ArrayList<>(1);
         primitives.add(relation);
-        Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_STOP_AREA_NO_PLATFORM);
+        TestError.Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_STOP_AREA_NO_PLATFORM);
         builder.message(tr("PT: Stop area relation has no platform"));
         builder.primitives(primitives);
         TestError e = builder.build();
@@ -122,7 +121,8 @@ public class StopChecker extends Checker {
         // Throw error message
         List<OsmPrimitive> primitives = new ArrayList<>(1);
         primitives.add(relation);
-        Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_STOP_AREA_COMPARE_RELATIONS);
+        TestError.Builder builder = TestError.builder(this.test, Severity.WARNING,
+                PTAssistantValidatorTest.ERROR_CODE_STOP_AREA_COMPARE_RELATIONS);
         builder.message(tr("PT: Route relations of stop position(s) and platform(s) of stop area members diverge"));
         builder.primitives(primitives);
         TestError e = builder.build();

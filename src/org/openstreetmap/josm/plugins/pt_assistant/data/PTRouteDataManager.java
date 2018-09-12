@@ -268,6 +268,7 @@ public class PTRouteDataManager {
     /**
      * Returns all PTWays of this route that contain the given node as their
      * first or last node.
+     * @param node end node
      *
      * @return all PTWays of this route that contain the given node as their
      * first or last node

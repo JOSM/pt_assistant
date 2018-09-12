@@ -23,16 +23,20 @@ import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.validation.Severity;
 import org.openstreetmap.josm.data.validation.Test;
 import org.openstreetmap.josm.data.validation.TestError;
-import org.openstreetmap.josm.data.validation.TestError.Builder;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantPaintVisitor;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 
+/**
+ * Performs tests of a route at the level of a node
+ *
+ * @author darya
+ *
+ */
 public class NodeChecker extends Checker {
 
     protected NodeChecker(Node node, Test test) {
         super(node, test);
-
     }
 
     /**
@@ -54,7 +58,7 @@ public class NodeChecker extends Checker {
 
         List<OsmPrimitive> primitives = new ArrayList<>(1);
         primitives.add(node);
-        Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_SOLITARY_STOP_POSITION);
+        TestError.Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_SOLITARY_STOP_POSITION);
         builder.message(tr("PT: Stop_position is not part of a way"));
         builder.primitives(primitives);
         TestError e = builder.build();
@@ -75,7 +79,7 @@ public class NodeChecker extends Checker {
             if (referrer.getType().equals(OsmPrimitiveType.WAY)) {
                 Way referringWay = (Way) referrer;
                 if (RouteUtils.isWaySuitableForPublicTransport(referringWay)) {
-                    Builder builder = TestError.builder(this.test, Severity.WARNING,
+                    TestError.Builder builder = TestError.builder(this.test, Severity.WARNING,
                             PTAssistantValidatorTest.ERROR_CODE_PLATFORM_PART_OF_HIGHWAY);
                     builder.message(tr("PT: Platform should not be part of a way"));
                     builder.primitives(primitives);
@@ -98,7 +102,8 @@ public class NodeChecker extends Checker {
 
             List<OsmPrimitive> primitives = new ArrayList<>(1);
             primitives.add(node);
-            Builder builder = TestError.builder(this.test, Severity.WARNING, PTAssistantValidatorTest.ERROR_CODE_NOT_PART_OF_STOP_AREA);
+            TestError.Builder builder = TestError.builder(this.test, Severity.WARNING,
+                    PTAssistantValidatorTest.ERROR_CODE_NOT_PART_OF_STOP_AREA);
             builder.message(tr("PT: Stop position or platform is not part of a stop area relation"));
             builder.primitives(primitives);
             TestError e = builder.build();
@@ -164,63 +169,62 @@ public class NodeChecker extends Checker {
     }
 
     protected void performRouteRefMatchingTest(Node primitive) {
-    		// the ref values of all parent routes:
-		List<String> parentsLabelList = new ArrayList<>();
-		for (OsmPrimitive parent : primitive.getReferrers()) {
-			if (parent.getType().equals(OsmPrimitiveType.RELATION)) {
-				Relation relation = (Relation) parent;
-				if (RouteUtils.isVersionTwoPTRoute(relation) && relation.get("ref") != null
-						&& !relation.get("ref").equals("")) {
+        // the ref values of all parent routes:
+        List<String> parentsLabelList = new ArrayList<>();
+        for (OsmPrimitive parent : primitive.getReferrers()) {
+            if (parent.getType().equals(OsmPrimitiveType.RELATION)) {
+                Relation relation = (Relation) parent;
+                if (RouteUtils.isVersionTwoPTRoute(relation) && relation.get("ref") != null
+                        && !relation.get("ref").equals("")) {
 
-					boolean stringFound = false;
-					for (String s : parentsLabelList) {
-						if (s.equals(relation.get("ref"))) {
-							stringFound = true;
-						}
-					}
-					if (!stringFound) {
-						parentsLabelList.add(relation.get("ref"));
-					}
+                    boolean stringFound = false;
+                    for (String s : parentsLabelList) {
+                        if (s.equals(relation.get("ref"))) {
+                            stringFound = true;
+                        }
+                    }
+                    if (!stringFound) {
+                        parentsLabelList.add(relation.get("ref"));
+                    }
 
-				}
-			}
-		}
+                }
+            }
+        }
 
-		Collections.sort(parentsLabelList, new PTAssistantPaintVisitor.RefTagComparator());
-		String route_ref = null;
-		if (primitive.hasTag("route_ref")) route_ref = primitive.get("route_ref");
-		else if (primitive.hasTag("route_ref:De_Lijn")) route_ref = primitive.get("route_ref:De_Lijn");
-		else if (primitive.hasTag("route_ref:TECB")) route_ref = primitive.get("route_ref:TECB");
-		else if (primitive.hasTag("route_ref:TECH")) route_ref = primitive.get("route_ref:TECH");
-		else if (primitive.hasTag("route_ref:TECC")) route_ref = primitive.get("route_ref:TECC");
-		else if (primitive.hasTag("route_ref:TECN")) route_ref = primitive.get("route_ref:TECN");
-		else if (primitive.hasTag("route_ref:TECL")) route_ref = primitive.get("route_ref:TECL");
-		else if (primitive.hasTag("route_ref:TECX")) route_ref = primitive.get("route_ref:TECX");
+        Collections.sort(parentsLabelList, new PTAssistantPaintVisitor.RefTagComparator());
+        String route_ref = null;
+        if (primitive.hasTag("route_ref")) route_ref = primitive.get("route_ref");
+        else if (primitive.hasTag("route_ref:De_Lijn")) route_ref = primitive.get("route_ref:De_Lijn");
+        else if (primitive.hasTag("route_ref:TECB")) route_ref = primitive.get("route_ref:TECB");
+        else if (primitive.hasTag("route_ref:TECH")) route_ref = primitive.get("route_ref:TECH");
+        else if (primitive.hasTag("route_ref:TECC")) route_ref = primitive.get("route_ref:TECC");
+        else if (primitive.hasTag("route_ref:TECN")) route_ref = primitive.get("route_ref:TECN");
+        else if (primitive.hasTag("route_ref:TECL")) route_ref = primitive.get("route_ref:TECL");
+        else if (primitive.hasTag("route_ref:TECX")) route_ref = primitive.get("route_ref:TECX");
 
-		if (route_ref != null) {
-			String[] splitted = route_ref.split("[|;]");
-			if (splitted.length != parentsLabelList.size()) {
-				Builder builder = TestError.builder(this.test, Severity.OTHER, PTAssistantValidatorTest.ERROR_CODE_ROUTE_REF);
+        if (route_ref != null) {
+            String[] splitted = route_ref.split("[|;]");
+            if (splitted.length != parentsLabelList.size()) {
+                TestError.Builder builder = TestError.builder(this.test, Severity.OTHER, PTAssistantValidatorTest.ERROR_CODE_ROUTE_REF);
             builder.message(tr("PT: Refs of the routes do not match with the route_ref tag of the primitive"));
             builder.primitives(primitive);
             TestError e = builder.build();
             this.errors.add(e);
 
-			} else {
-				for(String s : splitted) {
-					if (!parentsLabelList.contains(s)) {
-						Builder builder = TestError.builder(this.test, Severity.OTHER, PTAssistantValidatorTest.ERROR_CODE_ROUTE_REF);
-		                builder.message(tr("Refs of the routes do not match with the route_ref tag of the primitive"));
-		                builder.primitives(primitive);
-		                TestError e = builder.build();
-		                this.errors.add(e);
-						break;
-					}
-				}
-			}
-		}
+            } else {
+                for (String s : splitted) {
+                    if (!parentsLabelList.contains(s)) {
+                        TestError.Builder builder = TestError.builder(this.test, Severity.OTHER, PTAssistantValidatorTest.ERROR_CODE_ROUTE_REF);
+                        builder.message(tr("Refs of the routes do not match with the route_ref tag of the primitive"));
+                        builder.primitives(primitive);
+                        TestError e = builder.build();
+                        this.errors.add(e);
+                        break;
+                    }
+                }
+            }
+        }
     }
-
 
     private static int showFixNodeTagDialog(TestError e) {
         Node problematicNode = (Node) e.getPrimitives().iterator().next();

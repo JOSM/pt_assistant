@@ -113,6 +113,7 @@ public final class RouteUtils {
      * Checks if the given way has tags that make it oneway for public
      * transport. The test does not check whether the way violates those
      * restrictions.
+     * @param way way to check
      *
      * @return 0 if the way is not oneway for public transport, 1 if the way is
      *         oneway for public transport, -1 if the way is reversely oneway
@@ -146,6 +147,7 @@ public final class RouteUtils {
      * Checks if the given way has tags that make it oneway for bicycles
      * The test does not check whether the way violates those
      * restrictions.
+     * @param way way to check
      *
      * @return 0 if the way is not oneway for bicycles, 1 if the way is
      *         oneway for bicycles, -1 if the way is reversely oneway

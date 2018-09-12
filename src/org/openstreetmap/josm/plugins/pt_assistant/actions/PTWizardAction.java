@@ -1,3 +1,4 @@
+// License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
 import static org.openstreetmap.josm.gui.help.HelpUtil.ht;
@@ -59,7 +60,6 @@ import org.openstreetmap.josm.tools.Logging;
  *
  * @author Biswesh
  */
-
 public final class PTWizardAction extends JosmAction {
     private static final SpinnerNumberModel QUESTION_1_SPINNER_MODEL = new SpinnerNumberModel();
 
@@ -93,7 +93,7 @@ public final class PTWizardAction extends JosmAction {
             this.noDialogBox = false;
         } else {
             JPanel panel = new JPanel(new GridBagLayout());
-            panel.setBorder(BorderFactory.createEmptyBorder(0,10,10,10));
+            panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 
             PTWizardDialog wizardDialog = new PTWizardDialog();
             wizardDialog.setPreferredSize(new Dimension(250, 300));
@@ -104,7 +104,7 @@ public final class PTWizardAction extends JosmAction {
 
             int lastCheck = -1;
             try {
-                for (int i=1; i <= 4; i++) {
+                for (int i = 1; i <= 4; i++) {
                     if (lastCheck == closeCheck) {
                         return;
                     } else {
@@ -116,8 +116,8 @@ public final class PTWizardAction extends JosmAction {
                         default: return; // Do nothing
                     }
                 }
-            } catch (Exception excp) {
-                excp.printStackTrace();
+            } catch (Exception ex) {
+                Logging.error(ex);
             }
         }
     }
@@ -151,14 +151,14 @@ public final class PTWizardAction extends JosmAction {
         return null;
     }
 
-
     private void addDefaultValues() {
         TagEditHelper.PROPERTY_RECENT_TAGS_NUMBER.put(PTProperties.WIZARD_1_SUGGESTION.get());
         question2ChangeValues(PTProperties.getWizardSuggestions(2).stream().map(it -> it.get(0)).collect(Collectors.toList()));
-        question3ChangeValues(PTProperties.getWizardSuggestions(3).stream().filter(it -> "Default".equals(it.get(1))).map(it -> it.get(0)).collect(Collectors.toList()));
-        question4ChangeValues(PTProperties.getWizardSuggestions(4).stream().filter(it -> "Default".equals(it.get(1))).map(it -> it.get(0)).collect(Collectors.toList()));
+        question3ChangeValues(PTProperties.getWizardSuggestions(3).stream().filter(
+                it -> "Default".equals(it.get(1))).map(it -> it.get(0)).collect(Collectors.toList()));
+        question4ChangeValues(PTProperties.getWizardSuggestions(4).stream().filter(
+                it -> "Default".equals(it.get(1))).map(it -> it.get(0)).collect(Collectors.toList()));
     }
-
 
     private void addLabel(JPanel panel, int questionNumber, boolean withTitle, boolean withQuestion, boolean withSuggestion) {
 
@@ -180,7 +180,7 @@ public final class PTWizardAction extends JosmAction {
             j.setWrapStyleWord(true);
             j.setEditable(false);
             j.setOpaque(false);
-            panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
+            panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
             panel.add(j, GBC.eol().fill(GBC.HORIZONTAL));
         }
 
@@ -191,11 +191,10 @@ public final class PTWizardAction extends JosmAction {
             j.setWrapStyleWord(true);
             j.setEditable(false);
             j.setOpaque(false);
-            panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
+            panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
             panel.add(j, GBC.eol().fill(GBC.HORIZONTAL));
         }
     }
-
 
     private void introduction(JPanel panel) {
         addLabel(panel, 0, true, false, false);
@@ -206,16 +205,15 @@ public final class PTWizardAction extends JosmAction {
         j.setWrapStyleWord(true);
         j.setEditable(false);
         j.setOpaque(false);
-        panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
+        panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
         panel.add(j, GBC.eol().fill(GBC.HORIZONTAL));
     }
-
 
     private void question1(JPanel panel) {
         addLabel(panel, 1, true, true, false);
         QUESTION_1_SPINNER_MODEL.setValue(TagEditHelper.PROPERTY_RECENT_TAGS_NUMBER.get());
         final JSpinner spinner = new JSpinner(QUESTION_1_SPINNER_MODEL);
-        panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
+        panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
         panel.add(spinner, GBC.eol().fill(GBC.HORIZONTAL));
     }
 
@@ -244,9 +242,9 @@ public final class PTWizardAction extends JosmAction {
         }
 
         checkBoxPanel.setBackground(Color.white);
-        checkBoxPanel.add(Box.createRigidArea(new Dimension(10,0)));
+        checkBoxPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 
-        panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
+        panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
         panel.add(checkBoxPanel, GBC.eol().fill(GBC.HORIZONTAL));
     }
 
@@ -263,7 +261,7 @@ public final class PTWizardAction extends JosmAction {
             for (List<String> suggestionList : PTProperties.getWizardSuggestions(3)) {
                 final String paintStyle = suggestionList.get(0);
                 JCheckBox con = new JCheckBox(paintStyle);
-                for(StyleSource style : styleList) {
+                for (StyleSource style : styleList) {
                     if (style.title.equals(paintStyle)) {
                         con.setSelected(true);
                         break;
@@ -272,13 +270,13 @@ public final class PTWizardAction extends JosmAction {
                 checkBoxPanel.add(con);
             }
         } catch (Exception e) {
-                 e.printStackTrace();
+            Logging.error(e);
         }
 
         checkBoxPanel.setBackground(Color.white);
-        checkBoxPanel.add(Box.createRigidArea(new Dimension(10,0)));
+        checkBoxPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 
-        panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
+        panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
         panel.add(checkBoxPanel, GBC.eol().fill(GBC.HORIZONTAL));
     }
 
@@ -304,9 +302,9 @@ public final class PTWizardAction extends JosmAction {
         }
 
         checkBoxPanel.setBackground(Color.white);
-        checkBoxPanel.add(Box.createRigidArea(new Dimension(10,0)));
+        checkBoxPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 
-        panel.add(new JLabel("<html><br></html>"),GBC.eol().fill(GBC.HORIZONTAL));
+        panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
         panel.add(checkBoxPanel, GBC.eol().fill(GBC.HORIZONTAL));
     }
 
@@ -338,19 +336,18 @@ public final class PTWizardAction extends JosmAction {
         }
 
         switch (questionNumber) {
-            case 2: question2ChangeValues(finalValues);break;
-            case 3: question3ChangeValues(finalValues);break;
-            case 4: question4ChangeValues(finalValues);break;
+            case 2: question2ChangeValues(finalValues); break;
+            case 3: question3ChangeValues(finalValues); break;
+            case 4: question4ChangeValues(finalValues); break;
             default : // Do nothing
         }
     }
-
 
     private void question2ChangeValues(List<String> finalValues) {
         if (Logging.isDebugEnabled()) {
             Logging.debug(String.join("\n", finalValues));
         }
-        if(finalValues.contains("Sort stops in route relation")) {
+        if (finalValues.contains("Sort stops in route relation")) {
             MainMenu.add(MainApplication.getMenu().toolsMenu, new SortPTRouteMembersMenuBar());
         }
 
@@ -411,8 +408,6 @@ public final class PTWizardAction extends JosmAction {
         }
     }
 
-
-
     private void question4ChangeValues(List<String> finalValues) {
         final List<List<String>> suggestionLists = PTProperties.getWizardSuggestions(4);
         List<SelectorItem> itemList = new ArrayList<>();
@@ -421,7 +416,7 @@ public final class PTWizardAction extends JosmAction {
         Map<String, SelectorItem> items;
         items = restorePreferences();
 
-        for(List<String> keys : suggestionLists) {
+        for (List<String> keys : suggestionLists) {
             String Key = keys.get(0);
             if (!finalValues.contains(Key))
                     unmarkedKeyList.add(Key);
@@ -429,11 +424,11 @@ public final class PTWizardAction extends JosmAction {
 
         for (String fv : finalValues) {
             if (!items.containsKey(fv)) {
-                for(List<String> suggestions : suggestionLists) {
+                for (List<String> suggestions : suggestionLists) {
                     String key = suggestions.get(0);
                     if (key == fv) {
                         String Value = "";
-                        for (int i=2;i<suggestions.size();i++) {
+                        for (int i = 2; i < suggestions.size(); i++) {
                             Value = Value + suggestions.get(i);
                         }
                         SelectorItem item = new SelectorItem(key, Value);
@@ -456,11 +451,10 @@ public final class PTWizardAction extends JosmAction {
         }
         try {
             savePreferences(items);
-        }  catch (Exception e) {
+        } catch (Exception e) {
             Logging.warn(e);
         }
     }
-
 
     /**
      * Loads the user saved items from preferences.
@@ -489,9 +483,9 @@ public final class PTWizardAction extends JosmAction {
         return result;
     }
 
-
     /**
      * Saves all elements from the list to the preferences.
+     * @param items selector items to save
      */
     private void savePreferences(Map<String, SelectorItem> items) {
             final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss, dd-MM-yyyy");
@@ -508,11 +502,6 @@ public final class PTWizardAction extends JosmAction {
         Config.getPref().putListOfMaps("download.overpass.queries", toSave);
     }
 
-
-
-
-
-
     private String[] defaultToolBar() {
         String[] deftoolbar = {"open", "save", "download", "upload", "|",
             "undo", "redo", "|", "dialogs/search", "preference", "|", "splitway", "combineway",
@@ -525,26 +514,24 @@ public final class PTWizardAction extends JosmAction {
         return deftoolbar;
     }
 
-
-
     private void nextAct(int pageNumber, JPanel panel) {
 
         switch (pageNumber) {
-            case 2: question1Action();break;
-            case 3: question2to4Action(panel, 2);break;
-            case 4: question2to4Action(panel, 3);break;
-            case 5: question2to4Action(panel, 4);break;
+            case 2: question1Action(); break;
+            case 3: question2to4Action(panel, 2); break;
+            case 4: question2to4Action(panel, 3); break;
+            case 5: question2to4Action(panel, 4); break;
             default : // Do nothing
         }
 
         panel.removeAll();
 
         switch (pageNumber) {
-            case 0: introduction(panel);break;
-            case 1: question1(panel);break;
-            case 2: question2(panel);break;
-            case 3: question3(panel);break;
-            case 4: question4(panel);break;
+            case 0: introduction(panel); break;
+            case 1: question1(panel); break;
+            case 2: question2(panel); break;
+            case 3: question3(panel); break;
+            case 4: question4(panel); break;
             default : // Do nothing
         }
     }
@@ -552,7 +539,7 @@ public final class PTWizardAction extends JosmAction {
     private class PTWizardDialog extends ExtendedDialog {
 
         PTWizardDialog() {
-            super(MainApplication.getMainFrame(), tr("PT Wizard"), new String[] { tr("Ok"), tr("Cancel") },
+            super(MainApplication.getMainFrame(), tr("PT Wizard"), new String[] {tr("Ok"), tr("Cancel") },
                     true);
         }
 
