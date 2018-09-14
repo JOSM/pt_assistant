@@ -10,7 +10,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Preferences;
 import org.openstreetmap.josm.data.preferences.JosmBaseDirectories;
 import org.openstreetmap.josm.data.projection.ProjectionRegistry;
@@ -33,10 +32,8 @@ public final class TestUtil {
   }
 
   /**
-   * Initializes the {@link Main} class of JOSM and the mapillary plugin with
+   * Initializes the main class of JOSM and the mapillary plugin with
    * the preferences from test/data/preferences.
-   *
-   * That is needed e.g. to use {@link MapillaryLayer#getInstance()}
    */
   public static synchronized void initPlugin() {
     if (!isInitialized) {
