@@ -104,6 +104,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     boolean abort = false;
     boolean shorterRoutes = false;
     boolean showOption0 = false;
+    boolean onFly = false;
+    boolean aroundGaps = false;
+    boolean aroundStops = false;
     HashMap<Way, Character> wayColoring;
     HashMap<Character, List<Way>> wayListColoring;
 
@@ -142,12 +145,17 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         String str3 = ");\n" + ");\n" + "(._;<;);\n" + "(._;>;);\n" + "out meta;";
 
-        List<Node> nodeList = getBrokenNodes();
+        List<Node> nodeList = new ArrayList<>();
 
-        for (int i = 0; i < members.size(); i++) {
-            if (members.get(i).isNode()) {
-                nodeList.add(members.get(i).getNode());
-            }
+        if (aroundGaps)
+        		nodeList = getBrokenNodes();
+
+        if (aroundStops) {
+        		for (int i = 0; i < members.size(); i++) {
+        			if (members.get(i).isNode()) {
+        				nodeList.add(members.get(i).getNode());
+        			}
+        		}
         }
 
         for (int i = 0; i < nodeList.size(); i++) {
@@ -227,21 +235,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             showOption0 = false;
             currentIndex = 0;
 
-////            if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-////                            tr("How would you want the download to take place?"), tr("Routing Helper download style"),
-////                            list, JOptionPane.QUESTION_MESSAGE, null, null, null)) {
-////                new AlignInCircleAction().actionPerformed(null);
-////            }
-
-//            String[] values = {"Around Stops", "Around Gaps", "On the fly", "", "18", "24"};
-//
-//            Object selected = JOptionPane.showInputDialog(null, tr("How would you want the download to take place?"), tr("Routing Helper download style"), JOptionPane.DEFAULT_OPTION, null, values, "0");
-
-//            String[] buttons = { "Yes", "Yes to all", "No", "Cancel"};
-//            int returnValue = JOptionPane.showOptionDialog(null, "Narrative", "Narrative",
-//                    JOptionPane.WARNING_MESSAGE, 0, null, buttons, buttons[0]);
-//            System.out.println(returnValue);
-
             final JPanel panel = new JPanel(new GridBagLayout());
             panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
             final JRadioButton button1 = new JRadioButton("Around Stops");
@@ -255,8 +248,17 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             panel.add(button2, GBC.eol().fill(GBC.HORIZONTAL));
             panel.add(button3, GBC.eol().fill(GBC.HORIZONTAL));
 
-            JOptionPane.showMessageDialog(null, panel);
-            downloadEntireArea();
+            int i = JOptionPane.showConfirmDialog(null, panel);
+            if (i == 0) {
+            		if (button1.isSelected()) {
+            			aroundStops = true;
+            		} else if (button2.isSelected()) {
+            			aroundGaps = true;
+            		} else if (button3.isSelected()) {
+            			onFly = true;
+            		}
+            		downloadEntireArea();
+            }
         } else {
             halt = false;
             callNextWay(currentIndex);
@@ -293,22 +295,27 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         String query = getQuery();
         Logging.debug(query);
 
-        final Future<?> future = task.download(
-            new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query),
-            DEFAULT_DOWNLOAD_PARAMS,
-            area,
-            null
-        );
+        if (aroundStops || aroundGaps) {
+        	    final Future<?> future = task.download(
+                    new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query),
+                    DEFAULT_DOWNLOAD_PARAMS,
+                    area,
+                    null
+                );
 
-        MainApplication.worker.submit(() -> {
-            try {
-                downloadWithNotifications(future, tr("Entire area"));
-                callNextWay(currentIndex);
-            } catch (InterruptedException | ExecutionException e1) {
-                Logging.error(e1);
-                return;
-            }
-        });
+            MainApplication.worker.submit(() -> {
+                    try {
+                        downloadWithNotifications(future, tr("Entire area"));
+                        callNextWay(currentIndex);
+                    } catch (InterruptedException | ExecutionException e1) {
+                        Logging.error(e1);
+                        return;
+                    }
+                });
+        } else {
+        		callNextWay(currentIndex);
+        }
+
     }
 
     void callNextWay(int i) {
@@ -1175,7 +1182,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         if (abort)
             return;
 
-        if (downloadCounter > 160 || way.isOutsideDownloadArea() || way.isNew()) {
+        if ((downloadCounter > 160 || way.isOutsideDownloadArea() || way.isNew()) && onFly) {
             downloadCounter = 0;
 
             DownloadOsmTask task = new DownloadOsmTask();
@@ -1206,7 +1213,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         if (abort)
             return;
 
-        if (downloadCounter > 160) {
+        if (downloadCounter > 160 && onFly) {
             downloadCounter = 0;
 
             DownloadOsmTask task = new DownloadOsmTask();
@@ -1243,7 +1250,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         if (abort)
             return;
 
-        if (downloadCounter > 160 || way.isOutsideDownloadArea() || way.isNew()) {
+        if ((downloadCounter > 160 || way.isOutsideDownloadArea() || way.isNew()) && onFly) {
             downloadCounter = 0;
 
             DownloadOsmTask task = new DownloadOsmTask();
@@ -1272,6 +1279,10 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     void downloadAreaBeforeRemovalOption(List<Way> wayList, List<Integer> Int) {
         if (abort)
             return;
+
+        if (!onFly) {
+        		displayWaysToRemove(Int);
+        }
 
         downloadCounter = 0;
 
