@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -27,7 +28,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
@@ -64,6 +69,7 @@ import org.openstreetmap.josm.gui.layer.validation.PaintVisitor;
 import org.openstreetmap.josm.io.OverpassDownloadReader;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
@@ -107,7 +113,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     public MendRelationAction(IRelationEditorActionAccess editorAccess) {
         super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
         putValue(SHORT_DESCRIPTION, tr("Routing Helper"));
-        new ImageProvider("dialogs/relation", "routing_assistance").getResource().attachImageIcon(this, true);
+        new ImageProvider("dialogs/relation", "routing_assistance.svg").getResource().attachImageIcon(this, true);
         updateEnabledState();
         editor = (GenericRelationEditor) editorAccess.getEditor();
         memberTableModel = editorAccess.getMemberTableModel();
@@ -217,9 +223,39 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             nextWay = null;
             noLinkToPreviousWay = true;
             nextIndex = true;
-            shorterRoutes = true;
+            shorterRoutes = false;
             showOption0 = false;
             currentIndex = 0;
+
+////            if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+////                            tr("How would you want the download to take place?"), tr("Routing Helper download style"),
+////                            list, JOptionPane.QUESTION_MESSAGE, null, null, null)) {
+////                new AlignInCircleAction().actionPerformed(null);
+////            }
+
+//            String[] values = {"Around Stops", "Around Gaps", "On the fly", "", "18", "24"};
+//
+//            Object selected = JOptionPane.showInputDialog(null, tr("How would you want the download to take place?"), tr("Routing Helper download style"), JOptionPane.DEFAULT_OPTION, null, values, "0");
+
+//            String[] buttons = { "Yes", "Yes to all", "No", "Cancel"};
+//            int returnValue = JOptionPane.showOptionDialog(null, "Narrative", "Narrative",
+//                    JOptionPane.WARNING_MESSAGE, 0, null, buttons, buttons[0]);
+//            System.out.println(returnValue);
+
+            final JPanel panel = new JPanel(new GridBagLayout());
+            panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+            final JRadioButton button1 = new JRadioButton("Around Stops");
+            final JRadioButton button2 = new JRadioButton("Around Gaps");
+            final JRadioButton button3 = new JRadioButton("On the fly");
+            button2.setSelected(true);
+            button3.setSelected(true);
+            panel.add(new JLabel(tr("How would you want the download to take place?")), GBC.eol().fill(GBC.HORIZONTAL));
+            panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
+            panel.add(button1, GBC.eol().fill(GBC.HORIZONTAL));
+            panel.add(button2, GBC.eol().fill(GBC.HORIZONTAL));
+            panel.add(button3, GBC.eol().fill(GBC.HORIZONTAL));
+
+            JOptionPane.showMessageDialog(null, panel);
             downloadEntireArea();
         } else {
             halt = false;
@@ -655,7 +691,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         else
             showOption0 = true;
 
-        if (directRoute != null && directRoute.size() > 0 && !shorterRoutes) {
+        if (directRoute != null && directRoute.size() > 0 && !shorterRoutes && parentWays.size() > 0 && notice == null) {
             displayFixVariantsWithOverlappingWays(directRoute);
             return null;
         }
@@ -667,12 +703,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             displayFixVariants(parentWays);
         } else {
             nextIndex = true;
-            if (directRoute != null && directRoute.size() > 0 && !shorterRoutes) {
-                showOption0 = false;
-                shorterRoutes = false;
-                displayFixVariantsWithOverlappingWays(directRoute);
-                return null;
-            }
+
             if (currentIndex >= members.size() - 1) {
                 deleteExtraWays();
             } else {
@@ -1549,11 +1580,11 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     nextIndex = true;
                     if (typedKeyUpperCase.charValue() == 'S' || typedKeyUpperCase.charValue() == '7') {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = true;
+                        shorterRoutes = false;
                         getNextWayAfterSelection(null);
                     } else if (typedKeyUpperCase.charValue() == 'Q' || typedKeyUpperCase.charValue() == '9') {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = true;
+                        shorterRoutes = false;
                         removeCurrentEdge();
                     } else if (typedKeyUpperCase.charValue() == 'W' || typedKeyUpperCase.charValue() == '0') {
                         shorterRoutes = shorterRoutes ? false : true;
@@ -1561,14 +1592,14 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                         callNextWay(currentIndex);
                     } else {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = true;
+                        shorterRoutes = false;
                         getNextWayAfterSelection(Arrays.asList(fixVariants.get(idx)));
                     }
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     MainApplication.getMap().mapView.removeKeyListener(this);
                     nextIndex = false;
-                    shorterRoutes = true;
+                    shorterRoutes = false;
                     setEnable = true;
                     halt = true;
                     setEnabled(true);
@@ -1653,11 +1684,11 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     nextIndex = true;
                     if (typedKeyUpperCase.charValue() == 'S' || typedKeyUpperCase.charValue() == '7') {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = true;
+                        shorterRoutes = false;
                         getNextWayAfterSelection(null);
                     } else if (typedKeyUpperCase.charValue() == 'Q' || typedKeyUpperCase.charValue() == '9') {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = true;
+                        shorterRoutes = false;
                         removeCurrentEdge();
                     } else if (typedKeyUpperCase.charValue() == 'W' || typedKeyUpperCase.charValue() == '0') {
                         shorterRoutes = shorterRoutes ? false : true;
@@ -1665,7 +1696,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                         callNextWay(currentIndex);
                     } else {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = true;
+                        shorterRoutes = false;
                         getNextWayAfterSelection(fixVariants.get(idx));
                     }
                 }
@@ -1673,7 +1704,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     MainApplication.getMap().mapView.removeKeyListener(this);
                     nextIndex = false;
                     setEnable = true;
-                    shorterRoutes = true;
+                    shorterRoutes = false;
                     halt = true;
                     setEnabled(true);
                     MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
