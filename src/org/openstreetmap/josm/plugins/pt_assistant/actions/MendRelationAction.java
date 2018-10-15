@@ -29,10 +29,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
@@ -237,9 +237,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
             final JPanel panel = new JPanel(new GridBagLayout());
             panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-            final JRadioButton button1 = new JRadioButton("Around Stops");
-            final JRadioButton button2 = new JRadioButton("Around Gaps");
-            final JRadioButton button3 = new JRadioButton("On the fly");
+            final JCheckBox button1 = new JCheckBox("Around Stops");
+            final JCheckBox button2 = new JCheckBox("Around Gaps");
+            final JCheckBox button3 = new JCheckBox("On the fly");
             button2.setSelected(true);
             button3.setSelected(true);
             panel.add(new JLabel(tr("How would you want the download to take place?")), GBC.eol().fill(GBC.HORIZONTAL));
