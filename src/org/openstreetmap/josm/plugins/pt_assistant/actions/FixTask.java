@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -22,12 +23,15 @@ import org.xml.sax.SAXException;
 /**
  * This class was copied with minor changes from ValidatorDialog.FixTask
  *
+ * FIXME: remove this copy/paste by extending JOSM core class
+ *
  * @author darya
  *
  */
 public class FixTask extends PleaseWaitRunnable {
 
     private final Collection<TestError> testErrors;
+    private final List<Command> fixCommands = new ArrayList<>();
     private boolean canceled;
 
     public FixTask(Collection<TestError> testErrors) {
@@ -53,6 +57,7 @@ public class FixTask extends PleaseWaitRunnable {
                     @Override
                     public void run() {
                         UndoRedoHandler.getInstance().addNoRedraw(fixCommand);
+                        fixCommands.add(fixCommand);
                     }
                 });
             }
@@ -86,7 +91,7 @@ public class FixTask extends PleaseWaitRunnable {
             }
             monitor.subTask(tr("Updating map ..."));
             SwingUtilities.invokeAndWait(() -> {
-                UndoRedoHandler.getInstance().afterAdd(null);
+                UndoRedoHandler.getInstance().afterAdd(fixCommands);
                 MainApplication.getMap().repaint();
             });
         } catch (InterruptedException | InvocationTargetException e) {
