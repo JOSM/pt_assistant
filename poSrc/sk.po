@@ -1,0 +1,18 @@
+msgid ", "
+msgstr ", "
+
+msgid "Close"
+msgstr "Zavrieť"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Zobrazuje zastávky zvolených trás hromadnej dopravy ako graf"
+
+msgid "Invalid selection"
+msgstr "Chybný výber"
+
+msgid "Public transport routes"
+msgstr "Trasy hromadnej dopravy"
+
+msgid "Visualize public transport routes"
+msgstr "Zobrazuje trasy hromadnej dopravy"
+

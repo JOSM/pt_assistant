@@ -1,0 +1,24 @@
+msgid ", "
+msgstr ", "
+
+msgid "Close"
+msgstr "Fechar"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Exibe rotas selecionadas de paradas de transporte público como gráfico"
+
+msgid "Invalid selection"
+msgstr "Seleção inválida"
+
+msgid "Public transport routes"
+msgstr "Rotas de transporte público"
+
+msgid "Toggle direction arrows"
+msgstr "Alterar setas de direção"
+
+msgid "Toggle reference labels"
+msgstr "Alterar rótulos de referência"
+
+msgid "Visualize public transport routes"
+msgstr "Visualizar rotas de transporte público"
+

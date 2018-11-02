@@ -1,0 +1,9 @@
+msgid ", "
+msgstr ", "
+
+msgid "Close"
+msgstr "닫기"
+
+msgid "Toggle direction arrows"
+msgstr "방향 화살표 활성화/비활성화"
+

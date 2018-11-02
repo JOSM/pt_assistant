@@ -1,0 +1,9 @@
+msgid ", "
+msgstr ", "
+
+msgid "Close"
+msgstr "Stäng"
+
+msgid "Invalid selection"
+msgstr "Ogiltigt val"
+

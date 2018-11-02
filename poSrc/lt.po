@@ -1,0 +1,15 @@
+msgid ", "
+msgstr ", "
+
+msgid "Close"
+msgstr "Užverti"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Rodo stoteles iš pasirinkto viešojo transporto maršruto, kaip grafiką"
+
+msgid "Public transport routes"
+msgstr "Viešojo transporto maršrutai"
+
+msgid "Visualize public transport routes"
+msgstr "Pavaizduoti viešojo transporto maršrutus"
+

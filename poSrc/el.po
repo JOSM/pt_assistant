@@ -1,0 +1,9 @@
+msgid ", "
+msgstr ", "
+
+msgid "Close"
+msgstr "Κλείσιμο"
+
+msgid "Invalid selection"
+msgstr "Μη έγκυρη επιλογή"
+

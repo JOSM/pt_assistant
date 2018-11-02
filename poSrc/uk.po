@@ -1,0 +1,30 @@
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Вимагається маршрут позначенй за схемою public_transport:version=2"
+
+msgid "Close"
+msgstr "Закрити"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Показує зупинки виділеного маршруту громадського транспорту у вигляді графу"
+
+msgid "Distance between stops"
+msgstr "Відстань між зупинками"
+
+msgid "Invalid selection"
+msgstr "Неправильне виділення"
+
+msgid "Public transport routes"
+msgstr "Маршрути громадського транспорту"
+
+msgid "Toggle direction arrows"
+msgstr "Показувати стрілки напрямку"
+
+msgid "Toggle reference labels"
+msgstr "Показувати таблички маршрутів"
+
+msgid "Visualize public transport routes"
+msgstr "Показати маршрути громадського транспорту"
+

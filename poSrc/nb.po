@@ -1,0 +1,3 @@
+msgid "Close"
+msgstr "Lukk"
+

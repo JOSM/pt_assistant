@@ -1,0 +1,24 @@
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "需要有效的 public_transport:version=2 路線"
+
+msgid "Close"
+msgstr "關閉"
+
+msgid "Distance between stops"
+msgstr "停靠站之間距離"
+
+msgid "Invalid selection"
+msgstr "無效的選擇範圍"
+
+msgid "Public transport routes"
+msgstr "大眾運輸路線"
+
+msgid "Toggle direction arrows"
+msgstr "切換方向箭頭"
+
+msgid "Visualize public transport routes"
+msgstr "視覺化大眾運輸路線"
+

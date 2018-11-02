@@ -1,0 +1,30 @@
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Je vyžadována platná trasa public_transport:version=2"
+
+msgid "Close"
+msgstr "Zavřít"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Zobrazuje zastávky zvolených tras veřejné dopravy jako graf"
+
+msgid "Distance between stops"
+msgstr "Vzdálenost mezi zastávkami"
+
+msgid "Invalid selection"
+msgstr "Neplatný výběr"
+
+msgid "Public transport routes"
+msgstr "Trasy veřejné dopravy"
+
+msgid "Toggle direction arrows"
+msgstr "Přepnout směrové šipky"
+
+msgid "Toggle reference labels"
+msgstr "Přepnout referenční štítky"
+
+msgid "Visualize public transport routes"
+msgstr "Vizualizovat trasy veřejné dopravy"
+

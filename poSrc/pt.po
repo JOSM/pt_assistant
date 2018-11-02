@@ -1,0 +1,24 @@
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "É necessária uma rota public_transport:version=2 válida"
+
+msgid "Close"
+msgstr "Fechar"
+
+msgid "Distance between stops"
+msgstr "Distância entre paragens"
+
+msgid "Invalid selection"
+msgstr "Seleção incorreta"
+
+msgid "Public transport routes"
+msgstr "Rotas de transporte público"
+
+msgid "Toggle direction arrows"
+msgstr "Inverter setas de direção"
+
+msgid "Visualize public transport routes"
+msgstr "Ver rotas de transporte público"
+

@@ -1,0 +1,12 @@
+msgid ", "
+msgstr "， "
+
+msgid "Close"
+msgstr "关闭"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "将所选的公共交通路线显示为图表"
+
+msgid "Invalid selection"
+msgstr "无效的选择范围"
+

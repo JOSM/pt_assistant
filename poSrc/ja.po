@@ -1,0 +1,9 @@
+msgid ", "
+msgstr ", "
+
+msgid "Close"
+msgstr "閉じる"
+
+msgid "Invalid selection"
+msgstr "選択が無効です"
+

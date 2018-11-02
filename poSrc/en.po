@@ -1,0 +1,30 @@
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "A valid public_transport:version=2 route is required"
+
+msgid "Close"
+msgstr "Close"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Displays stops of selected public transport routes as graph"
+
+msgid "Distance between stops"
+msgstr "Distance between stops"
+
+msgid "Invalid selection"
+msgstr "Invalid selection"
+
+msgid "Public transport routes"
+msgstr "Public transport routes"
+
+msgid "Toggle direction arrows"
+msgstr "Toggle direction arrows"
+
+msgid "Toggle reference labels"
+msgstr "Toggle reference labels"
+
+msgid "Visualize public transport routes"
+msgstr "Visualize public transport routes"
+

@@ -1,0 +1,30 @@
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Rute public_trasnport:version=2 yang valid dibutuhkan"
+
+msgid "Close"
+msgstr "Tutup"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Menampilkan pemberhatian dari rute transportasi umum terpilih sebagai grafik"
+
+msgid "Distance between stops"
+msgstr "Jarak antar pemberhentian"
+
+msgid "Invalid selection"
+msgstr "Pilihan tidak valid"
+
+msgid "Public transport routes"
+msgstr "Rute transportasi umum"
+
+msgid "Toggle direction arrows"
+msgstr "Atur arah panah"
+
+msgid "Toggle reference labels"
+msgstr "Ubah label referensi"
+
+msgid "Visualize public transport routes"
+msgstr "Visualisasikan rute transportasi umum"
+

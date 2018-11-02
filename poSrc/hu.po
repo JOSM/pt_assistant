@@ -1,0 +1,30 @@
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Érvényes, public_transport:version=2 típusú útvonal szükséges"
+
+msgid "Close"
+msgstr "Bezárás"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "A kijelölt tömegközlekedési útvonalak megállóit ábrázolja gráfként"
+
+msgid "Distance between stops"
+msgstr "Megállók közti távolság"
+
+msgid "Invalid selection"
+msgstr "Érvénytelen kijelölés"
+
+msgid "Public transport routes"
+msgstr "Tömegközlekedési útvonalak"
+
+msgid "Toggle direction arrows"
+msgstr "Irány nyilak átkapcsolása"
+
+msgid "Toggle reference labels"
+msgstr "Azonosító címkék átkapcsolása"
+
+msgid "Visualize public transport routes"
+msgstr "Tömegközlekedési útvonalak vizualizálása"
+

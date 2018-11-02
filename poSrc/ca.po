@@ -1,0 +1,24 @@
+msgid ", "
+msgstr ", "
+
+msgid "Close"
+msgstr "Tanca"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Mostra les parades de les línies de transport públic seleccionades en forma gràfica"
+
+msgid "Invalid selection"
+msgstr "Selecció no vàlida"
+
+msgid "Public transport routes"
+msgstr "Itinerari de transport públic"
+
+msgid "Toggle direction arrows"
+msgstr "Commuta les fletxes de direcció"
+
+msgid "Toggle reference labels"
+msgstr "Commuta les etiquetes de referència"
+
+msgid "Visualize public transport routes"
+msgstr "Visualitza itineraris de transport públic"
+

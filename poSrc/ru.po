@@ -1,0 +1,30 @@
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Требуется действительный маршрут  public_transport:version=2"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Отображает остановки выбранных маршрутов общественного транспорта в виде графа"
+
+msgid "Distance between stops"
+msgstr "Расстояние между остановками"
+
+msgid "Invalid selection"
+msgstr "Неправильное выделение"
+
+msgid "Public transport routes"
+msgstr "Маршруты общественного транспорта"
+
+msgid "Toggle direction arrows"
+msgstr "Показать/скрыть стрелки направлений"
+
+msgid "Toggle reference labels"
+msgstr "Показать/скрыть метки"
+
+msgid "Visualize public transport routes"
+msgstr "Визуализировать маршруты общественного транспорта"
+

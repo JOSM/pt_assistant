@@ -1,0 +1,30 @@
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Eine gültige public_transport:version=2 Route ist erforderlich"
+
+msgid "Close"
+msgstr "Schließen"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Haltestellen der gewählten Routen des öffentlichen Verkehrs als Graph anzeigen"
+
+msgid "Distance between stops"
+msgstr "Entfernung zwischen Haltestellen"
+
+msgid "Invalid selection"
+msgstr "Ungültige Auswahl"
+
+msgid "Public transport routes"
+msgstr "Routen des öffentlichen Verkehrs"
+
+msgid "Toggle direction arrows"
+msgstr "Richtungspfeile umschalten"
+
+msgid "Toggle reference labels"
+msgstr "Referenzbeschriftung umschalten"
+
+msgid "Visualize public transport routes"
+msgstr "Routen des öffentlichen Verkehrs visualisieren"
+

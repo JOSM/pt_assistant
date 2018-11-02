@@ -1,0 +1,9 @@
+msgid ", "
+msgstr ", "
+
+msgid "Close"
+msgstr "Zarrar"
+
+msgid "Invalid selection"
+msgstr "Escoyeta non válida"
+

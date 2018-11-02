@@ -1,0 +1,21 @@
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Kelvollinen public_transport:version=2 -reitti vaaditaan"
+
+msgid "Close"
+msgstr "Sulje"
+
+msgid "Distance between stops"
+msgstr "Etäisyys pysäkkien välillä"
+
+msgid "Public transport routes"
+msgstr "Joukkoliikenteen reitit"
+
+msgid "Toggle direction arrows"
+msgstr "Näytä/piilota suuntanuolet"
+
+msgid "Visualize public transport routes"
+msgstr "Visualisoi joukkoliikennereitit"
+

@@ -1,0 +1,30 @@
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Een geldige route public_transport:version=2 is vereist"
+
+msgid "Close"
+msgstr "Sluiten"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Geeft haltes van geselecteerde routes van openbaar vervoer weer als grafiek"
+
+msgid "Distance between stops"
+msgstr "Afstand tussen haltes"
+
+msgid "Invalid selection"
+msgstr "Ongeldige selectie"
+
+msgid "Public transport routes"
+msgstr "Routes openbaar vervoer"
+
+msgid "Toggle direction arrows"
+msgstr "Richtingpijlen schakelen"
+
+msgid "Toggle reference labels"
+msgstr "Verwijzingslabels schakelen"
+
+msgid "Visualize public transport routes"
+msgstr "Routes openbaar vervoer visualiseren"
+
