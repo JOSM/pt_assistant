@@ -1,8 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (es)
-# Copyright (C) 2018 
+# Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -17,6 +17,12 @@ msgstr ""
 "Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Se requiere una ruta valida public_transport:version=2"
+
 msgid "Bicycle and foot routes Tests"
 msgstr "Pruebas de rutas pedestres y bicisendas"
 
@@ -28,6 +34,15 @@ msgid ""
 msgstr ""
 "Comprobar si las relaciones de ruta son compatibles con la versión 2 del "
 "transporte público"
+
+msgid "Close"
+msgstr "Cerrar"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Muestra las paradas de rutas de transporte público seleccionadas como gráfico"
+
+msgid "Distance between stops"
+msgstr "Distancia entre paradas"
 
 msgid "Do you want to download referrers of platforms and stop positions?"
 msgstr ""
@@ -60,6 +75,9 @@ msgstr "Incluir análisis de la zona de parada"
 
 msgid "Incomplete Members"
 msgstr "Miembros incompletos"
+
+msgid "Invalid selection"
+msgstr "Selección no válida"
 
 #, java-format
 msgid "Mode: {0}"
@@ -190,6 +208,9 @@ msgstr "Transporte público"
 msgid "Public Transport Assistant tests"
 msgstr "Tests del Asistente de Transporte Público"
 
+msgid "Public transport routes"
+msgstr "Rutas de transporte público"
+
 msgid "Remember my choice and do not ask me again in this session"
 msgstr "Recordar mi elección y no volver a preguntar en esta sesión"
 
@@ -215,6 +236,12 @@ msgstr ""
 "La relación tiene miembros incompletos. ¿Desea descargarlos y continuar con "
 "la clasificación?"
 
+msgid "Toggle direction arrows"
+msgstr "Cambiar la dirección de las flechas"
+
+msgid "Toggle reference labels"
+msgstr "Cambiar las etiquetas de referencia"
+
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
 "Introduzca el tipo de letra para seleccionar la variante de solución de "
@@ -222,6 +249,9 @@ msgstr ""
 
 msgid "Updating map ..."
 msgstr "Actualizando mapa..."
+
+msgid "Visualize public transport routes"
+msgstr "Visualizar las rutas del transporte público"
 
 msgid "Warning: the diplayed fix variants are based on less strict criteria"
 msgstr ""

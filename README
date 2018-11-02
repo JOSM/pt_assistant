@@ -1,10 +1,13 @@
-README 
-======
+PT Assistant
+============
 
-Readme for the JOSM plugin Public Transport Assistant (pt_assistant)
+The JOSM plugin "Public Transport Assistant" (pt_assistant).
+Displays stops of selected public transport routes as graph.
 
-    * Author: Darya Golovko, darya0705@gmail.com
-    
-    * License: GPL v2 or later.
-      
-    * Notes for future developers: no notes yet.
+Authors:
+* Darya Golovko <darya0705@gmail.com>
+* Giacomo Servadei
+* Simon Legner (simon04)
+* Biswesh Mohapatra
+
+License: GPL v2 or later (same as JOSM)

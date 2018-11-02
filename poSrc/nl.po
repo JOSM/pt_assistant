@@ -1,8 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (nl)
-# Copyright (C) 2018 
+# Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -17,6 +17,12 @@ msgstr ""
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Een geldige route public_transport:version=2 is vereist"
+
 msgid "Bicycle and foot routes Tests"
 msgstr "Testen voor fiets- en wandelroutes"
 
@@ -27,6 +33,15 @@ msgid ""
 "Check if route relations are compatible with public transport version 2"
 msgstr ""
 "Controleren of routerelaties overeenkomen met openbaar vervoer versie 2"
+
+msgid "Close"
+msgstr "Sluiten"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Geeft haltes van geselecteerde routes van openbaar vervoer weer als grafiek"
+
+msgid "Distance between stops"
+msgstr "Afstand tussen haltes"
 
 msgid "Do you want to download referrers of platforms and stop positions?"
 msgstr "Wilt u verwijzingen naar platformen halteposities downloaden?"
@@ -58,6 +73,9 @@ msgstr "Testen stop_area opnemen"
 
 msgid "Incomplete Members"
 msgstr "Incomplete leden"
+
+msgid "Invalid selection"
+msgstr "Ongeldige selectie"
 
 #, java-format
 msgid "Mode: {0}"
@@ -184,6 +202,9 @@ msgstr "Openbaar vervoer"
 msgid "Public Transport Assistant tests"
 msgstr "Testen Assistent openbaar vervoer"
 
+msgid "Public transport routes"
+msgstr "Routes openbaar vervoer"
+
 msgid "Remember my choice and do not ask me again in this session"
 msgstr "Onthoud mijn keuze en vraag me dat in deze sessie niet meer"
 
@@ -209,6 +230,12 @@ msgstr ""
 "De relatie heeft incomplete leden. Wilt u ze downloaden en doorgaan met "
 "sorteren?"
 
+msgid "Toggle direction arrows"
+msgstr "Richtingpijlen schakelen"
+
+msgid "Toggle reference labels"
+msgstr "Verwijzingslabels schakelen"
+
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
 "Typ letter om de variant voor de reparatie te selecteren of druk op Escape "
@@ -216,6 +243,9 @@ msgstr ""
 
 msgid "Updating map ..."
 msgstr "Kaart wordt bijgewerkt ..."
+
+msgid "Visualize public transport routes"
+msgstr "Routes openbaar vervoer visualiseren"
 
 msgid "Warning: the diplayed fix variants are based on less strict criteria"
 msgstr ""

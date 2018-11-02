@@ -1,8 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (cs)
-# Copyright (C) 2018 
+# Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -17,6 +17,12 @@ msgstr ""
 "Language: cs\n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Je vyžadována platná trasa public_transport:version=2"
+
 msgid "Bicycle and foot routes Tests"
 msgstr "Testy tras pro jízdní kola a pěší"
 
@@ -28,6 +34,15 @@ msgid ""
 msgstr ""
 "Kontroluje, zda relace route jsou kompatibilní se schématem veřejné dopravy "
 "verze 2"
+
+msgid "Close"
+msgstr "Zavřít"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Zobrazuje zastávky zvolených tras veřejné dopravy jako graf"
+
+msgid "Distance between stops"
+msgstr "Vzdálenost mezi zastávkami"
 
 msgid "Do you want to download referrers of platforms and stop positions?"
 msgstr "Chcete stáhnout prvky odkazující na nástupiště a místa zastavení?"
@@ -59,6 +74,9 @@ msgstr "Zahrnout testy stop_area"
 
 msgid "Incomplete Members"
 msgstr "Nekompletní členy"
+
+msgid "Invalid selection"
+msgstr "Neplatný výběr"
 
 #, java-format
 msgid "Mode: {0}"
@@ -174,6 +192,9 @@ msgstr "Hromadná doprava"
 msgid "Public Transport Assistant tests"
 msgstr "Public Transport Assistant testy"
 
+msgid "Public transport routes"
+msgstr "Trasy veřejné dopravy"
+
 msgid "Remember my choice and do not ask me again in this session"
 msgstr "Pamatuj si moje volbu a při tomto sezení se již neptej"
 
@@ -199,6 +220,12 @@ msgstr ""
 "Relace obsahuje nekompletní členy. Chcete je stáhnout a pokračovat v "
 "třídění?"
 
+msgid "Toggle direction arrows"
+msgstr "Přepnout směrové šipky"
+
+msgid "Toggle reference labels"
+msgstr "Přepnout referenční štítky"
+
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
 "Stiskněte písmeno pro volbu opravy, nebo stiskněte Escape pro opuštění bez "
@@ -206,6 +233,9 @@ msgstr ""
 
 msgid "Updating map ..."
 msgstr "Aktualizuji mapu ..."
+
+msgid "Visualize public transport routes"
+msgstr "Vizualizovat trasy veřejné dopravy"
 
 msgid "Warning: the diplayed fix variants are based on less strict criteria"
 msgstr ""

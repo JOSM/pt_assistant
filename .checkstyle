@@ -13,7 +13,7 @@
     <filter-data value="data"/>
     <filter-data value="images"/>
     <filter-data value="resources"/>
-    <filter-data value="styles"/>
     <filter-data value="scripts"/>
+    <filter-data value="styles"/>
   </filter>
 </fileset-config>

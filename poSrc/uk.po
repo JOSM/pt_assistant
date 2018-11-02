@@ -1,8 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (uk)
-# Copyright (C) 2018 
+# Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -17,6 +17,12 @@ msgstr ""
 "Language: uk\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Вимагається маршрут позначенй за схемою public_transport:version=2"
+
 msgid "Bicycle and foot routes Tests"
 msgstr "Перевірка велосипедних та пішохідних маршрутів"
 
@@ -28,6 +34,15 @@ msgid ""
 msgstr ""
 "Перевірити чи звʼязок сумісний зі схемою позначення громадського транспорту "
 "версії 2"
+
+msgid "Close"
+msgstr "Закрити"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Показує зупинки виділеного маршруту громадського транспорту у вигляді графу"
+
+msgid "Distance between stops"
+msgstr "Відстань між зупинками"
 
 msgid "Do you want to download referrers of platforms and stop positions?"
 msgstr "Бажаєте завантажити обʼєкти, що посилаються на платформи та зупинки?"
@@ -56,6 +71,9 @@ msgstr "Включаючи перевірку stop_area"
 
 msgid "Incomplete Members"
 msgstr "Незавантажені члени"
+
+msgid "Invalid selection"
+msgstr "Неправильне виділення"
 
 #, java-format
 msgid "Mode: {0}"
@@ -175,6 +193,9 @@ msgstr "ГТ_Помічник втулок визначив, що цей звʼ�
 msgid "Public Transport Assistant tests"
 msgstr "Перевірки Помічника громадського транспорту"
 
+msgid "Public transport routes"
+msgstr "Маршрути громадського транспорту"
+
 msgid "Remember my choice and do not ask me again in this session"
 msgstr "Запамʼятати мій вибір та не запитувати знов у цьому сеансі"
 
@@ -200,6 +221,12 @@ msgstr ""
 "Звʼязок завантажено не повністю. Завантажити відсутніх членів та продовжити "
 "сортування?"
 
+msgid "Toggle direction arrows"
+msgstr "Показувати стрілки напрямку"
+
+msgid "Toggle reference labels"
+msgstr "Показувати таблички маршрутів"
+
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
 "Натисніть літеру, щоб вибрати варіант виправлення або натисніть Esc, що "
@@ -207,6 +234,9 @@ msgstr ""
 
 msgid "Updating map ..."
 msgstr "Оновлення мапи…"
+
+msgid "Visualize public transport routes"
+msgstr "Показати маршрути громадського транспорту"
 
 msgid "Warning: the diplayed fix variants are based on less strict criteria"
 msgstr ""

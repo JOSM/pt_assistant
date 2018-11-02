@@ -44,6 +44,8 @@ import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.BicycleFootRouteValidatorTest;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.PTAssistantValidatorTest;
+import org.openstreetmap.josm.plugins.ptl.DistanceBetweenStops;
+import org.openstreetmap.josm.plugins.ptl.PublicTransportLayer;
 
 /**
  * This is the main class of the PTAssistant plugin.
@@ -73,8 +75,12 @@ public class PTAssistantPlugin extends Plugin {
         OsmValidator.addTest(PTAssistantValidatorTest.class);
         OsmValidator.addTest(BicycleFootRouteValidatorTest.class);
 
+        // "Public Transport" menu
         MainMenu menu = MainApplication.getMenu();
         JMenu PublicTransportMenu = menu.addMenu("File", trc("menu", "Public Transport"), KeyEvent.VK_P, 5, ht("/Menu/Public Transport"));
+        // Menu items for public transport layer in "data" menu
+        MainMenu.add(menu.dataMenu, new PublicTransportLayer.AddLayerAction());
+        MainMenu.add(menu.dataMenu, new DistanceBetweenStops());
 
         SelectionEventManager.getInstance().addSelectionListener(PTAssistantLayerManager.PTLM);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(PTAssistantLayerManager.PTLM);

@@ -1,8 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (da)
-# Copyright (C) 2018 
+# Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -17,6 +17,12 @@ msgstr ""
 "Language: da\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "En gyldig public_transport:version=2 rute kræves"
+
 msgid "Bicycle and foot routes Tests"
 msgstr "Cykel- og gåruter test"
 
@@ -27,6 +33,15 @@ msgid ""
 "Check if route relations are compatible with public transport version 2"
 msgstr ""
 "Tjek om rute relationer er kompatible med offentlig transport version 2"
+
+msgid "Close"
+msgstr "Luk"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Viser stop fra udvalgte offentlige transportruter som graf"
+
+msgid "Distance between stops"
+msgstr "Afstand mellem stop"
 
 msgid "Do you want to download referrers of platforms and stop positions?"
 msgstr "Vil du at downloade refererende platforme og stoppositioner?"
@@ -55,6 +70,9 @@ msgstr "Medtag stopområde tests"
 
 msgid "Incomplete Members"
 msgstr "Ufuldstændige medlemmer"
+
+msgid "Invalid selection"
+msgstr "Ugyldigt valg"
 
 #, java-format
 msgid "Mode: {0}"
@@ -179,6 +197,9 @@ msgstr "Offentlig transport"
 msgid "Public Transport Assistant tests"
 msgstr "Offentlig transport assistent tests"
 
+msgid "Public transport routes"
+msgstr "Offentlig transportrute"
+
 msgid "Remember my choice and do not ask me again in this session"
 msgstr "Husk mit valg og spørg mig ikke igen i denne session"
 
@@ -204,6 +225,12 @@ msgstr ""
 "Relationen har ufuldstændige medlemmer. Vil du downloade dem og fortsætte "
 "med sorteringen?"
 
+msgid "Toggle direction arrows"
+msgstr "Skift retningspile"
+
+msgid "Toggle reference labels"
+msgstr "Skift reference etiketter"
+
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
 "Skriv bogstav for at vælge rettelses variant eller tryk på Escape for ingen "
@@ -211,6 +238,9 @@ msgstr ""
 
 msgid "Updating map ..."
 msgstr "Opdaterer kort..."
+
+msgid "Visualize public transport routes"
+msgstr "Synliggør offentlig transportrute"
 
 msgid "Warning: the diplayed fix variants are based on less strict criteria"
 msgstr ""

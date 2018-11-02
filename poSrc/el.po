@@ -1,8 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (el)
-# Copyright (C) 2018 
+# Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -17,6 +17,9 @@ msgstr ""
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid ", "
+msgstr ", "
+
 msgid "Bicycle and foot routes Tests"
 msgstr "Δοκιμές πεζοπορικών και ποδηλατικών διαδρομών"
 
@@ -28,6 +31,9 @@ msgid ""
 msgstr ""
 "Ελέγξτε εάν οι σχέσεις διαδρομής είναι συμβατές με τη δημόσια συγκοινωνία "
 "έκδοση 2"
+
+msgid "Close"
+msgstr "Κλείσιμο"
 
 msgid "Do you want to download referrers of platforms and stop positions?"
 msgstr "Θέλετε να κατεβάσετε παραπομπές για πλατφόρμες και θέσεις στάσεων;"
@@ -65,6 +71,9 @@ msgstr "Συμπεριλάβετε δοκιμές περιοχής στάσης"
 
 msgid "Incomplete Members"
 msgstr "Ελλιπή μέλη"
+
+msgid "Invalid selection"
+msgstr "Μη έγκυρη επιλογή"
 
 #, java-format
 msgid ""

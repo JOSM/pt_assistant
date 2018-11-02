@@ -1,8 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (pl)
-# Copyright (C) 2018 
+# Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -16,6 +16,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pl\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+
+msgid ", "
+msgstr ", "
 
 msgid "Add public_transport=stop_position + mode of transport on these nodes"
 msgstr ""
@@ -35,6 +38,12 @@ msgid ""
 msgstr ""
 "Sprawdź, czy relacje tras są kompatybilne z transportem publicznym w wersji "
 "2"
+
+msgid "Close"
+msgstr "Zamknij"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Wyświetla przystanki wybranych tras transportu publicznego jako graf"
 
 msgid "Do you want to download referrers of platforms and stop positions?"
 msgstr "Czy chcesz pobrać odniesienia dla przystanków i miejsc zatrzymania?"
@@ -101,6 +110,9 @@ msgstr "Dołącz testy obszarów_zatrzymań"
 
 msgid "Incomplete Members"
 msgstr "Niekompletni członkowie"
+
+msgid "Invalid selection"
+msgstr "Złe zaznaczenie"
 
 #, java-format
 msgid ""
@@ -251,6 +263,9 @@ msgstr "Transport publiczny"
 msgid "Public Transport Assistant tests"
 msgstr "Testy asystenta transportu publicznego"
 
+msgid "Public transport routes"
+msgstr "Trasy pojazdów transportu publicznego"
+
 msgid ""
 "Refs of the routes do not match with the route_ref tag of the primitive"
 msgstr "Odniesienia trasy nie odpowiadają tagowi route_ref elementu"
@@ -330,6 +345,9 @@ msgstr "Aktualizowanie mapy..."
 
 msgid "Use 1/2/3/4 instead of A/B/C/D for selecting which way to follow"
 msgstr "Użyj 1/2/3/4 zamiast A/B/C/D, aby wybrać, którą drogą podążać"
+
+msgid "Visualize public transport routes"
+msgstr "Wizualizacja tras pojazdów transportu publicznego"
 
 msgid "Warning: the diplayed fix variants are based on less strict criteria"
 msgstr ""

@@ -1,8 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (be)
-# Copyright (C) 2018 
+# Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -17,6 +17,12 @@ msgstr ""
 "Language: be\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Патрабуецца сапраўдны маршрут public_transport:version=2"
+
 msgid "Cancel"
 msgstr "Скасаваць"
 
@@ -25,6 +31,15 @@ msgid ""
 msgstr ""
 "Правярае сумяшчальнасць дачыненняў маршрутаў з 2-й версіяй маршрутаў "
 "грамадскага транспарта"
+
+msgid "Close"
+msgstr "Закрыць"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Адлюстроўвае прыпынкі выбраных маршрутаў грамадскага транспарту ў выглядзе графа"
+
+msgid "Distance between stops"
+msgstr "Адлегласць паміж прыпынкамі"
 
 msgid "Do you want to download referrers of platforms and stop positions?"
 msgstr "Жадаеце сцягнуць аб''екты, якія спасылаюцца на платформы і прыпынкі?"
@@ -47,6 +62,9 @@ msgstr "Што вы выбераце для працягу?"
 
 msgid "Include stop_area tests"
 msgstr "Уключаючы праверку stop_area"
+
+msgid "Invalid selection"
+msgstr "Няправільнае вылучэнне"
 
 #, java-format
 msgid "Mode: {0}"
@@ -132,6 +150,9 @@ msgstr ""
 msgid "Public Transport Assistant tests"
 msgstr "Праверкі Памочніка грамадскага транспарту"
 
+msgid "Public transport routes"
+msgstr "Маршруты грамадскага транспарту"
+
 msgid "Remember my choice and do not ask me again in this session"
 msgstr "Запомніць мой выбар і больш не пытаць у гэтым сеансе"
 
@@ -147,11 +168,20 @@ msgstr ""
 "Яны павінны быць загружаны, каб працягнуць праверку.\n"
 "Вы хочаце загрузіць іх?"
 
+msgid "Toggle direction arrows"
+msgstr "Паказаць/схаваць стрэлкі напрамкаў"
+
+msgid "Toggle reference labels"
+msgstr "Паказаць/схаваць пазнакі"
+
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr "ГТ: Праблема ў сегменце маршруту з адным аўтаматычным выпраўленнем"
 
 msgid "Updating map ..."
 msgstr "Абнаўленне карты ..."
+
+msgid "Visualize public transport routes"
+msgstr "Візуалізаваць маршруты грамадскага транспарту"
 
 msgid "Warning: the diplayed fix variants are based on less strict criteria"
 msgstr ""

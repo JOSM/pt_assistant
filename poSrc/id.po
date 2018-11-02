@@ -1,8 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (id)
-# Copyright (C) 2018 
+# Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -17,6 +17,12 @@ msgstr ""
 "Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Rute public_trasnport:version=2 yang valid dibutuhkan"
+
 msgid "Bicycle and foot routes Tests"
 msgstr "Uji coba rute sepeda dan pejalan kaki"
 
@@ -26,6 +32,15 @@ msgstr "Batalkan"
 msgid ""
 "Check if route relations are compatible with public transport version 2"
 msgstr "Periksa apakah relasi rute sesuai dengan transportasi publik versi 2"
+
+msgid "Close"
+msgstr "Tutup"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Menampilkan pemberhatian dari rute transportasi umum terpilih sebagai grafik"
+
+msgid "Distance between stops"
+msgstr "Jarak antar pemberhentian"
 
 msgid "Do you want to download referrers of platforms and stop positions?"
 msgstr "Apakah Anda mau mengunduh perujuk dari platform dan posisi henti?"
@@ -57,6 +72,9 @@ msgstr "Masukkan uji coba stop_area"
 
 msgid "Incomplete Members"
 msgstr "Anggota tidak lengkap"
+
+msgid "Invalid selection"
+msgstr "Pilihan tidak valid"
 
 #, java-format
 msgid "Mode: {0}"
@@ -181,6 +199,9 @@ msgstr "Transportasi Publik"
 msgid "Public Transport Assistant tests"
 msgstr "Uji coba Public Transport Assistant"
 
+msgid "Public transport routes"
+msgstr "Rute transportasi umum"
+
 msgid "Remember my choice and do not ask me again in this session"
 msgstr "Ingat pilihan saya dan jangan tanya saya lagi pada sesi ini"
 
@@ -206,6 +227,12 @@ msgstr ""
 "Relasi memiliki anggota yang tidak lengkap. Apakah Anda mau mengunduhnya dan"
 " melanjutkan dengan penyortiran?"
 
+msgid "Toggle direction arrows"
+msgstr "Atur arah panah"
+
+msgid "Toggle reference labels"
+msgstr "Ubah label referensi"
+
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
 "Ketikkan huruf untuk memilih jenis perbaikan atau pencet Escape untuk tidak "
@@ -213,6 +240,9 @@ msgstr ""
 
 msgid "Updating map ..."
 msgstr "memperbarui peta"
+
+msgid "Visualize public transport routes"
+msgstr "Visualisasikan rute transportasi umum"
 
 msgid "Warning: the diplayed fix variants are based on less strict criteria"
 msgstr ""

@@ -1,8 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (de)
-# Copyright (C) 2018 
+# Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -16,6 +16,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid ", "
+msgstr ", "
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Eine gültige public_transport:version=2 Route ist erforderlich"
 
 msgid "Always split ways, even if they are not at the end of the itinerary"
 msgstr "Linien immer auftrennen, sogar wenn sie nicht am Ende der Route sind"
@@ -34,6 +40,15 @@ msgid ""
 msgstr ""
 "Prüft, ob Routen-Relationen kompatibel mit dem Schema des öffentlichen "
 "Verkehrs Version 2 sind"
+
+msgid "Close"
+msgstr "Schließen"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr "Haltestellen der gewählten Routen des öffentlichen Verkehrs als Graph anzeigen"
+
+msgid "Distance between stops"
+msgstr "Entfernung zwischen Haltestellen"
 
 msgid "Do you want to download referrers of platforms and stop positions?"
 msgstr ""
@@ -100,6 +115,9 @@ msgstr "Unvollständige Elemente"
 
 msgid "Incomplete relations"
 msgstr "Unvollständige Relationen"
+
+msgid "Invalid selection"
+msgstr "Ungültige Auswahl"
 
 #, java-format
 msgid "Mode: {0}"
@@ -240,6 +258,9 @@ msgstr "Öffentlicher Verkehr"
 msgid "Public Transport Assistant tests"
 msgstr "Tests des Assistenten für Öffentlichen Verkehr"
 
+msgid "Public transport routes"
+msgstr "Routen des öffentlichen Verkehrs"
+
 msgid "Remember my choice and do not ask me again in this session"
 msgstr "Meine Wahl merken und in dieser Sitzung nicht wieder danach fragen"
 
@@ -271,6 +292,12 @@ msgstr ""
 "Die Relation hat unvollständige Elemente. Sollen sie heruntergeladen und mit"
 " der Sortierung fortgefahren werden?"
 
+msgid "Toggle direction arrows"
+msgstr "Richtungspfeile umschalten"
+
+msgid "Toggle reference labels"
+msgstr "Referenzbeschriftung umschalten"
+
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
 "Tippen Sie einen Buchstaben zum Auswählen einer Korrekturvariante ein oder "
@@ -287,6 +314,9 @@ msgid "Use 1/2/3/4 instead of A/B/C/D for selecting which way to follow"
 msgstr ""
 "1/2/3/4 statt A/B/C/D verwenden, um auszuwählen, welcher Linie man folgen "
 "möchte"
+
+msgid "Visualize public transport routes"
+msgstr "Routen des öffentlichen Verkehrs visualisieren"
 
 msgid "Warning: the diplayed fix variants are based on less strict criteria"
 msgstr ""
