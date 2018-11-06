@@ -57,15 +57,11 @@ public class DistanceBetweenStops extends JosmAction {
         for (int i = 0; i < links.size(); i++) {
             final WayConnectionType link = links.get(i);
             final List<Node> nodes = routeSegments.get(i).getWay().getNodes();
-            switch (link.direction) {
-            case BACKWARD:
+            if (link.direction == WayConnectionType.Direction.BACKWARD) {
                 Collections.reverse(nodes);
-                // fall through
-            case FORWARD:
+            }
+            if (link.direction == WayConnectionType.Direction.BACKWARD || link.direction == WayConnectionType.Direction.FORWARD) {
                 routeNodes.addAll(link.linkPrev ? nodes.subList(1, nodes.size()) : nodes);
-                break;
-            default:
-                break;
             }
         }
 
@@ -94,16 +90,16 @@ public class DistanceBetweenStops extends JosmAction {
                 } else {
                     length = 0.0;
                 }
-                sb.append(SystemOfMeasurement.getSystemOfMeasurement().getDistText(length, new DecimalFormat("0"), -1));
-                sb.append("\t");
-                sb.append(n.getDisplayName(DefaultNameFormatter.getInstance()));
-                sb.append("\n");
+                sb.append(SystemOfMeasurement.getSystemOfMeasurement().getDistText(length, new DecimalFormat("0"), -1))
+                    .append('\t')
+                    .append(n.getDisplayName(DefaultNameFormatter.getInstance()))
+                    .append('\n');
                 lastN = n;
             }
-            sb.insert(0, "\n");
-            sb.insert(0, route.getDisplayName(DefaultNameFormatter.getInstance()));
-            sb.insert(0, "\t");
-            sb.insert(0, SystemOfMeasurement.getSystemOfMeasurement().getDistText(totalLength / lengthN, new DecimalFormat("0"), -1));
+            sb.insert(0, '\n')
+                .insert(0, route.getDisplayName(DefaultNameFormatter.getInstance()))
+                .insert(0, '\t')
+                .insert(0, SystemOfMeasurement.getSystemOfMeasurement().getDistText(totalLength / lengthN, new DecimalFormat("0"), -1));
         } finally {
             Config.getPref().putBoolean("system_of_measurement.use_only_lower_unit", onlyLowerUnit);
         }
@@ -123,8 +119,8 @@ public class DistanceBetweenStops extends JosmAction {
         Node lastN = null;
         for (Node n : nodes) {
             if (lastN != null) {
-                LatLon lastNcoor = lastN.getCoor();
-                LatLon coor = n.getCoor();
+                final LatLon lastNcoor = lastN.getCoor();
+                final LatLon coor = n.getCoor();
                 if (lastNcoor != null && coor != null) {
                     length += coor.greatCircleDistance(lastNcoor);
                 }
@@ -141,20 +137,22 @@ public class DistanceBetweenStops extends JosmAction {
         }
         final StringBuilder sb = new StringBuilder();
         for (Relation relation : getLayerManager().getEditDataSet().getSelectedRelations()) {
-            if (!isRouteSupported(relation)) {
-                JOptionPane.showMessageDialog(MainApplication.getMainFrame(),
-                        "<html>" + tr("A valid public_transport:version=2 route is required")
-                + Utils.joinAsHtmlUnorderedList(Collections.singleton(relation.getDisplayName(DefaultNameFormatter.getInstance()))),
-                tr("Invalid selection"), JOptionPane.WARNING_MESSAGE);
-                continue;
+            if (isRouteSupported(relation)) {
+                sb.append('\n').append(calculateDistanceBetweenStops(relation)).append('\n');
+            } else {
+                JOptionPane.showMessageDialog(
+                    MainApplication.getMainFrame(),
+                    "<html>" + tr("A valid public_transport:version=2 route is required") +
+                    Utils.joinAsHtmlUnorderedList(Collections.singleton(relation.getDisplayName(DefaultNameFormatter.getInstance()))),
+                    tr("Invalid selection"),
+                    JOptionPane.WARNING_MESSAGE
+                );
             }
-            sb.append("\n");
-            sb.append(calculateDistanceBetweenStops(relation)).append("\n");
         }
 
-        new ExtendedDialog(MainApplication.getMainFrame(), getValue(NAME).toString(), new String[]{tr("Close")}) {
+        new ExtendedDialog(MainApplication.getMainFrame(), getValue(NAME).toString(), tr("Close")) {
             {
-                setButtonIcons(new String[]{"ok.png"});
+                setButtonIcons("ok.png");
                 final JosmTextArea jte = new JosmTextArea();
                 jte.setFont(GuiHelper.getMonospacedFont(jte));
                 jte.setEditable(false);

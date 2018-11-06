@@ -102,7 +102,7 @@ public class PublicTransportLayer extends Layer {
         Color color = new Color(0x80FFFFFF, true);
 
         for (Pair<Node, Node> nodePair : segmentRefs.keySet()) {
-            final String label = Utils.join(tr(", "), new TreeSet<>(segmentRefs.get(nodePair)));
+            final String label = Utils.join(", ", new TreeSet<>(segmentRefs.get(nodePair)));
             c.put(StyleKeys.TEXT, label);
             final TextLabel text = TextLabel.create(env, color, false);
             final Way way = new Way();
