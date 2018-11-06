@@ -1,8 +1,10 @@
-import java.util.regex.Pattern
+import java.net.URL
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 
 plugins {
-  id "eclipse"
-  id "org.openstreetmap.josm" version "0.5.0"
+  id("org.openstreetmap.josm") version "0.5.3"
+  id("com.github.ben-manes.versions") version "0.20.0"
 }
 
 repositories {
@@ -10,23 +12,23 @@ repositories {
 }
 dependencies {
   testImplementation("org.openstreetmap.josm:josm-unittest:SNAPSHOT"){changing=true}
-  def junitVersion = "5.2.0"
-  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
-  testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
-  testImplementation "org.junit.vintage:junit-vintage-engine:$junitVersion"
-  testImplementation("com.github.tomakehurst:wiremock:2.18.0")
+  def junitVersion = "5.3.1"
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+  testImplementation("org.junit.vintage:junit-vintage-engine:$junitVersion")
+  testImplementation("com.github.tomakehurst:wiremock:2.19.0")
   testImplementation("org.awaitility:awaitility:3.1.2")
 }
 
 tasks.withType(JavaCompile) {
-  options.compilerArgs += [
-    "-Xlint:all",
-    "-Xlint:-serial",
-  ]
+  options.compilerArgs.addAll(
+    ["-Xlint:all", "-Xlint:-serial"]
+  )
 }
 
 josm {
   manifest {
+    oldVersionDownloadLink(14149, "2.1.6", new URL("https://github.com/JOSM/pt_assistant/releases/download/v2.1.6/pt_assistant.jar"))
     oldVersionDownloadLink(14027, "v2.1.4", new URL("https://github.com/JOSM/pt_assistant/releases/download/v2.1.4/pt_assistant.jar"))
     oldVersionDownloadLink(13957, "v2.0.0", new URL("https://github.com/JOSM/pt_assistant/releases/download/v2.0.0/pt_assistant.jar"))
   }
@@ -35,47 +37,33 @@ josm {
   }
 }
 
-test {
-    testLogging.exceptionFormat = "full"
+tasks.withType(Test.class) {
+  testLogging.exceptionFormat = TestExceptionFormat.FULL
 }
 
 sourceSets {
-  main {
+  getByName("main") {
     java {
-      srcDirs = ["$projectDir/src"]
+      setSrcDirs(["$projectDir/src"])
     }
-    po {
-      srcDirs = ["$projectDir/poSrc"]
-    }
+      po {
+        setSrcDirs(["$projectDir/poSrc"])
+      }
   }
-  test {
+  getByName("test") {
     java {
-      srcDirs = ["test/unit"]
+      setSrcDirs(["test/unit"])
     }
     resources {
-      srcDirs = ["test/data"]
+      setSrcDirs(["test/data"])
     }
   }
 }
-tasks.withType(ProcessResources.class).getByName(sourceSets.main.getProcessResourcesTaskName()) {
+tasks.withType(ProcessResources.class).getByName(sourceSets["main"].getProcessResourcesTaskName()) {
   from(projectDir) {
     include("images/**")
     include("GPL-*")
     include("README")
     include("LICENSE")
-  }
-}
-
-// By default the git version is used, if that is not available this tries to get the SVN revision number
-if (project.version == null) {
-  def process = new ProcessBuilder("svn", "info").directory(project.projectDir).start()
-  if (process.waitFor() == 0) {
-    def pattern = Pattern.compile("Revision: ([1-9][0-9]*)")
-    Arrays.stream(process.inputStream.text.split("\n"))
-      .map { pattern.matcher(it) }
-      .filter { it.matches() }
-      .map { it.group(1) }
-      .findFirst()
-      .ifPresent { project.version = "r" + it.group(1) }
   }
 }
