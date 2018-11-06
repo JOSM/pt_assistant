@@ -4,6 +4,7 @@ jdk:
   - openjdk8
   - oraclejdk8
   - oraclejdk9
+  - openjdk10
 
 script: ./gradlew build compileJava_minJosm compileJava_latestJosm --stacktrace
 
@@ -36,4 +37,4 @@ jobs:
 stages:
   - test
   - name: i18n
-    if: type = push AND branch = trunk AND repo = JOSM/pt_assistant
+    if: type = push AND branch = master AND repo = JOSM/pt_assistant
