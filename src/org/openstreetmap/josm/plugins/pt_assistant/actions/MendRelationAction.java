@@ -16,7 +16,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,6 +26,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -44,11 +44,10 @@ import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.command.SplitWayCommand;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.UndoRedoHandler;
-import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.NodePair;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
-import org.openstreetmap.josm.data.osm.OsmUtils;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.TagMap;
@@ -68,8 +67,12 @@ import org.openstreetmap.josm.gui.layer.MapViewPaintable;
 import org.openstreetmap.josm.gui.layer.validation.PaintVisitor;
 import org.openstreetmap.josm.io.OverpassDownloadReader;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.BoundsUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.NotificationUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.GBC;
+import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
@@ -83,6 +86,41 @@ import org.openstreetmap.josm.tools.Utils;
  */
 public class MendRelationAction extends AbstractRelationEditorAction {
     private static final DownloadParams DEFAULT_DOWNLOAD_PARAMS = new DownloadParams();
+
+    private static final Color[] FIVE_COLOR_PALETTE = {
+        new Color(0, 255, 0, 150),
+        new Color(255, 0, 0, 150),
+        new Color(0, 0, 255, 150),
+        new Color(255, 255, 0, 150),
+        new Color(0, 255, 255, 150)
+    };
+
+    private static final Map<Character, Color> CHARACTER_COLOR_MAP = new HashMap<>();
+    static {
+        CHARACTER_COLOR_MAP.put('A', new Color(0, 255, 0, 200));
+        CHARACTER_COLOR_MAP.put('B', new Color(255, 0, 0, 200));
+        CHARACTER_COLOR_MAP.put('C', new Color(0, 0, 255, 200));
+        CHARACTER_COLOR_MAP.put('D', new Color(255, 255, 0, 200));
+        CHARACTER_COLOR_MAP.put('E', new Color(0, 255, 255, 200));
+        CHARACTER_COLOR_MAP.put('1', new Color(0, 255, 0, 200));
+        CHARACTER_COLOR_MAP.put('2', new Color(255, 0, 0, 200));
+        CHARACTER_COLOR_MAP.put('3', new Color(0, 0, 255, 200));
+        CHARACTER_COLOR_MAP.put('4', new Color(255, 255, 0, 200));
+        CHARACTER_COLOR_MAP.put('5', new Color(0, 255, 255, 200));
+    }
+
+    private static final Color CURRENT_WAY_COLOR = new Color(255, 255, 255, 190);
+    private static final Color NEXT_WAY_COLOR = new Color(169, 169, 169, 210);
+
+    private static final String I18N_ADD_ONEWAY_BUS_NO_TO_WAY = I18n.marktr("Add oneway:bus=no to way");
+    private static final String I18N_CLOSE_OPTIONS = I18n.marktr("Close the options");
+    private static final String I18N_NOT_REMOVE_WAYS = I18n.marktr("Do not remove ways");
+    private static final String I18N_REMOVE_CURRENT_EDGE = I18n.marktr("Remove current edge (white)");
+    private static final String I18N_REMOVE_WAYS = I18n.marktr("Remove ways");
+    private static final String I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY = I18n.marktr("Remove ways along with previous way");
+    private static final String I18N_SKIP = I18n.marktr("Skip");
+    private static final String I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS = I18n.marktr("solutions based on other route relations");
+    private static final String I18N_TURN_BY_TURN_NEXT_INTERSECTION = I18n.marktr("turn-by-turn at next intersection");
 
     Relation relation = null;
     MemberTableModel memberTableModel = null;
@@ -124,49 +162,30 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         editor.addWindowListener(new WindowEventHandler());
     }
 
-    private void downloadWithNotifications(final Future<?> downloadFuture, final String translatedLabel)
-            throws ExecutionException, InterruptedException {
-        new Notification(tr("Download started: {0}", translatedLabel))
-            .setIcon(JOptionPane.INFORMATION_MESSAGE)
-            .setDuration(Notification.TIME_SHORT)
-            .show();
-        downloadFuture.get();
-        new Notification(tr("Download finished: {0}", translatedLabel))
-            .setIcon(JOptionPane.INFORMATION_MESSAGE)
-            .setDuration(Notification.TIME_SHORT)
-            .show();
-    }
+
 
     private String getQuery() {
-        String str = "[timeout:100];\n" + "(\n";
+        final StringBuilder str = new StringBuilder("[timeout:100];\n(\n");
+        final String wayFormatterString = "   way(%.6f,%.6f,%.6f,%.6f)\n";
+        final String str3 = "   [\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n";
 
-        String str2 = "   [\"highway\"]" + "[\"highway\"!=\"footway\"]" + "[\"highway\"!=\"path\"]"
-                + "[\"highway\"!=\"cycleway\"];" + "\n";
+        final List<Node> nodeList = aroundGaps ? getBrokenNodes() : (
+            aroundStops
+            ? members.stream().filter(RelationMember::isNode).map(RelationMember::getNode).collect(Collectors.toList())
+            : new ArrayList<>()
+        );
 
-        String str3 = ");\n" + "(._;<;);\n" + "(._;>;);\n" + "out meta;";
+        for (final Node n : nodeList) {
+            final double maxLat = n.getBBox().getTopLeftLat() + 0.001;
+            final double minLat = n.getBBox().getBottomRightLat() - 0.001;
+            final double maxLon = n.getBBox().getBottomRightLon() + 0.001;
+            final double minLon = n.getBBox().getTopLeftLon() - 0.001;
+            str.append(String.format(wayFormatterString, minLat, minLon, maxLat, maxLon))
+                .append(str3);
 
-        List<Node> nodeList = new ArrayList<>();
-
-        if (aroundGaps)
-        		nodeList = getBrokenNodes();
-
-        if (aroundStops) {
-        		for (int i = 0; i < members.size(); i++) {
-        			if (members.get(i).isNode()) {
-        				nodeList.add(members.get(i).getNode());
-        			}
-        		}
         }
 
-        for (int i = 0; i < nodeList.size(); i++) {
-            Node n = nodeList.get(i);
-            double maxLat = n.getBBox().getTopLeftLat() + 0.001, minLat = n.getBBox().getBottomRightLat() - 0.001;
-            double maxLon = n.getBBox().getBottomRightLon() + 0.001, minLon = n.getBBox().getTopLeftLon() - 0.001;
-            str = str + "   way (" + minLat + "," + minLon + "," + maxLat + "," + maxLon + ")\n" + str2;
-        }
-
-        str = str + str3;
-        return str;
+        return str.append(");\n(._;<;);\n(._;>;);\nout meta;").toString();
     }
 
     List<Node> getBrokenNodes() {
@@ -249,7 +268,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             panel.add(button3, GBC.eol().fill(GBC.HORIZONTAL));
 
             int i = JOptionPane.showConfirmDialog(null, panel);
-            if (i == 0) {
+            if (i == JOptionPane.OK_OPTION) {
             		if (button1.isSelected()) {
             			aroundStops = true;
             		} else if (button2.isSelected()) {
@@ -277,49 +296,35 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             return;
         }
 
-        double maxLat = wayList.get(0).getBBox().getTopLeftLat(), minLat = wayList.get(0).getBBox().getBottomRightLat();
-        double maxLon = wayList.get(0).getBBox().getBottomRightLon(), minLon = wayList.get(0).getBBox().getTopLeftLon();
-
-        for (Way way : wayList) {
-            BBox rbbox = way.getBBox();
-            maxLat = maxLat > rbbox.getTopLeftLat() ? maxLat : rbbox.getTopLeftLat();
-            minLat = minLat < rbbox.getBottomRightLat() ? minLat : rbbox.getBottomRightLat();
-            maxLon = maxLon > rbbox.getBottomRightLon() ? maxLon : rbbox.getBottomRightLon();
-            minLon = minLon < rbbox.getTopLeftLon() ? minLon : rbbox.getTopLeftLon();
-        }
-
-        double latOffset = (maxLat - minLat) / 10;
-        double lonOffset = (maxLon - minLon) / 10;
-
-        Bounds area = new Bounds(minLat - latOffset, minLon - lonOffset, maxLat + latOffset, maxLon + lonOffset);
         String query = getQuery();
         Logging.debug(query);
 
         if (aroundStops || aroundGaps) {
-        	    final Future<?> future = task.download(
+            BoundsUtils.createBoundsWithPadding(wayList, .1).ifPresent(area -> {
+                final Future<?> future = task.download(
                     new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query),
                     DEFAULT_DOWNLOAD_PARAMS,
                     area,
                     null
                 );
 
-            MainApplication.worker.submit(() -> {
+                MainApplication.worker.submit(() -> {
                     try {
-                        downloadWithNotifications(future, tr("Entire area"));
+                        NotificationUtils.downloadWithNotifications(future, tr("Entire area"));
                         callNextWay(currentIndex);
                     } catch (InterruptedException | ExecutionException e1) {
                         Logging.error(e1);
-                        return;
                     }
                 });
+            });
         } else {
-        		callNextWay(currentIndex);
+            callNextWay(currentIndex);
         }
 
     }
 
     void callNextWay(int i) {
-        System.out.println("Index + " + i);
+        Logging.debug("Index + " + i);
         downloadCounter++;
         if (i < members.size() && members.get(i).isWay()) {
             if (currentNode == null)
@@ -403,13 +408,14 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         nextIndex = false;
         notice = null;
 
-        int numberOfNodes = findNumberOfCommonFirstLastNode(nextWay, way);
-        if (numberOfNodes > 1) {
+        final NodePair commonEndNodes = WayUtils.findCommonFirstLastNodes(nextWay, way);
+        if (commonEndNodes.getA() != null && commonEndNodes.getB() != null) {
             nextWayDelete = true;
             notice = "Multiple common nodes found between current and next way";
-        } else if (numberOfNodes == 1) {
-            // the method only checks at the first last nodes
-            node = findCommonFirstLastNode(nextWay, way, currentNode);
+        } else if (commonEndNodes.getA() != null) {
+            node = commonEndNodes.getA();
+        } else if (commonEndNodes.getB() != null) {
+            node = commonEndNodes.getB();
         } else {
             // the nodes can be one of the intermediate nodes
             for (Node n : nextWay.getNodes()) {
@@ -421,28 +427,22 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
 
         // check if there is a restricted relation that doesn't allow both the ways together
-        if (node != null) {
-            if (isRestricted(nextWay, way, node)) {
-                nextWayDelete = true;
-            }
+        if (node != null && isRestricted(nextWay, way, node)) {
+            nextWayDelete = true;
         }
 
-        if (way.hasTag("junction", "roundabout")) {
-            if (isNonSplitRoundAbout(way)) {
-                nextWayDelete = false;
-                for (Node n : way.getNodes()) {
-                    if (nextWay.firstNode().equals(n) || nextWay.lastNode().equals(n)) {
-                        node = n;
-                        currentNode = n;
-                    }
+        if (isNonSplitRoundAbout(way)) {
+            nextWayDelete = false;
+            for (Node n : way.getNodes()) {
+                if (nextWay.firstNode().equals(n) || nextWay.lastNode().equals(n)) {
+                    node = n;
+                    currentNode = n;
                 }
             }
         }
 
-        if (nextWay.hasTag("junction", "roundabout")) {
-            if (isNonSplitRoundAbout(nextWay)) {
-                nextWayDelete = false;
-            }
+        if (isNonSplitRoundAbout(nextWay)) {
+            nextWayDelete = false;
         }
 
         if (node != null && !checkOneWaySatisfiability(nextWay, node)) {
@@ -469,12 +469,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         halt = false;
     }
 
-    boolean isOneWay(Way w) {
-        if (w.isOneway() == 0)
-            return false;
-        return true;
-    }
-
     void removeWay(int j) {
         List<Integer> Int = new ArrayList<>();
         List<Way> lst = new ArrayList<>();
@@ -483,15 +477,15 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         // if the way at members.get(j) is one way then check if the next ways are on
         // way, if so then remove them as well
-        if (isOneWay(members.get(j).getWay())) {
+        if (WayUtils.isOneWay(members.get(j).getWay())) {
             while (true) {
                 int k = getNextWayIndex(j);
                 if (k == -1 || k >= members.size())
                     break;
 
-                if (!isOneWay(members.get(k).getWay()))
+                if (!WayUtils.isOneWay(members.get(k).getWay()))
                     break;
-                if (findNumberOfCommonFirstLastNode(members.get(k).getWay(), members.get(j).getWay()) == 0)
+                if (WayUtils.findNumberOfCommonFirstLastNodes(members.get(k).getWay(), members.get(j).getWay()) == 0)
                     break;
 
                 j = k;
@@ -548,7 +542,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
     private void downloadIncompleteRelations() {
 
-        List<Relation> parents = Arrays.asList(relation);
+        List<Relation> parents = Collections.singletonList(relation);
 
         Future<?> future = MainApplication.worker
                 .submit(new DownloadRelationMemberTask(parents,
@@ -558,27 +552,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         MainApplication.worker.submit(() -> {
             try {
-                downloadWithNotifications(future, tr("Incomplete relations"));
+                NotificationUtils.downloadWithNotifications(future, tr("Incomplete relations"));
                 initialise();
             } catch (InterruptedException | ExecutionException e1) {
                 Logging.error(e1);
-                return;
             }
         });
-    }
-
-    int findNumberOfCommonFirstLastNode(Way way, Way previousWay) {
-        Node node1 = previousWay.firstNode();
-        Node node2 = previousWay.lastNode();
-        int count = 0;
-        if (way.firstNode().equals(node1) || way.firstNode().equals(node2)) {
-            count++;
-        }
-        if (way.lastNode().equals(node1) || way.lastNode().equals(node2)) {
-            count++;
-        }
-
-        return count++;
     }
 
     int findNumberOfCommonNode(Way way, Way previousWay) {
@@ -590,33 +569,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             }
         }
         return count;
-    }
-
-    Node findCommonFirstLastNode(Way way, Way previousWay) {
-        Node node1 = previousWay.firstNode();
-        Node node2 = previousWay.lastNode();
-
-        if (way.firstNode().equals(node1) || way.firstNode().equals(node2)) {
-            return way.firstNode();
-        }
-        if (way.lastNode().equals(node1) || way.lastNode().equals(node2)) {
-            return way.lastNode();
-        }
-
-        return null;
-    }
-
-    Node findCommonFirstLastNode(Way way, Way prevWay, Node currentNode) {
-        if (currentNode == null) {
-            if (way.firstNode().equals(prevWay.firstNode()) || way.firstNode().equals(prevWay.lastNode()))
-                return way.firstNode();
-            else
-                return way.lastNode();
-        }
-        if (way.lastNode().equals(prevWay.lastNode()) || way.lastNode().equals(prevWay.firstNode()))
-            return way.lastNode();
-        else
-            return way.firstNode();
     }
 
     void addNewWays(List<Way> ways, int i) {
@@ -652,8 +604,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 // if the next index where the same way comes is well connected with its prev
                 // and next way then don't delete it in that index
                 if (prev != null && next != null) {
-                    if (findNumberOfCommonFirstLastNode(prev, way) != 0
-                            && findNumberOfCommonFirstLastNode(way, nextWay) != 0) {
+                    if (WayUtils.findNumberOfCommonFirstLastNodes(prev, way) != 0
+                            && WayUtils.findNumberOfCommonFirstLastNodes(way, nextWay) != 0) {
                         del = false;
                     }
                 }
@@ -671,14 +623,14 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         nextIndex = false;
         DataSet ds = MainApplication.getLayerManager().getEditDataSet();
         ds.setSelected(way);
-        AutoScaleAction.zoomTo(Arrays.asList(way));
+        AutoScaleAction.zoomTo(Collections.singletonList(way));
         downloadAreaAroundWay(way, node, null);
         return null;
     }
 
     Way findNextWayBeforeDownload(Way way, Node node1, Node node2) {
         nextIndex = false;
-        AutoScaleAction.zoomTo(Arrays.asList(way));
+        AutoScaleAction.zoomTo(Collections.singletonList(way));
         downloadAreaAroundWay(way, node1, node2);
         return null;
     }
@@ -771,6 +723,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         return list;
     }
 
+    // TODO: Merge with searchWayFromOtherRelationsReversed(Relation r, Way current, Way next)! These seem to do largely the same thing.
     List<Way> searchWayFromOtherRelations(Relation r, Way current, Way next) {
         List<RelationMember> member = r.getMembers();
         List<Way> lst = new ArrayList<>();
@@ -789,15 +742,16 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     if (findNumberOfCommonNode(w, prev) != 0) {
                         lst.add(w);
                         prev = w;
-                    } else
+                    } else {
                         break;
-                    ;
+                    }
                 }
             }
         }
         return null;
     }
 
+    // TODO: Merge with searchWayFromOtherRelations(Relation r, Way current, Way next)! These seem to do largely the same thing.
     List<Way> searchWayFromOtherRelationsReversed(Relation r, Way current, Way next) {
         List<RelationMember> member = r.getMembers();
         List<Way> lst = new ArrayList<>();
@@ -815,13 +769,13 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     return lst;
                 } else if (canAdd) {
                     // not valid in reverse if it is oneway or part of roundabout
-                    if (findNumberOfCommonNode(w, prev) != 0 && w.isOneway() == 0 && isOnewayForPublicTransport(w) == 0
-                            && !isSplitRoundAbout(w)) {
+                    if (findNumberOfCommonNode(w, prev) != 0 && w.isOneway() == 0 && RouteUtils.isOnewayForPublicTransport(w) == 0
+                        && !isSplitRoundAbout(w)) {
                         lst.add(w);
                         prev = w;
-                    } else
+                    } else {
                         break;
-                    ;
+                    }
                 }
             }
         }
@@ -926,13 +880,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
 
         // put the most possible answer in front
-        Way frontWay = null;
-        for (int i = 0; i < parentWays.size(); i++) {
-            if (checkIfWayConnectsToNextWay(parentWays.get(i), 0, node)) {
-                frontWay = parentWays.get(i);
-                break;
-            }
-        }
+        Way frontWay = parentWays.stream().filter(it -> checkIfWayConnectsToNextWay(it, 0, node)).findFirst().orElse(null);
 
         if (frontWay == null && parentWays.size() > 0) {
             Way minWay = parentWays.get(0);
@@ -1068,62 +1016,40 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
         parentWays.addAll(waysToBeAdded);
         // one way direction doesn't match
-        for (Way w : parentWays) {
-            if (w.isOneway() != 0) {
-                if (!checkOneWaySatisfiability(w, node)) {
-                    waysToBeRemoved.add(w);
-                }
-            }
-        }
+        parentWays.stream()
+            .filter(it -> WayUtils.isOneWay(it) && !checkOneWaySatisfiability(it, node))
+            .forEach(waysToBeRemoved::add);
+
         parentWays.removeAll(waysToBeRemoved);
         waysToBeRemoved.clear();
 
         // check if both nodes of the ways are common, then remove
         for (Way w : parentWays) {
-            if (findNumberOfCommonFirstLastNode(way, w) != 1 && !w.hasTag("junction", "roundabout")) {
+            if (WayUtils.findNumberOfCommonFirstLastNodes(way, w) != 1 && !w.hasTag("junction", "roundabout")) {
                 waysToBeRemoved.add(w);
             }
         }
 
         // check if any of them belong to roundabout, if yes then show ways accordingly
-        for (Way w : parentWays) {
-            if (w.hasTag("junction", "roundabout")) {
-                if (findNumberOfCommonFirstLastNode(way, w) == 1) {
-                    if (w.lastNode().equals(node)) {
-                        waysToBeRemoved.add(w);
-                    }
-                }
-            }
-        }
+        parentWays.stream()
+            .filter(it -> it.hasTag("junction", "roundabout") && WayUtils.findNumberOfCommonFirstLastNodes(way, it) == 1 && it.lastNode().equals(node))
+            .forEach(waysToBeRemoved::add);
 
         // check mode of transport, also check if there is no loop
-        for (Way w : parentWays) {
-            if (relation.hasTag("route", "bus")) {
-                if (!isWaySuitableForBuses(w)) {
-                    waysToBeRemoved.add(w);
-                }
-            } else if (RouteUtils.isPTRoute(relation)) {
-                if (!isWaySuitableForOtherModes(w)) {
-                    waysToBeRemoved.add(w);
-                }
-            }
+        if (relation.hasTag("route", "bus")) {
+            parentWays.stream().filter(it -> !WayUtils.isSuitableForBuses(it)).forEach(waysToBeRemoved::add);
+        } else if (RouteUtils.isPTRoute(relation)) {
+            parentWays.stream().filter(it -> !isWaySuitableForOtherModes(it)).forEach(waysToBeRemoved::add);
         }
 
-        for (Way w : parentWays) {
-            if (w.equals(previousWay)) {
-                waysToBeRemoved.add(w);
-            }
-        }
+        parentWays.stream().filter(it -> it.equals(previousWay)).forEach(waysToBeRemoved::add);
 
         parentWays.removeAll(waysToBeRemoved);
         waysToBeRemoved.clear();
 
         // check restrictions
-        for (Way w : parentWays) {
-            if (isRestricted(w, way, node)) {
-                waysToBeRemoved.add(w);
-            }
-        }
+        parentWays.stream().filter(it -> isRestricted(it, way, node)).forEach(waysToBeRemoved::add);
+
         parentWays.removeAll(waysToBeRemoved);
 
         return parentWays;
@@ -1148,7 +1074,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         // check if any of them belong to roundabout, if yes then show ways accordingly
         for (Way w : parentWays) {
             if (w.hasTag("junction", "roundabout")) {
-                if (findNumberOfCommonFirstLastNode(way, w) == 1) {
+                if (WayUtils.findNumberOfCommonFirstLastNodes(way, w) == 1) {
                     if (w.lastNode().equals(node)) {
                         waysToBeRemoved.add(w);
                     }
@@ -1158,7 +1084,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         // check mode of transport, also check if there is no loop
         for (Way w : parentWays) {
-            if (!isWaySuitableForBuses(w)) {
+            if (!WayUtils.isSuitableForBuses(w)) {
                 waysToBeRemoved.add(w);
             }
 
@@ -1187,22 +1113,17 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
             DownloadOsmTask task = new DownloadOsmTask();
 
-            BBox rbbox = way.getBBox();
-            double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 10;
-            double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 10;
-            Bounds area = new Bounds(rbbox.getBottomRightLat() - 4 * latOffset, rbbox.getTopLeftLon() - 4 * lonOffset,
-                    rbbox.getTopLeftLat() + 4 * latOffset, rbbox.getBottomRightLon() + 4 * lonOffset);
+            BoundsUtils.createBoundsWithPadding(way.getBBox(), .4).ifPresent(area -> {
+                Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
 
-            Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
-
-            MainApplication.worker.submit(() -> {
-                try {
-                    downloadWithNotifications(future, tr("Area around way") + " (1)");
-                    findNextWayAfterDownload(way, node1, node2);
-                } catch (InterruptedException | ExecutionException e1) {
-                    Logging.error(e1);
-                    return;
-                }
+                MainApplication.worker.submit(() -> {
+                    try {
+                        NotificationUtils.downloadWithNotifications(future, tr("Area around way") + " (1)");
+                        findNextWayAfterDownload(way, node1, node2);
+                    } catch (InterruptedException | ExecutionException e1) {
+                        Logging.error(e1);
+                    }
+                });
             });
         } else {
             findNextWayAfterDownload(way, node1, node2);
@@ -1217,25 +1138,21 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             downloadCounter = 0;
 
             DownloadOsmTask task = new DownloadOsmTask();
-            BBox rbbox = way.getBBox();
-            double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 10;
-            double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 10;
-            Bounds area = new Bounds(rbbox.getBottomRightLat() - latOffset, rbbox.getTopLeftLon() - lonOffset,
-                    rbbox.getTopLeftLat() + latOffset, rbbox.getBottomRightLon() + lonOffset);
-            Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
+            BoundsUtils.createBoundsWithPadding(way.getBBox(), .1).ifPresent(area -> {
+                Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
 
-            MainApplication.worker.submit(() -> {
-                try {
-                    downloadWithNotifications(future, tr("Area around way") + " (2)");
-                    if (currentIndex >= members.size() - 1) {
-                        deleteExtraWays();
-                    } else {
-                        callNextWay(++currentIndex);
+                MainApplication.worker.submit(() -> {
+                    try {
+                        NotificationUtils.downloadWithNotifications(future, tr("Area around way") + " (2)");
+                        if (currentIndex >= members.size() - 1) {
+                            deleteExtraWays();
+                        } else {
+                            callNextWay(++currentIndex);
+                        }
+                    } catch (InterruptedException | ExecutionException e1) {
+                        Logging.error(e1);
                     }
-                } catch (InterruptedException | ExecutionException e1) {
-                    Logging.error(e1);
-                    return;
-                }
+                });
             });
         } else {
             if (currentIndex >= members.size() - 1) {
@@ -1255,21 +1172,17 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
             DownloadOsmTask task = new DownloadOsmTask();
 
-            BBox rbbox = way.getBBox();
-            double latOffset = (rbbox.getTopLeftLat() - rbbox.getBottomRightLat()) / 20;
-            double lonOffset = (rbbox.getBottomRightLon() - rbbox.getTopLeftLon()) / 20;
-            Bounds area = new Bounds(rbbox.getBottomRightLat() - 4 * latOffset, rbbox.getTopLeftLon() - 4 * lonOffset,
-                    rbbox.getTopLeftLat() + 4 * latOffset, rbbox.getBottomRightLon() + 4 * lonOffset);
-            Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
+            BoundsUtils.createBoundsWithPadding(way.getBBox(), .2).ifPresent(area -> {
+                Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
 
-            MainApplication.worker.submit(() -> {
-                try {
-                    downloadWithNotifications(future, tr("Area around way") + " (3)");
-                    goToNextWays(way, prevWay, ways);
-                } catch (InterruptedException | ExecutionException e1) {
-                    Logging.error(e1);
-                    return;
-                }
+                MainApplication.worker.submit(() -> {
+                    try {
+                        NotificationUtils.downloadWithNotifications(future, tr("Area around way") + " (3)");
+                        goToNextWays(way, prevWay, ways);
+                    } catch (InterruptedException | ExecutionException e1) {
+                        Logging.error(e1);
+                    }
+                });
             });
         } else {
             goToNextWays(way, prevWay, ways);
@@ -1281,41 +1194,25 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             return;
 
         if (!onFly) {
-        		displayWaysToRemove(Int);
+            displayWaysToRemove(Int);
         }
 
         downloadCounter = 0;
 
         DownloadOsmTask task = new DownloadOsmTask();
 
-        double maxLat = wayList.get(0).getBBox().getTopLeftLat(), minLat = wayList.get(0).getBBox().getBottomRightLat();
-        double maxLon = wayList.get(0).getBBox().getBottomRightLon(), minLon = wayList.get(0).getBBox().getTopLeftLon();
+        BoundsUtils.createBoundsWithPadding(wayList, .4).ifPresent( area -> {
+            Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
 
-        for (Way way : wayList) {
-            BBox rbbox = way.getBBox();
-            maxLat = maxLat > rbbox.getTopLeftLat() ? maxLat : rbbox.getTopLeftLat();
-            minLat = minLat < rbbox.getBottomRightLat() ? minLat : rbbox.getBottomRightLat();
-            maxLon = maxLon > rbbox.getBottomRightLon() ? maxLon : rbbox.getBottomRightLon();
-            minLon = minLon < rbbox.getTopLeftLon() ? minLon : rbbox.getTopLeftLon();
-        }
-
-        double latOffset = (maxLat - minLat) / 10;
-        double lonOffset = (maxLon - minLon) / 10;
-
-        Bounds area = new Bounds(minLat - 4 * latOffset, minLon - 4 * lonOffset, maxLat + 4 * latOffset,
-                maxLon + 4 * lonOffset);
-        Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
-
-        MainApplication.worker.submit(() -> {
-            try {
-                downloadWithNotifications(future, tr("Area before removal"));
-                displayWaysToRemove(Int);
-            } catch (InterruptedException | ExecutionException e1) {
-                Logging.error(e1);
-                return;
-            }
+            MainApplication.worker.submit(() -> {
+                try {
+                    NotificationUtils.downloadWithNotifications(future, tr("Area before removal"));
+                    displayWaysToRemove(Int);
+                } catch (InterruptedException | ExecutionException e1) {
+                    Logging.error(e1);
+                }
+            });
         });
-
     }
 
     boolean isRestricted(Way currentWay, Way previousWay, Node commonNode) {
@@ -1357,8 +1254,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         // check for "only" kind of restrictions
         for (Relation r : parentRelation) {
-            Collection<RelationMember> prevMemberList = r.getMembersFor(Arrays.asList(previousWay));
-            Collection<RelationMember> commonNodeList = r.getMembersFor(Arrays.asList(commonNode));
+            Collection<RelationMember> prevMemberList = r.getMembersFor(Collections.singletonList(previousWay));
+            Collection<RelationMember> commonNodeList = r.getMembersFor(Collections.singletonList(commonNode));
             // commonNode is not the node involved in the restriction relation then just continue
             if (prevMemberList.isEmpty() || commonNodeList.isEmpty())
                 continue;
@@ -1373,7 +1270,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     // if we have any "only" type restrictions then the current way should be in the
                     // relation else it is restricted
                     if (r.hasTag(s, acceptedTags)) {
-                        if (r.getMembersFor(Arrays.asList(currentWay)).isEmpty()) {
+                        if (r.getMembersFor(Collections.singletonList(currentWay)).isEmpty()) {
                             for (String str : acceptedTags) {
                                 if (r.hasTag(s, str))
                                     notice = str + " restriction violated";
@@ -1386,8 +1283,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
 
         for (Relation r : parentRelation) {
-            Collection<RelationMember> curMemberList = r.getMembersFor(Arrays.asList(currentWay));
-            Collection<RelationMember> prevMemberList = r.getMembersFor(Arrays.asList(previousWay));
+            Collection<RelationMember> curMemberList = r.getMembersFor(Collections.singletonList(currentWay));
+            Collection<RelationMember> prevMemberList = r.getMembersFor(Collections.singletonList(previousWay));
 
             if (curMemberList.isEmpty() || prevMemberList.isEmpty())
                 continue;
@@ -1409,25 +1306,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     }
                 }
             }
-        }
-
-        return false;
-    }
-
-    boolean isWaySuitableForBuses(Way way) {
-
-        String[] acceptedHighwayTags = new String[] {"motorway", "trunk", "primary", "secondary", "tertiary",
-                "unclassified", "road", "residential", "service", "motorway_link", "trunk_link", "primary_link",
-                "secondary_link", "tertiary_link", "living_street", "bus_guideway", "road" };
-
-        if (way.hasTag("highway", acceptedHighwayTags) || way.hasTag("cycleway", "share_busway")
-                || way.hasTag("cycleway", "shared_lane")) {
-            return true;
-        }
-
-        if ((way.hasTag("highway", "pedestrian")
-                && (way.hasTag("bus", "yes", "designated") || way.hasTag("psv", "yes", "designated")))) {
-            return true;
         }
 
         return false;
@@ -1486,34 +1364,14 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 return false;
         }
 
-        if (isOnewayForPublicTransport(way) == 0)
+        if (RouteUtils.isOnewayForPublicTransport(way) == 0)
             return true;
-        else if (isOnewayForPublicTransport(way) == 1 && way.lastNode().equals(node))
+        else if (RouteUtils.isOnewayForPublicTransport(way) == 1 && way.lastNode().equals(node))
             return false;
-        else if (isOnewayForPublicTransport(way) == -1 && way.firstNode().equals(node))
+        else if (RouteUtils.isOnewayForPublicTransport(way) == -1 && way.firstNode().equals(node))
             return false;
 
         return true;
-    }
-
-    // to be removed and taken from routeUtils later
-    int isOnewayForPublicTransport(Way way) {
-
-        if (OsmUtils.isTrue(way.get("oneway")) || OsmUtils.isReversed(way.get("oneway"))
-                || way.hasTag("junction", "roundabout") || way.hasTag("highway", "motorway")) {
-
-            if (!way.hasTag("busway", "lane") && !way.hasTag("busway", "opposite_lane")
-                    && !way.hasTag("busway:left", "lane") && !way.hasTag("busway:right", "lane")
-                    && !way.hasTag("oneway:bus", "no") && !way.hasTag("oneway:psv", "no")
-                    && !way.hasTag("trolley_wire", "backward")) {
-
-                if (OsmUtils.isReversed(way.get("oneway"))) {
-                    return -1;
-                }
-                return 1;
-            }
-        }
-        return 0;
     }
 
     Node getOtherNode(Way way, Node currentNode) {
@@ -1556,13 +1414,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             return;
 
         // zoom to problem:
-        final Collection<OsmPrimitive> waysToZoom = new ArrayList<>();
-
-        for (Way variant : fixVariants) {
-            waysToZoom.add(variant);
-        }
-
-        AutoScaleAction.zoomTo(waysToZoom);
+        AutoScaleAction.zoomTo(fixVariants);
 
         // display the fix variants:
         temporaryLayer = new MendRelationAddLayer();
@@ -1580,31 +1432,31 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 }
                 Character typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
                 if (allowedCharacters.contains(typedKeyUpperCase)) {
-                    int idx = typedKeyUpperCase.charValue() - 65;
+                    int idx = typedKeyUpperCase - 65;
                     if (numeric) {
                         // for numpad numerics and the plain numerics
-                        if (typedKeyUpperCase.charValue() <= 57)
-                            idx = typedKeyUpperCase.charValue() - 49;
+                        if (typedKeyUpperCase <= 57)
+                            idx = typedKeyUpperCase - 49;
                         else
-                            idx = typedKeyUpperCase.charValue() - 97;
+                            idx = typedKeyUpperCase - 97;
                     }
                     nextIndex = true;
-                    if (typedKeyUpperCase.charValue() == 'S' || typedKeyUpperCase.charValue() == '7') {
+                    if (typedKeyUpperCase == 'S' || typedKeyUpperCase == '7') {
                         removeKeyListenerAndTemporaryLayer(this);
                         shorterRoutes = false;
                         getNextWayAfterSelection(null);
-                    } else if (typedKeyUpperCase.charValue() == 'Q' || typedKeyUpperCase.charValue() == '9') {
+                    } else if (typedKeyUpperCase == 'Q' || typedKeyUpperCase == '9') {
                         removeKeyListenerAndTemporaryLayer(this);
                         shorterRoutes = false;
                         removeCurrentEdge();
-                    } else if (typedKeyUpperCase.charValue() == 'W' || typedKeyUpperCase.charValue() == '0') {
-                        shorterRoutes = shorterRoutes ? false : true;
+                    } else if (typedKeyUpperCase == 'W' || typedKeyUpperCase == '0') {
+                        shorterRoutes = !shorterRoutes;
                         removeKeyListenerAndTemporaryLayer(this);
                         callNextWay(currentIndex);
                     } else {
                         removeKeyListenerAndTemporaryLayer(this);
                         shorterRoutes = false;
-                        getNextWayAfterSelection(Arrays.asList(fixVariants.get(idx)));
+                        getNextWayAfterSelection(Collections.singletonList(fixVariants.get(idx)));
                     }
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -1658,15 +1510,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             return;
 
         // zoom to problem:
-        final Collection<OsmPrimitive> waysToZoom = new ArrayList<>();
-
-        for (List<Way> variants : fixVariants) {
-            for (Way variant : variants) {
-                waysToZoom.add(variant);
-            }
-        }
-
-        AutoScaleAction.zoomTo(waysToZoom);
+        AutoScaleAction.zoomTo(fixVariants.stream().flatMap(Collection::stream).collect(Collectors.toList()));
 
         // display the fix variants:
         temporaryLayer = new MendRelationAddMultipleLayer();
@@ -1682,26 +1526,26 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     removeKeyListenerAndTemporaryLayer(this);
                     return;
                 }
-                Character typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
+                char typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
                 if (allowedCharacters.contains(typedKeyUpperCase)) {
-                    int idx = typedKeyUpperCase.charValue() - 65;
+                    int idx = typedKeyUpperCase - 65;
                     if (numeric) {
                         // for numpad numerics and the plain numerics
-                        if (typedKeyUpperCase.charValue() <= 57)
-                            idx = typedKeyUpperCase.charValue() - 49;
+                        if (typedKeyUpperCase <= 57)
+                            idx = typedKeyUpperCase - 49;
                         else
-                            idx = typedKeyUpperCase.charValue() - 97;
+                            idx = typedKeyUpperCase - 97;
                     }
                     nextIndex = true;
-                    if (typedKeyUpperCase.charValue() == 'S' || typedKeyUpperCase.charValue() == '7') {
+                    if (typedKeyUpperCase == 'S' || typedKeyUpperCase == '7') {
                         removeKeyListenerAndTemporaryLayer(this);
                         shorterRoutes = false;
                         getNextWayAfterSelection(null);
-                    } else if (typedKeyUpperCase.charValue() == 'Q' || typedKeyUpperCase.charValue() == '9') {
+                    } else if (typedKeyUpperCase == 'Q' || typedKeyUpperCase == '9') {
                         removeKeyListenerAndTemporaryLayer(this);
                         shorterRoutes = false;
                         removeCurrentEdge();
-                    } else if (typedKeyUpperCase.charValue() == 'W' || typedKeyUpperCase.charValue() == '0') {
+                    } else if (typedKeyUpperCase == 'W' || typedKeyUpperCase == '0') {
                         shorterRoutes = shorterRoutes ? false : true;
                         removeKeyListenerAndTemporaryLayer(this);
                         callNextWay(currentIndex);
@@ -1745,7 +1589,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
 
         for (int i = 0; i < 5 && i < wayIndices.size(); i++) {
-            wayColoring.put(members.get(wayIndices.get(i).intValue()).getWay(), alphabet);
+            wayColoring.put(members.get(wayIndices.get(i)).getWay(), alphabet);
         }
 
         if (notice.equals("vehicle travels against oneway restriction")) {
@@ -1766,7 +1610,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         final Collection<OsmPrimitive> waysToZoom = new ArrayList<>();
 
         for (Integer i : wayIndices) {
-            waysToZoom.add(members.get(i.intValue()).getWay());
+            waysToZoom.add(members.get(i).getWay());
         }
 
         AutoScaleAction.zoomTo(waysToZoom);
@@ -1798,15 +1642,15 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     nextIndex = true;
                     MainApplication.getMap().mapView.removeKeyListener(this);
                     MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
-                    System.out.println(typedKeyUpperCase);
-                    if (typedKeyUpperCase.charValue() == 'R' || typedKeyUpperCase.charValue() == '3') {
+                    Logging.debug(String.valueOf(typedKeyUpperCase));
+                    if (typedKeyUpperCase == 'R' || typedKeyUpperCase == '3') {
                         wayIndices.add(0, currentIndex);
                     }
                     RemoveWayAfterSelection(wayIndices, typedKeyUpperCase);
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     MainApplication.getMap().mapView.removeKeyListener(this);
-                    System.out.println("ESC");
+                    Logging.debug("ESC");
                     nextIndex = false;
                     setEnable = true;
                     halt = true;
@@ -1823,7 +1667,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     void RemoveWayAfterSelection(List<Integer> wayIndices, Character chr) {
-        if (chr.charValue() == 'A' || chr.charValue() == '1') {
+        if (chr == 'A' || chr == '1') {
             // remove all the ways
             int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
             memberTableModel.remove(lst);
@@ -1839,7 +1683,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 notice = null;
                 deleteExtraWays();
             }
-        } else if (chr.charValue() == 'B' || chr.charValue() == '2') {
+        } else if (chr == 'B' || chr == '2') {
             if (currentIndex < members.size() - 1) {
                 notice = null;
                 currentIndex = wayIndices.get(wayIndices.size() - 1);
@@ -1848,7 +1692,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 notice = null;
                 deleteExtraWays();
             }
-        } else if (chr.charValue() == 'C' || chr.charValue() == '4') {
+        } else if (chr == 'C' || chr == '4') {
             List<Command> cmdlst = new ArrayList<>();
             int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
             for (int i = 0; i < lst.length; i++) {
@@ -1868,7 +1712,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 deleteExtraWays();
             }
         }
-        if (chr.charValue() == 'R' || chr.charValue() == '3') {
+        if (chr == 'R' || chr == '3') {
             // calculate the previous index
             int prevIndex = -1;
             for (int i = currentIndex - 1; i >= 0; i--) {
@@ -1905,7 +1749,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
              * current node is the node splitting a certain way 2) if next way's first node
              * is splitting the way 3) if next way's last node is splitting the way
              */
-            System.out.println("Number of ways " + ways.size());
+            Logging.debug("Number of ways " + ways.size());
             int ind = currentIndex;
             Way prev = currentWay;
             for (int i = 0; i < ways.size(); i++) {
@@ -1922,7 +1766,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                         for (Way v : par) {
                             if (v.getNodes().containsAll(w.getNodes())) {
                                 if (w.equals(v)) {
-                                    addNewWays(Arrays.asList(v), ind);
+                                    addNewWays(Collections.singletonList(v), ind);
                                     prev = v;
                                     ind++;
                                     brk = true;
@@ -1949,10 +1793,10 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                         if (v.getNodes().containsAll(w.getNodes()) && w1 == null) {
                             if (!w.equals(v) && !v.isFirstLastNode(nextWay.firstNode())) {
                                 w1 = v;
-                                breakNode = Arrays.asList(nextWay.firstNode());
+                                breakNode = Collections.singletonList(nextWay.firstNode());
                                 break;
                             } else if (w.equals(v)) {
-                                addNewWays(Arrays.asList(v), ind);
+                                addNewWays(Collections.singletonList(v), ind);
                                 prev = v;
                                 ind++;
                                 brk = true;
@@ -1966,10 +1810,10 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                         if (v.getNodes().containsAll(w.getNodes()) && w1 == null) {
                             if (!w.equals(v) && !v.isFirstLastNode(nextWay.lastNode())) {
                                 w1 = v;
-                                breakNode = Arrays.asList(nextWay.lastNode());
+                                breakNode = Collections.singletonList(nextWay.lastNode());
                                 break;
                             } else if (w.equals(v)) {
-                                addNewWays(Arrays.asList(v), ind);
+                                addNewWays(Collections.singletonList(v), ind);
                                 ind++;
                                 prev = v;
                                 brk = true;
@@ -1978,7 +1822,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                         }
                     }
 
-                    if (w1 != null && brk == false) {
+                    if (w1 != null && !brk) {
                         SplitWayCommand result = SplitWayCommand.split(w1, breakNode, Collections.emptyList());
                         if (result != null) {
                             UndoRedoHandler.getInstance().add(result);
@@ -1988,23 +1832,23 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                             else
                                 w = result.getNewWays().get(0);
 
-                            addNewWays(Arrays.asList(w), ind);
+                            addNewWays(Collections.singletonList(w), ind);
                             prev = w;
                             ind++;
                         }
 
-                    } else if (brk == false) {
-                        System.out.println("none");
+                    } else if (!brk) {
+                        Logging.debug("none");
                     }
                 } else {
-                    addNewWays(Arrays.asList(w), ind);
+                    addNewWays(Collections.singletonList(w), ind);
                     prev = w;
                     ind++;
                 }
             }
             Way way = members.get(currentIndex).getWay();
             Way nextWay = members.get(currentIndex + 1).getWay();
-            Node n = findCommonFirstLastNode(nextWay, way, currentNode);
+            Node n = WayUtils.findCommonFirstLastNode(nextWay, way, currentNode).orElse(null);
             currentNode = getOtherNode(nextWay, n);
             save();
             try {
@@ -2037,12 +1881,13 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             if (prevWay == null)
                 break;
 
-            Node n = findCommonFirstLastNode(curr, prevWay);
-
-            if (n == null)
+            if (
+                !WayUtils.findCommonFirstLastNode(curr, prevWay)
+                    .filter(node -> node.getParentWays().size() <= 2)
+                    .isPresent()
+            ) {
                 break;
-            if (n.getParentWays().size() > 2)
-                break;
+            }
 
             lst.add(prevWay);
             curr = prevWay;
@@ -2068,12 +1913,13 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             if (prevWay == null)
                 break;
 
-            n = findCommonFirstLastNode(curr, prevWay);
-
-            if (n == null)
+            if (
+                !WayUtils.findCommonFirstLastNode(curr, prevWay)
+                    .filter(node -> node.getParentWays().size() <= 2)
+                    .isPresent()
+            ) {
                 break;
-            if (n.getParentWays().size() > 2)
-                break;
+            }
 
             lst.add(i);
             curr = prevWay;
@@ -2175,7 +2021,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
          */
 
         void drawVariants() {
-            drawFixVariantsWithParallelLines();
+            drawFixVariantsWithParallelLines(true);
 
             Color[] colors = {new Color(0, 255, 150), new Color(255, 0, 0, 150), new Color(0, 0, 255, 150),
                     new Color(255, 255, 0, 150), new Color(0, 255, 255, 150) };
@@ -2190,16 +2036,16 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
             if (showOption0 && numeric) {
                 if (!shorterRoutes)
-                    drawFixVariantLetter("0 : turn-by-turn at next intersection", Color.ORANGE, letterX, letterY, 25);
+                    drawFixVariantLetter("0 : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX, letterY, 25);
                 else
-                    drawFixVariantLetter("0 : solutions based on other route relations", Color.PINK, letterX, letterY,
+                    drawFixVariantLetter("0 : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX, letterY,
                             25);
                 letterY = letterY + 60;
             } else if (showOption0) {
                 if (!shorterRoutes)
-                    drawFixVariantLetter("W : turn-by-turn at next intersection", Color.ORANGE, letterX, letterY, 25);
+                    drawFixVariantLetter("W : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX, letterY, 25);
                 else
-                    drawFixVariantLetter("W : solutions based on other route relations", Color.PINK, letterX, letterY,
+                    drawFixVariantLetter("W : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX, letterY,
                             25);
                 letterY = letterY + 60;
             }
@@ -2213,25 +2059,22 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             }
 
             // display the "Esc", "Skip" label:
-            drawFixVariantLetter("Esc : Close the options", Color.WHITE, letterX, letterY, 25);
+            drawFixVariantLetter("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 25);
             letterY = letterY + 60;
             if (numeric) {
-                drawFixVariantLetter("7 : Skip", Color.WHITE, letterX, letterY, 25);
+                drawFixVariantLetter("7 : " + tr(I18N_SKIP), Color.WHITE, letterX, letterY, 25);
                 letterY = letterY + 60;
-                drawFixVariantLetter("9 : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
+                drawFixVariantLetter("9 : " + tr(I18N_REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
             } else {
-                drawFixVariantLetter("S : Skip", Color.WHITE, letterX, letterY, 25);
+                drawFixVariantLetter("S : " + tr(I18N_SKIP), Color.WHITE, letterX, letterY, 25);
                 letterY = letterY + 60;
-                drawFixVariantLetter("Q : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
+                drawFixVariantLetter("Q : " + tr(I18N_REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
             }
         }
 
         void drawOptionsToRemoveWays() {
-            drawFixVariantsWithParallelLinesWhileRemove();
+            drawFixVariantsWithParallelLines(false);
             boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
-
-            Color[] colors = {new Color(255, 0, 0, 150), new Color(0, 255, 0, 150), new Color(255, 255, 0, 150),
-                    new Color(0, 255, 255, 200) };
 
             double letterX = MainApplication.getMap().mapView.getBounds().getMinX() + 20;
             double letterY = MainApplication.getMap().mapView.getBounds().getMinY() + 100;
@@ -2241,38 +2084,35 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 letterY = letterY + 60;
             }
             if (numeric) {
-                drawFixVariantLetter("1 : Remove Ways", colors[1], letterX, letterY, 25);
+                drawFixVariantLetter("1 : " + tr(I18N_REMOVE_WAYS), FIVE_COLOR_PALETTE[0], letterX, letterY, 25);
                 letterY = letterY + 60;
-                drawFixVariantLetter("2 : Do Not Remove Ways", colors[0], letterX, letterY, 25);
+                drawFixVariantLetter("2 : " + tr(I18N_NOT_REMOVE_WAYS), FIVE_COLOR_PALETTE[1], letterX, letterY, 25);
                 letterY = letterY + 60;
-                drawFixVariantLetter("3 : Remove ways along with previous way", colors[3], letterX, letterY, 25);
+                drawFixVariantLetter("3 : " + tr(I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY), FIVE_COLOR_PALETTE[4], letterX, letterY, 25);
                 letterY = letterY + 60;
                 if (notice.equals("vehicle travels against oneway restriction")) {
-                    drawFixVariantLetter("4 : Add oneway:bus=no to way", colors[2], letterX, letterY, 25);
+                    drawFixVariantLetter("4 : " + tr(I18N_ADD_ONEWAY_BUS_NO_TO_WAY), FIVE_COLOR_PALETTE[3], letterX, letterY, 25);
                 }
             } else {
-                drawFixVariantLetter("A : Remove Ways", colors[1], letterX, letterY, 25);
+                drawFixVariantLetter("A : " + tr(I18N_REMOVE_WAYS), FIVE_COLOR_PALETTE[0], letterX, letterY, 25);
                 letterY = letterY + 60;
-                drawFixVariantLetter("B : Do Not Remove Ways", colors[0], letterX, letterY, 25);
+                drawFixVariantLetter("B : " + tr(I18N_NOT_REMOVE_WAYS), FIVE_COLOR_PALETTE[1], letterX, letterY, 25);
                 letterY = letterY + 60;
                 if (notice.equals("vehicle travels against oneway restriction")) {
-                    drawFixVariantLetter("C : Add oneway:bus=no to way", colors[2], letterX, letterY, 25);
+                    drawFixVariantLetter("C : " + tr(I18N_ADD_ONEWAY_BUS_NO_TO_WAY), FIVE_COLOR_PALETTE[3], letterX, letterY, 25);
                     letterY = letterY + 60;
                 }
-                drawFixVariantLetter("R : Remove ways along with previous way", colors[3], letterX, letterY, 25);
+                drawFixVariantLetter("R : " + tr(I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY), FIVE_COLOR_PALETTE[4], letterX, letterY, 25);
             }
 
             letterY = letterY + 60;
-            drawFixVariantLetter("Esc : Close the options", Color.WHITE, letterX, letterY, 30);
+            drawFixVariantLetter("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 30);
         }
 
         void drawMultipleVariants(HashMap<Character, List<Way>> fixVariants) {
             waysColoring = new HashMap<>();
             addFixVariants(fixVariants);
             drawFixVariantsWithParallelLines(waysColoring);
-
-            Color[] colors = {new Color(0, 255, 0, 150), new Color(255, 0, 0, 150), new Color(0, 0, 255, 150),
-                    new Color(255, 255, 0, 150), new Color(0, 255, 255, 150) };
 
             int colorIndex = 0;
 
@@ -2283,16 +2123,16 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
             if (showOption0 && numeric) {
                 if (!shorterRoutes)
-                    drawFixVariantLetter("0 : turn-by-turn at next intersection", Color.ORANGE, letterX, letterY, 25);
+                    drawFixVariantLetter("0 : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX, letterY, 25);
                 else
-                    drawFixVariantLetter("0 : solutions based on other route relations", Color.PINK, letterX, letterY,
+                    drawFixVariantLetter("0 : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX, letterY,
                             25);
                 letterY = letterY + 60;
             } else if (showOption0) {
                 if (!shorterRoutes)
-                    drawFixVariantLetter("W : turn-by-turn at next intersection", Color.ORANGE, letterX, letterY, 25);
+                    drawFixVariantLetter("W : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX, letterY, 25);
                 else
-                    drawFixVariantLetter("W : solutions based on other route relations", Color.PINK, letterX, letterY,
+                    drawFixVariantLetter("W : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX, letterY,
                             25);
                 letterY = letterY + 60;
             }
@@ -2300,120 +2140,68 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             for (Entry<Character, List<Way>> entry : fixVariants.entrySet()) {
                 Character c = entry.getKey();
                 if (fixVariants.get(c) != null) {
-                    drawFixVariantLetter(c.toString(), colors[colorIndex % 5], letterX, letterY, 35);
+                    drawFixVariantLetter(c.toString(), FIVE_COLOR_PALETTE[colorIndex % 5], letterX, letterY, 35);
                     colorIndex++;
                     letterY = letterY + 60;
                 }
             }
 
             // display the "Esc", "Skip" label:
-            drawFixVariantLetter("Esc : Close the options", Color.WHITE, letterX, letterY, 25);
+            drawFixVariantLetter("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 25);
             letterY = letterY + 60;
             if (numeric) {
-                drawFixVariantLetter("7 : Skip", Color.WHITE, letterX, letterY, 25);
+                drawFixVariantLetter("7 : " + tr(I18N_SKIP), Color.WHITE, letterX, letterY, 25);
                 letterY = letterY + 60;
-                drawFixVariantLetter("9 : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
+                drawFixVariantLetter("9 : " + tr(I18N_REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
             } else {
-                drawFixVariantLetter("S : Skip", Color.WHITE, letterX, letterY, 25);
+                drawFixVariantLetter("S : " + tr(I18N_SKIP), Color.WHITE, letterX, letterY, 25);
                 letterY = letterY + 60;
-                drawFixVariantLetter("Q : Remove current edge(white)", Color.WHITE, letterX, letterY, 25);
+                drawFixVariantLetter("Q : " + tr(I18N_REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
             }
 
         }
 
-        protected void drawFixVariantsWithParallelLines() {
 
-            HashMap<Character, Color> colors = new HashMap<>();
-            colors.put('A', new Color(0, 255, 0, 200));
-            colors.put('B', new Color(255, 0, 0, 200));
-            colors.put('C', new Color(0, 0, 255, 200));
-            colors.put('D', new Color(255, 255, 0, 200));
-            colors.put('E', new Color(0, 255, 255, 200));
-            colors.put('1', new Color(0, 255, 0, 200));
-            colors.put('2', new Color(255, 0, 0, 200));
-            colors.put('3', new Color(0, 0, 255, 200));
-            colors.put('4', new Color(255, 255, 0, 200));
-            colors.put('5', new Color(0, 255, 255, 200));
 
-            for (Entry<Way, Character> entry : wayColoring.entrySet()) {
-                Way way = entry.getKey();
-                for (Pair<Node, Node> nodePair : way.getNodePairs(false)) {
-                    Character letter = entry.getValue();
-                    drawSegmentWithParallelLines(nodePair.a, nodePair.b, Arrays.asList(colors.get(letter)));
-                }
-            }
-            for (Pair<Node, Node> nodePair : currentWay.getNodePairs(false)) {
-                drawSegmentWithParallelLines(nodePair.a, nodePair.b, Arrays.asList(new Color(255, 255, 255, 190)));
-            }
-            for (Pair<Node, Node> nodePair : nextWay.getNodePairs(false)) {
-                drawSegmentWithParallelLines(nodePair.a, nodePair.b, Arrays.asList(new Color(169, 169, 169, 210)));
+        protected void drawFixVariantsWithParallelLines(final boolean drawNextWay) {
+            wayColoring.entrySet().stream()
+                // Create pairs of a color and an associated pair of nodes
+                .flatMap( entry ->
+                    entry.getKey().getNodePairs(false).stream()
+                        .map(it -> Pair.create(CHARACTER_COLOR_MAP.get(entry.getValue()), it))
+                )
+                // Grouping by color: groups stream into a map, each map entry has a color and all associated pairs of nodes
+                .collect(Collectors.groupingBy(it -> it.a, Collectors.mapping(it -> it.b, Collectors.toList())))
+                .forEach((color, nodePairs) -> drawSegmentsWithParallelLines(nodePairs, color));
+            drawSegmentsWithParallelLines(currentWay.getNodePairs(false), CURRENT_WAY_COLOR);
+            if (drawNextWay) {
+                drawSegmentsWithParallelLines(nextWay.getNodePairs(false), NEXT_WAY_COLOR);
             }
         }
 
         protected void drawFixVariantsWithParallelLines(Map<Way, List<Character>> waysColoring) {
-
-            HashMap<Character, Color> colors = new HashMap<>();
-            colors.put('A', new Color(0, 255, 0, 200));
-            colors.put('B', new Color(255, 0, 0, 200));
-            colors.put('C', new Color(0, 0, 255, 200));
-            colors.put('D', new Color(255, 255, 0, 200));
-            colors.put('E', new Color(0, 255, 255, 200));
-            colors.put('1', new Color(0, 255, 0, 200));
-            colors.put('2', new Color(255, 0, 0, 200));
-            colors.put('3', new Color(0, 0, 255, 200));
-            colors.put('4', new Color(255, 255, 0, 200));
-            colors.put('5', new Color(0, 255, 255, 200));
-
-            for (Entry<Way, List<Character>> entry : waysColoring.entrySet()) {
-                Way way = entry.getKey();
-                List<Character> letterList = waysColoring.get(way);
-                List<Color> wayColors = new ArrayList<>();
-                for (Character letter : letterList) {
-                    wayColors.add(colors.get(letter));
-                }
-                for (Pair<Node, Node> nodePair : way.getNodePairs(false)) {
+            for (final Entry<Way, List<Character>> entry : waysColoring.entrySet()) {
+                final List<Color> wayColors = entry.getValue().stream().map(CHARACTER_COLOR_MAP::get).collect(Collectors.toList());
+                for (final Pair<Node, Node> nodePair : entry.getKey().getNodePairs(false)) {
                     drawSegmentWithParallelLines(nodePair.a, nodePair.b, wayColors);
                 }
             }
 
-            List<Way> currentEdge = findCurrentEdge();
+            drawSegmentsWithParallelLines(
+                findCurrentEdge().stream().flatMap(it -> it.getNodePairs(false).stream()).collect(Collectors.toList()),
+                CURRENT_WAY_COLOR
+            );
 
-            for (Way w : currentEdge) {
-                for (Pair<Node, Node> nodePair : w.getNodePairs(false)) {
-                    drawSegmentWithParallelLines(nodePair.a, nodePair.b, Arrays.asList(new Color(255, 255, 255, 190)));
-                }
-            }
-
-            for (Pair<Node, Node> nodePair : nextWay.getNodePairs(false)) {
-                drawSegmentWithParallelLines(nodePair.a, nodePair.b, Arrays.asList(new Color(169, 169, 169, 210)));
-            }
+            drawSegmentsWithParallelLines(nextWay.getNodePairs(false), NEXT_WAY_COLOR);
 
         }
 
-        void drawFixVariantsWithParallelLinesWhileRemove() {
-
-            HashMap<Character, Color> colors = new HashMap<>();
-            colors.put('A', new Color(0, 255, 0, 200));
-            colors.put('B', new Color(255, 0, 0, 200));
-            colors.put('C', new Color(0, 0, 255, 200));
-            colors.put('D', new Color(255, 255, 0, 200));
-            colors.put('E', new Color(0, 255, 255, 200));
-            colors.put('1', new Color(0, 255, 0, 200));
-            colors.put('2', new Color(255, 0, 0, 200));
-            colors.put('3', new Color(0, 0, 255, 200));
-            colors.put('4', new Color(255, 255, 0, 200));
-            colors.put('5', new Color(0, 255, 255, 200));
-
-            for (Entry<Way, Character> entry : wayColoring.entrySet()) {
-                Way way = entry.getKey();
-                for (Pair<Node, Node> nodePair : way.getNodePairs(false)) {
-                    Character letter = entry.getValue();
-                    drawSegmentWithParallelLines(nodePair.a, nodePair.b, Arrays.asList(colors.get(letter)));
-                }
-            }
-            for (Pair<Node, Node> nodePair : currentWay.getNodePairs(false)) {
-                drawSegmentWithParallelLines(nodePair.a, nodePair.b, Arrays.asList(new Color(255, 255, 255, 190)));
-            }
+        /**
+         * Convenience method for {@link #drawSegmentWithParallelLines(Node, Node, List)}.
+         */
+        private void drawSegmentsWithParallelLines(List<Pair<Node, Node>> nodePairs, final Color color) {
+            final List<Color> colorList = Collections.singletonList(color);
+            nodePairs.forEach(it -> drawSegmentWithParallelLines(it.a, it.b, colorList));
         }
 
         void drawSegmentWithParallelLines(Node n1, Node n2, List<Color> colors) {
@@ -2523,7 +2311,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         @Override
         public void windowClosing(WindowEvent e) {
             editor.cancel();
-            System.out.println("close");
+            Logging.debug("close");
             stop();
         }
     }
