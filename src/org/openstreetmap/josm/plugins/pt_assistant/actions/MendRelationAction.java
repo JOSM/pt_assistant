@@ -169,11 +169,10 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         final String wayFormatterString = "   way(%.6f,%.6f,%.6f,%.6f)\n";
         final String str3 = "   [\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n";
 
-        final List<Node> nodeList = aroundGaps ? getBrokenNodes() : (
-            aroundStops
-            ? members.stream().filter(RelationMember::isNode).map(RelationMember::getNode).collect(Collectors.toList())
-            : new ArrayList<>()
-        );
+        final List<Node> nodeList = aroundGaps ? getBrokenNodes() : new ArrayList<>();
+        if (aroundStops) {
+            nodeList.addAll(members.stream().filter(RelationMember::isNode).map(RelationMember::getNode).collect(Collectors.toList()));
+        }
 
         for (final Node n : nodeList) {
             final double maxLat = n.getBBox().getTopLeftLat() + 0.001;
