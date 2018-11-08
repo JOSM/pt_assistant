@@ -207,17 +207,15 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
     @Override
     protected void updateEnabledState() {
-        if (relation != null && !((relation.hasTag("route", "bus") && relation.hasTag("public_transport:version", "2"))
-                || (RouteUtils.isPTRoute(relation) && !relation.hasTag("route", "bus")))) {
-            setEnabled(false);
-            return;
-        }
-        if (!setEnable) {
-            setEnabled(false);
-            return;
-        }
-        // only enable the action if we have members referring to the selected primitives
-        setEnabled(true);
+        final Relation curRel = relation;
+
+        setEnabled(
+            curRel != null && setEnable &&
+            (
+                (curRel.hasTag("route", "bus") && curRel.hasTag("public_transport:version", "2")) ||
+                (RouteUtils.isPTRoute(curRel) && !curRel.hasTag("route", "bus"))
+            )
+        );
     }
 
     @Override

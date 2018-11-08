@@ -394,10 +394,6 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
     @Override
     protected void updateEnabledState() {
-        if (editor != null && !RouteUtils.isPTRoute(editor.getRelation())) {
-            setEnabled(false);
-            return;
-        }
-        setEnabled(true);
+        setEnabled(editor != null && RouteUtils.isPTRoute(editor.getRelation()));
     }
 }
