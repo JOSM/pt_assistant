@@ -222,6 +222,9 @@ msgstr ""
 msgid "Toggle direction arrows"
 msgstr "Inverter setas de direção"
 
+msgid "Tool: {0}"
+msgstr "Ferramenta: {0}"
+
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
 "Digite a letra para selecionar a variante de correção ou pressione a tecla "

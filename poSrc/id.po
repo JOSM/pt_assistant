@@ -36,6 +36,9 @@ msgstr "Periksa apakah relasi rute sesuai dengan transportasi publik versi 2"
 msgid "Close"
 msgstr "Tutup"
 
+msgid "Customization of public transport stops."
+msgstr "Kustomisasi untuk halte transport umum."
+
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Menampilkan pemberhatian dari rute transportasi umum terpilih sebagai grafik"
 
@@ -232,6 +235,9 @@ msgstr "Atur arah panah"
 
 msgid "Toggle reference labels"
 msgstr "Ubah label referensi"
+
+msgid "Tool: {0}"
+msgstr "Alat: {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""

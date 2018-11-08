@@ -41,6 +41,9 @@ msgstr ""
 msgid "Close"
 msgstr "Закрыть"
 
+msgid "Customization of public transport stops."
+msgstr "Настройка остановок общественного транспорта."
+
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Отображает остановки выбранных маршрутов общественного транспорта в виде графа"
 
@@ -316,6 +319,9 @@ msgstr "Показать/скрыть стрелки направлений"
 
 msgid "Toggle reference labels"
 msgstr "Показать/скрыть метки"
+
+msgid "Tool: {0}"
+msgstr "Инструмент: {0}"
 
 msgid ""
 "Transfer details from platform way to node representing the stop (leave "

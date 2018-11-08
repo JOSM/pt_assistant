@@ -37,6 +37,9 @@ msgstr ""
 msgid "Close"
 msgstr "Sluiten"
 
+msgid "Customization of public transport stops."
+msgstr "Aanpassen van haltes openbaar vervoer."
+
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Geeft haltes van geselecteerde routes van openbaar vervoer weer als grafiek"
 
@@ -235,6 +238,9 @@ msgstr "Richtingpijlen schakelen"
 
 msgid "Toggle reference labels"
 msgstr "Verwijzingslabels schakelen"
+
+msgid "Tool: {0}"
+msgstr "Gereedschap: {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""

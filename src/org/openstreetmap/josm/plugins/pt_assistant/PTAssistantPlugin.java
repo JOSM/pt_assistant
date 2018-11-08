@@ -28,6 +28,7 @@ import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorAction
 import org.openstreetmap.josm.gui.preferences.PreferenceSetting;
 import org.openstreetmap.josm.plugins.Plugin;
 import org.openstreetmap.josm.plugins.PluginInformation;
+import org.openstreetmap.josm.plugins.customizepublictransportstop.CustomizeStopAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.AddStopPositionAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.CreatePlatformNodeAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.CreatePlatformNodeThroughReplaceAction;
@@ -81,6 +82,8 @@ public class PTAssistantPlugin extends Plugin {
         // Menu items for public transport layer in "data" menu
         MainMenu.add(menu.dataMenu, new PublicTransportLayer.AddLayerAction());
         MainMenu.add(menu.dataMenu, new DistanceBetweenStops());
+        // Menu items for CustomizePublicTransportStop in "tools" menu
+        MainMenu.add(menu.toolsMenu, CustomizeStopAction.createCustomizeStopAction());
 
         SelectionEventManager.getInstance().addSelectionListener(PTAssistantLayerManager.PTLM);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(PTAssistantLayerManager.PTLM);

@@ -38,6 +38,9 @@ msgstr ""
 msgid "Close"
 msgstr "Zavřít"
 
+msgid "Customization of public transport stops."
+msgstr "Úpravy zastávek veřejné dopravy."
+
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Zobrazuje zastávky zvolených tras veřejné dopravy jako graf"
 
@@ -225,6 +228,9 @@ msgstr "Přepnout směrové šipky"
 
 msgid "Toggle reference labels"
 msgstr "Přepnout referenční štítky"
+
+msgid "Tool: {0}"
+msgstr "Nástroj: {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""

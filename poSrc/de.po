@@ -44,6 +44,9 @@ msgstr ""
 msgid "Close"
 msgstr "Schließen"
 
+msgid "Customization of public transport stops."
+msgstr "Anpassung von Haltestellen öffentlicher Verkehrsmittel."
+
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Haltestellen der gewählten Routen des öffentlichen Verkehrs als Graph anzeigen"
 
@@ -297,6 +300,9 @@ msgstr "Richtungspfeile umschalten"
 
 msgid "Toggle reference labels"
 msgstr "Referenzbeschriftung umschalten"
+
+msgid "Tool: {0}"
+msgstr "Werkzeug: {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""

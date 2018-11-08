@@ -38,6 +38,9 @@ msgstr ""
 msgid "Close"
 msgstr "Zavrieť"
 
+msgid "Customization of public transport stops."
+msgstr "Úpravy zastávok hromadnej dopravy."
+
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Zobrazuje zastávky zvolených trás hromadnej dopravy ako graf"
 
@@ -155,6 +158,9 @@ msgstr ""
 "Relácie trás majú neúplných členov.\n"
 "Musia byť stiahnuté, aby sa dalo pokračovať v kontrole.\n"
 "Chcete ich teraz stiahnuť?"
+
+msgid "Tool: {0}"
+msgstr "Nástroj: {0}"
 
 msgid "Updating map ..."
 msgstr "Aktualizujem mapu ..."

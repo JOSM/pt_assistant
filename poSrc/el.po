@@ -251,6 +251,9 @@ msgstr ""
 "Η σχέση έχει ελλιπή μέλη. Θέλετε να τα κατεβάσετε και να συνεχίσετε με την "
 "ταξινόμηση;"
 
+msgid "Tool: {0}"
+msgstr "Εργαλείο: {0}"
+
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
 "Πληκτρολογήστε γράμμα για να επιλέξετε την παραλλαγή επιδιόρθωσης ή πατήστε "

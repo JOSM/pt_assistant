@@ -382,6 +382,9 @@ msgstr "Questa azione richiede che sia selezionato un singolo nodo."
 msgid "Toggle direction arrows"
 msgstr "Passa alle frecce di direzione"
 
+msgid "Tool: {0}"
+msgstr "Strumenti: {0}"
+
 msgid ""
 "Transfer details from platform way to node representing the stop (leave "
 "tactile_paving and wheelchair on the platform way)"

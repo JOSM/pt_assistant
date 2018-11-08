@@ -38,6 +38,9 @@ msgstr ""
 msgid "Close"
 msgstr "Fermer"
 
+msgid "Customization of public transport stops."
+msgstr "Personnalisation des arrêts des transports publics."
+
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Affiche sur un graphe les arrêts des lignes de transport public sélectionnées"
 
@@ -240,6 +243,9 @@ msgstr "Inverser les flèches de direction"
 
 msgid "Toggle reference labels"
 msgstr "Inverser les étiquettes de référence"
+
+msgid "Tool: {0}"
+msgstr "Outil : {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""

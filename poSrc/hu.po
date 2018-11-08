@@ -38,6 +38,9 @@ msgstr ""
 msgid "Close"
 msgstr "Bezárás"
 
+msgid "Customization of public transport stops."
+msgstr "Az összes tömegközlekedési megálló testreszabása"
+
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "A kijelölt tömegközlekedési útvonalak megállóit ábrázolja gráfként"
 
@@ -190,6 +193,9 @@ msgstr "Irány nyilak átkapcsolása"
 
 msgid "Toggle reference labels"
 msgstr "Azonosító címkék átkapcsolása"
+
+msgid "Tool: {0}"
+msgstr "Eszköz: {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""

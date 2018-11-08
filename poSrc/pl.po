@@ -319,6 +319,9 @@ msgstr ""
 "Relacja ma niekompletnych członków. Czy chcesz ich pobrać i kontynuować "
 "sortowanie?"
 
+msgid "Tool: {0}"
+msgstr "Narzędzie: {0}"
+
 msgid ""
 "Transfer details from platform way to node representing the stop (leave "
 "tactile_paving and wheelchair on the platform way)"

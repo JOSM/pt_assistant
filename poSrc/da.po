@@ -37,6 +37,9 @@ msgstr ""
 msgid "Close"
 msgstr "Luk"
 
+msgid "Customization of public transport stops."
+msgstr "Tilpasning af stoppesteder for offentlig transport."
+
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Viser stop fra udvalgte offentlige transportruter som graf"
 
@@ -230,6 +233,9 @@ msgstr "Skift retningspile"
 
 msgid "Toggle reference labels"
 msgstr "Skift reference etiketter"
+
+msgid "Tool: {0}"
+msgstr "Værktøj: {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""

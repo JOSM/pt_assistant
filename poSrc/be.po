@@ -35,6 +35,9 @@ msgstr ""
 msgid "Close"
 msgstr "Закрыць"
 
+msgid "Customization of public transport stops."
+msgstr "Налада прыпынкаў грамадскага транспарта."
+
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Адлюстроўвае прыпынкі выбраных маршрутаў грамадскага транспарту ў выглядзе графа"
 
@@ -173,6 +176,9 @@ msgstr "Паказаць/схаваць стрэлкі напрамкаў"
 
 msgid "Toggle reference labels"
 msgstr "Паказаць/схаваць пазнакі"
+
+msgid "Tool: {0}"
+msgstr "Інструмент: {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr "ГТ: Праблема ў сегменце маршруту з адным аўтаматычным выпраўленнем"

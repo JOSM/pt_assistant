@@ -38,6 +38,9 @@ msgstr ""
 msgid "Close"
 msgstr "Закрити"
 
+msgid "Customization of public transport stops."
+msgstr "Налаштування параметрів зупинок громадського транспорту."
+
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Показує зупинки виділеного маршруту громадського транспорту у вигляді графу"
 
@@ -226,6 +229,9 @@ msgstr "Показувати стрілки напрямку"
 
 msgid "Toggle reference labels"
 msgstr "Показувати таблички маршрутів"
+
+msgid "Tool: {0}"
+msgstr "Інструмент: {0}"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
