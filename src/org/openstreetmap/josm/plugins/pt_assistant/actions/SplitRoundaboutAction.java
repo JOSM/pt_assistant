@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -31,7 +32,6 @@ import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
-import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
@@ -717,17 +717,20 @@ public class SplitRoundaboutAction extends JosmAction {
     }
 
     @Override
-    protected void updateEnabledState(Collection<? extends OsmPrimitive> selection) {
-        setEnabled(false);
-        if (selection == null || selection.size() != 1)
-            return;
-        OsmPrimitive selected = selection.iterator().next();
-        if (selected.getType() != OsmPrimitiveType.WAY)
-            return;
-        if (((Way) selected).isClosed()
-                && (selected.hasTag("junction", "roundabout") || selected.hasTag("oneway", "yes"))) {
-            setEnabled(true);
-            return;
+    protected void updateEnabledState() {
+        super.updateEnabledState();
+        updateEnabledStateOnCurrentSelection();
+    }
+
+    @Override
+    protected void updateEnabledState(final Collection<? extends OsmPrimitive> selection) {
+        if (selection != null && selection.size() == 1) {
+            Optional<Way> selectedWay = Optional.ofNullable(selection.iterator().next())
+                .map(it -> it instanceof Way ? (Way) it : null);
+            selectedWay.ifPresent(way -> {
+                setEnabled(way.isClosed() && (way.hasTag("junction", "roundabout") || way.hasTag("oneway", "yes")));
+            });
         }
+        setEnabled(false);
     }
 }

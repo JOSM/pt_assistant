@@ -77,7 +77,7 @@ public class CreatePlatformNodeAction extends JosmAction {
         transferDialog.setPreferredSize(new Dimension(500, 300));
         transferDialog.toggleEnable("toggle-transfer-details-dialog");
         transferDialog.setButtonIcons("ok", "cancel");
-        transferDetails = new JCheckBox(tr("Remove public_transport=platform from platform WAYS when transfering details to platform NODE."));
+        transferDetails = new JCheckBox(tr("Remove public_transport=platform from platform WAYS when transferring details to platform NODE."));
         panel.add(transferDetails);
         JScrollPane scrollPanel = new JScrollPane(panel);
         transferDialog.setContent(scrollPanel, true);
@@ -364,12 +364,14 @@ public class CreatePlatformNodeAction extends JosmAction {
     }
 
     @Override
-    protected void updateEnabledState(Collection<? extends OsmPrimitive> selection) {
-        setEnabled(false);
+    protected void updateEnabledState() {
+        super.updateEnabledState();
+        updateEnabledStateOnCurrentSelection();
+    }
 
-        if (selection.size() > 1) {
-            setEnabled(true);
-        }
+    @Override
+    protected void updateEnabledState(final Collection<? extends OsmPrimitive> selection) {
+        setEnabled(selection != null && selection.size() > 1);
     }
 
     private void addToPreferences() {
@@ -380,7 +382,7 @@ public class CreatePlatformNodeAction extends JosmAction {
     private static class transferDetailsDialog extends ExtendedDialog {
 
         transferDetailsDialog() {
-            super(MainApplication.getMainFrame(), tr("transfering details to platform NODE."), new String[] {tr("Ok"), tr("Cancel") },
+            super(MainApplication.getMainFrame(), tr("Transferring details to platform NODE."), new String[] {tr("Ok"), tr("Cancel") },
                     true);
         }
 

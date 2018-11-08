@@ -85,19 +85,17 @@ public class SortPTRouteMembersMenuBar extends JosmAction {
     }
 
     @Override
-    protected void updateEnabledState(Collection<? extends OsmPrimitive> selection) {
-        if (selection.isEmpty()) {
-            setEnabled(false);
-            return;
-        }
+    protected void updateEnabledState() {
+        super.updateEnabledState();
+        updateEnabledStateOnCurrentSelection();
+    }
 
-        for (OsmPrimitive sel : selection) {
-            if (sel.getType() != OsmPrimitiveType.RELATION || !RouteUtils.isPTRoute((Relation) sel)) {
-                setEnabled(false);
-                return;
-            }
-        }
-
-        setEnabled(true);
+    @Override
+    protected void updateEnabledState(final Collection<? extends OsmPrimitive> selection) {
+        setEnabled(
+            selection != null &&
+            !selection.isEmpty() &&
+            selection.stream().allMatch(it -> it instanceof Relation && RouteUtils.isPTRoute((Relation) it))
+        );
     }
 }
