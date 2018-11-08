@@ -1,0 +1,2 @@
+msgid "Tool: {0}"
+msgstr "Įrankis: {0}"

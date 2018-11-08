@@ -1,0 +1,5 @@
+msgid "Customization of public public transport stops."
+msgstr "대중교통 정류장 사용자 지정"
+
+msgid "Tool: {0}"
+msgstr "도구: {0}"

@@ -1,0 +1,5 @@
+msgid "Customization of public public transport stops."
+msgstr "Úpravy zastávok hromadnej dopravy."
+
+msgid "Tool: {0}"
+msgstr "Nástroj: {0}"

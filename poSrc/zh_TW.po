@@ -1,0 +1,5 @@
+msgid "Customization of public public transport stops."
+msgstr "自訂公開的大眾運輸停靠站。"
+
+msgid "Tool: {0}"
+msgstr "工具：{0}"

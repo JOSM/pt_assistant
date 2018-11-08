@@ -1,0 +1,5 @@
+msgid "Customization of public public transport stops."
+msgstr "Anpassung von Haltestellen öffentlicher Verkehrsmittel."
+
+msgid "Tool: {0}"
+msgstr "Werkzeug: {0}"

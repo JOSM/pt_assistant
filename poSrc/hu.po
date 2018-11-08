@@ -1,0 +1,5 @@
+msgid "Customization of public public transport stops."
+msgstr "Az összes tömegközlekedési megálló testreszabása"
+
+msgid "Tool: {0}"
+msgstr "Eszköz: {0}"
