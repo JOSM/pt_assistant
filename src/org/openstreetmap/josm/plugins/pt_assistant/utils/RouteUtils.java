@@ -59,6 +59,20 @@ public final class RouteUtils {
         return r.hasTag(PT_VERSION_TAG, "1");
     }
 
+    /**
+     * Adds the version of the PT route schema to the given PT route.
+     *
+     * If the given relation is not a PT route (as determined by {@link #isPTRoute(Relation)}),
+     * then this method does NOT change the given relation!
+     * @param r the relation for which the version of the PT route is set
+     * @param version the version that should be set for the given relation
+     */
+    public static void setPTRouteVersion(final Relation r, final String version) {
+        if (isPTRoute(r)) {
+            r.put(PT_VERSION_TAG, version);
+        }
+    }
+
     public static boolean isPTRoute(Relation r) {
 
         if (r == null) {

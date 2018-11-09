@@ -133,7 +133,7 @@ public class PTStop extends RelationMember {
      * Returns the name of this stop
      * @return the name of this stop
      */
-    protected String getName() {
+    public String getName() {
         return this.name;
     }
 
