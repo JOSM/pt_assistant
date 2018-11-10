@@ -16,6 +16,7 @@ import java.util.concurrent.Future;
 import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
+import org.openstreetmap.josm.actions.search.SearchAction;
 import org.openstreetmap.josm.command.AddCommand;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.data.UndoRedoHandler;
@@ -26,6 +27,7 @@ import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.data.osm.search.SearchMode;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.dialogs.relation.DownloadRelationMemberTask;
 import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
@@ -82,7 +84,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             if (
                 JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
                 tr("The relation has incomplete members. Do you want to download them and continue with the sorting?"),
-                tr("Incomplete Members"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                tr("Not all members are downloaded"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, null, null)
             ) {
 
@@ -120,7 +122,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         if (!RouteUtils.isVersionTwoPTRoute(newRel)) {
             if (
                 JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                tr("This relation is not yet PT v2, would you like to set it to 2?"),
+                tr("This relation is not PT v2. Sorting its stops wouldn't work.\nWould you like to set it to version=2?\nThere will be some extra work needed after you do,\nbut PT_Assistant can help with the preparations."),
                 tr("Not a PT v2 relation"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, null, null)
             ) {
@@ -141,14 +143,20 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         String lastStopName = null;
 
         if (route_manager != null) {
-            firstStopName = route_manager.getFirstStop().getName();
-            lastStopName = route_manager.getLastStop().getName();
+            PTStop firstStop = route_manager.getFirstStop();
+            if (firstStop != null) {
+                firstStopName = firstStop.getName();
+            }
+            PTStop lastStop = route_manager.getLastStop();
+            if (lastStop != null) {
+                lastStopName = lastStop.getName();
+            }
 
             if (from == null || to == null) {
                 if (from == null && firstStopName != null) {
                     if (
                         JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                        tr("This relation doesn't have its from tag set? Set it to " + firstStopName + "?"),
+                        tr("<html><i>from</i> tag not set. Set it to <i>" + firstStopName + "</i>?</html>"),
                         tr("Set from tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                         null, null, null)
                     ) {
@@ -160,7 +168,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 if (to == null && lastStopName != null) {
                     if (
                         JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                        tr("This relation doesn't have its to tag set? Set it to " + lastStopName + "?"),
+                        tr("<html><i>to</i> tag not set. Set it to <i>" + lastStopName + "</i>?</html>"),
                         tr("Set to tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                         null, null, null)
                     ) {
@@ -174,7 +182,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             if (firstStopName != null && from != firstStopName) {
                 if (
                     JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                    tr("from=" + from + ". Set it to " + firstStopName + " instead?"), tr("Change from tag?"),
+                    tr("<html><i>from</i>=" + from + ". Change it to <i>" + firstStopName + "</i> instead?</html>"), tr("Change from tag?"),
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                     null, null, null)
                 ) {
@@ -188,7 +196,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             if (lastStopName != null && to != lastStopName) {
                 if (
                     JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                    tr("to=" + to + ". Set it to " + lastStopName + " instead?"),
+                    tr("<html><i>to</i>=" + to + ". Change it to <i>" + lastStopName + "</i> instead?</html>"),
                     tr("Change to tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                     null, null, null)
                 ) {
@@ -208,7 +216,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         if (ask_to_create_return_route_and_routeMaster) {
             if (
                 JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                tr("Create route relation for opposite direction of travel?"),
+                tr("<html>Create <b>route</b> relation for opposite direction of travel?</html>"),
                 tr("Opposite itinerary?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, null, null)
             ) {
@@ -257,7 +265,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 if (rmr == null) {
                     if (
                         JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                        tr("Create route_master relation and add route relations to it?"), tr("route_master"),
+                        tr("<html>Create <i>route_master</i> relation and add route relations to it?</html>"), tr("route_master"),
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null)
                     ) {
                         routeMaster = new Relation();
@@ -287,11 +295,15 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 UndoRedoHandler.getInstance().add(new ChangeCommand(routeMaster, newRouteMaster));
                 editor.reloadDataFromRelation();
 
+                SearchAction.search("(oneway OR junction=roundabout -closed) child new",
+                        SearchMode.fromCode('R'));
+
                 RelationEditor editorRM = RelationDialogManager.getRelationDialogManager().getEditorForRelation(layer,
                         routeMaster);
                 if (editorRM == null) {
                     editorRM = RelationEditor.getEditor(layer, routeMaster, null);
                     editorRM.setVisible(true);
+                    editorRM.toBack();
                     return;
                 }
                 editor.reloadDataFromRelation();
