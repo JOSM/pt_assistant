@@ -131,8 +131,8 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             }
         }
         sortPTRouteMembers(newRel);
+        route_manager = new PTRouteDataManager(newRel);
 
-        // determine names of first and last stop by looping over all members
         String fromtag = "from";
         String from = newRel.get(fromtag);
         String totag = "to";
@@ -140,28 +140,56 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         String firstStopName = null;
         String lastStopName = null;
 
-        firstStopName = route_manager.getFirstStop().getName();
-        lastStopName = route_manager.getLastStop().getName();
+        if (route_manager != null) {
+            firstStopName = route_manager.getFirstStop().getName();
+            lastStopName = route_manager.getLastStop().getName();
 
-        if (from == null || to == null) {
-            if (from == null) {
+            if (from == null || to == null) {
+                if (from == null && firstStopName != null) {
+                    if (
+                        JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                        tr("This relation doesn't have its from tag set? Set it to " + firstStopName + "?"),
+                        tr("Set from tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                        null, null, null)
+                    ) {
+                        newRel.put(fromtag, firstStopName);
+                    } else {
+                        return;
+                    }
+                }
+                if (to == null && lastStopName != null) {
+                    if (
+                        JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                        tr("This relation doesn't have its to tag set? Set it to " + lastStopName + "?"),
+                        tr("Set to tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                        null, null, null)
+                    ) {
+                        newRel.put(totag, lastStopName);
+                    } else {
+                        return;
+                    }
+                }
+            }
+            from = newRel.get(fromtag);
+            if (firstStopName != null && from != firstStopName) {
                 if (
                     JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                    tr("This relation doesn't have its from tag set? Set it to " + firstStopName + "?"),
-                    tr("Set from tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    tr("from=" + from + ". Set it to " + firstStopName + " instead?"), tr("Change from tag?"),
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                     null, null, null)
                 ) {
-
                     newRel.put(fromtag, firstStopName);
                 } else {
                     return;
                 }
             }
-            if (to == null) {
+            to = newRel.get(totag);
+
+            if (lastStopName != null && to != lastStopName) {
                 if (
                     JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                    tr("This relation doesn't have its to tag set? Set it to " + lastStopName + "?"),
-                    tr("Set to tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    tr("to=" + to + ". Set it to " + lastStopName + " instead?"),
+                    tr("Change to tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                     null, null, null)
                 ) {
                     newRel.put(totag, lastStopName);
@@ -169,37 +197,10 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                     return;
                 }
             }
-        }
-        from = newRel.get(fromtag);
-        if (from != firstStopName) {
-            if (
-                JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                tr("from=" + from + ". Set it to " + firstStopName + " instead?"),
-                tr("Change from tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, null, null)
-            ) {
-                newRel.put(fromtag, firstStopName);
-            } else {
-                return;
-            }
-        }
-        to = newRel.get(totag);
 
-        if (to != lastStopName) {
-            if (
-                JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                tr("to=" + to + ". Set it to " + lastStopName + " instead?"),
-                tr("Change to tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, null, null)
-            ) {
-                newRel.put(totag, lastStopName);
-            } else {
-                return;
-            }
+            UndoRedoHandler.getInstance().add(new ChangeCommand(rel, newRel));
+            editor.reloadDataFromRelation();
         }
-
-        UndoRedoHandler.getInstance().add(new ChangeCommand(rel, newRel));
-        editor.reloadDataFromRelation();
 
         OsmDataLayer layer = MainApplication.getLayerManager().getEditLayer();
         Relation routeMaster = null;
@@ -241,52 +242,59 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 if (editor == null) {
                     editor = RelationEditor.getEditor(layer, otherDirRel, null);
                     editor.setVisible(true);
-                    return;
                 }
                 editor.reloadDataFromRelation();
 
                 Relation rmr = null;
 
-                for (OsmPrimitive parent : newRel.getReferrers()) {
-                    if (parent.get("type") == "routeMaster") {
+                for (OsmPrimitive parent : rel.getReferrers()) {
+                    if (parent.get("type") == "route_master") {
                         rmr = (Relation) parent;
+                        System.out.println("rmr" + rmr);
                         break;
                     }
                 }
-                System.out.println("rmr" + rmr);
                 if (rmr == null) {
-                    System.out.println("Creating new routeMaster");
-                    routeMaster = new Relation();
-                    routeMaster.put("type", "routeMaster");
-                    if (rel.hasKey("route")) {
-                        routeMaster.put("routeMaster", rel.get("route"));
-                    }
-
-                    List<String> tagslist = Arrays.asList("name", "ref", "operator", "network", "colour");
-                    for (String key : tagslist) {
-                        if (rel.hasKey(key)) {
-                            routeMaster.put(key, rel.get(key));
+                    if (
+                        JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                        tr("Create route_master relation and add route relations to it?"), tr("route_master"),
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null)
+                    ) {
+                        routeMaster = new Relation();
+                        routeMaster.put("type", "route_master");
+                        if (rel.hasKey("route")) {
+                            routeMaster.put("route_master", rel.get("route"));
                         }
-                    }
 
-                    routeMaster.addMember(new RelationMember("", rel));
+                        List<String> tagslist = Arrays.asList("name", "ref", "operator", "network", "colour");
+                        for (String key : tagslist) {
+                            if (rel.hasKey(key)) {
+                                routeMaster.put(key, rel.get(key));
+                            }
+                        }
+
+                        routeMaster.addMember(new RelationMember("", rel));
+                        UndoRedoHandler.getInstance()
+                                .add(new AddCommand(MainApplication.getLayerManager().getActiveDataSet(), routeMaster));
+
+                    }
                 } else {
                     routeMaster = rmr;
                 }
-                System.out.println("Adding existing route relation to master");
-            routeMaster.addMember(new RelationMember("", otherDirRel));
+                Relation newRouteMaster = new Relation(routeMaster);
+                newRouteMaster.addMember(new RelationMember("", otherDirRel));
 
-            UndoRedoHandler.getInstance()
-            .add(new AddCommand(MainApplication.getLayerManager().getActiveDataSet(), routeMaster));
+                UndoRedoHandler.getInstance().add(new ChangeCommand(routeMaster, newRouteMaster));
+                editor.reloadDataFromRelation();
 
-            RelationEditor editorRM = RelationDialogManager.getRelationDialogManager().getEditorForRelation(layer,
-                    routeMaster);
-            if (editorRM == null) {
-                editorRM = RelationEditor.getEditor(layer, routeMaster, null);
-                editorRM.setVisible(true);
-                return;
-            }
-            editor.reloadDataFromRelation();
+                RelationEditor editorRM = RelationDialogManager.getRelationDialogManager().getEditorForRelation(layer,
+                        routeMaster);
+                if (editorRM == null) {
+                    editorRM = RelationEditor.getEditor(layer, routeMaster, null);
+                    editorRM.setVisible(true);
+                    return;
+                }
+                editor.reloadDataFromRelation();
             }
 
         } else {
@@ -525,8 +533,8 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         for (Relation ref : Utils.filteredCollection(p.getReferrers(), Relation.class)) {
             if (
                 ref.hasTag("type", "public_transport")
-                    && StopUtils.isStopArea(ref)
-                    && ref.getName() != null
+                && StopUtils.isStopArea(ref)
+                && ref.getName() != null
             ) {
                 return ref.getName();
             }
