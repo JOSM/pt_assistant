@@ -34,6 +34,21 @@ public class PTStop extends RelationMember {
     /* the name of this stop */
     private String name = "";
 
+    /* the ref of this stop */
+    private String ref = "";
+
+    /* the local_ref of this stop */
+    private String localRef = "";
+
+    /* the route_ref of this stop */
+    private String routeRef = "";
+
+    /* the operator of this stop */
+    private String operator = "";
+
+    /* the network of this stop */
+    private String network = "";
+
     /* indicates a stop where people can only exit the bus */
     private boolean exitOnly;
 
@@ -44,9 +59,8 @@ public class PTStop extends RelationMember {
      * Constructor
      *
      * @param other other relation member
-     * @throws IllegalArgumentException
-     *             if the given relation member does not fit to the data model
-     *             used in the plugin
+     * @throws IllegalArgumentException if the given relation member does not fit to
+     *                                  the data model used in the plugin
      */
     public PTStop(RelationMember other) {
 
@@ -63,11 +77,11 @@ public class PTStop extends RelationMember {
 
         if (isPTStopPosition(other)) {
             stopPosition = other.getNode();
-            name = stopPosition.get("name");
+            setName(stopPosition.get("name"));
             stopPositionRM = new RelationMember("stop" + role, other.getMember());
         } else if (isPTPlatform(other)) {
             platform = other.getMember();
-            name = platform.get("name");
+            setName(platform.get("name"));
             platformRM = new RelationMember("platform" + role, other.getMember());
         } else {
             throw new IllegalArgumentException(
@@ -78,12 +92,11 @@ public class PTStop extends RelationMember {
     /**
      * Adds the given element to the stop after a check
      *
-     * @param member
-     *            Element to add
-     * @return true if added successfully, false otherwise. A false value
-     *         indicates either that the OsmPrimitiveType of the given
-     *         RelationMember does not match its role or that this PTStop
-     *         already has an attribute with that role.
+     * @param member Element to add
+     * @return true if added successfully, false otherwise. A false value indicates
+     *         either that the OsmPrimitiveType of the given RelationMember does not
+     *         match its role or that this PTStop already has an attribute with that
+     *         role.
      */
     public boolean addStopElement(RelationMember member) {
 
@@ -130,7 +143,21 @@ public class PTStop extends RelationMember {
     }
 
     /**
+     * Sets the name for this stop
+     *
+     * @param name
+     */
+    public void setName(String name) {
+        if (name == null) {
+            this.name = "";
+        } else {
+            this.name = name;
+        }
+    }
+
+    /**
      * Returns the name of this stop
+     *
      * @return the name of this stop
      */
     public String getName() {
@@ -139,6 +166,7 @@ public class PTStop extends RelationMember {
 
     /**
      * Sets the stop_position for this stop to the given node
+     *
      * @param newStopPosition the stop_position for this stop to the given node
      */
     public void setStopPosition(Node newStopPosition) {
@@ -148,10 +176,10 @@ public class PTStop extends RelationMember {
     }
 
     /**
-     * Finds potential stop_positions of the platform of this PTStop. It only
-     * makes sense to call this method if the stop_position attribute is null.
-     * The stop_positions are potential because they may refer to a different
-     * route, which this method does not check.
+     * Finds potential stop_positions of the platform of this PTStop. It only makes
+     * sense to call this method if the stop_position attribute is null. The
+     * stop_positions are potential because they may refer to a different route,
+     * which this method does not check.
      *
      * @return List of potential stop_positions for this PTStop
      */
@@ -177,11 +205,8 @@ public class PTStop extends RelationMember {
         String platName = platform.get("name");
         for (Node currentNode : allNodes) {
             String nodeName = currentNode.get("name");
-            if (platformBBox.bounds(currentNode.getBBox())
-                    && StopUtils.isStopPosition(currentNode)
-                    && (platName == null
-                        || nodeName == null
-                        || platName.equals(nodeName))) {
+            if (platformBBox.bounds(currentNode.getBBox()) && StopUtils.isStopPosition(currentNode)
+                    && (platName == null || nodeName == null || platName.equals(nodeName))) {
                 potentialStopPositions.add(currentNode);
             }
         }
@@ -193,8 +218,7 @@ public class PTStop extends RelationMember {
      * Checks if this stop equals to other by comparing if they have the same
      * stop_position or a platform
      *
-     * @param other
-     *            PTStop to be compared
+     * @param other PTStop to be compared
      * @return true if equal, false otherwise
      */
     public boolean equalsStop(PTStop other) {
@@ -209,16 +233,14 @@ public class PTStop extends RelationMember {
         }
 
         return this.platform != null
-                && (this.platform == other.getPlatform()
-                    || this.platform == other.getStopPosition());
+                && (this.platform == other.getPlatform() || this.platform == other.getStopPosition());
     }
 
     /**
-     * Checks if the relation member refers to a stop in a public transport
-     * route. Some stops can be modeled with ways.
+     * Checks if the relation member refers to a stop in a public transport route.
+     * Some stops can be modeled with ways.
      *
-     * @param rm
-     *            relation member to be checked
+     * @param rm relation member to be checked
      * @return true if the relation member refers to a stop, false otherwise
      */
     public static boolean isPTStop(RelationMember rm) {
@@ -227,24 +249,23 @@ public class PTStop extends RelationMember {
 
     /**
      * checks whether the given relation member matches a Stop Position or not
+     *
      * @param rm member to check
      * @return true if it matches, false otherwise
      */
     public static boolean isPTStopPosition(RelationMember rm) {
-        return StopUtils.isStopPosition(rm.getMember())
-                && rm.getType().equals(OsmPrimitiveType.NODE);
+        return StopUtils.isStopPosition(rm.getMember()) && rm.getType().equals(OsmPrimitiveType.NODE);
     }
 
     /**
      * checks whether the given relation member matches a Platform or not
+     *
      * @param rm member to check
      * @return true if it matches, false otherwise
      */
     public static boolean isPTPlatform(RelationMember rm) {
-        return rm.getMember().hasTag("highway", "bus_stop")
-                || rm.getMember().hasTag("public_transport", "platform")
-                || rm.getMember().hasTag("highway", "platform")
-                || rm.getMember().hasTag("railway", "platform");
+        return rm.getMember().hasTag("highway", "bus_stop") || rm.getMember().hasTag("public_transport", "platform")
+                || rm.getMember().hasTag("highway", "platform") || rm.getMember().hasTag("railway", "platform");
     }
 
     public RelationMember getPlatformRM() {

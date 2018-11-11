@@ -122,7 +122,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         if (!RouteUtils.isVersionTwoPTRoute(newRel)) {
             if (
                 JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                tr("This relation is not PT v2. Sorting its stops wouldn't work.\nWould you like to set it to version=2?\nThere will be some extra work needed after you do,\nbut PT_Assistant can help with the preparations."),
+                tr("This relation is not PT version 2. Sorting its stops wouldn't make sense.\n\nWould you like to set its tag to version=2?\n\nThere will be some extra work needed after c,\n\nbut PT_Assistant can help with the preparations."),
                 tr("Not a PT v2 relation"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, null, null)
             ) {
@@ -133,82 +133,80 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             }
         }
         sortPTRouteMembers(newRel);
-        route_manager = new PTRouteDataManager(newRel);
+        UndoRedoHandler.getInstance().add(new ChangeCommand(rel, newRel));
+        editor.reloadDataFromRelation();
 
-        String fromtag = "from";
-        String from = newRel.get(fromtag);
-        String totag = "to";
-        String to = newRel.get(totag);
-        String firstStopName = null;
-        String lastStopName = null;
+        route_manager = new PTRouteDataManager(rel);
 
-        if (route_manager != null) {
-            PTStop firstStop = route_manager.getFirstStop();
-            if (firstStop != null) {
-                firstStopName = firstStop.getName();
-            }
-            PTStop lastStop = route_manager.getLastStop();
-            if (lastStop != null) {
-                lastStopName = lastStop.getName();
-            }
+        String from = route_manager.get("from");
+        String firstStopName = route_manager.getNameOfFirstStop();
+        if (from.isEmpty() && !firstStopName.isEmpty()) {
+            if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                    tr("<html><i>from</i> tag not set. Set it to <i>" + firstStopName + "</i>?</html>"),
+                    tr("Set from tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null)) {
 
-            if (from == null || to == null) {
-                if (from == null && firstStopName != null) {
-                    if (
-                        JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                        tr("<html><i>from</i> tag not set. Set it to <i>" + firstStopName + "</i>?</html>"),
-                        tr("Set from tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                        null, null, null)
-                    ) {
-                        newRel.put(fromtag, firstStopName);
-                    } else {
-                        return;
-                    }
-                }
-                if (to == null && lastStopName != null) {
-                    if (
-                        JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                        tr("<html><i>to</i> tag not set. Set it to <i>" + lastStopName + "</i>?</html>"),
-                        tr("Set to tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                        null, null, null)
-                    ) {
-                        newRel.put(totag, lastStopName);
-                    } else {
-                        return;
-                    }
-                }
+                route_manager.set("from", firstStopName);
+            } else {
+                return;
             }
-            from = newRel.get(fromtag);
-            if (firstStopName != null && from != firstStopName) {
-                if (
-                    JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                    tr("<html><i>from</i>=" + from + ". Change it to <i>" + firstStopName + "</i> instead?</html>"), tr("Change from tag?"),
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                    null, null, null)
-                ) {
-                    newRel.put(fromtag, firstStopName);
-                } else {
-                    return;
-                }
-            }
-            to = newRel.get(totag);
-
-            if (lastStopName != null && to != lastStopName) {
-                if (
-                    JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                    tr("<html><i>to</i>=" + to + ". Change it to <i>" + lastStopName + "</i> instead?</html>"),
-                    tr("Change to tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                    null, null, null)
-                ) {
-                    newRel.put(totag, lastStopName);
-                } else {
-                    return;
-                }
-            }
-
-            UndoRedoHandler.getInstance().add(new ChangeCommand(rel, newRel));
-            editor.reloadDataFromRelation();
         }
+
+        String to = route_manager.get("to");
+        String lastStopName = route_manager.getNameOfLastStop();
+        if (to.isEmpty() && !lastStopName.isEmpty()) {
+            if (
+                JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                tr("<html><i>to</i> tag not set. Set it to <i>" + lastStopName + "</i>?</html>"), tr("Set to tag?"),
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, null, null)
+            ) {
+                route_manager.set("to", lastStopName);
+            } else {
+                return;
+            }
+        }
+
+        if (!firstStopName.isEmpty() && from != firstStopName) {
+            if (
+                JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                tr("<html><i>from</i>=" + from + ". Change it to <i>" + firstStopName + "</i> instead?</html>"),
+                tr("Change from tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, null, null)
+            ) {
+                route_manager.set("from", firstStopName);
+            } else {
+                return;
+            }
+        }
+
+        if (!lastStopName.isEmpty() && to != lastStopName) {
+            if (
+                JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                tr("<html><i>to</i>=" + to + ". Change it to <i>" + lastStopName + "</i> instead?</html>"),
+                tr("Change to tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, null, null)
+            ) {
+                route_manager.set("to", lastStopName);
+            } else {
+                return;
+            }
+        }
+
+        String proposedRelname = route_manager.getComposedName();
+        if (proposedRelname != route_manager.get("name")) {
+            if (
+                JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                tr("<html>Change name to\n <i>" + proposedRelname + "</i>\n?</html>"),
+                tr("Change name tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, null, null)
+            ) {
+                route_manager.set("name", proposedRelname);
+            } else {
+                return;
+            }
+        }
+        route_manager.writeTagsToRelation();
+        editor.reloadDataFromRelation();
 
         OsmDataLayer layer = MainApplication.getLayerManager().getEditLayer();
         Relation routeMaster = null;
@@ -222,8 +220,12 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             ) {
                 Relation otherDirRel = new Relation(newRel);
                 otherDirRel.clearOsmMetadata();
-                otherDirRel.put(fromtag, lastStopName);
-                otherDirRel.put(totag, firstStopName);
+                if (lastStopName != "") {
+                    otherDirRel.put("from", lastStopName);
+                }
+                if (firstStopName != "") {
+                    otherDirRel.put("to", firstStopName);
+                }
 
                 // Reverse order of members in new route relation
                 PTRouteDataManager return_route_manager = new PTRouteDataManager(otherDirRel);

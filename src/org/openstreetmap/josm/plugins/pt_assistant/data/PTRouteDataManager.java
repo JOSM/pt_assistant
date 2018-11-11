@@ -2,10 +2,13 @@
 package org.openstreetmap.josm.plugins.pt_assistant.data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.openstreetmap.josm.command.ChangeCommand;
+import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Relation;
@@ -37,6 +40,10 @@ public class PTRouteDataManager {
      */
     private Set<RelationMember> failedMembers = new HashSet<>();
 
+    private String routeNameFormat = "[operator] [ref] [from] - [via] - [to]";
+
+    private HashMap<String, String> tags = new HashMap<>(30);
+
     public PTRouteDataManager(Relation relation) {
 
         // It is assumed that the relation is a route. Build in a check here
@@ -44,6 +51,19 @@ public class PTRouteDataManager {
         // from outside the pt_assitant SegmentChecker)
 
         this.relation = relation;
+
+//        String routeOperator = this.relation.get("operator");
+//        if (routeOperator == null) {
+//            routeOperator = "";
+//        }
+//        String network = this.relation.get("network");
+//        if (network == null) {
+//            network = "";
+//        }
+//        String routeRef = this.relation.get("ref");
+//        if (routeRef == null) {
+//            routeRef = "";
+//        }
 
         PTStop prev = null; // stores the last created PTStop
 
@@ -136,6 +156,80 @@ public class PTRouteDataManager {
         LatLon coord1 = member1.getMember().getBBox().getCenter();
         LatLon coord2 = member2.getMember().getBBox().getCenter();
         return coord1.distanceSq(coord2);
+    }
+
+    public void set(String key, String value) {
+        if (!key.isEmpty() && !value.isEmpty()) {
+            this.tags.put(key, value);
+        }
+    }
+
+    public String get(String key) {
+        String value = "";
+        if (!key.isEmpty()) {
+            if (this.tags.containsKey(key)) {
+                value = this.tags.get(key);
+            } else {
+                value = this.relation.get(key);
+            }
+        }
+        if (value == null || value.isEmpty()) {
+            value = "";
+        }
+        return value;
+    }
+
+    public void writeTagsToRelation() {
+        Relation tempRel = new Relation(this.relation);
+        String v;
+        for (String k : this.tags.keySet()) {
+            v = this.tags.get(k);
+            if (v != null && v !="" && !v.isEmpty()) {
+                tempRel.put(k, v);
+            }
+        }
+        UndoRedoHandler.getInstance().add(new ChangeCommand(this.relation, tempRel));
+    }
+
+    public String getNameOfFirstStop() {
+        PTStop firstStop = this.getFirstStop();
+        if (firstStop != null) {
+            return firstStop.getName();
+        } else {
+            return "";
+        }
+
+    }
+
+    public String getNameOfLastStop() {
+        PTStop lastStop = this.getLastStop();
+        if (lastStop != null) {
+            return lastStop.getName();
+        } else {
+            return "";
+        }
+
+    }
+
+    public String getComposedName( ) {
+
+        String composedName = get("operator");
+        if (composedName.isEmpty()) {
+            composedName = get("network");
+        }
+        composedName += " " + get("ref");
+
+        if (!get("from").isEmpty()) {
+            composedName += " " + get("from");
+        }
+        if (!get("via").isEmpty()) {
+            composedName += " - " + get("via");
+        }
+        if (!get("to").isEmpty()) {
+            composedName += " - " + get("to");
+        }
+
+        return composedName;
     }
 
     /**
@@ -362,14 +456,14 @@ public class PTRouteDataManager {
         for (Integer potentialStartIndex : potentialStartIndices) {
             for (Integer potentialEndIndex : potentialEndIndices) {
                 if (potentialStartIndex <= potentialEndIndex) {
-                    int[] pair = {potentialStartIndex, potentialEndIndex};
+                    int[] pair = { potentialStartIndex, potentialEndIndex };
                     pairList.add(pair);
                 }
             }
         }
 
         int minDifference = Integer.MAX_VALUE;
-        int[] mostSuitablePair = {0, 0};
+        int[] mostSuitablePair = { 0, 0 };
         for (int[] pair : pairList) {
             int diff = pair[1] - pair[0];
             if (diff < minDifference) {
@@ -416,23 +510,23 @@ public class PTRouteDataManager {
         return null;
     }
 
-   /**
-    * Returns the first way of this route
-    *
-    * @return the first way of this route
-    */
-   public Way getFirstWay() {
-       if (ptWays.isEmpty()) {
-           return null;
-       }
+    /**
+     * Returns the first way of this route
+     *
+     * @return the first way of this route
+     */
+    public Way getFirstWay() {
+        if (ptWays.isEmpty()) {
+            return null;
+        }
 
-       PTWay lastPTWay = ptWays.get(0);
-       if (lastPTWay == null || lastPTWay.getWays().isEmpty()) {
-           return null;
-       }
+        PTWay lastPTWay = ptWays.get(0);
+        if (lastPTWay == null || lastPTWay.getWays().isEmpty()) {
+            return null;
+        }
 
-       return lastPTWay.getWays().get(0);
-   }
+        return lastPTWay.getWays().get(0);
+    }
 
     /**
      * Returns the last way of this route
