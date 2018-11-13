@@ -20,6 +20,7 @@ import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.DialogUtils;
 import org.openstreetmap.josm.tools.Logging;
 
 /**
@@ -196,7 +197,6 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
      * @param target Platform node or way
      * @param commands Original command list
      * @param stopArea Stop area object
-     * @param isSelected true, if this platform is selected in editor
      * @param isFirst true, if this platform is first in stop area
      * @return Resulting command list
      */
@@ -553,7 +553,7 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
             }
             return commands;
         } catch (Exception ex) {
-            MessageBox.ok(ex.getMessage());
+            DialogUtils.showOkWarning("Exception when customizing stop", ex.getMessage());
         }
         return null;
     }

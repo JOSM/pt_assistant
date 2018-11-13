@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.DialogUtils;
 
 /**
  * Dialog for setting stop area properties
@@ -449,7 +450,7 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
             }
             return false;
         } catch (Exception ex) {
-            MessageBox.ok(ex.getMessage());
+            DialogUtils.showOkWarning("Exception when getting checkbox value", ex.getMessage());
         }
         return false;
     }
@@ -576,7 +577,7 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
             stopArea.isCovered = getCheckBoxValue(checkBoxIsCover);
             stopArea.isArea = getCheckBoxValue(checkBoxIsArea);
         } catch (Exception ex) {
-            MessageBox.ok(ex.getMessage());
+            DialogUtils.showOkWarning("Exception when saving preferences!", ex.getMessage());
         }
         return stopArea;
     }
