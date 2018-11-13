@@ -1,28 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>JOSM-pt-assistant</name>
-	<comment></comment>
-	<projects>
-	</projects>
+	<name>JOSM-pt_assistant</name>
+	<comment>The pt_assistant plugin for JOSM</comment>
+	<projects/>
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>
-			<arguments>
-			</arguments>
+			<arguments/>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.buildship.core.gradleprojectbuilder</name>
+			<arguments/>
 		</buildCommand>
 		<buildCommand>
 			<name>org.sonarlint.eclipse.core.sonarlintBuilder</name>
-			<arguments>
-			</arguments>
+			<arguments/>
 		</buildCommand>
 		<buildCommand>
 			<name>net.sf.eclipsecs.core.CheckstyleBuilder</name>
-			<arguments>
-			</arguments>
+			<arguments/>
+		</buildCommand>
+		<buildCommand>
+			<name>edu.umd.cs.findbugs.plugin.eclipse.findbugsBuilder</name>
+			<arguments/>
 		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>net.sf.eclipsecs.core.CheckstyleNature</nature>
+		<nature>edu.umd.cs.findbugs.plugin.eclipse.findbugsNature</nature>
+		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
 	</natures>
+	<linkedResources/>
+	<filteredResources/>
 </projectDescription>
