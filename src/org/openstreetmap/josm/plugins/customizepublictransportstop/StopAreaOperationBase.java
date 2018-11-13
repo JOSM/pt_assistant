@@ -22,7 +22,7 @@ public abstract class StopAreaOperationBase implements IStopAreaCustomizer {
     /**
      * Current dataset of Josm
      */
-    private DataSet _CurrentDataSet;
+    private final DataSet _CurrentDataSet;
 
     /**
      * Constructor of operation of customizing of stop area

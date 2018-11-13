@@ -4,9 +4,11 @@ package org.openstreetmap.josm.plugins.customizepublictransportstop;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import org.openstreetmap.josm.command.AddCommand;
@@ -99,7 +101,7 @@ public class CreateNewStopPointOperation extends StopAreaOperationBase {
         Point p = MainApplication.getMap().mapView.getPoint(platformCoord);
         Map<Double, List<Node>> dist_nodes = getNearestNodesImpl(p);
         Double[] distances = dist_nodes.keySet().toArray(new Double[0]);
-        distances = sort(distances);
+        Arrays.sort(distances);
         Integer distanceIndex = -1;
         Node nearestNode = null;
         while (++distanceIndex < distances.length && nearestNode == null) {
@@ -108,7 +110,7 @@ public class CreateNewStopPointOperation extends StopAreaOperationBase {
                 for (Way way : getCurrentDataSet().getWays()) {
                     if (way.getNodes().contains(node) && testWay(way, stopArea)) {
                         nearestNode = node;
-                        return new AbstractMap.SimpleEntry<Double, Node>(distances[distanceIndex], nearestNode);
+                        return new AbstractMap.SimpleEntry<>(distances[distanceIndex], nearestNode);
                     }
                 }
                 if (nearestNode != null)
@@ -119,57 +121,26 @@ public class CreateNewStopPointOperation extends StopAreaOperationBase {
     }
 
     /**
-     * Sorting of founded points by distance
-     *
-     * @param distances Array of distances
-     * @return Sorted array of distances
-     */
-    public Double[] sort(Double[] distances) {
-        for (Integer i = 0; i < distances.length - 1; i++) {
-            for (Integer j = i + 1; j < distances.length; j++) {
-                if (distances[i] > distances[j]) {
-                    Double d = distances[i];
-                    distances[i] = distances[j];
-                    distances[j] = d;
-                }
-            }
-        }
-        return distances;
-    }
-
-    /**
      * Selection of ways for stop position by type of way and type of stop
      *
      * @param way The way
      * @param stopArea Stop area
      * @return true, if way can contain stop position
      */
-    public Boolean testWay(Way way, StopArea stopArea) {
+    public Boolean testWay(final Way way, final StopArea stopArea) {
         if (stopArea.isTrainStation || stopArea.isTrainStop) {
-            if (OSMTags.RAIL_TAG_VALUE.equals(way.getKeys().get(OSMTags.RAILWAY_TAG))
-                    && OSMTags.MAIN_TAG_VALUE.equals(way.getKeys().get(OSMTags.USAGE_TAG)))
-                return true;
-            return false;
+            return OSMTags.RAIL_TAG_VALUE.equals(way.getKeys().get(OSMTags.RAILWAY_TAG)) &&
+                OSMTags.MAIN_TAG_VALUE.equals(way.getKeys().get(OSMTags.USAGE_TAG));
         }
 
         if (stopArea.isTram) {
-            if (OSMTags.TRAM_TAG_VALUE.equals(way.getKeys().get(OSMTags.RAILWAY_TAG)))
-                return true;
-            return false;
+            return OSMTags.TRAM_TAG_VALUE.equals(way.getKeys().get(OSMTags.RAILWAY_TAG));
         }
 
-        String[] highwayValues = {OSMTags.TRUNK_TAG_VALUE, OSMTags.PRIMARY_TAG_VALUE, OSMTags.SECONDARY_TAG_VALUE,
-                OSMTags.TERTIARY_TAG_VALUE, OSMTags.UNCLASSIFIED_TAG_VALUE, OSMTags.RESIDENTIAL_TAG_VALUE,
-                OSMTags.SERVICE_TAG_VALUE, OSMTags.BUS_GUIDEWAY_TAG_VALUE, OSMTags.ROAD_TAG_VALUE,
-                OSMTags.TRUNK_LINK_TAG_VALUE, OSMTags.PRIMARY_LINK_TAG_VALUE, OSMTags.SECONDARY_LINK_TAG_VALUE,
-                OSMTags.TERTIARY_LINK_TAG_VALUE};
         if (stopArea.isBus || stopArea.isTrolleybus || stopArea.isShareTaxi) {
-            String highway = way.getKeys().get(OSMTags.HIGHWAY_TAG);
-            if (highway != null)
-                for (Integer i = 0; i < highwayValues.length; i++) {
-                    if (highwayValues[i].equals(highway))
-                        return true;
-                }
+            return Optional.ofNullable(way.getKeys().get(OSMTags.HIGHWAY_TAG))
+                .map(OSMTags.TAG_VALUES_HIGHWAY::contains)
+                .orElse(false);
         }
         return false;
     }

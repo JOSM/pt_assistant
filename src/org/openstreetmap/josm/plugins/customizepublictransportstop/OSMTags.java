@@ -1,6 +1,10 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.customizepublictransportstop;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * OSM object tags
  *
@@ -20,6 +24,23 @@ public final class OSMTags {
     public static final String SECONDARY_TAG_VALUE = "secondary";
     public static final String PRIMARY_TAG_VALUE = "primary";
     public static final String TRUNK_TAG_VALUE = "trunk";
+
+    public static final Collection<String> TAG_VALUES_HIGHWAY = Collections.unmodifiableCollection(Arrays.asList(
+        TRUNK_TAG_VALUE,
+        PRIMARY_TAG_VALUE,
+        SECONDARY_TAG_VALUE,
+        TERTIARY_TAG_VALUE,
+        UNCLASSIFIED_TAG_VALUE,
+        RESIDENTIAL_TAG_VALUE,
+        SERVICE_TAG_VALUE,
+        BUS_GUIDEWAY_TAG_VALUE,
+        ROAD_TAG_VALUE,
+        TRUNK_LINK_TAG_VALUE,
+        PRIMARY_LINK_TAG_VALUE,
+        SECONDARY_LINK_TAG_VALUE,
+        TERTIARY_LINK_TAG_VALUE
+    ));
+
     public static final String TRAM_TAG_VALUE = "tram";
     public static final String USAGE_TAG = "usage";
     public static final String MAIN_TAG_VALUE = "main";
