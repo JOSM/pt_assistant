@@ -119,20 +119,19 @@ public class EdgeSelectionAction extends MapMode {
             return RouteUtils.isWaySuitableForBuses(way);
 
         if ("bicycle".equals(modeOfTravel)) {
-            if (way.hasTag("bicycle", "yes"))
-                return true;
-            if (way.hasTag("bicycle", "no") || way.hasTag("bicycle", "side_path"))
-                return false;
-            if (way.hasTag("highway", "motorway") || way.hasTag("highway", "trunk") || way.hasTag("highway", "footway")
-                    || way.hasTag("highway", "pedestrian"))
-                return false;
-
-            return true;
+            return way.hasTag("bicycle", "yes")
+                || (
+                    !way.hasTag("bicycle", "no", "side_path")
+                    && !way.hasTag("highway", "motorway", "trunk", "footway", "pedestrian")
+                );
         }
 
         if ("foot".equals(modeOfTravel)) {
-            return (way.hasTag("highway", "footway") || !(way.hasKey("highway", "motorway") || way.hasKey("foot", "no")
-                    || way.hasKey("foot", "use_sidepath")));
+            return way.hasTag("highway", "footway")
+                || (
+                    !way.hasKey("highway", "motorway")
+                    && !way.hasKey("foot", "no", "use_sidepath")
+                );
         }
 
         // if ("hiking".equals(modeOfTravel))
@@ -163,19 +162,11 @@ public class EdgeSelectionAction extends MapMode {
         return RouteUtils.isWaySuitableForPublicTransport(way);
     }
 
-    /*
-     *
-     */
-    private Way chooseBestWay(List<Way> ways, String modeOfTravel) {
-        ways.removeIf(w -> !isWaySuitableForMode(w, modeOfTravel));
-        if (ways.isEmpty())
-            return null;
-        if (ways.size() == 1)
-            return ways.get(0);
-
-        Way theChoosenOne = null;
-
-        return theChoosenOne;
+    private Way chooseBestWay(final List<Way> ways, final String modeOfTravel) {
+        final List<Way> suitable = ways.stream()
+            .filter(w -> isWaySuitableForMode(w, modeOfTravel))
+            .collect(Collectors.toList());
+        return suitable.size() == 1 ? suitable.get(0) : null;
     }
 
     private String getModeOfTravel(Way initial) {
@@ -313,13 +304,7 @@ public class EdgeSelectionAction extends MapMode {
                 Node node3 = newEdges.get(j).firstNode();
                 Node node4 = newEdges.get(j).lastNode();
 
-                if (node1.equals(node3) && node2.equals(node4)) {
-                    if (!waysToBeRemoved.contains(newEdges.get(i)))
-                        waysToBeRemoved.add(newEdges.get(i));
-                    if (!waysToBeRemoved.contains(newEdges.get(j)))
-                        waysToBeRemoved.add(newEdges.get(j));
-
-                } else if (node1.equals(node4) && node2.equals(node3)) {
+                if ((node1.equals(node3) && node2.equals(node4)) || (node1.equals(node4) && node2.equals(node3))) {
                     if (!waysToBeRemoved.contains(newEdges.get(i)))
                         waysToBeRemoved.add(newEdges.get(i));
                     if (!waysToBeRemoved.contains(newEdges.get(j)))

@@ -9,6 +9,7 @@ import org.openstreetmap.josm.data.osm.OsmUtils;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
 
 /**
  * Utils class for routes
@@ -34,30 +35,17 @@ public final class RouteUtils {
      *         with the pt_assistant plugin, false otherwise.
      */
     public static boolean isVersionTwoPTRoute(Relation r) {
-
-        if (!isPTRoute(r)) {
-            return false;
-        }
-
-        if (!r.hasTag(PT_VERSION_TAG, "2")) {
-            return false;
-        }
-
-        return !r.hasTag("bus", "on_demand");
+        return isPTRoute(r) && r.hasTag(PT_VERSION_TAG, "2") && !r.hasTag("bus", "on_demand");
     }
 
     public static boolean isVersionOnePTRoute(Relation r) {
-
-        if (!isPTRoute(r)) {
-            return false;
-        }
-
-        if (r.get(PT_VERSION_TAG) == null) {
-            return true;
-        }
-
-        return r.hasTag(PT_VERSION_TAG, "1");
+        return isPTRoute(r) && (r.get(PT_VERSION_TAG) == null || r.hasTag(PT_VERSION_TAG, "1"));
     }
+
+    private static final String[] acceptedRouteTags = {
+        "bus", "trolleybus", "share_taxi",
+        "tram", "light_rail", "subway", "train"
+    };
 
     /**
      * Adds the version of the PT route schema to the given PT route.
@@ -74,20 +62,11 @@ public final class RouteUtils {
     }
 
     public static boolean isPTRoute(Relation r) {
-
-        if (r == null) {
-            return false;
-        }
-
-        String[] acceptedRouteTags = new String[] {
-                "bus", "trolleybus", "share_taxi",
-                "tram", "light_rail", "subway", "train"};
-
-        return r.hasTag(TAG_ROUTE, acceptedRouteTags);
+        return r != null && r.hasTag(OSMTags.KEY_ROUTE, acceptedRouteTags);
     }
 
     public static boolean isRoute(Relation r) {
-        return r.get(TAG_ROUTE) != null;
+        return r.get(OSMTags.KEY_ROUTE) != null;
     }
 
     /**
@@ -284,7 +263,7 @@ public final class RouteUtils {
             return false;
         }
 
-        return r.hasTag(TAG_ROUTE, "bicycle", "mtb");
+        return r.hasTag(OSMTags.KEY_ROUTE, "bicycle", "mtb");
     }
 
 
@@ -306,7 +285,7 @@ public final class RouteUtils {
             return false;
         }
 
-        return r.hasTag(TAG_ROUTE, "foot", "walking", "hiking");
+        return r.hasTag(OSMTags.KEY_ROUTE, "foot", "walking", "hiking");
     }
 
     public static boolean isHorseRoute(Relation r) {
@@ -314,6 +293,6 @@ public final class RouteUtils {
             return false;
         }
 
-        return r.hasTag(TAG_ROUTE, "horse");
+        return r.hasTag(OSMTags.KEY_ROUTE, "horse");
     }
 }

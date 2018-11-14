@@ -726,11 +726,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
     // turn off what has been highlighted on last mouse move and highlight what has
     // to be highlighted now
     private void updateHighlights() {
-        if (oldHighlights == null && newHighlights == null) {
-            return;
-        }
-
-        if (oldHighlights.isEmpty() && newHighlights.isEmpty()) {
+        if ((oldHighlights == null || oldHighlights.isEmpty()) && (newHighlights == null || newHighlights.isEmpty())) {
             return;
         }
 
