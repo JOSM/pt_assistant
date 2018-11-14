@@ -85,6 +85,15 @@ public final class OSMTags {
     public static final String LONG_DISTANCE_NETWORK_TAG_VALUE = "long_distance";
     public static final String HIGH_SPEED_NETWORK_TAG_VALUE = "high_speed";
 
+    /** See <a href="https://wiki.openstreetmap.org/wiki/Key:type">Key:type</a>. */
+    public static final String KEY_RELATION_TYPE = "type";
+    /** See <a href="https://wiki.openstreetmap.org/wiki/Key:route">Key:route</a>. */
+    public static final String KEY_ROUTE = "route";
+    /** See <a href="https://wiki.openstreetmap.org/wiki/Key:route_master">Key:route_master</a>. */
+    public static final String KEY_ROUTE_MASTER = "route_master";
+    /** See <a href="https://wiki.openstreetmap.org/wiki/Tag:type=route_master">Tag:type=route_master</a>. */
+    public static final String VALUE_TYPE_ROUTE_MASTER = KEY_ROUTE_MASTER;
+
     private OSMTags() {
         // Hide default constructor
     }

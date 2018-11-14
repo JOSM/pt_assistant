@@ -56,6 +56,7 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.CheckParameterUtil;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.Geometry;
@@ -183,18 +184,6 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
         return false;
     }
 
-    private Node checkCommonNode(Way affected, Way previousAffectedWay) {
-
-        // check if they have any common node
-        List<Node> presentNodeList = affected.getNodes();
-        for (Node previousNode : previousAffectedWay.getNodes()) {
-            if (presentNodeList.contains(previousNode)) {
-                return previousNode;
-            }
-        }
-        return null;
-    }
-
     private void removeFirstNode() {
 
         atNodes.get(0).setDeleted(true);
@@ -281,7 +270,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
         Node commonNode = null;
         boolean twoWaysWithCommonNode = false;
         if (previousAffectedWay != affected) {
-            commonNode = checkCommonNode(affected, previousAffectedWay);
+            commonNode = WayUtils.findFirstCommonNode(affected, previousAffectedWay).orElse(null);
             if (commonNode == null) {
                 removeFirstNode();
                 return;

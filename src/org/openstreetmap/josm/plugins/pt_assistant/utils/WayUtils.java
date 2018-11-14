@@ -1,15 +1,30 @@
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
+import java.util.Optional;
+
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.NodePair;
 import org.openstreetmap.josm.data.osm.Way;
 
-import java.util.Optional;
 
 public final class WayUtils {
     private WayUtils() {
         // Private constructor to avoid instantiation
     }
+
+    /**
+     * @param w1 a way
+     * @param w2 another way
+     * @return The first node of the ways {@code w1} and {@code w2} that is also part of the other
+     *     of those ways. If the two ways do not have a {@link Node} in common, or if at least
+     *     one of the given ways is {@link null}, the returned {@link Optional} is empty.
+     */
+     public static Optional<Node> findFirstCommonNode(final Way w1, final Way w2) {
+         if (w1 == null || w2 == null) {
+             return Optional.empty();
+         }
+         return w2.getNodes().stream().filter(w1::containsNode).findFirst();
+     }
 
     public static Optional<Node> findCommonFirstLastNode(final Way w1, final Way w2) {
         return findCommonFirstLastNode(w1, w2, null);
@@ -55,11 +70,17 @@ public final class WayUtils {
                 "motorway", "trunk", "primary", "secondary", "tertiary",
                 "unclassified", "road", "residential", "service", "motorway_link", "trunk_link", "primary_link",
                 "secondary_link", "tertiary_link", "living_street", "bus_guideway", "road"
-            ) ||
-                way.hasTag(
-                    "cycleway",
-                    "share_busway", "shared_lane"
-                ) ||
-                (way.hasTag("highway", "pedestrian") && (way.hasTag("bus", "yes", "designated") || way.hasTag("psv", "yes", "designated")));
+            )
+            || way.hasTag(
+                "cycleway",
+                "share_busway", "shared_lane"
+            )
+            || (
+                way.hasTag("highway", "pedestrian")
+                && (
+                    way.hasTag("bus", "yes", "designated")
+                    || way.hasTag("psv", "yes", "designated")
+                )
+            );
     }
 }
