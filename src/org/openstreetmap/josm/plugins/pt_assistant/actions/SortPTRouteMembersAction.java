@@ -5,6 +5,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,8 @@ import java.util.concurrent.Future;
 import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
+import org.openstreetmap.josm.actions.search.SearchAction;
+import org.openstreetmap.josm.command.AddCommand;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.coor.EastNorth;
@@ -24,14 +27,20 @@ import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.data.osm.search.SearchMode;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.dialogs.relation.DownloadRelationMemberTask;
 import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
+import org.openstreetmap.josm.gui.dialogs.relation.RelationDialogManager;
+import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
+import org.openstreetmap.josm.gui.layer.OsmDataLayer;
+import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteDataManager;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
+import org.openstreetmap.josm.plugins.pt_assistant.data.PTWay;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
@@ -43,7 +52,7 @@ import org.openstreetmap.josm.tools.Utils;
  * Sorts the members of a PT route. It orders first the ways, then the stops
  * according to the assigned ways
  *
- * @author giacomo
+ * @author giacomo, Polyglot
  *
  */
 public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
@@ -53,6 +62,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
     /**
      * Creates a new SortPTRouteMembersAction
+     *
      * @param editorAccess access to relation editor
      */
     public SortPTRouteMembersAction(IRelationEditorActionAccess editorAccess) {
@@ -71,10 +81,12 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         editor.apply();
 
         if (rel.hasIncompleteMembers()) {
-            if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
-                tr("The relation has incomplete members. Do you want to download them and continue with the sorting?"),
-                tr("Incomplete Members"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, null, null)) {
+            if (
+                JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                tr("The relation has incomplete members.\nDo you want to download them and continue with the sorting?"),
+                tr("Not all members are downloaded"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, null, null)
+            ) {
 
                 List<Relation> incomplete = Collections.singletonList(rel);
                 Future<?> future = MainApplication.worker.submit(new DownloadRelationMemberTask(
@@ -92,7 +104,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                         Logging.error(e1);
                         return;
                     }
-                 });
+                });
             } else {
                 return;
             }
@@ -102,10 +114,203 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
     }
 
     private void continueAfterDownload(Relation rel) {
+
+        PTRouteDataManager route_manager = new PTRouteDataManager(rel);
         Relation newRel = new Relation(rel);
+        Boolean ask_to_create_return_route_and_routeMaster = false;
+
+        if (!RouteUtils.isVersionTwoPTRoute(newRel)) {
+            if (
+                JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                tr(
+                    "This relation is not PT version 2. Sorting its stops wouldn't make sense.\n"
+                    + "Would you like to set ''public_transport:version=2''?\n\n"
+                    + "There will be some extra work needed after c,\n\n"
+                    + "but PT_Assistant can help prepare the relations."
+                ),
+                tr("This is not a PT v2 relation"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, null, null)
+            ) {
+                RouteUtils.setPTRouteVersion(newRel, "2");
+                ask_to_create_return_route_and_routeMaster = true;
+            } else {
+                return;
+            }
+        }
         sortPTRouteMembers(newRel);
         UndoRedoHandler.getInstance().add(new ChangeCommand(rel, newRel));
         editor.reloadDataFromRelation();
+
+        route_manager = new PTRouteDataManager(rel);
+
+        String from = route_manager.get("from");
+        String firstStopName = route_manager.getNameOfFirstStop();
+        if (from.isEmpty() && !firstStopName.isEmpty()) {
+            if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                    tr("''from'' tag not set. Set it to\n{0} ?", firstStopName), tr("Set from tag?"),
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null)) {
+
+                route_manager.set("from", firstStopName);
+            }
+        }
+
+        String to = route_manager.get("to");
+        String lastStopName = route_manager.getNameOfLastStop();
+        if (to.isEmpty() && !lastStopName.isEmpty()) {
+            if (
+                JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                tr("''to'' tag not set. Set it to\n{0} ?", lastStopName), tr("Set to tag?"),
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, null, null)
+            ) {
+                route_manager.set("to", lastStopName);
+            }
+        }
+
+        if (!firstStopName.isEmpty() && from != firstStopName) {
+            if (
+                JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                tr("''from''={0}.\nChange it to\n''{1}''\n instead?", from, firstStopName),
+                tr("Change from tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, null, null)
+            ) {
+                route_manager.set("from", firstStopName);
+            }
+        }
+
+        if (!lastStopName.isEmpty() && to != lastStopName) {
+            if (
+                JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                tr("''to''={0}.\nChange it to\n''{1}''\n instead?", to, lastStopName),
+                tr("Change to tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, null, null)
+            ) {
+                route_manager.set("to", lastStopName);
+            }
+        }
+
+        String proposedRelname = route_manager.getComposedName();
+        if (proposedRelname != route_manager.get("name")) {
+            if (
+                JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                tr("Change name to\n''{0}''\n?", proposedRelname),
+                tr("Change name tag?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, null, null)
+            ) {
+                route_manager.set("name", proposedRelname);
+            }
+            route_manager.writeTagsToRelation();
+            editor.reloadDataFromRelation();
+
+            OsmDataLayer layer = MainApplication.getLayerManager().getEditLayer();
+            Relation routeMaster = null;
+
+            if (ask_to_create_return_route_and_routeMaster) {
+                if (
+                    JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                    tr("Create ''route'' relation for opposite direction of travel?"),
+                    tr("Opposite itinerary?"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, null, null)
+                ) {
+                    Relation otherDirRel = new Relation(newRel);
+                    otherDirRel.clearOsmMetadata();
+                    if (lastStopName != "") {
+                        otherDirRel.put("from", lastStopName);
+                    }
+                    if (firstStopName != "") {
+                        otherDirRel.put("to", firstStopName);
+                    }
+
+                    // Reverse order of members in new route relation
+                    PTRouteDataManager return_route_manager = new PTRouteDataManager(otherDirRel);
+
+                    List<PTStop> stops_reversed = return_route_manager.getPTStops();
+                    Collections.reverse(stops_reversed);
+                    stops_reversed.forEach(stopMember -> {
+                        otherDirRel.removeMembersFor(stopMember.getMember());
+                        otherDirRel.addMember(stopMember);
+                    });
+
+                    List<PTWay> ways_reversed = return_route_manager.getPTWays();
+                    Collections.reverse(ways_reversed);
+                    ways_reversed.forEach(wayMember -> {
+                        otherDirRel.removeMembersFor(wayMember.getMember());
+                        otherDirRel.addMember(wayMember);
+                    });
+
+                    UndoRedoHandler.getInstance()
+                            .add(new AddCommand(MainApplication.getLayerManager().getActiveDataSet(), otherDirRel));
+
+                    RelationEditor editor = RelationDialogManager.getRelationDialogManager()
+                            .getEditorForRelation(layer, otherDirRel);
+                    if (editor == null) {
+                        editor = RelationEditor.getEditor(layer, otherDirRel, null);
+                        editor.setVisible(true);
+                    }
+                    editor.reloadDataFromRelation();
+
+                    Relation rmr = null;
+
+                    for (OsmPrimitive parent : rel.getReferrers()) {
+                        if (parent.get("type") == "route_master") {
+                            rmr = (Relation) parent;
+                            System.out.println("rmr" + rmr);
+                            break;
+                        }
+                    }
+                    if (rmr == null) {
+                        if (
+                            JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(MainApplication.getMainFrame(),
+                            tr("Create ''route_master'' relation and add route relations to it?"), tr("Create a route_master?"),
+                            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null)
+                        ) {
+                            routeMaster = new Relation();
+                            routeMaster.put("type", "route_master");
+                            if (rel.hasKey("route")) {
+                                routeMaster.put("route_master", rel.get("route"));
+
+                                List<String> tagslist = Arrays.asList("name", "ref", "operator", "network", "colour");
+                                for (String key : tagslist) {
+                                    if (rel.hasKey(key)) {
+                                        routeMaster.put(key, rel.get(key));
+                                    }
+                                }
+                            }
+
+                            routeMaster.addMember(new RelationMember("", rel));
+                            UndoRedoHandler.getInstance()
+                                    .add(new AddCommand(MainApplication.getLayerManager().getActiveDataSet(), routeMaster));
+                        } else {
+                            return;
+                        }
+                    } else {
+                        routeMaster = rmr;
+                    }
+                    Relation newRouteMaster = new Relation(routeMaster);
+                    newRouteMaster.addMember(new RelationMember("", otherDirRel));
+
+                    UndoRedoHandler.getInstance().add(new ChangeCommand(routeMaster, newRouteMaster));
+                    editor.reloadDataFromRelation();
+
+                    SearchAction.search("(oneway OR junction=roundabout -closed) child new",
+                            SearchMode.fromCode('R'));
+
+                    RelationEditor editorRM = RelationDialogManager.getRelationDialogManager()
+                            .getEditorForRelation(layer, routeMaster);
+                    if (editorRM == null) {
+                        editorRM = RelationEditor.getEditor(layer, routeMaster, null);
+                        editorRM.setVisible(true);
+                        editorRM.toBack();
+                        return;
+                    }
+                    editor.reloadDataFromRelation();
+                } else {
+                    return;
+                }
+            } else {
+                return;
+            }
+        }
     }
 
     /***
@@ -122,7 +327,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             rel.remove("fixme:relation");
         }
 
-        //first loop trough all the members and remove the roles
+        // first loop trough all the members and remove the roles
         List<RelationMember> members = new ArrayList<>();
         List<RelationMember> oldMembers = rel.getMembers();
         for (int i = 0; i < oldMembers.size(); i++) {
@@ -134,11 +339,11 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             rel.removeMember(0);
         }
 
-        //sort the members with the built in sorting function in order to get
-        //the continuity of the ways
+        // sort the members with the built in sorting function in order to get
+        // the continuity of the ways
         members = new RelationSorter().sortMembers(members);
 
-        //divide stops and ways
+        // divide stops and ways
         List<RelationMember> stops = new ArrayList<>();
         List<RelationMember> wayMembers = new ArrayList<>();
         List<Way> ways = new ArrayList<>();
@@ -153,10 +358,10 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             }
         }
 
-        //couple together stop positions and platforms that are part of the same
-        //stop. the only way used to determine whether they are part of the same
-        //stop or not is the name. this should be improved by using also the
-        //distance
+        // couple together stop positions and platforms that are part of the same
+        // stop. the only way used to determine whether they are part of the same
+        // stop or not is the name. this should be improved by using also the
+        // distance
         Map<String, List<PTStop>> stopsByName = new HashMap<>();
         List<PTStop> unnamed = new ArrayList<>();
         stops.forEach(rm -> {
@@ -178,8 +383,8 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             }
         });
 
-        //assign to each stop the corresponding way. if none is found add already
-        //the stop to the relation since it is not possible to reason on the order
+        // assign to each stop the corresponding way. if none is found add already
+        // the stop to the relation since it is not possible to reason on the order
         StopToWayAssigner assigner = new StopToWayAssigner(ways);
         List<PTStop> ptstops = new ArrayList<>();
         removeWrongSideStops(ptstops, wayMembers);
@@ -206,18 +411,18 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             wayStop.get(way).add(stop);
         });
 
-        //based on the order of the ways, add the stops to the relation
+        // based on the order of the ways, add the stops to the relation
         for (int i = 0; i < wayMembers.size(); i++) {
             RelationMember wm = wayMembers.get(i);
             Way prev = null;
             Way next = null;
             if (i > 0) {
-                RelationMember wmp = wayMembers.get(i-1);
+                RelationMember wmp = wayMembers.get(i - 1);
                 if (wmp.getType() == OsmPrimitiveType.WAY)
                     prev = wmp.getWay();
             }
             if (i < wayMembers.size() - 1) {
-                RelationMember wmn = wayMembers.get(i+1);
+                RelationMember wmn = wayMembers.get(i + 1);
                 if (wmn.getType() == OsmPrimitiveType.WAY)
                     next = wmn.getWay();
             }
@@ -226,8 +431,8 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 Way curr = wm.getWay();
                 List<PTStop> stps = wayStop.get(curr);
                 if (stps != null) {
-                    //if for one way there are more than one stop assigned to it,
-                    //another sorting step is needed
+                    // if for one way there are more than one stop assigned to it,
+                    // another sorting step is needed
                     if (stps.size() > 1)
                         stps = sortSameWayStops(stps, curr, prev, next);
                     stps.forEach(stop -> {
@@ -249,8 +454,8 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             rel.addMember(stop.getPlatformRM());
     }
 
-    //sorts the stops that are assigned to the same way. this is done based on
-    //the distance from the previous way.
+    // sorts the stops that are assigned to the same way. this is done based on
+    // the distance from the previous way.
     private static List<PTStop> sortSameWayStops(List<PTStop> stps, Way way, Way prev, Way next) {
         Map<Node, List<PTStop>> closeNodes = new HashMap<>();
         List<PTStop> noLocationStops = new ArrayList<>();
@@ -271,7 +476,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
         if (prev != null) {
             reverse = prev.firstNode().equals(way.lastNode())
-                        || prev.lastNode().equals(way.lastNode());
+                    || prev.lastNode().equals(way.lastNode());
         } else if (next != null) {
             reverse = next.firstNode().equals(way.firstNode())
                     || next.lastNode().equals(way.firstNode());
@@ -285,8 +490,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         return ret;
     }
 
-    private static List<PTStop> getSortedStops(List<Node> nodes,
-            Map<Node, List<PTStop>> closeNodes) {
+    private static List<PTStop> getSortedStops(List<Node> nodes, Map<Node, List<PTStop>> closeNodes) {
 
         List<PTStop> ret = new ArrayList<>();
         for (int i = 0; i < nodes.size(); i++) {
@@ -338,9 +542,11 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
     private static String getStopName(OsmPrimitive p) {
         for (Relation ref : Utils.filteredCollection(p.getReferrers(), Relation.class)) {
-            if (ref.hasTag("type", "public_transport")
-                    && StopUtils.isStopArea(ref)
-                    && ref.getName() != null) {
+            if (
+                ref.hasTag("type", "public_transport")
+                && StopUtils.isStopArea(ref)
+                && ref.getName() != null
+            ) {
                 return ref.getName();
             }
         }
@@ -353,12 +559,12 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             Way prev = null;
             Way next = null;
             if (i > 0) {
-                RelationMember wmp = wayMembers.get(i-1);
+                RelationMember wmp = wayMembers.get(i - 1);
                 if (wmp.getType() == OsmPrimitiveType.WAY)
                     prev = wmp.getWay();
             }
             if (i < wayMembers.size() - 1) {
-                RelationMember wmn = wayMembers.get(i+1);
+                RelationMember wmn = wayMembers.get(i + 1);
                 if (wmn.getType() == OsmPrimitiveType.WAY)
                     next = wmn.getWay();
             }
@@ -367,15 +573,15 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 Node firstNode = findCommonNode(curr, prev);
                 Node lastNode = findCommonNode(curr, next);
                 System.out.println(i);
-                    if (firstNode != null && firstNode.equals(curr.getNode(0))) {
-                        System.out.println("Front Way 1 == " + curr.getName());
-                    } else if (firstNode != null && firstNode.equals(curr.getNode(curr.getNodesCount() - 1))) {
-                        System.out.println("Back Way 2 == " + curr.getName());
-                    } else if (lastNode != null && lastNode.equals(curr.getNode(0))) {
-                        System.out.println("Back Way 3 == " + curr.getName());
-                    } else if (lastNode != null && lastNode.equals(curr.getNode(curr.getNodesCount() - 1))) {
-                        System.out.println("Front Way 4 == " + curr.getName());
-                    }
+                if (firstNode != null && firstNode.equals(curr.getNode(0))) {
+                    System.out.println("Front Way 1 == " + curr.getName());
+                } else if (firstNode != null && firstNode.equals(curr.getNode(curr.getNodesCount() - 1))) {
+                    System.out.println("Back Way 2 == " + curr.getName());
+                } else if (lastNode != null && lastNode.equals(curr.getNode(0))) {
+                    System.out.println("Back Way 3 == " + curr.getName());
+                } else if (lastNode != null && lastNode.equals(curr.getNode(curr.getNodesCount() - 1))) {
+                    System.out.println("Front Way 4 == " + curr.getName());
+                }
             }
         }
     }
