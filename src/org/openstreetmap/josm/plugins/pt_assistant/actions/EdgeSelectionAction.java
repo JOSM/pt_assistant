@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -180,15 +181,12 @@ public class EdgeSelectionAction extends MapMode {
     private String getModeOfTravel(Way initial) {
         // find a way to get the currently opened relation editor and get the
         // from there the current type of route
-        List<Layer> layers = MainApplication.getLayerManager().getLayers();
-        for (Layer layer : layers) {
-            if (layer.getName().equals("pt_assistant layer")) {
-                PTAssistantLayer PTL = (PTAssistantLayer) layer;
-                if (PTL.getModeOfTravel() != null)
-                    return PTL.getModeOfTravel();
-            }
-        }
-        return "bus";
+        return MainApplication.getLayerManager().getLayers().stream()
+            .filter(it -> it instanceof PTAssistantLayer)
+            .map(it -> ((PTAssistantLayer) it).getModeOfTravel())
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElse("bus");
     }
 
     @Override

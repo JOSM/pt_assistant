@@ -30,6 +30,7 @@ import org.openstreetmap.josm.gui.layer.LayerPositionStrategy;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPlugin;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTWay;
+import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 /**
@@ -47,7 +48,7 @@ public final class PTAssistantLayer extends Layer implements LayerChangeListener
     public String modeOfTravel = null;
 
     public PTAssistantLayer() {
-        super("pt_assistant layer");
+        super(I18n.tr("pt_assistant layer"));
         MainApplication.getLayerManager().addLayerChangeListener(this);
         MainApplication.getLayerManager().addLayer(this);
     }
@@ -158,7 +159,7 @@ public final class PTAssistantLayer extends Layer implements LayerChangeListener
 
     @Override
     public String getToolTipText() {
-        return "pt_assistant layer";
+        return getName();
     }
 
     @Override
