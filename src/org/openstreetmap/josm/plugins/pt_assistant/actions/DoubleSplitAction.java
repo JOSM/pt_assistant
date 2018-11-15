@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
@@ -152,7 +153,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
                         List<TagMap> affectedKeysList = new ArrayList<>();
                         affectedKeysList.add(way.getKeys());
                         newHighlights.add(way);
-                        dialogBox(3, null, way, way, commandList);
+                        dialogBox(SelectFromOptionDialog.TYPE_NODES_ARE_ENDS_OF_SAME_WAY, null, way, way, commandList);
                         return true;
                     }
                 }
@@ -269,22 +270,15 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
         // if both the nodes are not on same way and don't have any common node then
         // make second node as first node
-        Node commonNode = null;
-        boolean twoWaysWithCommonNode = false;
         if (previousAffectedWay != affected) {
-            commonNode = WayUtils.findFirstCommonNode(affected, previousAffectedWay).orElse(null);
-            if (commonNode == null) {
-                removeFirstNode();
-                return;
+            final Optional<Node> firstCommonNode = WayUtils.findFirstCommonNode(affected, previousAffectedWay);
+            if (firstCommonNode.isPresent()) {
+                dialogBox(SelectFromOptionDialog.TYPE_NODES_ON_ADJACENT_WAYS, firstCommonNode.get(), affected, previousAffectedWay, commandList);
             } else {
-                twoWaysWithCommonNode = true;
+                removeFirstNode();
             }
-        }
-
-        if (twoWaysWithCommonNode) {
-            dialogBox(1, commonNode, affected, previousAffectedWay, commandList);
         } else {
-            dialogBox(2, commonNode, affected, previousAffectedWay, commandList);
+            dialogBox(SelectFromOptionDialog.TYPE_NODES_ON_SAME_WAY, null, affected, previousAffectedWay, commandList);
         }
     }
 
@@ -774,6 +768,10 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
     // A dialogBox to query whether to select bus_bay, tunnel or bridge.
 
     private class SelectFromOptionDialog extends ExtendedDialog {
+        private static final int TYPE_NODES_ON_ADJACENT_WAYS = 1;
+        private static final int TYPE_NODES_ON_SAME_WAY = 2;
+        private static final int TYPE_NODES_ARE_ENDS_OF_SAME_WAY = 3;
+
         Way affected, previousAffectedWay;
         private JComboBox<String> keys;
         private JComboBox<String> values;
@@ -953,12 +951,12 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
             toggleSaveState(); // necessary since #showDialog() does not handle it due to the non-modal dialog
 
             if (getValue() == 1) {
-                if (this.type == 1) {
+                if (this.type == TYPE_NODES_ON_ADJACENT_WAYS) {
                     addKeysOnBothWays(this.commonNode, this.affected, this.previousAffectedWay, this.commandList, keys,
                             values);
-                } else if (this.type == 2) {
+                } else if (this.type == TYPE_NODES_ON_SAME_WAY) {
                     addKeys(this.affected, this.commandList, keys, values);
-                } else if (this.type == 3) {
+                } else if (this.type == TYPE_NODES_ARE_ENDS_OF_SAME_WAY) {
                     addKeysWhenStartEndPoint(this.affected, this.commandList, keys, values);
                 }
 
