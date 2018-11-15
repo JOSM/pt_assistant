@@ -133,10 +133,7 @@ public class PTRouteDataManager {
                 ptWays.add(ptway);
 
             } else {
-                if (!failedMembers.contains(member)) {
-                    failedMembers.add(member);
-                }
-
+                failedMembers.add(member);
             }
 
         }
@@ -191,28 +188,7 @@ public class PTRouteDataManager {
         UndoRedoHandler.getInstance().add(new ChangeCommand(this.relation, tempRel));
     }
 
-    public String getNameOfFirstStop() {
-        PTStop firstStop = this.getFirstStop();
-        if (firstStop != null) {
-            return firstStop.getName();
-        } else {
-            return "";
-        }
-
-    }
-
-    public String getNameOfLastStop() {
-        PTStop lastStop = this.getLastStop();
-        if (lastStop != null) {
-            return lastStop.getName();
-        } else {
-            return "";
-        }
-
-    }
-
     public String getComposedName( ) {
-
         String composedName = get("operator");
         if (composedName.isEmpty()) {
             composedName = get("network");
@@ -230,36 +206,6 @@ public class PTRouteDataManager {
         }
 
         return composedName;
-    }
-
-    /**
-     * Assigns the given way to a PTWay of this route relation. If multiple
-     * PTWays contain the same inputWay, the first found PTWay is returned.
-     *
-     * @param inputWay
-     *            Way to be assigned to a PTWAy of this route relation
-     * @return PTWay that contains the geometry of the inputWay, null if not
-     *         found
-     */
-    public PTWay getPTWay(Way inputWay) {
-
-        for (PTWay curr : ptWays) {
-
-            if (curr.isWay() && curr.getWays().get(0) == inputWay) {
-                return curr;
-            }
-
-            if (curr.isRelation()) {
-                for (RelationMember rm : curr.getRelation().getMembers()) {
-                    Way wayInNestedRelation = rm.getWay();
-                    if (wayInNestedRelation == inputWay) {
-                        return curr;
-                    }
-                }
-            }
-        }
-
-        return null; // if not found
     }
 
     public List<PTStop> getPTStops() {
@@ -322,23 +268,6 @@ public class PTRouteDataManager {
             }
         }
 
-        return null;
-    }
-
-    /**
-     * Returns a PTWay that matches the given id. Returns null if not found
-     *
-     * @param id identifier
-     * @return a PTWay that matches the given id. Returns null if not found
-     */
-    public PTWay getPTWay(long id) {
-        for (PTWay ptway : ptWays) {
-            for (Way way : ptway.getWays()) {
-                if (way.getId() == id) {
-                    return ptway;
-                }
-            }
-        }
         return null;
     }
 

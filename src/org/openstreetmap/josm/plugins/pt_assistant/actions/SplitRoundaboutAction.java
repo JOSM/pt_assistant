@@ -665,7 +665,7 @@ public class SplitRoundaboutAction extends JosmAction {
 
         Node n = exitNode;
 
-        while (!curr.equals(middleWay) && curr != null) {
+        while (curr != null && !curr.equals(middleWay)) {
             lst.add(curr);
             if (curr.firstNode().equals(n))
                 n = curr.lastNode();
@@ -677,7 +677,7 @@ public class SplitRoundaboutAction extends JosmAction {
             List<Way> possibleways = new ArrayList<>();
             for (Way w : parent) {
                 Collection<RelationMember> p = oldrelation.getMembersFor(Collections.singletonList(w));
-                if (p != null && p.size() != 0) {
+                if (p != null && !p.isEmpty()) {
                     if (!w.hasTag("junction", "roundabout"))
                         possibleways.add(w);
 
