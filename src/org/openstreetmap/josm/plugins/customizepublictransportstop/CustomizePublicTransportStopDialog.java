@@ -24,6 +24,7 @@ import javax.swing.JTextField;
 
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.DialogUtils;
+import org.openstreetmap.josm.tools.I18n;
 
 /**
  * Dialog for setting stop area properties
@@ -33,25 +34,27 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.DialogUtils;
 public class CustomizePublicTransportStopDialog implements ActionListener, ItemListener {
     private static final String CANCEL_COMMAND = "cancel";
     private static final String SAVE_COMMAND = "save";
-    private static final String CANCEL_BUTTON_CAPTION = "Cancel";
-    private static final String SAVE_BUTTON_CAPTION = "Save";
-    private static final String AREA_CAPTION = "Area";
-    private static final String COVER_CAPTION = "Cover";
-    private static final String SHELDER_CAPTION = "Shelder";
-    private static final String BENCH_CAPTION = "Bench";
-    private static final String RAILWAY_STOP_CAPTION = "Railway stop";
-    private static final String RAILWAY_STATION_CAPTION = "Railway station";
-    private static final String TRAM_CAPTION = "Tram";
-    private static final String TROLLEYBUS_CAPTION = "Trolleybus";
-    private static final String SHARE_TAXI_CAPTION = "Share taxi";
-    private static final String BUS_CAPTION = "Bus";
-    private static final String BUS_STATION_CAPTION = "Bus station";
-    private static final String ASSIGN_TRANSPORT_TYPE_CAPTION = "Assign transport type to platform";
-    private static final String NETWORK_LEVEL_CAPTION = "Network level";
-    private static final String OPERATOR_CAPTION = "Operator";
-    private static final String NETWORK_CAPTION = "Network";
-    private static final String NAME_EN_CAPTION = "Name (en.)";
-    private static final String NAME_CAPTION = "Name";
+    private static final String CANCEL_BUTTON_CAPTION = I18n.marktr("Cancel");
+    private static final String SAVE_BUTTON_CAPTION = I18n.marktr("Save");
+    private static final String AREA_CAPTION = I18n.marktr("Area");
+    private static final String COVER_CAPTION = I18n.marktr("Cover");
+    private static final String SHELDER_CAPTION = I18n.marktr("Shelter");
+    private static final String BENCH_CAPTION = I18n.marktr("Bench");
+    private static final String RAILWAY_STOP_CAPTION = I18n.marktr("Railway stop");
+    private static final String RAILWAY_STATION_CAPTION = I18n.marktr("Railway station");
+    private static final String TRAM_CAPTION = I18n.marktr("Tram");
+    private static final String TROLLEYBUS_CAPTION = I18n.marktr("Trolleybus");
+    private static final String SHARE_TAXI_CAPTION = I18n.marktr("Share taxi");
+    private static final String BUS_CAPTION = I18n.marktr("Bus");
+    private static final String BUS_STATION_CAPTION = I18n.marktr("Bus station");
+    private static final String ASSIGN_TRANSPORT_TYPE_CAPTION = I18n.marktr("Assign transport type to platform");
+    private static final String NETWORK_LEVEL_CAPTION = I18n.marktr("Network level");
+    private static final String OPERATOR_CAPTION = I18n.marktr("Operator");
+    private static final String NETWORK_CAPTION = I18n.marktr("Network");
+    // i18n: label for the tag name:en=*
+    private static final String NAME_EN_CAPTION = I18n.marktr("Name (en.)");
+    // i18n: label for the tag name=*
+    private static final String NAME_CAPTION = I18n.marktr("Name");
     private static final String STOP_CUSTOMIZING_DIALOG_CAPTION = "Stop customizing";
     public static final String LONG_DISTANCE_NETWORK_CAPTION = "Long distance";
     public static final String REGIONAL_NETWORK_CAPTION = "Regional";
