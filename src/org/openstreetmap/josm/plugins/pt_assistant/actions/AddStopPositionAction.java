@@ -35,6 +35,7 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Shortcut;
 
@@ -46,13 +47,17 @@ import org.openstreetmap.josm.tools.Shortcut;
  */
 public class AddStopPositionAction extends MapMode {
 
-    private static final String MAP_MODE_NAME = "Add stop position";
+    // i18n: name of the `AddStopPositionAction` map mode
+    private static final String MAP_MODE_NAME = I18n.marktr("Add stop position");
+
+    private static final String CROSSHAIR_IMAGE_FILENAME = "crosshair";
+    private static final Cursor CURSOR_JOIN_NODE = ImageProvider.getCursor(CROSSHAIR_IMAGE_FILENAME, "joinnode");
+    private static final Cursor CURSOR_JOIN_WAY = ImageProvider.getCursor(CROSSHAIR_IMAGE_FILENAME, "joinway");
+    private static final Cursor CURSOR_BUS = ImageProvider.getCursor(CROSSHAIR_IMAGE_FILENAME, "bus");
 
     private transient Set<OsmPrimitive> newHighlights = new HashSet<>();
     private transient Set<OsmPrimitive> oldHighlights = new HashSet<>();
 
-    private final Cursor cursorJoinNode;
-    private final Cursor cursorJoinWay;
 
     /**
      * Creates a new AddStopPositionAction
@@ -61,16 +66,10 @@ public class AddStopPositionAction extends MapMode {
         super(tr(MAP_MODE_NAME), "bus", tr(MAP_MODE_NAME),
               Shortcut.registerShortcut("mapmode:stop_position", tr("Mode: {0}", tr(MAP_MODE_NAME)), KeyEvent.VK_K, Shortcut.CTRL_SHIFT),
               getCursor());
-
-        cursorJoinNode = ImageProvider.getCursor("crosshair", "joinnode");
-        cursorJoinWay = ImageProvider.getCursor("crosshair", "joinway");
     }
 
     private static Cursor getCursor() {
-        Cursor cursor = ImageProvider.getCursor("crosshair", "bus");
-        if (cursor == null)
-            cursor = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
-        return cursor;
+        return CURSOR_BUS == null ? Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR) : CURSOR_BUS;
     }
 
     @Override
@@ -98,7 +97,7 @@ public class AddStopPositionAction extends MapMode {
         Node n = MainApplication.getMap().mapView.getNearestNode(e.getPoint(), OsmPrimitive::isUsable);
         if (n != null) {
             newHighlights.add(n);
-            newCurs = cursorJoinNode;
+            newCurs = CURSOR_JOIN_NODE;
         } else {
             List<WaySegment> wss =
                 MainApplication.getMap().mapView.getNearestWaySegments(e.getPoint(), OsmPrimitive::isSelectable);
@@ -107,7 +106,7 @@ public class AddStopPositionAction extends MapMode {
                 for (WaySegment ws : wss) {
                     newHighlights.add(ws.way);
                 }
-                newCurs = cursorJoinWay;
+                newCurs = CURSOR_JOIN_WAY;
             }
         }
 
@@ -271,19 +270,15 @@ public class AddStopPositionAction extends MapMode {
         return referrers;
     }
 
-    //turn off what has been highlighted on last mouse move and highlight what has to be highlighted now
-    private void updateHighlights() {
+    /**
+     * turn off what has been highlighted on last mouse move and highlight what has to be highlighted now
+     */
+    private synchronized void updateHighlights() {
         if (oldHighlights.isEmpty() && newHighlights.isEmpty()) {
             return;
         }
-
-        for (OsmPrimitive osm : oldHighlights) {
-            osm.setHighlighted(false);
-        }
-
-        for (OsmPrimitive osm : newHighlights) {
-            osm.setHighlighted(true);
-        }
+        oldHighlights.forEach(it -> it.setHighlighted(false));
+        newHighlights.forEach(it -> it.setHighlighted(true));
 
         MainApplication.getLayerManager().getEditLayer().invalidate();
 

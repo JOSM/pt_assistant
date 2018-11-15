@@ -60,6 +60,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.CheckParameterUtil;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.Geometry;
+import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
@@ -73,7 +74,8 @@ import org.openstreetmap.josm.tools.RightAndLefthandTraffic;
  */
 public class DoubleSplitAction extends MapMode implements KeyListener {
 
-    private static final String MAP_MODE_NAME = "Double Split";
+    // i18n: name of the `DoubleSplitAction` map mode
+    private static final String MAP_MODE_NAME = I18n.marktr("Double Split");
 
     private transient Set<OsmPrimitive> newHighlights = new HashSet<>();
     private transient Set<OsmPrimitive> oldHighlights = new HashSet<>();

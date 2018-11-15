@@ -17,11 +17,11 @@ import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembers
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
-import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.dialogs.relation.DownloadRelationMemberTask;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
@@ -34,13 +34,13 @@ import org.openstreetmap.josm.tools.Utils;
  */
 public class SortPTRouteMembersMenuBar extends JosmAction {
 
-    private static final String ACTION_NAME = "Sort PT Route Members";
+    private static final String ACTION_NAME = I18n.marktr("Sort PT Route Members");
 
     /**
      * Creates a new SortPTRouteMembersAction
      */
     public SortPTRouteMembersMenuBar() {
-        super(ACTION_NAME, "icons/sortptroutemembers", ACTION_NAME, null, true);
+        super(I18n.tr(ACTION_NAME), "icons/sortptroutemembers", I18n.tr(ACTION_NAME), null, true);
     }
 
     @Override
@@ -66,7 +66,6 @@ public class SortPTRouteMembersMenuBar extends JosmAction {
                             continueAfterDownload(rel);
                         } catch (InterruptedException | ExecutionException e1) {
                             Logging.error(e1);
-                            return;
                         }
                     });
                 } else {

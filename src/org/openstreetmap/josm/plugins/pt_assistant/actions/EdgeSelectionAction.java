@@ -28,6 +28,7 @@ import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayer;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
+import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Shortcut;
 
@@ -40,25 +41,34 @@ import org.openstreetmap.josm.tools.Shortcut;
  */
 public class EdgeSelectionAction extends MapMode {
 
-    private static final String MAP_MODE_NAME = "Edge Selection";
+    // i18n: name of the `EdgeSelectionAction` map mode
+    private static final String MAP_MODE_NAME = I18n.marktr("Edge Selection");
     private static final long serialVersionUID = 2414977774504904238L;
+
+    private static final Cursor SELECTION_CURSOR = ImageProvider.getCursor("normal", "selection");
+    private static final Cursor WAY_SELECT_CURSOR = ImageProvider.getCursor("normal", "select_way");
 
     private transient Set<Way> highlighted;
 
-    private Cursor selectionCursor;
-    private Cursor waySelectCursor;
     private List<Way> edgeList;
     private String modeOfTravel = null;
 
     public EdgeSelectionAction() {
-        super(tr(MAP_MODE_NAME), "edgeSelection", tr(MAP_MODE_NAME), Shortcut.registerShortcut("mapmode:edge_selection",
-                tr("Mode: {0}", tr(MAP_MODE_NAME)), KeyEvent.VK_K, Shortcut.CTRL),
-                ImageProvider.getCursor("normal", "selection"));
+        super(
+            tr(MAP_MODE_NAME),
+            "edgeSelection",
+            tr(MAP_MODE_NAME),
+            Shortcut.registerShortcut(
+                "mapmode:edge_selection",
+                tr("Mode: {0}", tr(MAP_MODE_NAME)),
+                KeyEvent.VK_K,
+                Shortcut.CTRL
+            ),
+            SELECTION_CURSOR
+        );
         highlighted = new HashSet<>();
         edgeList = new ArrayList<>();
 
-        selectionCursor = ImageProvider.getCursor("normal", "selection");
-        waySelectCursor = ImageProvider.getCursor("normal", "select_way");
     }
 
     /*
@@ -354,33 +364,29 @@ public class EdgeSelectionAction extends MapMode {
     public void mouseMoved(MouseEvent e) {
         super.mouseMoved(e);
 
-        for (Way way : highlighted) {
-            way.setHighlighted(false);
-        }
+        highlighted.forEach(it -> it.setHighlighted(false));
         highlighted.clear();
 
         Way initial = MainApplication.getMap().mapView.getNearestWay(e.getPoint(), OsmPrimitive::isUsable);
         if (initial == null) {
-            MainApplication.getMap().mapView.setCursor(selectionCursor);
+            MainApplication.getMap().mapView.setCursor(SELECTION_CURSOR);
         } else {
-            MainApplication.getMap().mapView.setCursor(waySelectCursor);
+            MainApplication.getMap().mapView.setCursor(WAY_SELECT_CURSOR);
             highlighted.addAll(getEdgeFromWay(initial, modeOfTravel));
         }
 
-        for (Way way : highlighted) {
-            way.setHighlighted(true);
-        }
+        highlighted.forEach(it -> it.setHighlighted(true));
     }
 
     @Override
-    public void enterMode() {
+    public synchronized void enterMode() {
         super.enterMode();
         MainApplication.getMap().mapView.addMouseListener(this);
         MainApplication.getMap().mapView.addMouseMotionListener(this);
     }
 
     @Override
-    public void exitMode() {
+    public synchronized void exitMode() {
         super.exitMode();
         MainApplication.getMap().mapView.removeMouseListener(this);
         MainApplication.getMap().mapView.removeMouseMotionListener(this);

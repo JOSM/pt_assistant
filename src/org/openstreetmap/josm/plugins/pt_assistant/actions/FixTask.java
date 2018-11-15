@@ -35,7 +35,7 @@ public class FixTask extends PleaseWaitRunnable {
     private boolean canceled;
 
     public FixTask(Collection<TestError> testErrors) {
-        super(tr("Fixing errors ..."), false /* don't ignore exceptions */);
+        super(tr("Fixing errors …"), false);
         this.testErrors = testErrors == null ? new ArrayList<>() : testErrors;
     }
 
