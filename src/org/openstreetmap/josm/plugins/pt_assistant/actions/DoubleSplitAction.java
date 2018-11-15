@@ -290,7 +290,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
                 commandList, atNodes);
         dialog.setModal(false);
         dialog.showDialog();
-        return; // splitting is performed in SegmentToKeepSelectionDialog.buttonAction()
+        // splitting is performed in SegmentToKeepSelectionDialog.buttonAction()
 
     }
 
@@ -410,15 +410,11 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
         UndoRedoHandler.getInstance().add(new SequenceCommand("Split Way", commandList));
 
         // add newly split way to relations
-        List<Relation> referrers1 = OsmPrimitive.getFilteredList(previousAffectedWay.getReferrers(), Relation.class);
-        referrers1.removeIf(r -> !RouteUtils.isPTRoute(r));
-
+        final List<Relation> referrers1 = WayUtils.findPTRouteParents(previousAffectedWay);
         Map<Relation, List<Integer>> Index1 = getIndex(previousAffectedWay, referrers1, previousAffectedWay);
 
-        List<Relation> referrers2 = OsmPrimitive.getFilteredList(affected.getReferrers(), Relation.class);
-        referrers2.removeIf(r -> !RouteUtils.isPTRoute(r));
-
-        Map<Relation, List<Integer>> Index2 = getIndex(affected, referrers1, affected);
+        final List<Relation> referrers2 = WayUtils.findPTRouteParents(affected);
+        Map<Relation, List<Integer>> Index2 = getIndex(affected, referrers2, affected);
 
         Way way1 = null, way2 = null;
 

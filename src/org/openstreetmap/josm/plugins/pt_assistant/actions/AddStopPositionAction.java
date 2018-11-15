@@ -35,6 +35,7 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Shortcut;
@@ -148,7 +149,7 @@ public class AddStopPositionAction extends MapMode {
         HashMap<String, String> tagsForNode = new HashMap<>(newStopPos.getKeys());
         if (PTAssistantPluginPreferences.SPLITWAY_1.get()) {
             for (Way w : newStopPos.getParentWays()) {
-                for (Relation r : getPTRouteParents(w)) {
+                for (Relation r : WayUtils.findPTRouteParents(w)) {
                     if (r.hasKey("route")) {
                         tagsForNode.put(r.get("route"), "yes");
                     }
@@ -219,7 +220,7 @@ public class AddStopPositionAction extends MapMode {
     private Map<Relation, Boolean> getAffectedRelation(Way affected, boolean bool) {
         if (bool == false) {
             Map<Relation, Boolean> ret = new HashMap<>();
-            for (Relation route : getPTRouteParents(affected)) {
+            for (Relation route : WayUtils.findPTRouteParents(affected)) {
                 if (isFirstMember(affected, route)) {
                     ret.put(route, true);
                 } else if (isLastMember(affected, route)) {
@@ -229,7 +230,7 @@ public class AddStopPositionAction extends MapMode {
             return ret;
         } else {
             Map<Relation, Boolean> ret = new HashMap<>();
-            for (Relation route : getPTRouteParents(affected)) {
+            for (Relation route : WayUtils.findPTRouteParents(affected)) {
                 ret.put(route, null);
             }
             return ret;
@@ -261,13 +262,6 @@ public class AddStopPositionAction extends MapMode {
         }
 
         return true;
-    }
-
-    private List<Relation> getPTRouteParents(Way way) {
-        List<Relation> referrers = OsmPrimitive.getFilteredList(
-                way.getReferrers(), Relation.class);
-        referrers.removeIf(r -> !RouteUtils.isPTRoute(r));
-        return referrers;
     }
 
     /**

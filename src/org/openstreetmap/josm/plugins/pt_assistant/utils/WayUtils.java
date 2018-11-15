@@ -1,11 +1,14 @@
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.NodePair;
+import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
-
 
 public final class WayUtils {
     private WayUtils() {
@@ -19,12 +22,12 @@ public final class WayUtils {
      *     of those ways. If the two ways do not have a {@link Node} in common, or if at least
      *     one of the given ways is {@link null}, the returned {@link Optional} is empty.
      */
-     public static Optional<Node> findFirstCommonNode(final Way w1, final Way w2) {
-         if (w1 == null || w2 == null) {
-             return Optional.empty();
-         }
-         return w2.getNodes().stream().filter(w1::containsNode).findFirst();
-     }
+    public static Optional<Node> findFirstCommonNode(final Way w1, final Way w2) {
+        if (w1 == null || w2 == null) {
+            return Optional.empty();
+        }
+        return w2.getNodes().stream().filter(w1::containsNode).findFirst();
+    }
 
     public static Optional<Node> findCommonFirstLastNode(final Way w1, final Way w2) {
         return findCommonFirstLastNode(w1, w2, null);
@@ -52,6 +55,13 @@ public final class WayUtils {
             nodes[0].equals(nodes[2]) || nodes[0].equals(nodes[3]) ? nodes[0] : null,
             nodes[1].equals(nodes[2]) || nodes[1].equals(nodes[3]) ? nodes[1] : null
         );
+    }
+
+    public static List<Relation> findPTRouteParents(final Way w) {
+        return w.getReferrers().stream()
+            .filter(it -> it instanceof Relation && RouteUtils.isPTRoute((Relation) it))
+            .map(it -> (Relation) it)
+            .collect(Collectors.toList());
     }
 
     public static int findNumberOfCommonFirstLastNodes(final Way w1, final Way w2) {
