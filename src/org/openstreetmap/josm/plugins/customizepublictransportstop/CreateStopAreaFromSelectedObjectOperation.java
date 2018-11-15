@@ -3,6 +3,7 @@ package org.openstreetmap.josm.plugins.customizepublictransportstop;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
@@ -152,16 +153,17 @@ public class CreateStopAreaFromSelectedObjectOperation extends StopAreaOperation
      *         it stop area relation
      */
     @Override
-    public StopArea performCustomizing(StopArea stopArea) {
-        if (getCurrentDataSet() == null)
-            return null;
-        OsmPrimitive selectedObject = getCurrentDataSet().getSelectedNodesAndWays().iterator().next();
-        if (selectedObject == null)
-            return null;
-        if (stopArea == null)
-            stopArea = new StopArea(selectedObject);
-        fromSelectedObject(stopArea);
-        return stopArea;
+    public StopArea performCustomizing(final StopArea stopArea) {
+        return Optional.ofNullable(getCurrentDataSet())
+            .map(DataSet::getSelectedNodesAndWays)
+            .filter(it -> !it.isEmpty())
+            .map(it -> it.iterator().next())
+            .map(it -> {
+                final StopArea result = stopArea == null ? new StopArea(it) : stopArea;
+                fromSelectedObject(result);
+                return result;
+            })
+            .orElse(null);
     }
 
 }
