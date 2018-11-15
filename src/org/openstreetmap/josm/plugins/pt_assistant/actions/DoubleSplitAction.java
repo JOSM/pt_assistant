@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.openstreetmap.josm.actions.JoinNodeWayAction;
 import org.openstreetmap.josm.actions.mapmode.MapMode;
 import org.openstreetmap.josm.command.AddCommand;
 import org.openstreetmap.josm.command.ChangeCommand;
@@ -56,7 +54,8 @@ import org.openstreetmap.josm.gui.ExtendedDialog;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
-import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.NodeUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.PrimitiveUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.CheckParameterUtil;
 import org.openstreetmap.josm.tools.GBC;
@@ -333,8 +332,8 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
         UndoRedoHandler.getInstance().add(new SequenceCommand("Add Nodes", commandList));
         commandList.clear();
 
-        addParentWay(atNodes.get(0));
-        addParentWay(atNodes.get(1));
+        NodeUtils.moveOntoNearestWay(atNodes.get(0));
+        NodeUtils.moveOntoNearestWay(atNodes.get(1));
 
         SplitWayCommand result = SplitWayCommand.split(affected, atNodes, Collections.emptyList());
         if (result == null) {
@@ -378,8 +377,8 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
         commandList.clear();
 
         // join newly created nodes to parent ways
-        addParentWay(atNodes.get(0));
-        addParentWay(atNodes.get(1));
+        NodeUtils.moveOntoNearestWay(atNodes.get(0));
+        NodeUtils.moveOntoNearestWay(atNodes.get(1));
 
         List<Node> nodelist1 = Arrays.asList(atNodes.get(0), commonNode);
         List<Node> nodelist2 = Arrays.asList(atNodes.get(1), commonNode);
@@ -407,14 +406,14 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
             return;
         }
 
-        UndoRedoHandler.getInstance().add(new SequenceCommand("Split Way", commandList));
+        UndoRedoHandler.getInstance().add(new SequenceCommand(I18n.tr("Split way"), commandList));
 
         // add newly split way to relations
         final List<Relation> referrers1 = WayUtils.findPTRouteParents(previousAffectedWay);
-        Map<Relation, List<Integer>> Index1 = getIndex(previousAffectedWay, referrers1, previousAffectedWay);
+        final Map<Relation, List<Integer>> indices1 = PrimitiveUtils.findIndicesOfPrimitiveInRelations(previousAffectedWay, referrers1);
 
         final List<Relation> referrers2 = WayUtils.findPTRouteParents(affected);
-        Map<Relation, List<Integer>> Index2 = getIndex(affected, referrers2, affected);
+        final Map<Relation, List<Integer>> indices2 = PrimitiveUtils.findIndicesOfPrimitiveInRelations(affected, referrers2);
 
         Way way1 = null, way2 = null;
 
@@ -422,7 +421,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
         // together would form middle way
         boolean isOriginalWay = true; // we check both the original way and new ways
         for (Way way : result1.getNewWays()) {
-            checkMembership(way, referrers1, Index1);
+            checkMembership(way, referrers1, indices1);
             if (way.containsNode(commonNode) && way.containsNode(atNodes.get(0))) {
                 way1 = way;
                 isOriginalWay = false;
@@ -430,7 +429,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
             }
         }
 
-        checkMembership(result1.getOriginalWay(), referrers1, Index1);
+        checkMembership(result1.getOriginalWay(), referrers1, indices1);
 
         if (isOriginalWay) {
             Way way = result1.getOriginalWay();
@@ -443,7 +442,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
         isOriginalWay = true;
 
         for (Way way : result2.getNewWays()) {
-            checkMembership(way, referrers2, Index2);
+            checkMembership(way, referrers2, indices2);
             if (way.containsNode(commonNode) && way.containsNode(atNodes.get(1))) {
                 way2 = way;
                 isOriginalWay = false;
@@ -451,7 +450,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
             }
         }
 
-        checkMembership(result2.getOriginalWay(), referrers2, Index2);
+        checkMembership(result2.getOriginalWay(), referrers2, indices2);
 
         if (isOriginalWay) {
             Way way = result2.getOriginalWay();
@@ -472,28 +471,14 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
     // this function is called when both nodes are starting and ending points of
     // same way, we dont split anything here
-    private void addKeysWhenStartEndPoint(Way affected, List<Command> commandList, JComboBox<String> keys,
-            JComboBox<String> values) {
-        List<TagMap> affectedKeysList = new ArrayList<>();
-        Way selectedWay = affected;
+    private void addKeysWhenStartEndPoint(Way affected, List<Command> commandList, JComboBox<String> keys, JComboBox<String> values) {
+        NodeUtils.moveOntoNearestWay(atNodes.get(0));
+        NodeUtils.moveOntoNearestWay(atNodes.get(1));
 
-        addParentWay(atNodes.get(0));
-        addParentWay(atNodes.get(1));
-
-        if (selectedWay != null) {
-            affectedKeysList.add(affected.getKeys());
-            addTags(affectedKeysList, Arrays.asList(selectedWay), keys, values, 2);
-        } else {
+        if (affected == null) {
             resetLayer();
-        }
-    }
-
-    // join the node to the way only if the node is new
-    private void addParentWay(Node node) {
-        if (node.getParentWays().size() == 0) {
-            MainApplication.getLayerManager().getEditLayer().data.setSelected(node);
-            JoinNodeWayAction joinNodeWayAction = JoinNodeWayAction.createMoveNodeOntoWayAction();
-            joinNodeWayAction.actionPerformed(null);
+        } else {
+            addTags(Collections.singletonList(affected.getKeys()), Collections.singletonList(affected), keys, values, 2);
         }
     }
 
@@ -514,21 +499,6 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
                 }
             }
         }
-    }
-
-    // get index where the way is present in a relation
-    private Map<Relation, List<Integer>> getIndex(Way way, List<Relation> referrers, Way previousAffectedWay) {
-        Map<Relation, List<Integer>> lst = new HashMap<>();
-        for (Relation r : referrers) {
-            List<Integer> Index = new ArrayList<>();
-            for (int i = 0; i < r.getMembers().size(); i++) {
-                if (r.getMembers().get(i).isWay() && r.getMembers().get(i).getWay().equals(previousAffectedWay)) {
-                    Index.add(i);
-                }
-            }
-            lst.put(r, Index);
-        }
-        return lst;
     }
 
     // take key value pair from the dialog box and add it to the existing ways

@@ -1,12 +1,13 @@
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
-import org.openstreetmap.josm.gui.Notification;
+import static org.openstreetmap.josm.tools.I18n.tr;
 
-import javax.swing.JOptionPane;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
+import javax.swing.JOptionPane;
+
+import org.openstreetmap.josm.gui.Notification;
 
 public final class NotificationUtils {
     private NotificationUtils() {

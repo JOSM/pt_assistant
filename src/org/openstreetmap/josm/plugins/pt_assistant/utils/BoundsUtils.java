@@ -1,11 +1,11 @@
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
+import java.util.Collection;
+import java.util.Optional;
+
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.Way;
-
-import java.util.Collection;
-import java.util.Optional;
 
 public final class BoundsUtils {
     private BoundsUtils() {
