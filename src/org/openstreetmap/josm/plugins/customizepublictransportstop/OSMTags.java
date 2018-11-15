@@ -70,7 +70,6 @@ public final class OSMTags {
     public static final String BUS_STATION_TAG_VALUE = "bus_station";
 
     public static final String BUS_STOP_TAG_VALUE = "bus_stop";
-    public static final String TYPE_TAG = "type";
     public static final String PUBLIC_TRANSPORT_TAG = "public_transport";
     public static final String STOP_AREA_TAG_VALUE = "stop_area";
     public static final String STOP_ROLE = "stop";

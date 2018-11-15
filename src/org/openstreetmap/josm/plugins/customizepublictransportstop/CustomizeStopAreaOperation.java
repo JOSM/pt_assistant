@@ -277,7 +277,7 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
         }
         UndoRedoHandler.getInstance().add(new AddCommand(MainApplication.getLayerManager().getEditDataSet(), newRelation));
         commands = generalTagAssign(newRelation, commands, stopArea);
-        commands = assignTag(commands, newRelation, OSMTags.TYPE_TAG, OSMTags.PUBLIC_TRANSPORT_TAG);
+        commands = assignTag(commands, newRelation, OSMTags.KEY_RELATION_TYPE, OSMTags.PUBLIC_TRANSPORT_TAG);
         commands = assignTag(commands, newRelation, OSMTags.PUBLIC_TRANSPORT_TAG, OSMTags.STOP_AREA_TAG_VALUE);
         return commands;
     }

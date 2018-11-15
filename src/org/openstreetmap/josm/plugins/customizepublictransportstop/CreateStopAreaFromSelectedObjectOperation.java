@@ -101,7 +101,7 @@ public class CreateStopAreaFromSelectedObjectOperation extends StopAreaOperation
         Collection<OsmPrimitive> selectedObjects = new ArrayList<OsmPrimitive>();
         selectedObjects.add(stopArea.selectedObject);
         for (Relation rel : OsmPrimitive.getParentRelations(selectedObjects)) {
-            if (compareTag(rel, OSMTags.TYPE_TAG, OSMTags.PUBLIC_TRANSPORT_TAG)
+            if (compareTag(rel, OSMTags.KEY_RELATION_TYPE, OSMTags.PUBLIC_TRANSPORT_TAG)
                     && compareTag(rel, OSMTags.PUBLIC_TRANSPORT_TAG, OSMTags.STOP_AREA_TAG_VALUE)) {
                 stopArea.stopAreaRelation = rel;
             }
