@@ -7,6 +7,7 @@ import java.awt.Cursor;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -24,7 +25,6 @@ import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.Notification;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
-import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayer;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
@@ -50,7 +50,7 @@ public class EdgeSelectionAction extends MapMode {
 
     private transient Set<Way> highlighted;
 
-    private List<Way> edgeList;
+    private List<Way> edgeList = new ArrayList<>();
     private String modeOfTravel = null;
 
     public EdgeSelectionAction() {
@@ -67,8 +67,6 @@ public class EdgeSelectionAction extends MapMode {
             SELECTION_CURSOR
         );
         highlighted = new HashSet<>();
-        edgeList = new ArrayList<>();
-
     }
 
     /*
@@ -82,7 +80,7 @@ public class EdgeSelectionAction extends MapMode {
 
         Way curr = initial;
         while (true) {
-            List<Way> options = curr.firstNode(true).getParentWays();
+            final List<Way> options = curr.firstNode(true).getParentWays();
             if (StopUtils.isStopPosition(curr.firstNode())) {
                 break;
             }
@@ -96,7 +94,7 @@ public class EdgeSelectionAction extends MapMode {
         List<Way> edge2 = new ArrayList<>();
         curr = initial;
         while (true) {
-            List<Way> options = curr.lastNode(true).getParentWays();
+            final List<Way> options = curr.lastNode(true).getParentWays();
             if (StopUtils.isStopPosition(curr.lastNode())) {
                 break;
             }
@@ -107,20 +105,17 @@ public class EdgeSelectionAction extends MapMode {
             edge2.add(curr);
         }
 
-        List<Way> edge = new ArrayList<>();
-        for (int i = edge1.size()-1; i >= 0; i--) {
-            edge.add(edge1.get(i));
-        }
+        Collections.reverse(edge1);
 
-        edge.add(initial);
-        edge.addAll(edge2);
-        edge = sortEdgeWays(edge);
-        return edge;
+        edge1.add(initial);
+        edge1.addAll(edge2);
+        edge1 = sortEdgeWays(edge1);
+        return edge1;
     }
 
     private List<Way> sortEdgeWays(List<Way> edge) {
-        List<RelationMember> members = edge.stream().map(w -> new RelationMember("", w)).collect(Collectors.toList());
-        List<RelationMember> sorted = new RelationSorter().sortMembers(members);
+        final List<RelationMember> members = edge.stream().map(w -> new RelationMember("", w)).collect(Collectors.toList());
+        final List<RelationMember> sorted = new RelationSorter().sortMembers(members);
         return sorted.stream().map(RelationMember::getWay).collect(Collectors.toList());
     }
 
@@ -194,7 +189,7 @@ public class EdgeSelectionAction extends MapMode {
     public void mouseClicked(MouseEvent e) {
 
         DataSet ds = MainApplication.getLayerManager().getEditDataSet();
-        Way initial = MainApplication.getMap().mapView.getNearestWay(e.getPoint(), OsmPrimitive::isUsable);
+        final Way initial = MainApplication.getMap().mapView.getNearestWay(e.getPoint(), OsmPrimitive::isUsable);
 
         updateKeyModifiers(e);
 
@@ -227,19 +222,16 @@ public class EdgeSelectionAction extends MapMode {
             /*
              * toggle mode where we can individually select and deselect the edges
              */
-            if (edgeList.size() == 0 || modeOfTravel == null) {
+            if (edgeList.isEmpty() || modeOfTravel == null) {
                 modeOfTravel = getModeOfTravel(initial);
                 if ("mtb".equals(modeOfTravel))
                     modeOfTravel = "bicycle";
             }
 
-            List<Way> edge = getEdgeFromWay(initial, modeOfTravel);
-            List<Way> newEdges = new ArrayList<>();
+            final List<Way> edge = getEdgeFromWay(initial, modeOfTravel);
+            final List<Way> newEdges = new ArrayList<>();
             if (edgeList.containsAll(edge)) {
-                for (Way way : edge) {
-                    if (edgeList.contains(way))
-                        edgeList.remove(way);
-                }
+                edgeList.removeAll(edge);
             } else {
                 for (Way way : edge) {
                     if (!edgeList.contains(way)) {
@@ -247,13 +239,11 @@ public class EdgeSelectionAction extends MapMode {
                         newEdges.addAll(findNewEdges(way, edge, edgeList));
                     }
                 }
-                if (newEdges != null) {
-                    List<Way> waysToBeRemoved = waysToBeRemoved(newEdges);
-                    if (waysToBeRemoved != null) {
-                        newEdges.removeAll(waysToBeRemoved);
-                    }
-                    edgeList.addAll(newEdges);
+                final List<Way> waysToBeRemoved = waysToBeRemoved(newEdges);
+                if (waysToBeRemoved != null) {
+                    newEdges.removeAll(waysToBeRemoved);
                 }
+                edgeList.addAll(newEdges);
             }
             ds.clearSelection();
             Set<Way> edgeSet = new HashSet<>(edgeList);
@@ -266,44 +256,40 @@ public class EdgeSelectionAction extends MapMode {
             /*
              * add new selection to existing edges
              */
-            if (edgeList.size() == 0 || modeOfTravel == null) {
+            if (edgeList.isEmpty() || modeOfTravel == null) {
                 modeOfTravel = getModeOfTravel(initial);
                 if ("mtb".equals(modeOfTravel))
                     modeOfTravel = "bicycle";
             }
-            if (initial != null) {
-                List<Way> edge = getEdgeFromWay(initial, modeOfTravel);
-                List<Way> newEdges = new ArrayList<>();
+            List<Way> edge = getEdgeFromWay(initial, modeOfTravel);
+            final List<Way> newEdges = new ArrayList<>();
 
-                for (Way way : edge) {
-                    if (!edgeList.contains(way)) {
-                        edgeList.add(way);
-                        newEdges.addAll(findNewEdges(way, edge, edgeList));
-                    }
+            for (Way way : edge) {
+                if (!edgeList.contains(way)) {
+                    edgeList.add(way);
+                    newEdges.addAll(findNewEdges(way, edge, edgeList));
                 }
-
-                if (newEdges != null) {
-                    List<Way> waysToBeRemoved = waysToBeRemoved(newEdges);
-                    if (waysToBeRemoved != null) {
-                        newEdges.removeAll(waysToBeRemoved);
-                    }
-                    edgeList.addAll(newEdges);
-                }
-
-                Set<Way> edgeSet = new HashSet<>(edgeList);
-                edgeList = sortEdgeWays(new ArrayList<>(edgeSet));
-                new Notification(
-                        tr("Mode of Travel -> {0} \n total ways selected -> {1}", modeOfTravel, edgeList.size()))
-                                .setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(900).show();
-                ds.setSelected(edgeList);
             }
+
+            List<Way> waysToBeRemoved = waysToBeRemoved(newEdges);
+            if (waysToBeRemoved != null) {
+                newEdges.removeAll(waysToBeRemoved);
+            }
+            edgeList.addAll(newEdges);
+
+            Set<Way> edgeSet = new HashSet<>(edgeList);
+            edgeList = sortEdgeWays(new ArrayList<>(edgeSet));
+            new Notification(
+                    tr("Mode of Travel: {0} \n total ways selected: {1}", modeOfTravel, edgeList.size()))
+                            .setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(900).show();
+            ds.setSelected(edgeList);
         }
 
     }
 
     private List<Way> waysToBeRemoved(List<Way> newEdges) {
 
-        List<Way> waysToBeRemoved = new ArrayList<>();
+        final List<Way> waysToBeRemoved = new ArrayList<>();
 
         for (int i = 0; i < newEdges.size(); i++) {
             Node node1 = newEdges.get(i).firstNode();
