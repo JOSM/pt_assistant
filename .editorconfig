@@ -9,8 +9,7 @@ tab_width = 2
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.gradle]
-indent_style = space
+[*.{gradle.kts,gradle,xml}]
 indent_size = 2
 
 [{.classpath,.project}]

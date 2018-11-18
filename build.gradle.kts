@@ -4,8 +4,17 @@ import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 
 plugins {
   java
+  jacoco
   id("org.openstreetmap.josm") version "0.5.3"
   id("com.github.ben-manes.versions") version "0.20.0"
+}
+
+object Versions {
+  const val awaitility = "3.1.2"
+  const val jacoco = "0.8.2"
+  const val gradleJosmPlugin = "0.5.3"
+  const val junit = "5.3.1"
+  const val wiremock = "2.19.0"
 }
 
 repositories {
@@ -13,12 +22,11 @@ repositories {
 }
 dependencies {
   testImplementation("org.openstreetmap.josm:josm-unittest:SNAPSHOT"){isChanging=true}
-  val junitVersion = "5.3.1"
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
-  testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
-  testImplementation("org.junit.vintage:junit-vintage-engine:$junitVersion")
-  testImplementation("com.github.tomakehurst:wiremock:2.19.0")
-  testImplementation("org.awaitility:awaitility:3.1.2")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${Versions.junit}")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.junit}")
+  testImplementation("org.junit.vintage:junit-vintage-engine:${Versions.junit}")
+  testImplementation("com.github.tomakehurst:wiremock:${Versions.wiremock}")
+  testImplementation("org.awaitility:awaitility:${Versions.awaitility}")
 }
 
 tasks.withType(JavaCompile::class) {
@@ -28,6 +36,7 @@ tasks.withType(JavaCompile::class) {
 }
 
 josm {
+  versionWithoutLeadingV = true
   manifest {
     oldVersionDownloadLink(14149, "2.1.6", URL("https://github.com/JOSM/pt_assistant/releases/download/v2.1.6/pt_assistant.jar"))
     oldVersionDownloadLink(14027, "v2.1.4", URL("https://github.com/JOSM/pt_assistant/releases/download/v2.1.4/pt_assistant.jar"))
@@ -43,16 +52,6 @@ tasks.withType(Test::class) {
 }
 
 sourceSets {
-  getByName("main") {
-    java {
-      setSrcDirs(setOf("$projectDir/src"))
-    }
-    withConvention(I18nSourceSet::class) {
-      po {
-        setSrcDirs(setOf("$projectDir/poSrc"))
-      }
-    }
-  }
   getByName("test") {
     java {
       setSrcDirs(setOf("test/unit"))
@@ -70,3 +69,17 @@ tasks.withType(ProcessResources::class).getByName(sourceSets["main"].processReso
     include("LICENSE")
   }
 }
+
+jacoco {
+  toolVersion = Versions.jacoco
+}
+
+val jacocoTestReport: JacocoReport by tasks
+jacocoTestReport.apply {
+  reports {
+    xml.isEnabled = true
+    html.isEnabled = true
+  }
+}
+tasks["check"].dependsOn(jacocoTestReport)
+jacocoTestReport.dependsOn(tasks["test"])
