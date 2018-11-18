@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.4-10-ged0ad68\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-07 15:18+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Greek (https://www.transifex.com/josm/teams/2544/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,8 +17,22 @@ msgstr ""
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid ", "
-msgstr ", "
+msgid "Always split ways, even if they are not at the end of the itinerary"
+msgstr ""
+"Πάντα διαχωρισμένες διαδρομές, ακόμα και αν δεν βρίσκονται στο τέλος της "
+"διαδρομής"
+
+msgid "Area"
+msgstr "Επιφάνεια"
+
+msgid "Area around way"
+msgstr "Περιοχή γύρω από την διαδρομή"
+
+msgid "Area before removal"
+msgstr "Περιοχή πριν από την αφαίρεση"
+
+msgid "Bench"
+msgstr "Παγκάκι"
 
 msgid "Bicycle and foot routes Tests"
 msgstr "Δοκιμές πεζοπορικών και ποδηλατικών διαδρομών"
@@ -41,8 +55,43 @@ msgstr "Θέλετε να κατεβάσετε παραπομπές για πλ�
 msgid "Do you want to make the roundabout round?"
 msgstr "Θέλετε να κάνετε την κυκλική διαδρομή;"
 
+msgid ""
+"Don’t check whether route relation starts and ends on stop_position node"
+msgstr ""
+"Μην ελέγχετε εάν η σχέση της διαδρομής αρχίζει και τελειώνει στον κόμβο της "
+"στάσης"
+
+msgid "Don’t compare name of first stop with from tag in route relation"
+msgstr ""
+"Μην συγκρίνετε το όνομα της πρώτης στάσης με την ετικέτα στη σχέση της "
+"διαδρομής"
+
+msgid "Don’t compare name of last stop with to tag in route relation"
+msgstr ""
+"Μην συγκρίνετε το όνομα της τελευταίας στάσης με την ετικέτα στη σχέση της "
+"διαδρομής"
+
+#, java-format
+msgid "Download finished: {0}"
+msgstr "Η λήψη ολοκληρώθηκε: {0}"
+
+#. CHECKSTYLE.OFF: LineLength
 msgid "Download incomplete route relation members"
 msgstr "Λήψη ημιτελών μελών σχέσης διαδρομής"
+
+#, java-format
+msgid "Download started: {0}"
+msgstr "Η λήψη ξεκίνησε: {0}"
+
+msgid ""
+"Downloading incomplete relation members. Kindly wait till download gets "
+"over."
+msgstr ""
+"Λήψη ημιτελών μελών σχέσης. Παρακαλούμε περιμένετε μέχρι να ολοκληρωθεί η "
+"λήψη."
+
+msgid "Entire area"
+msgstr "Ολόκληρη η περιοχή"
 
 msgid "Extract node from line"
 msgstr "Εξαγωγή κόμβου από τη γραμμή"
@@ -60,8 +109,10 @@ msgstr "Επίλυση σφάλματος"
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Διόρθωση ({0}/{1}): ''{2}''"
 
-msgid "Fixing errors ..."
-msgstr "Διόρθωση σφαλμάτων ..."
+msgid "Here you can change some preferences of PTAssistant functions"
+msgstr ""
+"Εδώ μπορείτε να αλλάξετε μερικές προτιμήσεις των λειτουργιών βοηθού "
+"PTAssistant"
 
 msgid "How do you want to proceed?"
 msgstr "Πώς θέλετε να προχωρήσετε;"
@@ -71,6 +122,9 @@ msgstr "Συμπεριλάβετε δοκιμές περιοχής στάσης"
 
 msgid "Incomplete Members"
 msgstr "Ελλιπή μέλη"
+
+msgid "Incomplete relations"
+msgstr "Ημιτελείς σχέσεις"
 
 msgid "Invalid selection"
 msgstr "Μη έγκυρη επιλογή"
@@ -87,11 +141,24 @@ msgstr ""
 msgid "Mode: {0}"
 msgstr "Κατάσταση: {0}"
 
+msgid "NA"
+msgstr "NA"
+
+#. i18n: label for the tag name=*
+msgid "Name"
+msgstr "Όνομα"
+
+msgid "Network"
+msgstr "Δίκτυο"
+
 msgid "No"
 msgstr "Όχι"
 
 msgid "Ok"
 msgstr "Εντάξει"
+
+msgid "Operator"
+msgstr "Λειτουργός"
 
 msgid "PT Wizard"
 msgstr "PT Βοηθός"
@@ -219,6 +286,12 @@ msgstr "Μέσα Μαζικής Μεταφοράς"
 msgid "Public Transport Assistant tests"
 msgstr "Δοκιμές Βοηθού Δημόσιας Συγκοινωνίας"
 
+msgid ""
+"Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
+"Οι αναφορές των δρομολογίων δεν ταιριάζουν με την ετικέτα route_ref του "
+"πρωτότυπου"
+
 msgid "Remember my choice and do not ask me again in this session"
 msgstr ""
 "Θυμηθείτε την επιλογή μου και μην με ρωτήσετε ξανά σε αυτή τη συνεδρία"
@@ -241,8 +314,17 @@ msgstr ""
 "Πρέπει να γίνει λήψη για να συνεχίσετε με την επικύρωση.\n"
 "Θέλετε να τα κατεβάσετε;"
 
+msgid "Routing Helper"
+msgstr "Βοηθός δρομολόγησης"
+
+msgid "Save"
+msgstr "Αποθήκευση"
+
 msgid "Set up PT Assistant for more convenient use"
 msgstr "Ρύθμιση του PT Βοηθού για πιο εύκολη χρήση"
+
+msgid "Shelter"
+msgstr "Καταφύγιο"
 
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
@@ -251,8 +333,18 @@ msgstr ""
 "Η σχέση έχει ελλιπή μέλη. Θέλετε να τα κατεβάσετε και να συνεχίσετε με την "
 "ταξινόμηση;"
 
+msgid "The selected node is not a stop position for public transport!"
+msgstr "Ο επιλεγμένος κόμβος δεν είναι στάση για τη δημόσια συγκοινωνία!"
+
+msgid "This action requires single node to be selected."
+msgstr "Αυτή η ενέργεια απαιτεί την επιλογή ενός κόμβου."
+
+#, java-format
 msgid "Tool: {0}"
 msgstr "Εργαλείο: {0}"
+
+msgid "Tram"
+msgstr "Τραμ"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
@@ -265,6 +357,11 @@ msgstr "Αδύνατη η σύνδεση στο {0}"
 
 msgid "Updating map ..."
 msgstr "Ανανέωση χάρτη ..."
+
+msgid "Use 1/2/3/4 instead of A/B/C/D for selecting which way to follow"
+msgstr ""
+"Χρησιμοποιήστε 1/2/3/4 αντί για A/B/C/D για να επιλέξετε την διαδρομή που θα"
+" ακολουθήσετε"
 
 msgid "Warning: the diplayed fix variants are based on less strict criteria"
 msgstr ""

@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.4-10-ged0ad68\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-07 15:18+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Danish (https://www.transifex.com/josm/teams/2544/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,14 +17,20 @@ msgstr ""
 "Language: da\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid ", "
-msgstr ", "
-
 msgid "A valid public_transport:version=2 route is required"
 msgstr "En gyldig public_transport:version=2 rute kræves"
 
+msgid "Area"
+msgstr "Område"
+
+msgid "Bench"
+msgstr "Bænk"
+
 msgid "Bicycle and foot routes Tests"
 msgstr "Cykel- og gåruter test"
+
+msgid "Bus"
+msgstr "Bus"
 
 msgid "Cancel"
 msgstr "Annuller"
@@ -36,9 +42,6 @@ msgstr ""
 
 msgid "Close"
 msgstr "Luk"
-
-msgid "Customization of public transport stops."
-msgstr "Tilpasning af stoppesteder for offentlig transport."
 
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Viser stop fra udvalgte offentlige transportruter som graf"
@@ -52,6 +55,7 @@ msgstr "Vil du at downloade refererende platforme og stoppositioner?"
 msgid "Do you want to make the roundabout round?"
 msgstr "Vil du lave rundkørslen rund?"
 
+#. CHECKSTYLE.OFF: LineLength
 msgid "Download incomplete route relation members"
 msgstr "Download ufuldstændige rute relations medlemmer"
 
@@ -61,9 +65,6 @@ msgstr "Ret fejl"
 #, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Retter ({0}/{1}): ''{2}''"
-
-msgid "Fixing errors ..."
-msgstr "Retter fejl..."
 
 msgid "How do you want to proceed?"
 msgstr "Hvordan vil du fortsætte?"
@@ -81,11 +82,21 @@ msgstr "Ugyldigt valg"
 msgid "Mode: {0}"
 msgstr "Tilstand: {0}"
 
+#. i18n: label for the tag name=*
+msgid "Name"
+msgstr "Navn"
+
+msgid "Network"
+msgstr "Netværk"
+
 msgid "No"
 msgstr "Nej"
 
 msgid "Ok"
 msgstr "Ok"
+
+msgid "Operator"
+msgstr "Selskab"
 
 msgid "PT Wizard"
 msgstr "OT guide"
@@ -221,6 +232,18 @@ msgstr ""
 "Der er brug for at de bliver hentet for at fortsætte med validering.\n"
 "Vil du downloade dem?"
 
+msgid "Save"
+msgstr "Gem"
+
+msgid "Share taxi"
+msgstr "Deletaxi"
+
+msgid "Shelter"
+msgstr "Midlertidig soveplads"
+
+msgid "Split way"
+msgstr "Opdel vej"
+
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
 "continue with the sorting?"
@@ -234,8 +257,15 @@ msgstr "Skift retningspile"
 msgid "Toggle reference labels"
 msgstr "Skift reference etiketter"
 
+#, java-format
 msgid "Tool: {0}"
 msgstr "Værktøj: {0}"
+
+msgid "Tram"
+msgstr "Sporvogn"
+
+msgid "Trolleybus"
+msgstr "Trolleybus"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""

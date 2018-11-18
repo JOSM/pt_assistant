@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.4-10-ged0ad68\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-07 15:18+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Czech (https://www.transifex.com/josm/teams/2544/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,14 +17,20 @@ msgstr ""
 "Language: cs\n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
-msgid ", "
-msgstr ", "
-
 msgid "A valid public_transport:version=2 route is required"
 msgstr "Je vyžadována platná trasa public_transport:version=2"
 
+msgid "Area"
+msgstr "Označit jako plochu"
+
+msgid "Bench"
+msgstr "Lavička"
+
 msgid "Bicycle and foot routes Tests"
 msgstr "Testy tras pro jízdní kola a pěší"
+
+msgid "Bus"
+msgstr "Autobus"
 
 msgid "Cancel"
 msgstr "Zrušit"
@@ -38,9 +44,6 @@ msgstr ""
 msgid "Close"
 msgstr "Zavřít"
 
-msgid "Customization of public transport stops."
-msgstr "Úpravy zastávek veřejné dopravy."
-
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Zobrazuje zastávky zvolených tras veřejné dopravy jako graf"
 
@@ -53,6 +56,7 @@ msgstr "Chcete stáhnout prvky odkazující na nástupiště a místa zastavení
 msgid "Do you want to make the roundabout round?"
 msgstr "Chcete udělat kruhový objezd kulatým?"
 
+#. CHECKSTYLE.OFF: LineLength
 msgid "Download incomplete route relation members"
 msgstr "Stáhnout nekompletní členy relace route"
 
@@ -65,9 +69,6 @@ msgstr "Opravit chybu"
 #, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Opravuji ({0}/{1}): ''{2}''"
-
-msgid "Fixing errors ..."
-msgstr "Opravuji chyby ..."
 
 msgid "How do you want to proceed?"
 msgstr "Jak chcete pokračovat?"
@@ -85,11 +86,21 @@ msgstr "Neplatný výběr"
 msgid "Mode: {0}"
 msgstr "Režim: {0}"
 
+#. i18n: label for the tag name=*
+msgid "Name"
+msgstr "Název"
+
+msgid "Network"
+msgstr "Síť"
+
 msgid "No"
 msgstr "Ne"
 
 msgid "Ok"
 msgstr "Ok"
+
+msgid "Operator"
+msgstr "Provozovatel"
 
 msgid "PT: First or last way needs to be split"
 msgstr "VD: První nebo poslední cesta by měla být rozdělena"
@@ -216,6 +227,15 @@ msgstr ""
 "Před pokračováním kontroly musí být staženy.\n"
 "Chcete je stáhnout?"
 
+msgid "Save"
+msgstr "Uložit"
+
+msgid "Share taxi"
+msgstr "Sdílené taxi"
+
+msgid "Shelter"
+msgstr "Zařízení poskytující dočasné přístřeší."
+
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
 "continue with the sorting?"
@@ -229,8 +249,15 @@ msgstr "Přepnout směrové šipky"
 msgid "Toggle reference labels"
 msgstr "Přepnout referenční štítky"
 
+#, java-format
 msgid "Tool: {0}"
 msgstr "Nástroj: {0}"
+
+msgid "Tram"
+msgstr "Tramvaj"
+
+msgid "Trolleybus"
+msgstr "Trolejbus"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""

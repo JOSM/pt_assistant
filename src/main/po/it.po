@@ -12,9 +12,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.5-1-gd6ae14e\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-30 13:08+0000\n"
+"POT-Creation-Date: 2018-11-15 16:58+0000\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Italian (https://www.transifex.com/josm/teams/2544/it/)\n"
 "MIME-Version: 1.0\n"
@@ -22,9 +22,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: it\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-msgid ", "
-msgstr ", "
 
 msgid "Add public_transport=stop_position + mode of transport on these nodes"
 msgstr ""
@@ -35,14 +32,23 @@ msgid "Always split ways, even if they are not at the end of the itinerary"
 msgstr ""
 "Dividere sempre i percorsi, anche se non sono alla fine dell'itinerario"
 
+msgid "Area"
+msgstr "Area"
+
 msgid "Area around way"
 msgstr "Area attorno al percorso"
 
 msgid "Area before removal"
 msgstr "Area prima della rimozione"
 
+msgid "Bench"
+msgstr "Panchina"
+
 msgid "Bicycle and foot routes Tests"
 msgstr "Test per itinerari ciclistici e pedonali"
+
+msgid "Bus"
+msgstr "Bus"
 
 msgid "Cancel"
 msgstr "Annulla"
@@ -57,7 +63,9 @@ msgid "Close"
 msgstr "Chiudi"
 
 msgid "Displays stops of selected public transport routes as graph"
-msgstr "Mostra le fermate dei percorsi di trasporto pubblico selezionati come grafico"
+msgstr ""
+"Mostra le fermate dei percorsi di trasporto pubblico selezionati come "
+"grafico"
 
 msgid "Distance between stops"
 msgstr "Distanza tra gli stop"
@@ -130,9 +138,6 @@ msgstr "Correggi errore"
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Correzione ({0}/{1}): ''{2}''"
 
-msgid "Fixing errors ..."
-msgstr "Correzione errori ..."
-
 msgid "Here you can change some preferences of PTAssistant functions"
 msgstr ""
 "Qui si possono modificare alcune preferenze delle funzioni di PTAssistant"
@@ -167,11 +172,21 @@ msgstr "Modalità: {0}"
 msgid "NA"
 msgstr "ND"
 
+#. i18n: label for the tag name=*
+msgid "Name"
+msgstr "Nome"
+
+msgid "Network"
+msgstr "Rete"
+
 msgid "No"
 msgstr "No"
 
 msgid "Ok"
 msgstr "Ok"
+
+msgid "Operator"
+msgstr "Operatore"
 
 msgid "PT Wizard"
 msgstr "Procedura guidata PT"
@@ -326,13 +341,6 @@ msgstr ""
 msgid "Remember my choice and do not ask me again in this session"
 msgstr "Ricorda la mia scelta e non chiedere di nuovo in questa sessione"
 
-msgid ""
-"Remove public_transport=platform from platform WAYS when transfering details"
-" to platform NODE."
-msgstr ""
-"Rimuovere public_transport=platform dal PERCORSO della banchina quando si "
-"trasferiscono i dettagli sul NODO della banchina."
-
 msgid "Remove public_transport=platform from platform ways"
 msgstr "Rimuovere public_transport=platform dai percorsi delle banchine"
 
@@ -363,8 +371,20 @@ msgstr ""
 msgid "Routing Helper"
 msgstr "Aiuto relazione"
 
+msgid "Save"
+msgstr "Salva"
+
 msgid "Set up PT Assistant for more convenient use"
 msgstr "Impostare PT Assistant per un uso più comodo"
+
+msgid "Share taxi"
+msgstr "Taxi condiviso"
+
+msgid "Shelter"
+msgstr "Rifugio"
+
+msgid "Split way"
+msgstr "Dividi percorso"
 
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
@@ -382,8 +402,12 @@ msgstr "Questa azione richiede che sia selezionato un singolo nodo."
 msgid "Toggle direction arrows"
 msgstr "Passa alle frecce di direzione"
 
+#, java-format
 msgid "Tool: {0}"
 msgstr "Strumenti: {0}"
+
+msgid "Tram"
+msgstr "Tramvia"
 
 msgid ""
 "Transfer details from platform way to node representing the stop (leave "
@@ -397,6 +421,9 @@ msgid ""
 msgstr ""
 "Trasferire i dettagli dai nodi stop_position ai nodi che rappresentano la "
 "fermata"
+
+msgid "Trolleybus"
+msgstr "Filobus"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
@@ -430,9 +457,6 @@ msgstr "Si"
 
 msgid "suggested value : "
 msgstr "Valore suggerito:"
-
-msgid "transfering details to platform NODE."
-msgstr "trasferimento dei dettagli sul NODO della banchina."
 
 #, java-format
 msgid "{0} direction error"

@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.4-10-ged0ad68\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-07 15:18+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Spanish (https://www.transifex.com/josm/teams/2544/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,14 +17,33 @@ msgstr ""
 "Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid ", "
-msgstr ", "
-
 msgid "A valid public_transport:version=2 route is required"
 msgstr "Se requiere una ruta valida public_transport:version=2"
 
+msgid "Add public_transport=stop_position + mode of transport on these nodes"
+msgstr ""
+"Añadir public_transport=stop_position + modos de transporte en estos nodos"
+
+msgid "Always split ways, even if they are not at the end of the itinerary"
+msgstr "Siembre separar vías, aunque no estén al final del itinerario"
+
+msgid "Area"
+msgstr "Área"
+
+msgid "Area around way"
+msgstr "Área alrededor de la vía"
+
+msgid "Area before removal"
+msgstr "Área antes de eliminación"
+
+msgid "Bench"
+msgstr "Banco"
+
 msgid "Bicycle and foot routes Tests"
 msgstr "Pruebas de rutas pedestres y bicisendas"
+
+msgid "Bus"
+msgstr "Autobús"
 
 msgid "Cancel"
 msgstr "Cancelar"
@@ -38,11 +57,10 @@ msgstr ""
 msgid "Close"
 msgstr "Cerrar"
 
-msgid "Customization of public transport stops."
-msgstr "Personalización de paradas de transporte público."
-
 msgid "Displays stops of selected public transport routes as graph"
-msgstr "Muestra las paradas de rutas de transporte público seleccionadas como gráfico"
+msgstr ""
+"Muestra las paradas de rutas de transporte público seleccionadas como "
+"gráfico"
 
 msgid "Distance between stops"
 msgstr "Distancia entre paradas"
@@ -54,11 +72,60 @@ msgstr ""
 msgid "Do you want to make the roundabout round?"
 msgstr "¿Desea hacer redonda la rotonda?"
 
+msgid ""
+"Don’t add public_transport=platform and mode of transport to node "
+"representing the stop (suffice with highway=bus_stop or railway=tram_stop)"
+msgstr ""
+"No añadir public_transport=platform y modo de transporte al nodo "
+"representando la parada (suficiente con highway=bus_stop o "
+"railway=tram_stop)"
+
+msgid ""
+"Don’t check whether route relation starts and ends on stop_position node"
+msgstr ""
+"No verifique si la relación de ruta empieza y termina en el nodo de "
+"stop_position"
+
+msgid "Don’t compare name of first stop with from tag in route relation"
+msgstr ""
+"No compare el nombre de la primera parada con la etiqueta Desde en la "
+"relación de ruta"
+
+msgid "Don’t compare name of last stop with to tag in route relation"
+msgstr ""
+"No compare el nombre de la primera parada con la etiqueta A en la relación "
+"de ruta"
+
+#, java-format
+msgid "Download finished: {0}"
+msgstr "Descarga finalizada: {0}"
+
+#. CHECKSTYLE.OFF: LineLength
 msgid "Download incomplete route relation members"
 msgstr "Descarga miembros de la relación de ruta incompletos"
 
+#, java-format
+msgid "Download started: {0}"
+msgstr "Descarga iniciada: {0}"
+
+msgid ""
+"Downloading incomplete relation members. Kindly wait till download gets "
+"over."
+msgstr ""
+"Descargando miembros de la relación incompletos. Por favor espere hasta que "
+"la descarga termine."
+
+msgid "Entire area"
+msgstr "Área completa"
+
 msgid "Extract node from line"
 msgstr "Extraer el nodo de la línea"
+
+msgid "Extract platform node"
+msgstr "Extraer nodo de plataforma"
+
+msgid "Extracts platform node from a node"
+msgstr "Extraer nodo de plataforma de un nodo"
 
 msgid "Fix error"
 msgstr "Arreglar error"
@@ -67,30 +134,59 @@ msgstr "Arreglar error"
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Corrigiendo ({0}/{1}): ''{2}''"
 
-msgid "Fixing errors ..."
-msgstr "Corrigiendo errores..."
+msgid "Here you can change some preferences of PTAssistant functions"
+msgstr ""
+"Aquí puede cambiar algunas de las preferencias de las funciones de "
+"PTAssistant"
 
 msgid "How do you want to proceed?"
 msgstr "¿Cómo desea proceder?"
 
 msgid "Include stop_area tests"
-msgstr "Incluir análisis de la zona de parada"
+msgstr "Incluir análisis de stop_area"
 
 msgid "Incomplete Members"
 msgstr "Miembros incompletos"
+
+msgid "Incomplete relations"
+msgstr "Relaciones incompletas"
 
 msgid "Invalid selection"
 msgstr "Selección no válida"
 
 #, java-format
+msgid ""
+"Mode of Travel -> {0} \n"
+" total ways selected -> {1}"
+msgstr ""
+"Modo de Viaje -> {0}\n"
+" total de vías seleccionadas -> {1}"
+
+#, java-format
 msgid "Mode: {0}"
 msgstr "Modo: {0}"
+
+msgid "NA"
+msgstr "NA"
+
+#. i18n: label for the tag name=*
+msgid "Name"
+msgstr "Nombre"
+
+msgid "Network"
+msgstr "Red"
 
 msgid "No"
 msgstr "No"
 
 msgid "Ok"
 msgstr "Aceptar"
+
+msgid "Operator"
+msgstr "Operador"
+
+msgid "PT Wizard"
+msgstr "Asistente PT"
 
 msgid "PT: First or last way needs to be split"
 msgstr "PT: Es necesario dividir la primera o última vía"
@@ -104,6 +200,12 @@ msgstr "PT: Problema en el segmento de ruta sin corrección automática"
 msgid "PT: Problem in the route segment with one automatic fix"
 msgstr "PT: Problema en el segmento de ruta con una corrección automática"
 
+msgid ""
+"PT: Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
+"PT: Referencias de las rutas no concuerdan con la etiqueta route_ref de la "
+"primitiva"
+
 msgid "PT: Relation member roles do not match tags"
 msgstr ""
 "PT: Los roles de los miembros de la relación no coinciden con las etiquetas"
@@ -112,10 +214,12 @@ msgid "PT: Road is under construction"
 msgstr "PT: La carretera se encuentra en construcción"
 
 msgid "PT: Route contains a gap that can be fixed by sorting"
-msgstr "PT: La ruta contiene un vacío que puede ser arreglado si se ordena"
+msgstr ""
+"PT: La ruta contiene una interrupción que puede ser corregida si se ordena"
 
 msgid "PT: Route gap can be closed by adding a single way"
-msgstr "PT: el corte en la ruta puede ser cerrado añadiendo una vía simple"
+msgstr ""
+"PT: la interrupción en la ruta puede ser cerrada añadiendo una vía simple"
 
 msgid ""
 "PT: Route gaps can decrease by sorting members. Further validations will be "
@@ -185,8 +289,15 @@ msgstr ""
 "PT: el nombre de la última parada no concuerda con la etiqueta \"to\" de la "
 "relación de ruta"
 
+#, java-format
+msgid "PT: There is a gap in the {0} route"
+msgstr "PT: Hay una interrupción en la ruta {0}"
+
 msgid "PT: dummy test warning"
 msgstr "PT: advertencia de ensayo simulado"
+
+msgid "PTAssistantPlugin settings"
+msgstr "Preferencias de PTAssistantPlugin"
 
 msgid "PT_Assistant Fetch Request"
 msgstr "Asistente PT de petición de recuperación"
@@ -214,11 +325,29 @@ msgstr "Tests del Asistente de Transporte Público"
 msgid "Public transport routes"
 msgstr "Rutas de transporte público"
 
+msgid ""
+"Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
+"Referencias de las rutas no concuerdan con la etiqueta route_ref de la "
+"primitiva"
+
 msgid "Remember my choice and do not ask me again in this session"
 msgstr "Recordar mi elección y no volver a preguntar en esta sesión"
 
+msgid "Remove public_transport=platform from platform ways"
+msgstr "Quitar public_transport=platform de las vías de plataforma"
+
 msgid "Repeat last fix"
 msgstr "Repetir la última corrección"
+
+msgid "Replace Membership"
+msgstr "Reemplazar Miembros"
+
+msgid ""
+"Replace platform way in the route relations by node representing the stop"
+msgstr ""
+"Reemplazar vía de plataforma en las relaciones de ruta por nodo "
+"representando la parada"
 
 msgid "Roundabout round"
 msgstr "Rotonda redonda"
@@ -232,6 +361,26 @@ msgstr ""
 "Necesitan ser descargados para proceder a la validación.\n"
 "¿Desea descargarlas?"
 
+msgid "Routing Helper"
+msgstr "Ayudante de Ruteo"
+
+msgid "Save"
+msgstr "Guardar"
+
+msgid "Set up PT Assistant for more convenient use"
+msgstr "Configure el Asistente PT para uso más conveniente"
+
+msgid "Share taxi"
+msgstr "Taxi compartido"
+
+msgid "Shelter"
+msgstr ""
+"Albergue temporal (para colectivos en situación de exclusión, riesgo o "
+"desastre)"
+
+msgid "Split way"
+msgstr "Dividir la vía"
+
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
 "continue with the sorting?"
@@ -239,22 +388,56 @@ msgstr ""
 "La relación tiene miembros incompletos. ¿Desea descargarlos y continuar con "
 "la clasificación?"
 
+msgid "The selected node is not a stop position for public transport!"
+msgstr ""
+"¡El nodo seleccionado no es una posición de parada para transporte público!"
+
+msgid "This action requires single node to be selected."
+msgstr "Esta acción requiere un solo nodo a ser seleccionado."
+
 msgid "Toggle direction arrows"
 msgstr "Cambiar la dirección de las flechas"
 
 msgid "Toggle reference labels"
 msgstr "Cambiar las etiquetas de referencia"
 
+#, java-format
 msgid "Tool: {0}"
 msgstr "Herramienta: {0}"
+
+msgid "Tram"
+msgstr "Tranvía"
+
+msgid ""
+"Transfer details from platform way to node representing the stop (leave "
+"tactile_paving and wheelchair on the platform way)"
+msgstr ""
+"Transfiriendo detalles de la vía de la plataforma al nodo representando la "
+"parada (deje tactile_paving y wheelchair en la vía de la plataforma)"
+
+msgid ""
+"Transfer details from stop_position nodes to node representing the stop"
+msgstr ""
+"Transferir detalles desde los nodos de posición de parada al nodo "
+"representando la parada."
+
+msgid "Trolleybus"
+msgstr "Trolebús"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
 "Introduzca el tipo de letra para seleccionar la variante de solución de "
 "problemas o pulse la tecla Esc para no elegir ninguna solución"
 
+#, java-format
+msgid "Unable to connect to {0}"
+msgstr "No se ha podido conectar a {0}"
+
 msgid "Updating map ..."
 msgstr "Actualizando mapa..."
+
+msgid "Use 1/2/3/4 instead of A/B/C/D for selecting which way to follow"
+msgstr "Use 1/2/3/4 en lugar de A/B/C/D para seleccionar qué vía seguir"
 
 msgid "Visualize public transport routes"
 msgstr "Visualizar las rutas del transporte público"
@@ -264,8 +447,14 @@ msgstr ""
 "Advertencia: las variantes de resolución de problemas que se muestran se "
 "basan en criterios menos estrictos"
 
+msgid "What do you want the segment to be?"
+msgstr "¿Qué quiere que sea el segmento?"
+
 msgid "Yes"
 msgstr "Si"
+
+msgid "suggested value : "
+msgstr "Valor sugerido :"
 
 #, java-format
 msgid "{0} direction error"

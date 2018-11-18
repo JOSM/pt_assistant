@@ -6,19 +6,16 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-25 07:23+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Belarusian (https://www.transifex.com/josm/teams/2544/be/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: be\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
-
-msgid ", "
-msgstr ", "
 
 msgid "A valid public_transport:version=2 route is required"
 msgstr "Патрабуецца сапраўдны маршрут public_transport:version=2"
@@ -35,11 +32,10 @@ msgstr ""
 msgid "Close"
 msgstr "Закрыць"
 
-msgid "Customization of public transport stops."
-msgstr "Налада прыпынкаў грамадскага транспарта."
-
 msgid "Displays stops of selected public transport routes as graph"
-msgstr "Адлюстроўвае прыпынкі выбраных маршрутаў грамадскага транспарту ў выглядзе графа"
+msgstr ""
+"Адлюстроўвае прыпынкі выбраных маршрутаў грамадскага транспарту ў выглядзе "
+"графа"
 
 msgid "Distance between stops"
 msgstr "Адлегласць паміж прыпынкамі"
@@ -47,6 +43,7 @@ msgstr "Адлегласць паміж прыпынкамі"
 msgid "Do you want to download referrers of platforms and stop positions?"
 msgstr "Жадаеце сцягнуць аб''екты, якія спасылаюцца на платформы і прыпынкі?"
 
+#. CHECKSTYLE.OFF: LineLength
 msgid "Download incomplete route relation members"
 msgstr "Спампаваць патрэбных удзельнікаў дачынення маршруту"
 
@@ -56,9 +53,6 @@ msgstr "Выправіць памылку"
 #, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Выпраўленне ({0}/{1}): ''{2}''"
-
-msgid "Fixing errors ..."
-msgstr "Выпраўленне памылак ..."
 
 msgid "How do you want to proceed?"
 msgstr "Што вы выбераце для працягу?"
@@ -72,6 +66,10 @@ msgstr "Няправільнае вылучэнне"
 #, java-format
 msgid "Mode: {0}"
 msgstr "Рэжым: {0}"
+
+#. i18n: label for the tag name=*
+msgid "Name"
+msgstr "Назва"
 
 msgid "No"
 msgstr "Не"
@@ -171,12 +169,16 @@ msgstr ""
 "Яны павінны быць загружаны, каб працягнуць праверку.\n"
 "Вы хочаце загрузіць іх?"
 
+msgid "Save"
+msgstr "Запісаць"
+
 msgid "Toggle direction arrows"
 msgstr "Паказаць/схаваць стрэлкі напрамкаў"
 
 msgid "Toggle reference labels"
 msgstr "Паказаць/схаваць пазнакі"
 
+#, java-format
 msgid "Tool: {0}"
 msgstr "Інструмент: {0}"
 

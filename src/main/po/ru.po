@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.4-10-ged0ad68\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-07 15:18+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Russian (https://www.transifex.com/josm/teams/2544/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,14 +17,20 @@ msgstr ""
 "Language: ru\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-msgid ", "
-msgstr ", "
-
 msgid "A valid public_transport:version=2 route is required"
 msgstr "Требуется действительный маршрут  public_transport:version=2"
 
 msgid "Add public_transport=stop_position + mode of transport on these nodes"
 msgstr "Добавить public_transport=stop_position и вид транспорта на эти точки"
+
+msgid "Always split ways, even if they are not at the end of the itinerary"
+msgstr "Всегда разделять линии, даже если они не находятся в конце маршрута"
+
+msgid "Area around way"
+msgstr "Область вокруг линии"
+
+msgid "Area before removal"
+msgstr "Область перед удалением"
 
 msgid "Bicycle and foot routes Tests"
 msgstr "Тесты велосипедных и пеших маршрутов"
@@ -41,11 +47,10 @@ msgstr ""
 msgid "Close"
 msgstr "Закрыть"
 
-msgid "Customization of public transport stops."
-msgstr "Настройка остановок общественного транспорта."
-
 msgid "Displays stops of selected public transport routes as graph"
-msgstr "Отображает остановки выбранных маршрутов общественного транспорта в виде графа"
+msgstr ""
+"Отображает остановки выбранных маршрутов общественного транспорта в виде "
+"графа"
 
 msgid "Distance between stops"
 msgstr "Расстояние между остановками"
@@ -79,8 +84,17 @@ msgstr ""
 "Не сравнивать название последней остановки с тегом \"to\" в отношении "
 "маршрута"
 
+#, java-format
+msgid "Download finished: {0}"
+msgstr "Загрузка завершена: {0}"
+
+#. CHECKSTYLE.OFF: LineLength
 msgid "Download incomplete route relation members"
 msgstr "Скачать недостающих участников отношения маршрута"
+
+#, java-format
+msgid "Download started: {0}"
+msgstr "Загрузка начата: {0}"
 
 msgid ""
 "Downloading incomplete relation members. Kindly wait till download gets "
@@ -88,6 +102,9 @@ msgid ""
 msgstr ""
 "Загрузка недостающих участников отношений. Подождите, пока загрузка не "
 "закончится."
+
+msgid "Entire area"
+msgstr "Вся область"
 
 msgid "Extract node from line"
 msgstr "Извлечь точку из линии"
@@ -105,9 +122,6 @@ msgstr "Исправить ошибку"
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Исправление ({0}/{1}): ''{2}''"
 
-msgid "Fixing errors ..."
-msgstr "Исправление ошибок ..."
-
 msgid "Here you can change some preferences of PTAssistant functions"
 msgstr "Здесь вы можете изменить некоторые настройки работы PTAssistant"
 
@@ -120,12 +134,30 @@ msgstr "Включить тесты зон остановки"
 msgid "Incomplete Members"
 msgstr "Неполные участники"
 
+msgid "Incomplete relations"
+msgstr "Неполное отношение"
+
 msgid "Invalid selection"
 msgstr "Неправильное выделение"
 
 #, java-format
+msgid ""
+"Mode of Travel -> {0} \n"
+" total ways selected -> {1}"
+msgstr ""
+"Способ передвижения -> {0} \n"
+" всего линий выделено -> {1}"
+
+#, java-format
 msgid "Mode: {0}"
 msgstr "Режим: {0}"
+
+msgid "NA"
+msgstr "Н/Д"
+
+#. i18n: label for the tag name=*
+msgid "Name"
+msgstr "Название"
 
 msgid "No"
 msgstr "Нет"
@@ -271,13 +303,6 @@ msgstr "Номера маршрутов не совпадают с тегом \"
 msgid "Remember my choice and do not ask me again in this session"
 msgstr "Запомнить мой выбор и больше не спрашивать в этом сеансе"
 
-msgid ""
-"Remove public_transport=platform from platform WAYS when transfering details"
-" to platform NODE."
-msgstr ""
-"Удалить public_transport=platform с ЛИНИЙ платформы при переносе параметров "
-"на ТОЧКУ платформы."
-
 msgid "Remove public_transport=platform from platform ways"
 msgstr "Удалить public_transport=platform с линий платформ"
 
@@ -305,6 +330,12 @@ msgstr ""
 "Они должны быть загружены, чтобы продолжить проверку.\n"
 "Вы хотите загрузить их?"
 
+msgid "Routing Helper"
+msgstr "Помощник маршрутизации"
+
+msgid "Save"
+msgstr "Сохранить"
+
 msgid "Set up PT Assistant for more convenient use"
 msgstr "Настройка PT Assistant для более удобного использования"
 
@@ -314,12 +345,19 @@ msgid ""
 msgstr ""
 "У отношения есть неполные участники. Скачать их и продолжить сортировку?"
 
+msgid "The selected node is not a stop position for public transport!"
+msgstr "Выбранная точка не является остановкой общественного транспорта!"
+
+msgid "This action requires single node to be selected."
+msgstr "Это действие требует, чтобы была выбрана одна точка."
+
 msgid "Toggle direction arrows"
 msgstr "Показать/скрыть стрелки направлений"
 
 msgid "Toggle reference labels"
 msgstr "Показать/скрыть метки"
 
+#, java-format
 msgid "Tool: {0}"
 msgstr "Инструмент: {0}"
 
@@ -347,6 +385,10 @@ msgstr "Не удалось подключиться к {0}"
 msgid "Updating map ..."
 msgstr "Обновление карты ..."
 
+msgid "Use 1/2/3/4 instead of A/B/C/D for selecting which way to follow"
+msgstr ""
+"Использовать 1/2/3/4 вместо A/B/C/D при выборе за какой линией следовать"
+
 msgid "Visualize public transport routes"
 msgstr "Визуализировать маршруты общественного транспорта"
 
@@ -363,9 +405,6 @@ msgstr "Да"
 
 msgid "suggested value : "
 msgstr "предлагаемое значение:"
-
-msgid "transfering details to platform NODE."
-msgstr "перенос параметров на ТОЧКУ платформы."
 
 #, java-format
 msgid "{0} direction error"

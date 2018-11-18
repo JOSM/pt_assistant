@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.4-10-ged0ad68\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-07 15:18+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Portuguese (https://www.transifex.com/josm/teams/2544/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,17 +17,79 @@ msgstr ""
 "Language: pt\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid ", "
-msgstr ", "
+#, java-format
+msgid ""
+"''from'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+"etiqueta ''from'' não usada. Usar com\n"
+"{0} ?"
+
+#, java-format
+msgid ""
+"''from''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+"''from''={0}.\n"
+"Em vez disso,\n"
+"alterá-la para\n"
+"''{1}'' ?"
+
+#, java-format
+msgid ""
+"''to'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+"etiqueta ''to'' não usada Usar com\n"
+"{0} ?"
+
+#, java-format
+msgid ""
+"''to''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+"''to''={0}.\n"
+"Em vez disso,\n"
+"alterá-la para\n"
+"''{1}'' ?"
 
 msgid "A valid public_transport:version=2 route is required"
 msgstr "É necessária uma rota public_transport:version=2 válida"
 
+msgid "Add oneway:bus=no to way"
+msgstr "Adicionar à via oneway:bus=no"
+
+#. i18n: name of the `AddStopPositionAction` map mode
+msgid "Add stop position"
+msgstr "Adicionar posição de paragem"
+
+msgid "Area"
+msgstr "É uma área e não uma linha"
+
+msgid "Bench"
+msgstr "Banco"
+
 msgid "Bicycle and foot routes Tests"
 msgstr "Testes de rotas de bicicleta e a pé"
 
+msgid "Bus"
+msgstr "Autocarro"
+
+msgid "Bus station"
+msgstr "Estação de autocarros"
+
 msgid "Cancel"
 msgstr "Cancelar"
+
+msgid "Change from tag?"
+msgstr "Alterar etiqueta \"from\" (de)?"
+
+msgid "Change name tag?"
+msgstr "Alterar etiqueta nome?"
 
 msgid ""
 "Check if route relations are compatible with public transport version 2"
@@ -44,8 +106,20 @@ msgstr "Distância entre paragens"
 msgid "Do you want to make the roundabout round?"
 msgstr "Quer tornar a rotunda circular?"
 
+#, java-format
+msgid "Download finished: {0}"
+msgstr "Descarregamento terminado: {0}"
+
+#. CHECKSTYLE.OFF: LineLength
 msgid "Download incomplete route relation members"
 msgstr "Descarregar membros incompletos da relação de rota"
+
+#, java-format
+msgid "Download started: {0}"
+msgstr "Descarregamento iniciado: {0}"
+
+msgid "Entire area"
+msgstr "Toda a área"
 
 msgid "Extract node from line"
 msgstr "Extrair nó de uma linha"
@@ -56,9 +130,6 @@ msgstr "Corrigir erro"
 #, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Corrigindo ({0}/{1}): ''{2}''"
-
-msgid "Fixing errors ..."
-msgstr "A corrigir erros ..."
 
 msgid "How do you want to proceed?"
 msgstr "Como quer continuar?"
@@ -76,11 +147,24 @@ msgstr "Seleção incorreta"
 msgid "Mode: {0}"
 msgstr "Modo: {0}"
 
+#. i18n: label for the tag name=*
+msgid "Name"
+msgstr "Nome"
+
+msgid "Network"
+msgstr "Rede de Rota"
+
 msgid "No"
 msgstr "Não"
 
 msgid "Ok"
 msgstr "Ok"
+
+msgid "Operator"
+msgstr "Empresa/organismo que faz a gestão"
+
+msgid "PT Wizard"
+msgstr "Assistente TP"
 
 msgid "PT: First or last way needs to be split"
 msgstr "TP: É necessário dividir a primeira ou última via"
@@ -174,8 +258,15 @@ msgstr ""
 "TP: O nome da última paragem não corresponde à etiqueta \"to\" (para) da "
 "relação de rota"
 
+#, java-format
+msgid "PT: There is a gap in the {0} route"
+msgstr "TP: Há um intervalo na rota {0}"
+
 msgid "PT: dummy test warning"
 msgstr "TP: aviso de teste simulado"
+
+msgid "PTAssistantPlugin settings"
+msgstr "Configurações do Módulo de Assistente TP"
 
 msgid "PT_Assistant Fetch Request"
 msgstr "Pedido de Processamento do Assistente_TP"
@@ -219,11 +310,33 @@ msgstr ""
 "Eles têm de ser descarregados para continuar com a validação.\n"
 "Quer descarregá-los?"
 
+msgid "Routing Helper"
+msgstr "Assistente de Roteamento"
+
+msgid "Save"
+msgstr "Gravar"
+
+msgid "Share taxi"
+msgstr "Táxi coletivo"
+
+msgid "Shelter"
+msgstr "Abrigo Social"
+
+msgid "Split way"
+msgstr "Separar linha"
+
 msgid "Toggle direction arrows"
 msgstr "Inverter setas de direção"
 
+#, java-format
 msgid "Tool: {0}"
 msgstr "Ferramenta: {0}"
+
+msgid "Tram"
+msgstr "Elétrico"
+
+msgid "Trolleybus"
+msgstr "Trólei"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
@@ -243,6 +356,9 @@ msgstr ""
 
 msgid "Yes"
 msgstr "Sim"
+
+msgid "suggested value : "
+msgstr "valor sugerido : "
 
 #, java-format
 msgid "{0} direction error"

@@ -11,9 +11,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.5-1-gd6ae14e\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-30 13:08+0000\n"
+"POT-Creation-Date: 2018-11-15 16:58+0000\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Asturian (https://www.transifex.com/josm/teams/2544/ast/)\n"
 "MIME-Version: 1.0\n"
@@ -22,9 +22,6 @@ msgstr ""
 "Language: ast\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid ", "
-msgstr ", "
-
 msgid "Add public_transport=stop_position + mode of transport on these nodes"
 msgstr ""
 "Amestar public_transport=stop_position + mou de tresporte nesos nodios"
@@ -32,14 +29,23 @@ msgstr ""
 msgid "Always split ways, even if they are not at the end of the itinerary"
 msgstr "Dividir siempre les víes, anque nun tean al final del itinerariu"
 
+msgid "Area"
+msgstr "Área"
+
 msgid "Area around way"
 msgstr "Área alredor de la vía"
 
 msgid "Area before removal"
 msgstr "Área antes del desaniciu"
 
+msgid "Bench"
+msgstr "Bancu"
+
 msgid "Bicycle and foot routes Tests"
 msgstr "Pruebes pa rutes en bicicleta y a pie"
+
+msgid "Bus"
+msgstr "Autobús"
 
 msgid "Cancel"
 msgstr "Encaboxar"
@@ -77,9 +83,6 @@ msgstr "Iguar error"
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Iguando ({0}/{1}): ''{2}''"
 
-msgid "Fixing errors ..."
-msgstr "Iguando errores..."
-
 msgid "Here you can change some preferences of PTAssistant functions"
 msgstr "Equí puedes cambiar delles preferencies de funciones de PTAssistant"
 
@@ -105,11 +108,21 @@ msgstr "Mou: {0}"
 msgid "NA"
 msgstr "n/d"
 
+#. i18n: label for the tag name=*
+msgid "Name"
+msgstr "Nome"
+
+msgid "Network"
+msgstr "Rede"
+
 msgid "No"
 msgstr "Non"
 
 msgid "Ok"
 msgstr "Aceutar"
+
+msgid "Operator"
+msgstr "Operador"
 
 msgid "PT Wizard"
 msgstr "PT Wizard"
@@ -165,8 +178,24 @@ msgstr "Tresporte públicu"
 msgid "Public Transport Assistant tests"
 msgstr "Pruebes del Asistente de Tresporte Públicu"
 
+msgid "Save"
+msgstr "Guardar"
+
+msgid "Share taxi"
+msgstr "Taxi compartíu"
+
+msgid "Shelter"
+msgstr "Abelugu"
+
+#, java-format
 msgid "Tool: {0}"
 msgstr "Ferramienta: {0}"
+
+msgid "Tram"
+msgstr "Tranvía"
+
+msgid "Trolleybus"
+msgstr "Trolebús"
 
 msgid "Updating map ..."
 msgstr "Actualizando mapa..."

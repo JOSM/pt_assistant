@@ -10,9 +10,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.5-1-gd6ae14e\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-30 13:08+0000\n"
+"POT-Creation-Date: 2018-11-15 16:58+0000\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Slovak (https://www.transifex.com/josm/teams/2544/sk/)\n"
 "MIME-Version: 1.0\n"
@@ -21,11 +21,17 @@ msgstr ""
 "Language: sk\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);\n"
 
-msgid ", "
-msgstr ", "
+msgid "Area"
+msgstr "Oblasť"
+
+msgid "Bench"
+msgstr "Lavička"
 
 msgid "Bicycle and foot routes Tests"
 msgstr "Kontroly peších a cyklotrás"
+
+msgid "Bus"
+msgstr "Autobus"
 
 msgid "Cancel"
 msgstr "Zrušiť"
@@ -37,9 +43,6 @@ msgstr ""
 
 msgid "Close"
 msgstr "Zavrieť"
-
-msgid "Customization of public transport stops."
-msgstr "Úpravy zastávok hromadnej dopravy."
 
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Zobrazuje zastávky zvolených trás hromadnej dopravy ako graf"
@@ -55,9 +58,6 @@ msgstr "Extrahovať bod z čiary"
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Opravuje sa ({0}/{1}): ''{2}''"
 
-msgid "Fixing errors ..."
-msgstr "Opravujem chyby..."
-
 msgid "How do you want to proceed?"
 msgstr "Ako chcete pokračovať?"
 
@@ -71,11 +71,21 @@ msgstr "Chybný výber"
 msgid "Mode: {0}"
 msgstr "Režim: {0}"
 
+#. i18n: label for the tag name=*
+msgid "Name"
+msgstr "Názov"
+
+msgid "Network"
+msgstr "Sieť"
+
 msgid "No"
 msgstr "Nie"
 
 msgid "Ok"
 msgstr "Ok"
+
+msgid "Operator"
+msgstr "Prevádzkovateľ (Operátor)"
 
 msgid "PT: First or last way needs to be split"
 msgstr "PT: Prvý alebo posledný úsek by asi mal byť rozdelený"
@@ -159,8 +169,27 @@ msgstr ""
 "Musia byť stiahnuté, aby sa dalo pokračovať v kontrole.\n"
 "Chcete ich teraz stiahnuť?"
 
+msgid "Save"
+msgstr "Uložiť"
+
+msgid "Share taxi"
+msgstr "Zdieľané taxi"
+
+msgid "Shelter"
+msgstr "Prístrešok"
+
+msgid "Split way"
+msgstr "Rozdeliť cestu"
+
+#, java-format
 msgid "Tool: {0}"
 msgstr "Nástroj: {0}"
+
+msgid "Tram"
+msgstr "Električka"
+
+msgid "Trolleybus"
+msgstr "Trolejbus"
 
 msgid "Updating map ..."
 msgstr "Aktualizujem mapu ..."

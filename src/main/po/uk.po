@@ -6,19 +6,16 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.0.0-12-g8e5e9a2\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-25 07:23+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Ukrainian (https://www.transifex.com/josm/teams/2544/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: uk\n"
 "Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
-
-msgid ", "
-msgstr ", "
 
 msgid "A valid public_transport:version=2 route is required"
 msgstr "Вимагається маршрут позначенй за схемою public_transport:version=2"
@@ -38,11 +35,9 @@ msgstr ""
 msgid "Close"
 msgstr "Закрити"
 
-msgid "Customization of public transport stops."
-msgstr "Налаштування параметрів зупинок громадського транспорту."
-
 msgid "Displays stops of selected public transport routes as graph"
-msgstr "Показує зупинки виділеного маршруту громадського транспорту у вигляді графу"
+msgstr ""
+"Показує зупинки виділеного маршруту громадського транспорту у вигляді графу"
 
 msgid "Distance between stops"
 msgstr "Відстань між зупинками"
@@ -53,6 +48,7 @@ msgstr "Бажаєте завантажити обʼєкти, що посила�
 msgid "Do you want to make the roundabout round?"
 msgstr "Ви бажаєте зробити проїзд по кругу?"
 
+#. CHECKSTYLE.OFF: LineLength
 msgid "Download incomplete route relation members"
 msgstr "Завантажити відсутніх членів звʼязку маршруту"
 
@@ -62,9 +58,6 @@ msgstr "Виправити помилку"
 #, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Виправлення ({0}/{1}): ''{2}''"
-
-msgid "Fixing errors ..."
-msgstr "Виправлення помилок…"
 
 msgid "How do you want to proceed?"
 msgstr "Як бажаєте продовжити?"
@@ -81,6 +74,10 @@ msgstr "Неправильне виділення"
 #, java-format
 msgid "Mode: {0}"
 msgstr "Режим {0}"
+
+#. i18n: label for the tag name=*
+msgid "Name"
+msgstr "Назва"
 
 msgid "No"
 msgstr "Ні"
@@ -217,6 +214,9 @@ msgstr ""
 "Їх треба завантажити, для того щоб виконати перевірку.\n"
 "Завантажити їх?"
 
+msgid "Save"
+msgstr "Зберегти"
+
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
 "continue with the sorting?"
@@ -230,6 +230,7 @@ msgstr "Показувати стрілки напрямку"
 msgid "Toggle reference labels"
 msgstr "Показувати таблички маршрутів"
 
+#, java-format
 msgid "Tool: {0}"
 msgstr "Інструмент: {0}"
 

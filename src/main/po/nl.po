@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.4-10-ged0ad68\n"
+"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-07 15:18+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Dutch (https://www.transifex.com/josm/teams/2544/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,14 +17,20 @@ msgstr ""
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid ", "
-msgstr ", "
-
 msgid "A valid public_transport:version=2 route is required"
 msgstr "Een geldige route public_transport:version=2 is vereist"
 
+msgid "Area"
+msgstr "Gebied"
+
+msgid "Bench"
+msgstr "Bank"
+
 msgid "Bicycle and foot routes Tests"
 msgstr "Testen voor fiets- en wandelroutes"
+
+msgid "Bus"
+msgstr "Bus"
 
 msgid "Cancel"
 msgstr "Annuleren"
@@ -37,11 +43,9 @@ msgstr ""
 msgid "Close"
 msgstr "Sluiten"
 
-msgid "Customization of public transport stops."
-msgstr "Aanpassen van haltes openbaar vervoer."
-
 msgid "Displays stops of selected public transport routes as graph"
-msgstr "Geeft haltes van geselecteerde routes van openbaar vervoer weer als grafiek"
+msgstr ""
+"Geeft haltes van geselecteerde routes van openbaar vervoer weer als grafiek"
 
 msgid "Distance between stops"
 msgstr "Afstand tussen haltes"
@@ -52,6 +56,7 @@ msgstr "Wilt u verwijzingen naar platformen halteposities downloaden?"
 msgid "Do you want to make the roundabout round?"
 msgstr "Wilt u de rotonde rond maken?"
 
+#. CHECKSTYLE.OFF: LineLength
 msgid "Download incomplete route relation members"
 msgstr "Niet volledige leden van routrelatie downloaden"
 
@@ -64,9 +69,6 @@ msgstr "Fout oplossen"
 #, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "({0}/{1}): ''{2}'' worden hersteld"
-
-msgid "Fixing errors ..."
-msgstr "Herstellen van fouten ..."
 
 msgid "How do you want to proceed?"
 msgstr "Hoe wilt u verder gaan?"
@@ -84,11 +86,21 @@ msgstr "Ongeldige selectie"
 msgid "Mode: {0}"
 msgstr "Modus: {0}"
 
+#. i18n: label for the tag name=*
+msgid "Name"
+msgstr "Naam"
+
+msgid "Network"
+msgstr "Netwerk"
+
 msgid "No"
 msgstr "Neen"
 
 msgid "Ok"
 msgstr "OK"
+
+msgid "Operator"
+msgstr "Bedrijf"
 
 msgid "PT: First or last way needs to be split"
 msgstr "PT: Eerste of laatste weg zou moeten worden gesplitst"
@@ -226,6 +238,18 @@ msgstr ""
 "Zij moeten worden gedownload om door te kunnen gaan met valideren.\n"
 "Wilt u ze downloaden?"
 
+msgid "Save"
+msgstr "Opslaan"
+
+msgid "Share taxi"
+msgstr "Deeltaxi"
+
+msgid "Shelter"
+msgstr "Schuilplaats"
+
+msgid "Split way"
+msgstr "Weg splitsen"
+
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
 "continue with the sorting?"
@@ -239,8 +263,15 @@ msgstr "Richtingpijlen schakelen"
 msgid "Toggle reference labels"
 msgstr "Verwijzingslabels schakelen"
 
+#, java-format
 msgid "Tool: {0}"
 msgstr "Gereedschap: {0}"
+
+msgid "Tram"
+msgstr "Tram"
+
+msgid "Trolleybus"
+msgstr "Trolleybus"
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
