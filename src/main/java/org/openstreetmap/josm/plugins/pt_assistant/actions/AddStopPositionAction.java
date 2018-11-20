@@ -63,9 +63,15 @@ public class AddStopPositionAction extends MapMode {
      * Creates a new AddStopPositionAction
      */
     public AddStopPositionAction() {
-        super(tr(MAP_MODE_NAME), "bus", tr(MAP_MODE_NAME),
-              Shortcut.registerShortcut("mapmode:stop_position", tr("Mode: {0}", tr(MAP_MODE_NAME)), KeyEvent.VK_K, Shortcut.CTRL_SHIFT),
-              getCursor());
+        // CHECKSTYLE.OFF: LineLength
+        super(
+            tr(MAP_MODE_NAME),
+            "bus",
+            tr(MAP_MODE_NAME),
+            Shortcut.registerShortcut("mapmode:stop_position", tr("Mode: {0}", tr(MAP_MODE_NAME)), KeyEvent.VK_K, Shortcut.CTRL_SHIFT),
+            getCursor()
+        );
+        // CHECKSTYLE.ON: LineLength
     }
 
     private static Cursor getCursor() {

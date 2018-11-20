@@ -55,14 +55,20 @@ public class CreatePlatformNodeThroughReplaceAction extends JosmAction {
      * Creates a new PlatformAction
      */
     public CreatePlatformNodeThroughReplaceAction() {
-        super(ACTION_NAME, null, ACTION_NAME,
-                Shortcut.registerShortcut("tools:createplatformthruoghreplace",
-                        "Tool: CreatePlatformNodeThroughReplaceAction", KeyEvent.VK_G, Shortcut.SHIFT),
-                false);
+        // CHECKSTYLE.OFF: LineLength
+        super(
+            ACTION_NAME,
+            null,
+            ACTION_NAME,
+            Shortcut.registerShortcut("tools:createplatformthruoghreplace", "Tool: CreatePlatformNodeThroughReplaceAction", KeyEvent.VK_G, Shortcut.SHIFT),
+            false
+        );
         transferHandler = new OsmTransferHandler();
-        MainApplication.registerActionShortcut(this,
-                Shortcut.registerShortcut("tools:createplatformthruoghreplace",
-                        "Tool: CreatePlatformNodeThroughReplaceAction", KeyEvent.VK_G, Shortcut.SHIFT));
+        MainApplication.registerActionShortcut(
+            this,
+            Shortcut.registerShortcut("tools:createplatformthruoghreplace", "Tool: CreatePlatformNodeThroughReplaceAction", KeyEvent.VK_G, Shortcut.SHIFT)
+        );
+        // CHECKSTYLE.ON: LineLength
     }
 
     @Override

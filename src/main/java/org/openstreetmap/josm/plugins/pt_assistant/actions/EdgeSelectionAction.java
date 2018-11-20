@@ -54,18 +54,15 @@ public class EdgeSelectionAction extends MapMode {
     private String modeOfTravel = null;
 
     public EdgeSelectionAction() {
+        // CHECKSTYLE.OFF: LineLength
         super(
             tr(MAP_MODE_NAME),
             "edgeSelection",
             tr(MAP_MODE_NAME),
-            Shortcut.registerShortcut(
-                "mapmode:edge_selection",
-                tr("Mode: {0}", tr(MAP_MODE_NAME)),
-                KeyEvent.VK_K,
-                Shortcut.CTRL
-            ),
+            Shortcut.registerShortcut("mapmode:edge_selection", tr("Mode: {0}", tr(MAP_MODE_NAME)), KeyEvent.VK_K, Shortcut.CTRL),
             SELECTION_CURSOR
         );
+        // CHECKSTYLE.ON: LineLength
         highlighted = new HashSet<>();
     }
 

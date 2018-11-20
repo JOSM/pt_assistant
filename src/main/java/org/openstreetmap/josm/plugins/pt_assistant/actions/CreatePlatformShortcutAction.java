@@ -56,12 +56,20 @@ public class CreatePlatformShortcutAction extends JosmAction {
      * Creates a new PlatformAction
      */
     public CreatePlatformShortcutAction() {
-        super(ACTION_NAME, null, ACTION_NAME,
-                Shortcut.registerShortcut("tools:createplatformshortcut", "Tool: CreatePlatformNodeShortcut", KeyEvent.VK_G, Shortcut.CTRL),
-                false);
+        // CHECKSTYLE.OFF: LineLength
+        super(
+            ACTION_NAME,
+            null,
+            ACTION_NAME,
+            Shortcut.registerShortcut("tools:createplatformshortcut", "Tool: CreatePlatformNodeShortcut", KeyEvent.VK_G, Shortcut.CTRL),
+            false
+        );
         transferHandler = new OsmTransferHandler();
-        MainApplication.registerActionShortcut(this,
-                Shortcut.registerShortcut("tools:createplatformshortcut", "Tool: CreatePlatformNodeShortcut", KeyEvent.VK_G, Shortcut.CTRL));
+        MainApplication.registerActionShortcut(
+            this,
+            Shortcut.registerShortcut("tools:createplatformshortcut", "Tool: CreatePlatformNodeShortcut", KeyEvent.VK_G, Shortcut.CTRL)
+        );
+        // CHECKSTYLE.ON: LineLength
     }
 
     @Override

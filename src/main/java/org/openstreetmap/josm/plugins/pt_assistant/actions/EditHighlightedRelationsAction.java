@@ -30,9 +30,17 @@ public class EditHighlightedRelationsAction extends JosmAction {
      * Creates a new EditHighlightedRelationsAction
      */
     public EditHighlightedRelationsAction() {
-        super(tr(actionName), new ImageProvider("dialogs", "edit"), tr(actionName),
-                Shortcut.registerShortcut("Edit Highlighted Relation", tr(actionName), KeyEvent.VK_K, Shortcut.ALT),
-                false, "editHighlightedRelations", false);
+        // CHECKSTYLE.OFF: LineLength
+        super(
+            tr(actionName),
+            new ImageProvider("dialogs", "edit"),
+            tr(actionName),
+            Shortcut.registerShortcut("Edit Highlighted Relation", tr(actionName), KeyEvent.VK_K, Shortcut.ALT),
+            false,
+            "editHighlightedRelations",
+            false
+        );
+        // CHECKSTYLE.ON: LineLength
     }
 
     @Override
@@ -43,5 +51,4 @@ public class EditHighlightedRelationsAction extends JosmAction {
             editor.setVisible(true);
         }
     }
-
 }
