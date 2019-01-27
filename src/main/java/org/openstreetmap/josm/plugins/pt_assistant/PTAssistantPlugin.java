@@ -4,7 +4,6 @@ package org.openstreetmap.josm.plugins.pt_assistant;
 import static org.openstreetmap.josm.gui.help.HelpUtil.ht;
 import static org.openstreetmap.josm.tools.I18n.trc;
 
-import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JMenu;
-import javax.swing.JPopupMenu;
 
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.event.SelectionEventManager;
@@ -77,17 +75,12 @@ public class PTAssistantPlugin extends Plugin {
         OsmValidator.addTest(BicycleFootRouteValidatorTest.class);
 
         // "Public Transport" menu
-        MainMenu menu = MainApplication.getMenu();
-        JMenu PublicTransportMenu = menu.addMenu("File", trc("menu", "Public Transport"), KeyEvent.VK_P, 5, ht("/Menu/Public Transport"));
-        // Menu items for public transport layer in "data" menu
-        MainMenu.add(menu.dataMenu, new PublicTransportLayer.AddLayerAction());
-        MainMenu.add(menu.dataMenu, new DistanceBetweenStops());
-        // Menu items for CustomizePublicTransportStop in "tools" menu
-        MainMenu.add(menu.toolsMenu, CustomizeStopAction.createCustomizeStopAction());
+        JMenu PublicTransportMenu = MainApplication.getMenu()
+            .addMenu("File", trc("menu", "Public Transport"), KeyEvent.VK_P, 5, ht("/Menu/Public Transport"));
+        addToMenu(PublicTransportMenu);
 
         SelectionEventManager.getInstance().addSelectionListener(PTAssistantLayerManager.PTLM);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(PTAssistantLayerManager.PTLM);
-        addToPTAssistantmenu(PublicTransportMenu);
         initialiseWizard();
         initialiseShorcutsForCreatePlatformNode();
         addButtonsToRelationEditor();
@@ -149,13 +142,17 @@ public class PTAssistantPlugin extends Plugin {
         highlightedRelations.clear();
     }
 
-    private void addToPTAssistantmenu(JMenu PublicTransportMenu) {
-        MainMenu.add(PublicTransportMenu, new SplitRoundaboutAction());
-        MainMenu.add(PublicTransportMenu, new CreatePlatformNodeAction());
-        MainMenu.add(PublicTransportMenu, new SortPTRouteMembersMenuBar());
-        Component sep = new JPopupMenu.Separator();
-        PublicTransportMenu.add(sep);
-        MainMenu.add(PublicTransportMenu, new PTWizardAction());
+    private void addToMenu(JMenu menu) {
+        MainMenu.add(menu, new SplitRoundaboutAction());
+        MainMenu.add(menu, new CreatePlatformNodeAction());
+        MainMenu.add(menu, new SortPTRouteMembersMenuBar());
+        menu.addSeparator();
+        MainMenu.add(menu, new PTWizardAction());
+        menu.addSeparator();
+        MainMenu.add(menu, new PublicTransportLayer.AddLayerAction());
+        MainMenu.add(menu, new DistanceBetweenStops());
+        menu.addSeparator();
+        MainMenu.add(menu, CustomizeStopAction.createCustomizeStopAction());
     }
 
     private static void initialiseWizard() {
