@@ -32,11 +32,6 @@ import org.openstreetmap.josm.tools.Logging;
 public class CustomizeStopAreaOperation extends StopAreaOperationBase {
 
     /**
-     * Operation name in undo list
-     */
-    private static final String TAG_ASSIGN_COMMAND_NAME = "Stop area tag assign";
-
-    /**
      * Constructor of operation object
      *
      * @param currentDataSet Current Josm data set
@@ -570,7 +565,7 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
         List<Command> commands = customize(stopArea);
         if (commands != null && !commands.isEmpty())
             try {
-                UndoRedoHandler.getInstance().add(new SequenceCommand(tr(TAG_ASSIGN_COMMAND_NAME), commands));
+                UndoRedoHandler.getInstance().add(new SequenceCommand(tr("Stop area tag assign"), commands));
                 return stopArea;
             } catch (Exception ex) {
                 Logging.error(ex);

@@ -2,6 +2,7 @@
 package org.openstreetmap.josm.plugins.customizepublictransportstop;
 
 import static org.openstreetmap.josm.gui.help.HelpUtil.ht;
+import static org.openstreetmap.josm.tools.I18n.marktr;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.event.ActionEvent;
@@ -18,17 +19,9 @@ import org.openstreetmap.josm.tools.Shortcut;
 public class CustomizeStopAction extends JosmAction implements IStopAreaCustomizer {
 
     /**
-     * Menu icon file name
-     */
-    private static final String CUSTOMIZE_STOP_ACTION_ICON_NAME = "bus.png";
-    /**
-     * Menu item tooltip
-     */
-    private static final String CUSTOMIZE_STOP_ACTION_MENU_TOOLTIP = "Customize stop under osm public transit standard v2";
-    /**
      * Menu item caption
      */
-    private static final String CUSTOMIZE_STOP_ACTION_MENU_NAME = "Customize stop";
+    private static final String ACTION_NAME = marktr("Customize stop");
     /**
      * Serialization UID
      */
@@ -56,10 +49,10 @@ public class CustomizeStopAction extends JosmAction implements IStopAreaCustomiz
     public static CustomizeStopAction createCustomizeStopAction() {
         // CHECKSTYLE.OFF: LineLength
         CustomizeStopAction action = new CustomizeStopAction(
-            tr(CUSTOMIZE_STOP_ACTION_MENU_NAME),
-            CUSTOMIZE_STOP_ACTION_ICON_NAME,
-            tr(CUSTOMIZE_STOP_ACTION_MENU_TOOLTIP),
-            Shortcut.registerShortcut("tools:customizestop", tr("Tool: {0}", tr(CUSTOMIZE_STOP_ACTION_MENU_NAME)), KeyEvent.VK_U, Shortcut.DIRECT),
+            tr(ACTION_NAME),
+            "bus.png",
+            tr("Customize stop under osm public transit standard v2"),
+            Shortcut.registerShortcut("tools:customizestop", tr("Tool: {0}", tr(ACTION_NAME)), KeyEvent.VK_U, Shortcut.DIRECT),
             true
         );
         action.putValue("help", ht("/Action/CustomizeStopAction"));

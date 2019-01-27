@@ -55,12 +55,12 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
     private static final String NAME_EN_CAPTION = I18n.marktr("Name (en.)");
     // i18n: label for the tag name=*
     private static final String NAME_CAPTION = I18n.marktr("Name");
-    private static final String STOP_CUSTOMIZING_DIALOG_CAPTION = "Stop customizing";
-    public static final String LONG_DISTANCE_NETWORK_CAPTION = "Long distance";
-    public static final String REGIONAL_NETWORK_CAPTION = "Regional";
-    public static final String COMMUTER_NETWORK_CAPTION = "Commuter";
-    public static final String CITY_NETWORK_CAPTION = "City transport";
-    public static final String HIGH_SPEED_NETWORK_CAPTION = "High speed";
+    private static final String STOP_CUSTOMIZING_DIALOG_CAPTION = I18n.marktr("Stop customizing");
+    private static final String LONG_DISTANCE_NETWORK_CAPTION = I18n.marktr("Long distance");
+    private static final String REGIONAL_NETWORK_CAPTION = I18n.marktr("Regional");
+    private static final String COMMUTER_NETWORK_CAPTION = I18n.marktr("Commuter");
+    private static final String CITY_NETWORK_CAPTION = I18n.marktr("City transport");
+    private static final String HIGH_SPEED_NETWORK_CAPTION = I18n.marktr("High speed");
 
     private String[] serviceCaptionStrings = {CITY_NETWORK_CAPTION, COMMUTER_NETWORK_CAPTION, REGIONAL_NETWORK_CAPTION,
             LONG_DISTANCE_NETWORK_CAPTION, HIGH_SPEED_NETWORK_CAPTION};

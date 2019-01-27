@@ -1,6 +1,7 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
+import static org.openstreetmap.josm.tools.I18n.marktr;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.event.ActionEvent;
@@ -58,7 +59,7 @@ import org.openstreetmap.josm.tools.Utils;
  */
 public class SplitRoundaboutAction extends JosmAction {
 
-    private static final String ACTION_NAME = "Split Roundabout";
+    private static final String ACTION_NAME = marktr("Split Roundabout");
     private static final long serialVersionUID = 8912249304286025356L;
     private Map<Relation, Relation> changingRelations;
 
@@ -66,7 +67,7 @@ public class SplitRoundaboutAction extends JosmAction {
      * Creates a new SplitRoundaboutAction
      */
     public SplitRoundaboutAction() {
-        super(ACTION_NAME, "icons/splitroundabout", ACTION_NAME, null, true);
+        super(tr(ACTION_NAME), "icons/splitroundabout", tr(ACTION_NAME), null, true);
     }
 
     @Override
@@ -171,7 +172,7 @@ public class SplitRoundaboutAction extends JosmAction {
             commands.add(new ChangeCommand(oldR, newR));
         });
 
-        return new SequenceCommand("Updating Relations for SplitRoundabout", commands);
+        return new SequenceCommand(ACTION_NAME, commands);
     }
 
     private Map<Relation, Relation> updateRelations(Map<Relation, List<Integer>> savedPositions, List<Node> splitNodes,
@@ -197,7 +198,7 @@ public class SplitRoundaboutAction extends JosmAction {
 
             if (entryWay == null || exitWay == null) {
                 openEditorsWithErrors(r,
-                        "The roundabout is not directly connected to either of the previous or next way in the relation", changingRelation);
+                        tr("The roundabout is not directly connected to either of the previous or next way in the relation"), changingRelation);
                 return;
             }
 
@@ -207,7 +208,7 @@ public class SplitRoundaboutAction extends JosmAction {
 
             if (entryNode == null || exitNode == null) {
                 openEditorsWithErrors(r,
-                        "The roundabout is not directly connected to either of the previous or next way in the relation", changingRelation);
+                        tr("The roundabout is not directly connected to either of the previous or next way in the relation"), changingRelation);
                 return;
             }
 
@@ -254,7 +255,7 @@ public class SplitRoundaboutAction extends JosmAction {
             List<Way> parents = filterParents(entryNode.getParentWays(), entryWay, entryNode);
 
             if (parents.size() == 0) {
-                openEditorsWithErrors(r, "Error in roundabout", changingRelation);
+                openEditorsWithErrors(r, tr("Error in roundabout"), changingRelation);
                 return;
             }
 
@@ -266,7 +267,7 @@ public class SplitRoundaboutAction extends JosmAction {
                             || exitWay.hasTag("bicycle", "no", "use_sideway")
                             || beforeEntryWay.hasTag("bicycle", "no", "use_sideway")
                             || afterExitWay.hasTag("bicycle", "no", "use_sideway")) {
-                        openEditorsWithErrors(r, "Error: The paths connecting the roundabout in the relation do not allow bicycles.",
+                        openEditorsWithErrors(r, tr("Error: The paths connecting the roundabout in the relation do not allow bicycles."),
                                 changingRelation);
                         return;
                     }
@@ -574,7 +575,7 @@ public class SplitRoundaboutAction extends JosmAction {
             commands.add(new ChangeCommand(r, c));
         });
 
-        return new SequenceCommand("Remove roundabout from relations", commands);
+        return new SequenceCommand(tr("Remove roundabout from relations"), commands);
     }
 
     // save the position of the roundabout inside each public transport route

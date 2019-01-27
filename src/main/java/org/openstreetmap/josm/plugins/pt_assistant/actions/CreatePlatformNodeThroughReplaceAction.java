@@ -2,6 +2,7 @@
 
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
+import static org.openstreetmap.josm.tools.I18n.marktr;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.MouseInfo;
@@ -48,7 +49,7 @@ import org.openstreetmap.josm.tools.Shortcut;
  */
 public class CreatePlatformNodeThroughReplaceAction extends JosmAction {
 
-    private static final String ACTION_NAME = "Shortcut action to Transfer details of stop to platform node";
+    private static final String ACTION_NAME = marktr("Shortcut action to Transfer details of stop to platform node");
     protected final OsmTransferHandler transferHandler;
 
     /**
@@ -57,9 +58,9 @@ public class CreatePlatformNodeThroughReplaceAction extends JosmAction {
     public CreatePlatformNodeThroughReplaceAction() {
         // CHECKSTYLE.OFF: LineLength
         super(
-            ACTION_NAME,
+            tr(ACTION_NAME),
             null,
-            ACTION_NAME,
+            tr(ACTION_NAME),
             Shortcut.registerShortcut("tools:createplatformthruoghreplace", "Tool: CreatePlatformNodeThroughReplaceAction", KeyEvent.VK_G, Shortcut.SHIFT),
             false
         );
