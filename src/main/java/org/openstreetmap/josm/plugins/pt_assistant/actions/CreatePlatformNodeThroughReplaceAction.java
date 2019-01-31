@@ -10,7 +10,6 @@ import java.awt.PointerInfo;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,16 +26,22 @@ import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.OsmData;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.RelationToChildReference;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
+import org.openstreetmap.josm.gui.Notification;
 import org.openstreetmap.josm.gui.datatransfer.OsmTransferHandler;
 import org.openstreetmap.josm.gui.datatransfer.PrimitiveTransferable;
 import org.openstreetmap.josm.gui.datatransfer.data.PrimitiveTransferData;
+import org.openstreetmap.josm.gui.layer.OsmDataLayer;
+import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
+import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPlugin;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
+import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.MultiMap;
 import org.openstreetmap.josm.tools.Shortcut;
 
@@ -73,31 +78,36 @@ public class CreatePlatformNodeThroughReplaceAction extends JosmAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Collection<OsmPrimitive> selection = getLayerManager().getEditDataSet().getSelected();
+        final OsmDataLayer editLayer = getLayerManager().getEditLayer();
+        if (editLayer != null) {
+            final Optional<Node> stopPositionNode = Optional.ofNullable(editLayer.getDataSet()) // dataset
+                .map(OsmData::getSelected) // selection
+                .filter(it -> it.size() == 1) // only when exactly one primitive
+                .map(it -> it.iterator().next()) // get first and only one
+                .map(it -> it instanceof Node ? (Node) it : null) // only if it's a node
+                .filter(StopUtils::isHighwayOrRailwayStopPosition); // only if it's a stop position
+            if (stopPositionNode.isPresent()) {
+                transferHandler.pasteOn(
+                    editLayer,
+                    computePastePosition(e),
+                    new PrimitiveTransferable(PrimitiveTransferData.getDataWithReferences(Collections.singleton(stopPositionNode.get())))
+                );
 
-        final Optional<Node> stopPositionNode = selection.stream()
-            .map(it -> it instanceof Node ? (Node) it : null)
-            .filter(StopUtils::isHighwayOrRailwayStopPosition)
-            .reduce((a, b) -> b); // equivalent to a `findLast()` method if that would exist
-
-        if (stopPositionNode.isPresent() && selection.size() == 1) {
-            PrimitiveTransferData data = PrimitiveTransferData.getDataWithReferences(selection);
-            transferHandler.pasteOn(
-                getLayerManager().getEditLayer(),
-                computePastePosition(e),
-                new PrimitiveTransferable(data)
-            );
-            Collection<OsmPrimitive> newSelection = getLayerManager().getEditDataSet().getSelected();
-
-            final Optional<Node> newNode = newSelection.stream()
-                .map(it -> it instanceof Node ? (Node) it : null)
-                .filter(Objects::nonNull)
-                .reduce((a, b) -> b);
-
-            newNode.ifPresent(node -> modify(node, stopPositionNode.get()));
+                Optional.ofNullable(editLayer.getDataSet())
+                    .map(OsmData::getSelected)
+                    .flatMap(newSelection ->
+                        newSelection.stream()
+                            .map(primitive -> primitive instanceof Node ? (Node) primitive : null)
+                            .filter(Objects::nonNull)
+                            .reduce((a, b) -> b) // equivalent to a `findLast()` method if that would exist
+                    )
+                    .ifPresent(node -> modify(node, stopPositionNode.get()));
+            } else {
+                new Notification(I18n.tr("This action can only be performed if exactly one stop position node is selected."))
+                    .setIcon(PTAssistantPlugin.ICON.get())
+                    .show();
+            }
         }
-
-
 
         // try {
         // MainApplication.undoRedo.add(new DeleteCommand(stopPositionNode));
@@ -132,14 +142,14 @@ public class CreatePlatformNodeThroughReplaceAction extends JosmAction {
 
     public void modify(Node newNode, Node stopPositionNode) {
 
-        if (stopPositionNode.hasTag("railway")) {
-            newNode.put("tram", "yes");
-            newNode.put("railway", "tram_stop");
-            newNode.remove("public_transport");
-            newNode.put("public_transport", "platform");
+        if (stopPositionNode.hasTag(OSMTags.RAILWAY_TAG)) {
+            newNode.put(OSMTags.TRAM_TAG, OSMTags.YES_TAG_VALUE);
+            newNode.put(OSMTags.RAILWAY_TAG, OSMTags.TRAM_STOP_TAG_VALUE);
+            newNode.remove(OSMTags.PUBLIC_TRANSPORT_TAG);
+            newNode.put(OSMTags.PUBLIC_TRANSPORT_TAG, OSMTags.PLATFORM_TAG_VALUE);
 
             List<Command> commands = getReplaceGeometryCommand(stopPositionNode, newNode);
-            if (commands.size() > 0) {
+            if (!commands.isEmpty()) {
                 UndoRedoHandler.getInstance().add(new SequenceCommand(tr("Replace Membership"), commands));
             }
 
@@ -147,14 +157,14 @@ public class CreatePlatformNodeThroughReplaceAction extends JosmAction {
             tags.replaceAll((key, value) -> null);
             UndoRedoHandler.getInstance().add(new ChangePropertyCommand(Collections.singleton(stopPositionNode), tags));
 
-        } else if (stopPositionNode.hasTag("highway")) {
-            newNode.put("bus", "yes");
-            newNode.put("highway", "bus_stop");
-            newNode.remove("public_transport");
-            newNode.put("public_transport", "platform");
+        } else if (stopPositionNode.hasTag(OSMTags.HIGHWAY_TAG)) {
+            newNode.put(OSMTags.BUS_TAG, OSMTags.YES_TAG_VALUE);
+            newNode.put(OSMTags.HIGHWAY_TAG, OSMTags.BUS_STOP_TAG_VALUE);
+            newNode.remove(OSMTags.PUBLIC_TRANSPORT_TAG);
+            newNode.put(OSMTags.PUBLIC_TRANSPORT_TAG, OSMTags.PLATFORM_TAG_VALUE);
 
             List<Command> commands = getReplaceGeometryCommand(stopPositionNode, newNode);
-            if (commands.size() > 0) {
+            if (!commands.isEmpty()) {
                 UndoRedoHandler.getInstance().add(new SequenceCommand(tr("Replace Membership"), commands));
             }
 
@@ -176,7 +186,7 @@ public class CreatePlatformNodeThroughReplaceAction extends JosmAction {
             final Relation oldRelation = i.getKey();
             final Relation newRelation = new Relation(oldRelation);
             for (final RelationToChildReference reference : i.getValue()) {
-                newRelation.setMember(reference.getPosition(), new RelationMember("platform", secondObject));
+                newRelation.setMember(reference.getPosition(), new RelationMember(OSMTags.PLATFORM_ROLE, secondObject));
             }
             commands.add(new ChangeCommand(oldRelation, newRelation));
         }
