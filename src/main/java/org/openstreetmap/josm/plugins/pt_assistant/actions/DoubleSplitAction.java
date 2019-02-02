@@ -74,9 +74,6 @@ import org.openstreetmap.josm.tools.RightAndLefthandTraffic;
  */
 public class DoubleSplitAction extends MapMode implements KeyListener {
 
-    // i18n: name of the `DoubleSplitAction` map mode
-    private static final String MAP_MODE_NAME = I18n.marktr("Double Split");
-
     private transient Set<OsmPrimitive> newHighlights = new HashSet<>();
     private transient Set<OsmPrimitive> oldHighlights = new HashSet<>();
     private List<Node> atNodes = new ArrayList<>();
@@ -95,7 +92,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
      * Creates a new DoubleSplitAction
      */
     public DoubleSplitAction() {
-        super(tr(MAP_MODE_NAME), "logo_double_split", tr(MAP_MODE_NAME), null, getCursor());
+        super(tr("Double Split"), "logo_double_split", tr("Double Split"), null, getCursor());
         cursorJoinNode = ImageProvider.getCursor("crosshair", "joinnode");
         cursorJoinWay = ImageProvider.getCursor("crosshair", "joinway");
 

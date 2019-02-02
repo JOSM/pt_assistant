@@ -1,7 +1,6 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
-import static org.openstreetmap.josm.tools.I18n.marktr;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.event.ActionEvent;
@@ -59,7 +58,6 @@ import org.openstreetmap.josm.tools.Utils;
  */
 public class SplitRoundaboutAction extends JosmAction {
 
-    private static final String ACTION_NAME = marktr("Split Roundabout");
     private static final long serialVersionUID = 8912249304286025356L;
     private Map<Relation, Relation> changingRelations;
 
@@ -67,7 +65,7 @@ public class SplitRoundaboutAction extends JosmAction {
      * Creates a new SplitRoundaboutAction
      */
     public SplitRoundaboutAction() {
-        super(tr(ACTION_NAME), "icons/splitroundabout", tr(ACTION_NAME), null, true);
+        super(tr("Split Roundabout"), "icons/splitroundabout", tr("Split Roundabout"), null, true);
     }
 
     @Override
@@ -172,7 +170,7 @@ public class SplitRoundaboutAction extends JosmAction {
             commands.add(new ChangeCommand(oldR, newR));
         });
 
-        return new SequenceCommand(ACTION_NAME, commands);
+        return new SequenceCommand("Split Roundabout", commands);
     }
 
     private Map<Relation, Relation> updateRelations(Map<Relation, List<Integer>> savedPositions, List<Node> splitNodes,

@@ -1,7 +1,6 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
-import static org.openstreetmap.josm.tools.I18n.marktr;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.event.ActionEvent;
@@ -24,7 +23,6 @@ import org.openstreetmap.josm.tools.Shortcut;
  */
 public class EditHighlightedRelationsAction extends JosmAction {
 
-    private static final String ACTION_NAME = marktr("Edit Highlighted Relation");
     private static final long serialVersionUID = 2681464946469047054L;
 
     /**
@@ -33,10 +31,10 @@ public class EditHighlightedRelationsAction extends JosmAction {
     public EditHighlightedRelationsAction() {
         // CHECKSTYLE.OFF: LineLength
         super(
-            tr(ACTION_NAME),
+            tr("Edit Highlighted Relation"),
             new ImageProvider("dialogs", "edit"),
-            tr(ACTION_NAME),
-            Shortcut.registerShortcut("Edit Highlighted Relation", tr(ACTION_NAME), KeyEvent.VK_K, Shortcut.ALT),
+            tr("Edit Highlighted Relation"),
+            Shortcut.registerShortcut("Edit Highlighted Relation", tr("Edit Highlighted Relation"), KeyEvent.VK_K, Shortcut.ALT),
             false,
             "editHighlightedRelations",
             false

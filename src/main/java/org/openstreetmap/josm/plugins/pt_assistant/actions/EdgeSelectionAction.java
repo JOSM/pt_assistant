@@ -28,7 +28,6 @@ import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayer;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
-import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Shortcut;
 
@@ -41,8 +40,6 @@ import org.openstreetmap.josm.tools.Shortcut;
  */
 public class EdgeSelectionAction extends MapMode {
 
-    // i18n: name of the `EdgeSelectionAction` map mode
-    private static final String MAP_MODE_NAME = I18n.marktr("Edge Selection");
     private static final long serialVersionUID = 2414977774504904238L;
 
     private static final Cursor SELECTION_CURSOR = ImageProvider.getCursor("normal", "selection");
@@ -56,10 +53,10 @@ public class EdgeSelectionAction extends MapMode {
     public EdgeSelectionAction() {
         // CHECKSTYLE.OFF: LineLength
         super(
-            tr(MAP_MODE_NAME),
+            tr("Edge Selection"),
             "edgeSelection",
-            tr(MAP_MODE_NAME),
-            Shortcut.registerShortcut("mapmode:edge_selection", tr("Mode: {0}", tr(MAP_MODE_NAME)), KeyEvent.VK_K, Shortcut.CTRL),
+            tr("Edge Selection"),
+            Shortcut.registerShortcut("mapmode:edge_selection", tr("Mode: {0}", tr("Edge Selection")), KeyEvent.VK_K, Shortcut.CTRL),
             SELECTION_CURSOR
         );
         // CHECKSTYLE.ON: LineLength

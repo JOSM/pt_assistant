@@ -35,7 +35,6 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
-import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Shortcut;
 
@@ -46,9 +45,6 @@ import org.openstreetmap.josm.tools.Shortcut;
  * @author giacomo
  */
 public class AddStopPositionAction extends MapMode {
-
-    // i18n: name of the `AddStopPositionAction` map mode
-    private static final String MAP_MODE_NAME = I18n.marktr("Add stop position");
 
     private static final String CROSSHAIR_IMAGE_FILENAME = "crosshair";
     private static final Cursor CURSOR_JOIN_NODE = ImageProvider.getCursor(CROSSHAIR_IMAGE_FILENAME, "joinnode");
@@ -65,10 +61,10 @@ public class AddStopPositionAction extends MapMode {
     public AddStopPositionAction() {
         // CHECKSTYLE.OFF: LineLength
         super(
-            tr(MAP_MODE_NAME),
+            tr("Add stop position"),
             "bus",
-            tr(MAP_MODE_NAME),
-            Shortcut.registerShortcut("mapmode:stop_position", tr("Mode: {0}", tr(MAP_MODE_NAME)), KeyEvent.VK_K, Shortcut.CTRL_SHIFT),
+            tr("Add stop position"),
+            Shortcut.registerShortcut("mapmode:stop_position", tr("Mode: {0}", tr("Add stop position")), KeyEvent.VK_K, Shortcut.CTRL_SHIFT),
             getCursor()
         );
         // CHECKSTYLE.ON: LineLength

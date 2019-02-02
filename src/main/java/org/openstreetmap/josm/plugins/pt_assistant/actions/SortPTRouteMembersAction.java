@@ -47,7 +47,6 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
-import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
@@ -61,7 +60,6 @@ import org.openstreetmap.josm.tools.Utils;
  */
 public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
-    private static final String ACTION_NAME = I18n.marktr("Sort PT Route Members Relation Editor");
     private GenericRelationEditor editor = null;
 
     /**
@@ -71,7 +69,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
      */
     public SortPTRouteMembersAction(IRelationEditorActionAccess editorAccess) {
         super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
-        putValue(ACTION_NAME, tr(ACTION_NAME));
+        putValue(SHORT_DESCRIPTION, tr("Sort PT Route Members Relation Editor"));
         new ImageProvider("icons", "sortptroutemembers").getResource().attachImageIcon(this, true);
 
         editor = (GenericRelationEditor) editorAccess.getEditor();

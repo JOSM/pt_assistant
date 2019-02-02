@@ -2,7 +2,6 @@
 
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
-import static org.openstreetmap.josm.tools.I18n.marktr;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.Dimension;
@@ -57,8 +56,6 @@ import org.openstreetmap.josm.tools.UserCancelException;
  */
 public class CreatePlatformNodeAction extends JosmAction {
 
-    private static final String ACTION_NAME = marktr("Transfer details of stop to platform node");
-
     private Node dummy1;
     private Node dummy2;
     private Node dummy3;
@@ -68,7 +65,7 @@ public class CreatePlatformNodeAction extends JosmAction {
      * Creates a new PlatformAction
      */
     public CreatePlatformNodeAction() {
-        super(tr(ACTION_NAME), "icons/transfertags", tr(ACTION_NAME), null, true);
+        super(tr("Transfer details of stop to platform node"), "icons/transfertags", tr("Transfer details of stop to platform node"), null, true);
     }
 
     @Override

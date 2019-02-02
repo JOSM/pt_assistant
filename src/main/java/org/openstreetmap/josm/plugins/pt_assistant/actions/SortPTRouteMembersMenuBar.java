@@ -34,13 +34,11 @@ import org.openstreetmap.josm.tools.Utils;
  */
 public class SortPTRouteMembersMenuBar extends JosmAction {
 
-    private static final String ACTION_NAME = I18n.marktr("Sort PT Route Members");
-
     /**
      * Creates a new SortPTRouteMembersAction
      */
     public SortPTRouteMembersMenuBar() {
-        super(I18n.tr(ACTION_NAME), "icons/sortptroutemembers", I18n.tr(ACTION_NAME), null, true);
+        super(tr("Sort PT Route Members"), "icons/sortptroutemembers", tr("Sort PT Route Members"), null, true);
     }
 
     @Override

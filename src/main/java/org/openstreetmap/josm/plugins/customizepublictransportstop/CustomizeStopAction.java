@@ -2,7 +2,6 @@
 package org.openstreetmap.josm.plugins.customizepublictransportstop;
 
 import static org.openstreetmap.josm.gui.help.HelpUtil.ht;
-import static org.openstreetmap.josm.tools.I18n.marktr;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.event.ActionEvent;
@@ -18,10 +17,6 @@ import org.openstreetmap.josm.tools.Shortcut;
  */
 public class CustomizeStopAction extends JosmAction implements IStopAreaCustomizer {
 
-    /**
-     * Menu item caption
-     */
-    private static final String ACTION_NAME = marktr("Customize stop");
     /**
      * Serialization UID
      */
@@ -49,10 +44,10 @@ public class CustomizeStopAction extends JosmAction implements IStopAreaCustomiz
     public static CustomizeStopAction createCustomizeStopAction() {
         // CHECKSTYLE.OFF: LineLength
         CustomizeStopAction action = new CustomizeStopAction(
-            tr(ACTION_NAME),
+            tr("Customize stop"),
             "bus.png",
             tr("Customize stop under osm public transit standard v2"),
-            Shortcut.registerShortcut("tools:customizestop", tr("Tool: {0}", tr(ACTION_NAME)), KeyEvent.VK_U, Shortcut.DIRECT),
+            Shortcut.registerShortcut("tools:customizestop", tr("Tool: {0}", tr("Customize stop")), KeyEvent.VK_U, Shortcut.DIRECT),
             true
         );
         action.putValue("help", ht("/Action/CustomizeStopAction"));
