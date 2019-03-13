@@ -213,7 +213,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             curRel != null && setEnable &&
             (
                 (curRel.hasTag("route", "bus") && curRel.hasTag("public_transport:version", "2")) ||
-                (RouteUtils.isPTRoute(curRel) && !curRel.hasTag("route", "bus")) || (curRel.hasTag("route", "bicycle"))
+                (RouteUtils.isPTRoute(curRel) && !curRel.hasTag("route", "bus")) 
             )
         );
     }
