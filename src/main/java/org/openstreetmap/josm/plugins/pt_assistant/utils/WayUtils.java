@@ -92,4 +92,28 @@ public final class WayUtils {
                 )
             );
     }
+    public static boolean isSuitableForBicycle(Way way) {
+        return
+            way.hasTag(
+                "highway",
+                "trunk", "primary", "secondary", "tertiary",
+                "unclassified", "road", "residential", "service", "trunk_link", "primary_link",
+                "secondary_link", "tertiary_link", "living_street", "bus_guideway", "road"
+            )
+            || way.hasTag(
+                "cycleway",
+                "share_busway", "shared_lane"
+            )
+            || (
+                way.hasTag("highway", "pedestrian")
+            )
+            ||
+              way.hasTag(
+                  "cycleway"
+              );
+//            ||(
+//            way.hasTag("bicycle", "yes", "designated")
+//            );
+      }
+
 }

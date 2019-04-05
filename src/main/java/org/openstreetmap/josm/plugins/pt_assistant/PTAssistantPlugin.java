@@ -28,6 +28,7 @@ import org.openstreetmap.josm.plugins.Plugin;
 import org.openstreetmap.josm.plugins.PluginInformation;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.CustomizeStopAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.AddStopPositionAction;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.BicycleRoutingHelper;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.CreatePlatformNodeAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.CreatePlatformNodeThroughReplaceAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.CreatePlatformShortcutAction;
@@ -192,7 +193,19 @@ public class PTAssistantPlugin extends Plugin {
                 return Arrays.asList(new SortPTRouteMembersAction(editorAccess));
             }
         };
+        IRelationEditorActionGroup group3 = new IRelationEditorActionGroup() {
+            @Override
+            public int order() {
+                    return 20;
+               }
+
+            @Override
+            public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
+                return Arrays.asList(new BicycleRoutingHelper(editorAccess));
+            }
+        };
         RelationEditorHooks.addActionsToMembers(group1);
         RelationEditorHooks.addActionsToMembers(group2);
+        RelationEditorHooks.addActionsToMembers(group3);
     }
 }
