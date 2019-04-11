@@ -14,6 +14,7 @@ import org.openstreetmap.josm.data.validation.Severity;
 import org.openstreetmap.josm.data.validation.Test;
 import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
+import org.openstreetmap.josm.tools.Utils;
 
 /**
  * Performs tests of the stop area relations
@@ -89,7 +90,7 @@ public class StopChecker extends Checker {
             if (StopUtils.isStopPosition(member)) {
 
                 // Create a list of assigned route relations
-                for (Relation referrer : OsmPrimitive.getFilteredList(member.getReferrers(), Relation.class)) {
+                for (Relation referrer : Utils.filteredCollection(member.getReferrers(), Relation.class)) {
                     if (referrer.get("type") == "route") {
                         stopPositionRelationIds.put(referrer.getId(), referrer.getId());
                     }
@@ -98,7 +99,7 @@ public class StopChecker extends Checker {
             } else if (StopUtils.verifyStopAreaPlatform(member)) {
 
                 // Create a list of assigned route relations
-                for (Relation referrer : OsmPrimitive.getFilteredList(member.getReferrers(), Relation.class)) {
+                for (Relation referrer : Utils.filteredCollection(member.getReferrers(), Relation.class)) {
                     if (referrer.get("type") == "route") {
                         platformRelationIds.put(referrer.getId(), referrer.getId());
                     }
