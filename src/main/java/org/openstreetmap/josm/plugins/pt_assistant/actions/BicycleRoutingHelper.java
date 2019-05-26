@@ -224,6 +224,7 @@ public class BicycleRoutingHelper extends AbstractRelationEditorAction {
             new Notification(tr("Downloading incomplete relation members. Kindly wait till download gets over."))
                     .setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(3600).show();
         } else {
+        	System.out.println("you have clicked the button");
             initialise();
         }
     }
@@ -330,6 +331,8 @@ public class BicycleRoutingHelper extends AbstractRelationEditorAction {
             int j = getNextWayIndex(i);
             if (j >= members.size()) {
                 deleteExtraWays();
+                System.out.println("I am exit:"+j);
+                System.out.println("member size:"+members.size());
                 return;
             }
 
@@ -502,6 +505,8 @@ public class BicycleRoutingHelper extends AbstractRelationEditorAction {
             if (members.get(i).isWay()) {
                 waysAlreadyPresent.put(members.get(i).getWay(), 1);
                 ways.add(members.get(i).getWay());
+                Way w = members.get(i).getWay();
+                w.toString();
             }
         }
         return ways;

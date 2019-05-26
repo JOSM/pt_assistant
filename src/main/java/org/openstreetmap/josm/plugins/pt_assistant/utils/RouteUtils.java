@@ -250,7 +250,6 @@ public final class RouteUtils {
      * @return {@code true} if this way is suitable for public transport
      */
     public static boolean isWaySuitableForPublicTransport(Way way) {
-
         String[] acceptedRailwayTags = new String[] {
                 "tram", "subway", "light_rail", "rail"};
 
@@ -284,7 +283,6 @@ public final class RouteUtils {
         if (r == null) {
             return false;
         }
-
         return r.hasTag(OSMTags.KEY_ROUTE, "foot", "walking", "hiking");
     }
 
