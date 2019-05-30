@@ -213,7 +213,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             curRel != null && setEnable &&
             (
                 (curRel.hasTag("route", "bus") && curRel.hasTag("public_transport:version", "2")) ||
-                (RouteUtils.isPTRoute(curRel) && !curRel.hasTag("route", "bus")) 
+                (RouteUtils.isPTRoute(curRel) && !curRel.hasTag("route", "bus"))
             )
         );
     }
@@ -675,8 +675,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         List<Relation> r1;
         List<Relation> r2;
         try {
-            r1 = OsmPrimitive.getFilteredList(current.getReferrers(), Relation.class);
-            r2 = OsmPrimitive.getFilteredList(next.getReferrers(), Relation.class);
+            r1 = new ArrayList<>(Utils.filteredCollection(current.getReferrers(), Relation.class));
+            r2 = new ArrayList<>(Utils.filteredCollection(next.getReferrers(), Relation.class));
         } catch (Exception e) {
             return list;
         }

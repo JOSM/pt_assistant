@@ -47,6 +47,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.PTProperties;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.UserCancelException;
+import org.openstreetmap.josm.tools.Utils;
 
 /**
  * Sorts the stop positions in a PT route according to the assigned ways
@@ -287,7 +288,7 @@ public class CreatePlatformNodeAction extends JosmAction {
 
     private List<Relation> removeWayFromRelationsCommand(Way way) {
         List<Command> commands = new ArrayList<>();
-        List<Relation> referrers = OsmPrimitive.getFilteredList(way.getReferrers(), Relation.class);
+        List<Relation> referrers = new ArrayList<>(Utils.filteredCollection(way.getReferrers(), Relation.class));
         List<Relation> parentStopAreaRelation = new ArrayList<>();
         referrers.forEach(r -> {
             if (StopUtils.isStopArea(r)) {
@@ -306,7 +307,7 @@ public class CreatePlatformNodeAction extends JosmAction {
     private Map<Relation, List<Integer>> getSavedPositions(Way way) {
 
         Map<Relation, List<Integer>> savedPositions = new HashMap<>();
-        List<Relation> referrers = OsmPrimitive.getFilteredList(way.getReferrers(), Relation.class);
+        List<Relation> referrers = new ArrayList<>(Utils.filteredCollection(way.getReferrers(), Relation.class));
 
         for (Relation curr : referrers) {
             for (int j = 0; j < curr.getMembersCount(); j++) {
@@ -325,7 +326,7 @@ public class CreatePlatformNodeAction extends JosmAction {
             Way platformWay, List<Relation> parentStopAreaRelation) {
         Map<Relation, Relation> changingRelation = new HashMap<>();
         Map<Relation, Integer> memberOffset = new HashMap<>();
-        List<Relation> referrers = OsmPrimitive.getFilteredList(platformNode.getReferrers(), Relation.class);
+        List<Relation> referrers = new ArrayList<>(Utils.filteredCollection(platformNode.getReferrers(), Relation.class));
 
         savedPositions.forEach((r, positions) -> positions.forEach(i -> {
             if (!changingRelation.containsKey(r))

@@ -4,6 +4,7 @@ package org.openstreetmap.josm.plugins.pt_assistant.utils;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
+import org.openstreetmap.josm.tools.Utils;
 
 /**
  * Utils class for stop areas
@@ -69,12 +70,8 @@ public final class StopUtils {
      * @return true if the object part of stop area relation, false otherwise.
      */
     public static boolean verifyIfMemberOfStopArea(final OsmPrimitive member) {
-        for (Relation parentRelation : OsmPrimitive.getFilteredList(member.getReferrers(), Relation.class)) {
-            if (StopUtils.isStopArea(parentRelation)) {
-                return true;
-            }
-        }
-        return false;
+        return Utils.filteredCollection(member.getReferrers(), Relation.class).stream()
+        		.anyMatch(StopUtils::isStopArea);
     }
 
 }

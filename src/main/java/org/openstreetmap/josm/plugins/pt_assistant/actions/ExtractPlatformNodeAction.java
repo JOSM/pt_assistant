@@ -32,6 +32,7 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.Notification;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 import org.openstreetmap.josm.tools.Shortcut;
+import org.openstreetmap.josm.tools.Utils;
 
 /**
  * Extracts node from its ways and adds the public transport tags to it.
@@ -62,7 +63,7 @@ public class ExtractPlatformNodeAction extends JosmAction {
     public void actionPerformed(ActionEvent e) {
         DataSet ds = getLayerManager().getEditDataSet();
         Collection<OsmPrimitive> selection = ds.getSelected();
-        List<Node> selectedNodes = OsmPrimitive.getFilteredList(selection, Node.class);
+        List<Node> selectedNodes = new ArrayList<>(Utils.filteredCollection(selection, Node.class));
         if (selectedNodes.size() != 1) {
             new Notification(tr("This action requires single node to be selected."))
                 .setIcon(JOptionPane.WARNING_MESSAGE)

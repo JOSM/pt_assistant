@@ -98,7 +98,8 @@ public class Bicycle extends AbstractRelationEditorAction{
       new Color(255, 127,0, 150),//ORANGE 5
       new Color(148, 0, 211, 150),//VIOLET 6
       new Color(255, 255, 255, 150),//WHITE 7
-      new Color(169, 169, 169, 210)//GREY 8
+      new Color(169, 169, 169, 210),//GREY 8
+      new Color(239, 167, 222,220)
   };
 
   ////////////////Mapping options with colors////////////
@@ -120,7 +121,7 @@ public class Bicycle extends AbstractRelationEditorAction{
   //////////////assigning current edge with white color and next color with grey///////////
 
   private static Color CURRENT_WAY_COLOR = RAINBOW_COLOR_PALETTE[7];
-  private static Color NEXT_WAY_COLOR = RAINBOW_COLOR_PALETTE[8];
+  private static Color NEXT_WAY_COLOR = RAINBOW_COLOR_PALETTE[9];
 
   private static final String I18N_ADD_ONEWAY_BICYCLE_NO_TO_WAY = I18n.marktr("Add oneway:bicycle=no to way");
   private static final String I18N_CLOSE_OPTIONS = I18n.marktr("Close the options");
@@ -146,6 +147,7 @@ public class Bicycle extends AbstractRelationEditorAction{
   boolean noLinkToPreviousWay = true;
   int currentIndex;
   int downloadCounter;
+  int cnt =0;
   boolean nextIndex = true;
   boolean setEnable = true;
   boolean firstCall = true;
@@ -160,6 +162,7 @@ public class Bicycle extends AbstractRelationEditorAction{
   HashMap<Character, List<Way>> wayListColoring;
   AbstractMapViewPaintable temporaryLayer = null;
   String notice = null;
+  HashMap<Node, Integer> Isthere = new HashMap<>();
 
   /////////////Editor Access To Bicycle Routing Helper//////////////
 
@@ -231,6 +234,7 @@ public class Bicycle extends AbstractRelationEditorAction{
     members = editor.getRelation().getMembers();
     if (halt ==false) {
       updateStates();
+      getListOfAllWays();
       makepanelanddownloadArea();
     }
     else{
@@ -282,7 +286,7 @@ public void downloadEntireArea(){
 
 private List<Way> getListOfAllWays() {
 	// TODO Auto-generated method stub
-	List<Way>ways = new ArrayList<>();
+	List<Way> ways = new ArrayList<>();
 	for (RelationMember r:members) {
 		if(r.isWay()) {
 			waysAlreadyPresent.put(r.getWay(),1);
@@ -367,17 +371,33 @@ public void callNextWay(int idx){
 		}
 
 		Way way = members.get(idx).getWay();
-		nextWay = members.get(nexidx).getWay();
+    	for(Node nod:way.getNodes()){
+   	     Isthere.put(nod,new Integer(2));
+          System.out.println(nod.getUniqueId());
+   	   }
+		this.nextWay = members.get(nexidx).getWay();
+	    if(findNumberOfCommonNode(nextWay,way)==0){
+        Isthere.put(way.lastNode(),null);
+	    	System.out.println("YOOOOOOO");
+	    	System.out.println("Abe print kar: "+ Isthere.get(nextWay.lastNode()));
+	    	System.out.println("Abe print kar ab: "+ nextWay.firstNode().getUniqueId());
+	      if(Isthere.get(nextWay.firstNode())!= null || Isthere.get(nextWay.lastNode())!=null){
+	    	  System.out.println("booooooooooo");
+	    	  previousWay = way;
+//			  currentNode = getOtherNode(nextWay,node);
+  			  nextIndex = false;
+  			  downloadAreaAroundWay(way);
+  	      }
+	    }
 
 		Node node = checkVaildityOfWays(way,nexidx);
-
+//		Way way=members.get(currentIndex).getWay();
 		if (abort || nextIndex) {
               nextIndex = false;
               return;
           } else {
               nextIndex = true;
          }
-
 		if(noLinkToPreviousWay) {
 			if(node==null) {
 				currentWay = way;
@@ -399,7 +419,6 @@ public void callNextWay(int idx){
 				findNextWayBeforeDownload(way,currentNode);
 			}
 			else {
-				noLinkToPreviousWay = false;
 				previousWay = way;
 				currentNode = getOtherNode(nextWay,node);
 				nextIndex = false;
@@ -418,6 +437,32 @@ public void callNextWay(int idx){
 	}
 
 }
+// private Integer checkLoop(int idx,Node node){
+//   if(cnt > 10) {
+// 	  cnt=0;
+//     return -1;
+//   }
+//   cnt++;
+//   int nexidx = getNextWayIndex(idx);
+//   Way nexway = members.get(nexidx).getWay();
+//   Node stnode = nexway.firstNode();
+//   Node enode = nexway.lastNode();
+//   if(flag){
+//     if(enode.equals(node) || stnode.equals(node)){
+//       System.out.println("Checking of loop done: " + idx);
+//       cnt =0;
+//       return idx;
+//     }
+//     else{
+//       callNextWay(nexidx);
+//       checkLoop(++nexidx,node);
+//     }
+//   }
+//   else{
+// 	  cnt=0;
+//     return -1;
+//   }
+// }
 
 private void findNextWayBeforeDownload(Way way, Node node1, Node node2) {
     nextIndex = false;
@@ -441,24 +486,24 @@ private void downloadAreaAroundWay(Way way) {
 	if(downloadCounter >200 && onFly) {
 		downloadCounter=0;
 
-		DownloadOsmTask task = new DownloadOsmTask();
-		BoundsUtils.createBoundsWithPadding(way.getBBox(), .1).ifPresent(area->{
-			Future<?>future = task.download(DEFAULT_DOWNLOAD_PARAMS,area,null);
+    DownloadOsmTask task = new DownloadOsmTask();
+    BoundsUtils.createBoundsWithPadding(way.getBBox(), .1).ifPresent(area -> {
+        Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
 
-			MainApplication.worker.submit(()->{
-				try {
-				NotificationUtils.downloadWithNotifications(future, tr("Area around way") + " (2)");
-				if(currentIndex>=members.size()-1) {
-					deleteExtraWays();
-				}
-				else {
-					callNextWay(++currentIndex);
-				}
-			}catch(InterruptedException | ExecutionException e1) {
+        MainApplication.worker.submit(() -> {
+            try {
+                NotificationUtils.downloadWithNotifications(future, tr("Area around way") + " (2)");
+                if (currentIndex >= members.size() - 1) {
+                    deleteExtraWays();
+                } else {
+                  System.out.println("Hello printing the current index:" + currentIndex);
+                  callNextWay(++currentIndex);
+                }
+            } catch (InterruptedException | ExecutionException e1) {
                 Logging.error(e1);
-			}
-			});
-		});
+            }
+        });
+    });
 	}else {
 		if(currentIndex>=members.size()-1) {
 			deleteExtraWays();
@@ -521,17 +566,17 @@ void downloadAreaAroundWay(Way way, Way prevWay, List<Way> ways) {
     }
 }
 
-private void findNextWayAfterDownload(Way way, Node node1, Node node2) {
+private Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
 	// TODO Auto-generated method stub
 	currentWay = way;
 	if(abort)
-		return ;
-	List<Way>parentWays =findNextWay(way,node1);
+		return null;
+	List<Way> parentWays =findNextWay(way,node1);
 	if(node2!=null) {
 		parentWays.addAll(findNextWay(way,node2));
 	}
 
-	List<List<Way>>directroutes = getDirectRouteBetweenWays(currentWay,nextWay);
+	List<List<Way>> directroutes = getDirectRouteBetweenWays(currentWay,nextWay);
 	if(directroutes == null || directroutes.size()==0) {
 		showOption0 =false;
 	}
@@ -540,7 +585,7 @@ private void findNextWayAfterDownload(Way way, Node node1, Node node2) {
 	}
 	if(directroutes!=null  && directroutes.size() > 0 && !shorterRoutes && parentWays.size() > 0 && notice == null) {
 		displayFixVariantsWithOverlappingWays(directroutes);
-        return ;
+    return null ;
 	}
 	if(parentWays.size()==1) {
 		goToNextWay(parentWays.get(0),way,new ArrayList<>());
@@ -554,10 +599,10 @@ private void findNextWayAfterDownload(Way way, Node node1, Node node2) {
             deleteExtraWays();
         } else {
             callNextWay(++currentIndex);
-            return ;
+            return null;
         }
 	}
-
+	return null;
 }
 
 private List<List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
@@ -566,8 +611,8 @@ private List<List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
     List<Relation> r1;
     List<Relation> r2;
     try {
-        r1 = OsmPrimitive.getFilteredList(current.getReferrers(), Relation.class);
-        r2 = OsmPrimitive.getFilteredList(next.getReferrers(), Relation.class);
+        r1 = new ArrayList<>(Utils.filteredCollection(current.getReferrers(), Relation.class));
+        r2 = new ArrayList<>(Utils.filteredCollection(next.getReferrers(), Relation.class));
     } catch (Exception e) {
         return list;
     }
@@ -627,8 +672,7 @@ List<Way> searchWayFromOtherRelations(Relation r, Way current, Way next,boolean 
                   canAdd = true;
                   prev = w;
               } else if (w.equals(next) && lst.size() > 0) {
-                  flag=1;
-                  break;
+                  return lst;
               } else if (canAdd) {
                   if (findNumberOfCommonNode(w, prev) != 0) {
                       lst.add(w);
@@ -749,7 +793,8 @@ void goToNextWay(Way way, Way prevWay, List<Way> wayList) {
 
 private List<Way> findNextWay(Way way, Node node) {
 	// TODO Auto-generated method stub
-	List<Way>parentWays = node.getParentWays();
+	List<Way> parentWays = node.getParentWays();
+  parentWays = removeInvalidWaysFromParentWays(parentWays, node, way);
 	// if the way is a roundabout but it has not find any suitable option for next
     // way, look at parents of all nodes
 	if(way.hasTag("junction","roundabout") && parentWays.size()==0) {
@@ -1036,8 +1081,8 @@ private Node checkVaildityOfWays(Way way, int nexidx) {
 
 private void removeWay(int nexidx) {
 	// TODO Auto-generated method stub
-	List<Integer>Int = new ArrayList<>();
-	List<Way>lst = new ArrayList<>();
+	List<Integer> Int = new ArrayList<>();
+	List<Way> lst = new ArrayList<>();
 	Way way = members.get(nexidx).getWay();
 	Int.add(nexidx);
 	lst.add(way);
@@ -1394,9 +1439,7 @@ void getNextWayAfterSelection(List<Way> ways) {
             Way w1 = null;
             List<Node> breakNode = null;
             boolean brk = false;
-
             if (w.isNew()) {
-
                 if (prev != null) {
                     List<Way> par = new ArrayList<>(prev.firstNode().getParentWays());
                     par.addAll(prev.lastNode().getParentWays());
@@ -1509,8 +1552,12 @@ void addNewWays(List<Way> ways, int i) {
         for (int k = 0; k < ways.size(); k++) {
             c.add(new RelationMember("", ways.get(k)));
             // check if the way that is getting added is already present or not
-            if (!waysAlreadyPresent.containsKey(ways.get(k)))
+            if (!waysAlreadyPresent.containsKey(ways.get(k))) {
                 waysAlreadyPresent.put(ways.get(k), 1);
+                for(Node node:ways.get(k).getNodes()){
+                  Isthere.put(node,1);
+                }
+            }
             else {
                 deleteWayAfterIndex(ways.get(k), i);
             }
@@ -1641,6 +1688,12 @@ void RemoveWayAfterSelection(List<Integer> wayIndices, Character chr) {
     if (chr == 'A' || chr == '1') {
         // remove all the ways
         int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
+        // for (int i = 0; i < lst.length; i++) {
+        //     Way way = members.get(i).getWay();
+        //     for(Node node: way.getAllNodes()){
+        //       Isthere.put(node,0);
+        //     }
+        // }
         memberTableModel.remove(lst);
         for (int i = 0; i < lst.length; i++) {
             members.remove(lst[i] - i);
@@ -1716,6 +1769,14 @@ boolean checkOneWaySatisfiability(Way way, Node node) {
     if ((way.hasTag("oneway:bicycle", acceptedTags))
             && way.lastNode().equals(node) && relation.hasTag("route", "bicycle"))
         return false;
+
+    // if ((way.hasTag("oneway:bicycle", acceptedTags))
+    //         && way.lastNode().equals(node) && relation.hasTag("route", "bicycle") && way.getRole().equals("forward"))
+    //     return false;
+    //
+    // if ((way.hasTag("oneway:bicycle", acceptedTags))
+    //         && way.lastNode().equals(node) && relation.hasTag("route", "bicycle") && way.getRole().equals("backward"))
+    //     return true;
 
     if (!isNonSplitRoundAbout(way) && way.hasTag("junction", "roundabout")) {
         if (way.lastNode().equals(node))

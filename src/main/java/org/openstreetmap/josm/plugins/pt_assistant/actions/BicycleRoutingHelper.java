@@ -679,8 +679,8 @@ public class BicycleRoutingHelper extends AbstractRelationEditorAction {
         List<Relation> r1;
         List<Relation> r2;
         try {
-            r1 = OsmPrimitive.getFilteredList(current.getReferrers(), Relation.class);
-            r2 = OsmPrimitive.getFilteredList(next.getReferrers(), Relation.class);
+            r1 = new ArrayList<>(Utils.filteredCollection(current.getReferrers(), Relation.class));
+            r2 = new ArrayList<>(Utils.filteredCollection(next.getReferrers(), Relation.class));
         } catch (Exception e) {
             return list;
         }
