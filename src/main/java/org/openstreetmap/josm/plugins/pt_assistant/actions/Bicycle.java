@@ -62,6 +62,8 @@ import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEdito
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
+import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionType;
+import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionTypeCalculator;
 import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
 import org.openstreetmap.josm.gui.layer.MapViewPaintable;
 import org.openstreetmap.josm.gui.layer.validation.PaintVisitor;
@@ -163,6 +165,8 @@ public class Bicycle extends AbstractRelationEditorAction{
   AbstractMapViewPaintable temporaryLayer = null;
   String notice = null;
   HashMap<Node, Integer> Isthere = new HashMap<>();
+  List<WayConnectionType> links;
+  WayConnectionType link;
 
   /////////////Editor Access To Bicycle Routing Helper//////////////
 
@@ -232,6 +236,9 @@ public class Bicycle extends AbstractRelationEditorAction{
     savestateoneditor();
     sortBelowidx(relation.getMembers(),0);
     members = editor.getRelation().getMembers();
+    members.removeIf(m -> !m.isWay());
+    WayConnectionTypeCalculator connectionTypeCalculator = new WayConnectionTypeCalculator();
+    links = connectionTypeCalculator.updateLinks(members);
     if (halt ==false) {
       updateStates();
       getListOfAllWays();
@@ -362,36 +369,22 @@ public void callNextWay(int idx){
 	if(idx<members.size() && members.get(idx).isWay()) {
 		if (currentNode == null)
             noLinkToPreviousWay = true;
-
 		int nexidx = getNextWayIndex(idx);
-
 		if(nexidx>= members.size()) {
 			deleteExtraWays();
 			return;
 		}
-
+		link = links.get(nexidx);
+	    if(link.isOnewayLoopBackwardPart){
+	      System.out.println("oh bro index:"+nexidx);
+	    }
 		Way way = members.get(idx).getWay();
     	for(Node nod:way.getNodes()){
    	     Isthere.put(nod,new Integer(2));
-          System.out.println(nod.getUniqueId());
    	   }
 		this.nextWay = members.get(nexidx).getWay();
-	    if(findNumberOfCommonNode(nextWay,way)==0){
-        Isthere.put(way.lastNode(),null);
-	    	System.out.println("YOOOOOOO");
-	    	System.out.println("Abe print kar: "+ Isthere.get(nextWay.lastNode()));
-	    	System.out.println("Abe print kar ab: "+ nextWay.firstNode().getUniqueId());
-	      if(Isthere.get(nextWay.firstNode())!= null || Isthere.get(nextWay.lastNode())!=null){
-	    	  System.out.println("booooooooooo");
-	    	  previousWay = way;
-//			  currentNode = getOtherNode(nextWay,node);
-  			  nextIndex = false;
-  			  downloadAreaAroundWay(way);
-  	      }
-	    }
-
 		Node node = checkVaildityOfWays(way,nexidx);
-//		Way way=members.get(currentIndex).getWay();
+		// Way way=members.get(currentIndex).getWay();
 		if (abort || nextIndex) {
               nextIndex = false;
               return;
@@ -414,16 +407,25 @@ public void callNextWay(int idx){
 		}
 		else {
 			if(node==null) {
-				currentWay = way;
-				nextIndex = false;
-				findNextWayBeforeDownload(way,currentNode);
-			}
-			else {
-				previousWay = way;
-				currentNode = getOtherNode(nextWay,node);
-				nextIndex = false;
-				downloadAreaAroundWay(way);
-			}
+				Isthere.put(way.lastNode(),null);
+		        if(link.isOnewayLoopBackwardPart){
+		         System.out.println("ohh bhaii:"+nexidx);
+		          previousWay = way;
+		          nextIndex = false;
+		          downloadAreaAroundWay(way);
+		         }
+		        else{
+		  				currentWay = way;
+		  				nextIndex = false;
+		  				findNextWayBeforeDownload(way,currentNode);
+		         }
+					}
+					else {
+						previousWay = way;
+						currentNode = getOtherNode(nextWay,node);
+						nextIndex = false;
+						downloadAreaAroundWay(way);
+					}
 		}
 
 	}
@@ -436,6 +438,40 @@ public void callNextWay(int idx){
 		callNextWay(++currentIndex);
 	}
 
+}
+boolean checkOneWaySatisfiability(Way way, Node node) {
+    String[] acceptedTags = new String[] {"yes", "designated" };
+
+    if(link.isOnewayLoopBackwardPart){
+              System.out.println("yo bro whats going on...");
+              return true;
+            }
+
+    if ((way.hasTag("oneway:bicycle", acceptedTags))
+            && way.lastNode().equals(node) && relation.hasTag("route", "bicycle"))
+        return false;
+
+    // if ((way.hasTag("oneway:bicycle", acceptedTags))
+    //         && way.lastNode().equals(node) && relation.hasTag("route", "bicycle") && way.getRole().equals("forward"))
+    //     return false;
+    //
+    // if ((way.hasTag("oneway:bicycle", acceptedTags))
+    //         && way.lastNode().equals(node) && relation.hasTag("route", "bicycle") && way.getRole().equals("backward"))
+    //     return true;
+
+    if (!isNonSplitRoundAbout(way) && way.hasTag("junction", "roundabout")) {
+        if (way.lastNode().equals(node))
+            return false;
+    }
+
+    if (RouteUtils.isOnewayForBicycles(way) == 0)
+        return true;
+    else if (RouteUtils.isOnewayForBicycles(way) == 1 && way.lastNode().equals(node))
+        return false;
+    else if (RouteUtils.isOnewayForBicycles(way) == -1 && way.firstNode().equals(node))
+        return false;
+
+    return true;
 }
 // private Integer checkLoop(int idx,Node node){
 //   if(cnt > 10) {
@@ -1063,6 +1099,7 @@ private Node checkVaildityOfWays(Way way, int nexidx) {
     }
 
     if (node != null && !checkOneWaySatisfiability(nextWay, node)) {
+      System.out.println(link.isOnewayLoopBackwardPart);
         nexWayDelete = true;
         notice = "bicycle travels against oneway restriction";
     }
@@ -1763,35 +1800,7 @@ void RemoveWayAfterSelection(List<Integer> wayIndices, Character chr) {
     }
 }
 
-boolean checkOneWaySatisfiability(Way way, Node node) {
-    String[] acceptedTags = new String[] {"yes", "designated" };
 
-    if ((way.hasTag("oneway:bicycle", acceptedTags))
-            && way.lastNode().equals(node) && relation.hasTag("route", "bicycle"))
-        return false;
-
-    // if ((way.hasTag("oneway:bicycle", acceptedTags))
-    //         && way.lastNode().equals(node) && relation.hasTag("route", "bicycle") && way.getRole().equals("forward"))
-    //     return false;
-    //
-    // if ((way.hasTag("oneway:bicycle", acceptedTags))
-    //         && way.lastNode().equals(node) && relation.hasTag("route", "bicycle") && way.getRole().equals("backward"))
-    //     return true;
-
-    if (!isNonSplitRoundAbout(way) && way.hasTag("junction", "roundabout")) {
-        if (way.lastNode().equals(node))
-            return false;
-    }
-
-    if (RouteUtils.isOnewayForBicycles(way) == 0)
-        return true;
-    else if (RouteUtils.isOnewayForBicycles(way) == 1 && way.lastNode().equals(node))
-        return false;
-    else if (RouteUtils.isOnewayForBicycles(way) == -1 && way.firstNode().equals(node))
-        return false;
-
-    return true;
-}
 
 private boolean isNonSplitRoundAbout(final Way way) {
     return way.hasTag("junction", "roundabout") && way.firstNode().equals(way.lastNode());
