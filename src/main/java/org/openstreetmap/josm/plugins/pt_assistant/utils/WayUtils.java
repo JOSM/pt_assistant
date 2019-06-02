@@ -110,10 +110,9 @@ public final class WayUtils {
             ||
               way.hasTag(
                   "cycleway"
-              );
-//            ||(
-//            way.hasTag("bicycle", "yes", "designated")
-//            );
+              )
+            ||
+              way.hasTag("highway", "cycleway");
       }
 
 }

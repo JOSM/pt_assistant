@@ -167,6 +167,8 @@ public class Bicycle extends AbstractRelationEditorAction{
   HashMap<Node, Integer> Isthere = new HashMap<>();
   List<WayConnectionType> links;
   WayConnectionType link;
+  WayConnectionType prelink;
+  WayConnectionTypeCalculator connectionTypeCalculator = new WayConnectionTypeCalculator();
 
   /////////////Editor Access To Bicycle Routing Helper//////////////
 
@@ -237,7 +239,6 @@ public class Bicycle extends AbstractRelationEditorAction{
     sortBelowidx(relation.getMembers(),0);
     members = editor.getRelation().getMembers();
     members.removeIf(m -> !m.isWay());
-    WayConnectionTypeCalculator connectionTypeCalculator = new WayConnectionTypeCalculator();
     links = connectionTypeCalculator.updateLinks(members);
     if (halt ==false) {
       updateStates();
@@ -375,14 +376,20 @@ public void callNextWay(int idx){
 			return;
 		}
 		link = links.get(nexidx);
+    prelink = links.get(idx);
+	    System.out.println("link index:"+nexidx);
+	    System.out.println(link.isOnewayLoopBackwardPart);
 	    if(link.isOnewayLoopBackwardPart){
 	      System.out.println("oh bro index:"+nexidx);
 	    }
+
 		Way way = members.get(idx).getWay();
     	for(Node nod:way.getNodes()){
    	     Isthere.put(nod,new Integer(2));
+          // System.out.println(nod.getUniqueId());
    	   }
 		this.nextWay = members.get(nexidx).getWay();
+
 		Node node = checkVaildityOfWays(way,nexidx);
 		// Way way=members.get(currentIndex).getWay();
 		if (abort || nextIndex) {
@@ -408,15 +415,26 @@ public void callNextWay(int idx){
 		else {
 			if(node==null) {
 				Isthere.put(way.lastNode(),null);
-		        if(link.isOnewayLoopBackwardPart){
-		         System.out.println("ohh bhaii:"+nexidx);
+		       if(link.isOnewayLoopBackwardPart){
+		    	  System.out.println("ohh bhaii:"+nexidx);
 		          previousWay = way;
 		          nextIndex = false;
+              if(Isthere.get(nextWay.lastNode())!=null){
+                node = nextWay.lastNode();
+                 System.out.println("ahaa:"+nextWay.lastNode());
+              }
+              else{
+                node = nextWay.firstNode();
+                 System.out.println("ahaa:"+nextWay.firstNode());
+              }
+              currentNode = getOtherNode(nextWay,node);
 		          downloadAreaAroundWay(way);
 		         }
 		        else{
 		  				currentWay = way;
 		  				nextIndex = false;
+		  				System.out.println("findnextway:"+nexidx);
+              System.out.println("currentNode:"+currentNode.getUniqueId());
 		  				findNextWayBeforeDownload(way,currentNode);
 		         }
 					}
@@ -442,7 +460,8 @@ public void callNextWay(int idx){
 boolean checkOneWaySatisfiability(Way way, Node node) {
     String[] acceptedTags = new String[] {"yes", "designated" };
 
-    if(link.isOnewayLoopBackwardPart){
+    if((link.isOnewayLoopBackwardPart && relation.hasTag("route", "bicycle"))
+     || (prelink.isOnewayLoopBackwardPart && relation.hasTag("route", "bicycle")) ){
               System.out.println("yo bro whats going on...");
               return true;
             }
@@ -451,13 +470,6 @@ boolean checkOneWaySatisfiability(Way way, Node node) {
             && way.lastNode().equals(node) && relation.hasTag("route", "bicycle"))
         return false;
 
-    // if ((way.hasTag("oneway:bicycle", acceptedTags))
-    //         && way.lastNode().equals(node) && relation.hasTag("route", "bicycle") && way.getRole().equals("forward"))
-    //     return false;
-    //
-    // if ((way.hasTag("oneway:bicycle", acceptedTags))
-    //         && way.lastNode().equals(node) && relation.hasTag("route", "bicycle") && way.getRole().equals("backward"))
-    //     return true;
 
     if (!isNonSplitRoundAbout(way) && way.hasTag("junction", "roundabout")) {
         if (way.lastNode().equals(node))
@@ -472,6 +484,63 @@ boolean checkOneWaySatisfiability(Way way, Node node) {
         return false;
 
     return true;
+}
+private Node checkVaildityOfWays(Way way, int nexidx) {
+	// TODO Auto-generated method stub
+	boolean nexWayDelete = false;
+	Node node = null;
+	nextIndex = false;
+	notice = null;
+	final NodePair commonEndNodes = WayUtils.findCommonFirstLastNodes(nextWay, way);
+    if (commonEndNodes.getA() != null && commonEndNodes.getB() != null) {
+        nexWayDelete = true;
+        notice = "Multiple common nodes found between current and next way";
+    } else if (commonEndNodes.getA() != null) {
+        node = commonEndNodes.getA();
+    } else if (commonEndNodes.getB() != null) {
+        node = commonEndNodes.getB();
+    } else {
+        // the nodes can be one of the intermediate nodes
+        for (Node n : nextWay.getNodes()) {
+            if (way.getNodes().contains(n)) {
+                node = n;
+                currentNode = n;
+            }
+        }
+    }
+    if(node!=null && isRestricted(nextWay,way,node)) {
+    	nexWayDelete = true;
+    }
+    if(isNonSplitRoundAbout(way)) {
+        nexWayDelete = false;
+        for (Node n : way.getNodes()) {
+            if (nextWay.firstNode().equals(n) || nextWay.lastNode().equals(n)) {
+                node = n;
+                currentNode = n;
+            }
+        }
+    }
+
+    if (isNonSplitRoundAbout(nextWay)) {
+        nexWayDelete = false;
+    }
+
+    if (node != null && !checkOneWaySatisfiability(nextWay, node)) {
+      System.out.println(link.isOnewayLoopBackwardPart);
+        nexWayDelete = true;
+        notice = "bicycle travels against oneway restriction";
+    }
+
+    if (nexWayDelete) {
+        currentWay = way;
+        nextIndex = true;
+        removeWay(nexidx);
+        return null;
+    }
+
+    nextIndex = false;
+    return node;
+
 }
 // private Integer checkLoop(int idx,Node node){
 //   if(cnt > 10) {
@@ -830,8 +899,17 @@ void goToNextWay(Way way, Way prevWay, List<Way> wayList) {
 private List<Way> findNextWay(Way way, Node node) {
 	// TODO Auto-generated method stub
 	List<Way> parentWays = node.getParentWays();
+  for(int i=0;i<parentWays.size();i++){
+    System.out.println("AllparentId:"+parentWays.get(i).getUniqueId());
+  }
+
   parentWays = removeInvalidWaysFromParentWays(parentWays, node, way);
-	// if the way is a roundabout but it has not find any suitable option for next
+
+  System.out.println("total valid ways"+parentWays.size());
+  for(int i=0;i<parentWays.size();i++){
+    System.out.println("validparentId:"+parentWays.get(i).getUniqueId());
+  }
+  // if the way is a roundabout but it has not find any suitable option for next
     // way, look at parents of all nodes
 	if(way.hasTag("junction","roundabout") && parentWays.size()==0) {
 		for(Node n: way.getNodes()) {
@@ -870,6 +948,7 @@ List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way w
     List<Way> waysToBeAdded = new ArrayList<>();
     for (Way w : parentWays) {
         if (node != null && !w.isFirstLastNode(node)) {
+          System.out.println("Ouch");
             Way w1 = new Way();
             Way w2 = new Way();
 
@@ -914,6 +993,7 @@ List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way w
         }
 
         if (nextWayNode != null) {
+          System.out.println("wooow");
             Way w1 = new Way();
             Way w2 = new Way();
 
@@ -955,6 +1035,7 @@ List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way w
         .forEach(waysToBeRemoved::add);
 
     parentWays.removeAll(waysToBeRemoved);
+    System.out.println("inval:"+waysToBeRemoved.size());
     waysToBeRemoved.clear();
 
     // check if both nodes of the ways are common, then remove
@@ -964,14 +1045,25 @@ List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way w
         }
     }
 
+    for(int i=0;i<waysToBeRemoved.size();i++){
+      System.out.println("invalidparentId1:"+waysToBeRemoved.get(i).getUniqueId());
+    }
+
     // check if any of them belong to roundabout, if yes then show ways accordingly
     parentWays.stream()
         .filter(it -> it.hasTag("junction", "roundabout") && WayUtils.findNumberOfCommonFirstLastNodes(way, it) == 1 && it.lastNode().equals(node))
         .forEach(waysToBeRemoved::add);
 
+
+    for(int i=0;i<waysToBeRemoved.size();i++){
+      System.out.println("invalidparentId2:"+waysToBeRemoved.get(i).getUniqueId());
+    }
     // check mode of transport, also check if there is no loop
     if (relation.hasTag("route", "bicycle")) {
         parentWays.stream().filter(it -> !WayUtils.isSuitableForBicycle(it)).forEach(waysToBeRemoved::add);
+    }
+    for(int i=0;i<waysToBeRemoved.size();i++){
+      System.out.println("invalidparentId3test:"+waysToBeRemoved.get(i).getUniqueId());
     }
     parentWays.stream().filter(it -> it.equals(previousWay)).forEach(waysToBeRemoved::add);
 
@@ -981,6 +1073,10 @@ List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way w
     // check restrictions
     parentWays.stream().filter(it -> isRestricted(it, way, node)).forEach(waysToBeRemoved::add);
 
+
+    for(int i=0;i<waysToBeRemoved.size();i++){
+      System.out.println("invalidparentId4:"+waysToBeRemoved.get(i).getUniqueId());
+    }
     parentWays.removeAll(waysToBeRemoved);
 
     return parentWays;
@@ -1059,62 +1155,6 @@ double findDistanceBetweenWays(Way way, Way nextWay, Node node) {
     return (otherNode.lat() - Lat) * (otherNode.lat() - Lat) + (otherNode.lon() - Lon) * (otherNode.lon() - Lon);
 }
 
-private Node checkVaildityOfWays(Way way, int nexidx) {
-	// TODO Auto-generated method stub
-	boolean nexWayDelete = false;
-	Node node = null;
-	nextIndex = false;
-	notice = null;
-	final NodePair commonEndNodes = WayUtils.findCommonFirstLastNodes(nextWay, way);
-    if (commonEndNodes.getA() != null && commonEndNodes.getB() != null) {
-        nexWayDelete = true;
-        notice = "Multiple common nodes found between current and next way";
-    } else if (commonEndNodes.getA() != null) {
-        node = commonEndNodes.getA();
-    } else if (commonEndNodes.getB() != null) {
-        node = commonEndNodes.getB();
-    } else {
-        // the nodes can be one of the intermediate nodes
-        for (Node n : nextWay.getNodes()) {
-            if (way.getNodes().contains(n)) {
-                node = n;
-                currentNode = n;
-            }
-        }
-    }
-    if(node!=null && isRestricted(nextWay,way,node)) {
-    	nexWayDelete = true;
-    }
-    if(isNonSplitRoundAbout(way)) {
-        nexWayDelete = false;
-        for (Node n : way.getNodes()) {
-            if (nextWay.firstNode().equals(n) || nextWay.lastNode().equals(n)) {
-                node = n;
-                currentNode = n;
-            }
-        }
-    }
-    if (isNonSplitRoundAbout(nextWay)) {
-        nexWayDelete = false;
-    }
-
-    if (node != null && !checkOneWaySatisfiability(nextWay, node)) {
-      System.out.println(link.isOnewayLoopBackwardPart);
-        nexWayDelete = true;
-        notice = "bicycle travels against oneway restriction";
-    }
-
-    if (nexWayDelete) {
-        currentWay = way;
-        nextIndex = true;
-        removeWay(nexidx);
-        return null;
-    }
-
-    nextIndex = false;
-    return node;
-
-}
 
 private void removeWay(int nexidx) {
 	// TODO Auto-generated method stub
@@ -1586,8 +1626,15 @@ void getNextWayAfterSelection(List<Way> ways) {
 void addNewWays(List<Way> ways, int i) {
     try {
         List<RelationMember> c = new ArrayList<>();
+        String s="";
+        if(prelink.isOnewayLoopBackwardPart){
+          s="forward";
+        }
+        int[] idx = new int[1];
+        idx[0]=i+1;
+        System.out.println("check this out:" + s);
         for (int k = 0; k < ways.size(); k++) {
-            c.add(new RelationMember("", ways.get(k)));
+            c.add(new RelationMember(s, ways.get(k)));
             // check if the way that is getting added is already present or not
             if (!waysAlreadyPresent.containsKey(ways.get(k))) {
                 waysAlreadyPresent.put(ways.get(k), 1);
@@ -1601,7 +1648,9 @@ void addNewWays(List<Way> ways, int i) {
         }
 
         memberTableModel.addMembersAfterIdx(ways, i);
+        memberTableModel.updateRole(idx,s);
         members.addAll(i + 1, c);
+        links = connectionTypeCalculator.updateLinks(members);
     } catch (Exception e) {
         Logging.error(e);
     }
@@ -1629,10 +1678,12 @@ void deleteWayAfterIndex(Way way, int index) {
                 int[] x = {i };
                 memberTableModel.remove(x);
                 members.remove(i);
+
                 break;
             }
         }
     }
+    links = connectionTypeCalculator.updateLinks(members);
 }
 
 List<Way> findCurrentEdge() {
@@ -1991,6 +2042,7 @@ int getPreviousWayIndex(int idx) {
 //////////saving state on editor//////////////////
   public void savestateoneditor(){
     editor.apply();
+    // links = connectionTypeCalculator.updateLinks(members);
   }
 
 ////////////////////sorting//////////////
