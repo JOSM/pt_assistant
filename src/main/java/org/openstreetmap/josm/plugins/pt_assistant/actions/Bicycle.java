@@ -378,9 +378,13 @@ public void callNextWay(int idx){
 		link = links.get(nexidx);
     prelink = links.get(idx);
 	    System.out.println("link index:"+nexidx);
-	    System.out.println(link.isOnewayLoopBackwardPart);
-	    if(link.isOnewayLoopBackwardPart){
+	    if(link.isOnewayLoopBackwardPart ){
 	      System.out.println("oh bro index:"+nexidx);
+        System.out.println(link.isOnewayLoopBackwardPart);
+	    }
+      if(link.isOnewayLoopForwardPart ){
+	      System.out.println("oh bro index:"+nexidx);
+        System.out.println(link.isOnewayLoopForwardPart);
 	    }
 
 		Way way = members.get(idx).getWay();
@@ -419,12 +423,14 @@ public void callNextWay(int idx){
 		    	  System.out.println("ohh bhaii:"+nexidx);
 		          previousWay = way;
 		          nextIndex = false;
-              if(Isthere.get(nextWay.lastNode())!=null){
-                node = nextWay.lastNode();
+              System.out.println(Isthere.get(nextWay.firstNode()));
+              System.out.println(Isthere.get(nextWay.lastNode()));
+              if(Isthere.get(nextWay.firstNode())!=null){
+                node = nextWay.firstNode();
                  System.out.println("ahaa:"+nextWay.lastNode());
               }
               else{
-                node = nextWay.firstNode();
+                node = nextWay.lastNode();
                  System.out.println("ahaa:"+nextWay.firstNode());
               }
               currentNode = getOtherNode(nextWay,node);
@@ -460,8 +466,7 @@ public void callNextWay(int idx){
 boolean checkOneWaySatisfiability(Way way, Node node) {
     String[] acceptedTags = new String[] {"yes", "designated" };
 
-    if((link.isOnewayLoopBackwardPart && relation.hasTag("route", "bicycle"))
-     || (prelink.isOnewayLoopBackwardPart && relation.hasTag("route", "bicycle")) ){
+    if((link.isOnewayLoopBackwardPart && relation.hasTag("route", "bicycle"))||prelink.isOnewayLoopBackwardPart){
               System.out.println("yo bro whats going on...");
               return true;
             }
@@ -1607,6 +1612,12 @@ void getNextWayAfterSelection(List<Way> ways) {
         Way nextWay = members.get(currentIndex + 1).getWay();
         Node n = WayUtils.findCommonFirstLastNode(nextWay, way, currentNode).orElse(null);
         currentNode = getOtherNode(nextWay, n);
+        if(n !=null){
+          System.out.println("when adding way common id " + n.getUniqueId() );
+        }
+        if(currentNode !=null){
+          System.out.println("after adding currentNode id " + currentNode.getUniqueId() );
+        }
         savestateoneditor();
         try {
             TimeUnit.SECONDS.sleep(3);
@@ -1632,6 +1643,22 @@ void addNewWays(List<Way> ways, int i) {
         }
         int[] idx = new int[1];
         idx[0]=i+1;
+        Way w = ways.get(0);
+        if(prelink.isOnewayLoopBackwardPart && currentNode.equals(w.firstNode())){
+          s="backward";
+        }
+        else if(prelink.isOnewayLoopBackwardPart && currentNode.equals(w.lastNode())){
+          s="forward";
+        }
+        else if(prelink.isOnewayLoopForwardPart && currentNode.equals(w.firstNode())){
+          s="forward";
+        }
+        else if(prelink.isOnewayLoopForwardPart && currentNode.equals(w.lastNode())){
+          s="backward";
+        }
+        else{
+          s="";
+        }
         System.out.println("check this out:" + s);
         for (int k = 0; k < ways.size(); k++) {
             c.add(new RelationMember(s, ways.get(k)));
@@ -1650,6 +1677,7 @@ void addNewWays(List<Way> ways, int i) {
         memberTableModel.addMembersAfterIdx(ways, i);
         memberTableModel.updateRole(idx,s);
         members.addAll(i + 1, c);
+        currentNode = getOtherNode(w,currentNode);
         links = connectionTypeCalculator.updateLinks(members);
     } catch (Exception e) {
         Logging.error(e);
