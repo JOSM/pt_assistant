@@ -418,25 +418,40 @@ public void callNextWay(int idx){
 		}
 		else {
 			if(node==null) {
-				Isthere.put(way.lastNode(),null);
+        System.out.println("current way check:"+members.get(currentIndex).getUniqueId());
+        System.out.println("way check:"+way.getUniqueId());
+        System.out.println("way check before:"+Isthere.get(way.lastNode()));
+        if(members.get(currentIndex).getRole().equals("forward") && prelink.isOnewayLoopBackwardPart){
+          Isthere.put(way.firstNode(),null);
+          node = way.lastNode();
+        }
+        else if(members.get(currentIndex).getRole().equals("backward") && prelink.isOnewayLoopForwardPart){
+          Isthere.put(way.firstNode(),null);
+          node = way.lastNode();
+        }
+        else{
+          Isthere.put(way.lastNode(),null);
+          node = way.firstNode();
+        }
+        System.out.println("way check after making null:"+Isthere.get(way.lastNode()));
 		       if(link.isOnewayLoopBackwardPart){
 		    	  System.out.println("ohh bhaii:"+nexidx);
 		          previousWay = way;
 		          nextIndex = false;
               System.out.println(Isthere.get(nextWay.firstNode()));
               System.out.println(Isthere.get(nextWay.lastNode()));
-              if(Isthere.get(nextWay.firstNode())!=null){
-                node = nextWay.firstNode();
-                 System.out.println("ahaa:"+nextWay.lastNode());
+              if(Isthere.get(way.firstNode())!=null){
+                node = way.firstNode();
+                System.out.println("ahaa:"+nextWay.firstNode());
               }
               else{
-                node = nextWay.lastNode();
-                 System.out.println("ahaa:"+nextWay.firstNode());
+                node = way.lastNode();
+                System.out.println("ahaa:"+nextWay.firstNode());
               }
-              currentNode = getOtherNode(nextWay,node);
 		          downloadAreaAroundWay(way);
 		         }
 		        else{
+              currentNode = getOtherNode(way,node);
 		  				currentWay = way;
 		  				nextIndex = false;
 		  				System.out.println("findnextway:"+nexidx);
