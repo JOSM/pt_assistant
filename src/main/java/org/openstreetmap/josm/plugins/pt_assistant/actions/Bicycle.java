@@ -47,6 +47,7 @@ import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.NodePair;
+import org.openstreetmap.josm.data.osm.NodePositionComparator;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
@@ -144,12 +145,16 @@ public class Bicycle extends AbstractRelationEditorAction{
   Way previousWay;
   Way currentWay;
   Way nextWay;
+  Way lastForWay;
+  Way lastBackWay;
   List<Integer> extraWaysToBeDeleted = null;
   Node currentNode = null;
+  Node pseudocurrentNode = null;
   boolean noLinkToPreviousWay = true;
   int currentIndex;
   int downloadCounter;
   int cnt =0;
+  int brokenidx =0;
   boolean nextIndex = true;
   boolean setEnable = true;
   boolean firstCall = true;
@@ -165,9 +170,13 @@ public class Bicycle extends AbstractRelationEditorAction{
   AbstractMapViewPaintable temporaryLayer = null;
   String notice = null;
   HashMap<Node, Integer> Isthere = new HashMap<>();
+  HashMap<Way, Integer> IsWaythere = new HashMap<>();
   List<WayConnectionType> links;
   WayConnectionType link;
   WayConnectionType prelink;
+  Node brokenNode;
+  List<List<Way>> directroutes;
+  NodePositionComparator dist = new NodePositionComparator();
   WayConnectionTypeCalculator connectionTypeCalculator = new WayConnectionTypeCalculator();
 
   /////////////Editor Access To Bicycle Routing Helper//////////////
@@ -267,7 +276,7 @@ public void downloadEntireArea(){
     String query = getQueryforBicycle();
     Logging.debug(query);
 
-    if (aroundStops || aroundGaps) {
+    if (aroundGaps) {
         BoundsUtils.createBoundsWithPadding(wayList, .1).ifPresent(area -> {
             final Future<?> future = task.download(
                 new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query),
@@ -289,7 +298,7 @@ public void downloadEntireArea(){
         callNextWay(currentIndex);
     }
 
-  System.out.println("I am Download");
+  // System.out.println("I am Download");
 }
 
 private List<Way> getListOfAllWays() {
@@ -299,7 +308,7 @@ private List<Way> getListOfAllWays() {
 		if(r.isWay()) {
 			waysAlreadyPresent.put(r.getWay(),1);
 			ways.add(r.getWay());
-			System.out.println("hello");
+			// System.out.println("hello");
 		}
 	}
 	return ways;
@@ -370,32 +379,43 @@ public void callNextWay(int idx){
 	if(idx<members.size() && members.get(idx).isWay()) {
 		if (currentNode == null)
             noLinkToPreviousWay = true;
-		int nexidx = getNextWayIndex(idx);
-		if(nexidx>= members.size()) {
+
+    int nexidx = getNextWayIndex(idx);
+
+    if(nexidx>= members.size()) {
 			deleteExtraWays();
+      makeNodesZeros();
 			return;
 		}
-		link = links.get(nexidx);
+
+    link = links.get(nexidx);
     prelink = links.get(idx);
-	    System.out.println("link index:"+nexidx);
-	    if(link.isOnewayLoopBackwardPart ){
-	      System.out.println("oh bro index:"+nexidx);
-        System.out.println(link.isOnewayLoopBackwardPart);
-	    }
-      if(link.isOnewayLoopForwardPart ){
-	      System.out.println("oh bro index:"+nexidx);
-        System.out.println(link.isOnewayLoopForwardPart);
-	    }
 
-		Way way = members.get(idx).getWay();
-    	for(Node nod:way.getNodes()){
-   	     Isthere.put(nod,new Integer(2));
-          // System.out.println(nod.getUniqueId());
-   	   }
-		this.nextWay = members.get(nexidx).getWay();
+    if(prelink.isOnewayLoopBackwardPart ){
+      lastBackWay = members.get(idx).getWay();
+    }
+    if(prelink.isOnewayLoopForwardPart ){
+      lastForWay = members.get(idx).getWay();
+    }
 
-		Node node = checkVaildityOfWays(way,nexidx);
-		// Way way=members.get(currentIndex).getWay();
+    Way way = members.get(idx).getWay();
+    if(IsWaythere.get(way)==null){
+    for(Node nod:way.getNodes()){
+      if(Isthere.get(nod)==null || Isthere.get(nod)==0){
+        Isthere.put(nod,1);
+      }
+      else{
+        Isthere.put(nod,Isthere.get(nod)+1);
+      }
+ 	   }
+     IsWaythere.put(way,1);
+   }
+     System.out.println(way.firstNode().getUniqueId() + " ---- " + Isthere.get(way.firstNode()));
+     System.out.println(way.lastNode().getUniqueId() + " ---- " + Isthere.get(way.lastNode()));
+    this.nextWay = members.get(nexidx).getWay();
+
+    Node node = checkVaildityOfWays(way,nexidx);
+
 		if (abort || nextIndex) {
               nextIndex = false;
               return;
@@ -418,35 +438,44 @@ public void callNextWay(int idx){
 		}
 		else {
 			if(node==null) {
-        System.out.println("current way check:"+members.get(currentIndex).getUniqueId());
-        System.out.println("way check:"+way.getUniqueId());
-        System.out.println("way check before:"+Isthere.get(way.lastNode()));
+        // System.out.println("current way check:"+members.get(currentIndex).getUniqueId());
+        // System.out.println("way check:"+way.getUniqueId());
+        // System.out.println("way check before:"+Isthere.get(way.lastNode()));
         if(members.get(currentIndex).getRole().equals("forward") && prelink.isOnewayLoopBackwardPart){
-          Isthere.put(way.firstNode(),null);
+          // Isthere.put(way.firstNode(),Isthere.get(way.firstNode())-1);
           node = way.lastNode();
         }
         else if(members.get(currentIndex).getRole().equals("backward") && prelink.isOnewayLoopForwardPart){
-          Isthere.put(way.firstNode(),null);
+          // Isthere.put(way.firstNode(),Isthere.get(way.firstNode())-1);
           node = way.lastNode();
         }
-        else{
-          Isthere.put(way.lastNode(),null);
-          node = way.firstNode();
+        else {
+          if(currentIndex-1>=0){
+            Way prevw = members.get(currentIndex-1).getWay();
+            if(prevw.firstNode().equals(way.lastNode()) || prevw.lastNode().equals(way.lastNode())){
+              // Isthere.put(way.firstNode(),Isthere.get(way.firstNode())-1);
+              node = way.lastNode();
+            }
+            else{
+              // Isthere.put(way.lastNode(),Isthere.get(way.lastNode())-1);
+              node = way.firstNode();
+            }
+          }
         }
-        System.out.println("way check after making null:"+Isthere.get(way.lastNode()));
+        // System.out.println("way check after making null:"+Isthere.get(way.lastNode()));
 		       if(link.isOnewayLoopBackwardPart){
-		    	  System.out.println("ohh bhaii:"+nexidx);
+		    	    // System.out.println("ohh bhaii:"+nexidx);
 		          previousWay = way;
 		          nextIndex = false;
-              System.out.println(Isthere.get(nextWay.firstNode()));
-              System.out.println(Isthere.get(nextWay.lastNode()));
-              if(Isthere.get(way.firstNode())!=null){
+              // System.out.println(Isthere.get(nextWay.firstNode()));
+              // System.out.println(Isthere.get(nextWay.lastNode()));
+              if(Isthere.get(way.firstNode())!=null && Isthere.get(way.firstNode())!=0){
                 node = way.firstNode();
-                System.out.println("ahaa:"+nextWay.firstNode());
+                // System.out.println("ahaa:"+nextWay.firstNode());
               }
               else{
                 node = way.lastNode();
-                System.out.println("ahaa:"+nextWay.firstNode());
+                // System.out.println("ahaa:"+nextWay.firstNode());
               }
 		          downloadAreaAroundWay(way);
 		         }
@@ -454,8 +483,8 @@ public void callNextWay(int idx){
               currentNode = getOtherNode(way,node);
 		  				currentWay = way;
 		  				nextIndex = false;
-		  				System.out.println("findnextway:"+nexidx);
-              System.out.println("currentNode:"+currentNode.getUniqueId());
+		  				// System.out.println("findnextway:"+nexidx);
+              // System.out.println("currentNode:"+currentNode.getUniqueId());
 		  				findNextWayBeforeDownload(way,currentNode);
 		         }
 					}
@@ -473,6 +502,7 @@ public void callNextWay(int idx){
 
 	if(idx>= members.size()-1) {
 		deleteExtraWays();
+    makeNodesZeros();
 	}else if(nextIndex) {
 		callNextWay(++currentIndex);
 	}
@@ -482,7 +512,7 @@ boolean checkOneWaySatisfiability(Way way, Node node) {
     String[] acceptedTags = new String[] {"yes", "designated" };
 
     if((link.isOnewayLoopBackwardPart && relation.hasTag("route", "bicycle"))||prelink.isOnewayLoopBackwardPart){
-              System.out.println("yo bro whats going on...");
+              // System.out.println("yo bro whats going on...");
               return true;
             }
 
@@ -546,7 +576,7 @@ private Node checkVaildityOfWays(Way way, int nexidx) {
     }
 
     if (node != null && !checkOneWaySatisfiability(nextWay, node)) {
-      System.out.println(link.isOnewayLoopBackwardPart);
+      // System.out.println(link.isOnewayLoopBackwardPart);
         nexWayDelete = true;
         notice = "bicycle travels against oneway restriction";
     }
@@ -562,32 +592,6 @@ private Node checkVaildityOfWays(Way way, int nexidx) {
     return node;
 
 }
-// private Integer checkLoop(int idx,Node node){
-//   if(cnt > 10) {
-// 	  cnt=0;
-//     return -1;
-//   }
-//   cnt++;
-//   int nexidx = getNextWayIndex(idx);
-//   Way nexway = members.get(nexidx).getWay();
-//   Node stnode = nexway.firstNode();
-//   Node enode = nexway.lastNode();
-//   if(flag){
-//     if(enode.equals(node) || stnode.equals(node)){
-//       System.out.println("Checking of loop done: " + idx);
-//       cnt =0;
-//       return idx;
-//     }
-//     else{
-//       callNextWay(nexidx);
-//       checkLoop(++nexidx,node);
-//     }
-//   }
-//   else{
-// 	  cnt=0;
-//     return -1;
-//   }
-// }
 
 private void findNextWayBeforeDownload(Way way, Node node1, Node node2) {
     nextIndex = false;
@@ -621,7 +625,7 @@ private void downloadAreaAroundWay(Way way) {
                 if (currentIndex >= members.size() - 1) {
                     deleteExtraWays();
                 } else {
-                  System.out.println("Hello printing the current index:" + currentIndex);
+                  // System.out.println("Hello printing the current index:" + currentIndex);
                   callNextWay(++currentIndex);
                 }
             } catch (InterruptedException | ExecutionException e1) {
@@ -700,8 +704,11 @@ private Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
 	if(node2!=null) {
 		parentWays.addAll(findNextWay(way,node2));
 	}
-
-	List<List<Way>> directroutes = getDirectRouteBetweenWays(currentWay,nextWay);
+  // System.out.println("parentsize is "+ parentWays.size());
+  // for(Way x:parentWays){
+  //   System.out.println("print all parent ids " + x.getUniqueId());
+  // }
+	directroutes = getDirectRouteBetweenWays(currentWay,nextWay);
 	if(directroutes == null || directroutes.size()==0) {
 		showOption0 =false;
 	}
@@ -709,28 +716,37 @@ private Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
 		showOption0 = true;
 	}
 	if(directroutes!=null  && directroutes.size() > 0 && !shorterRoutes && parentWays.size() > 0 && notice == null) {
+    // System.out.println("No directroutes are not null: " + way.getUniqueId() );
 		displayFixVariantsWithOverlappingWays(directroutes);
     return null ;
 	}
 	if(parentWays.size()==1) {
+    // System.out.println("go to Next Way: " + way.getUniqueId() );
 		goToNextWay(parentWays.get(0),way,new ArrayList<>());
 	}else if(parentWays.size()>1) {
 		nextIndex = false;
+    // System.out.println("parent size is greater than one: ");
+    System.out.println("parents more than one: " + way.getUniqueId() );
+    System.out.println("iteration on first node " +Isthere.get(way.firstNode()));
+    System.out.println("iteration on last node "+ Isthere.get(way.lastNode()));
 		displayFixVariants(parentWays);
 	}
 	else {
 		nextIndex = true;
         if (currentIndex >= members.size() - 1) {
             deleteExtraWays();
+            makeNodesZeros();
         } else {
             callNextWay(++currentIndex);
             return null;
         }
 	}
+  // System.out.println("display fix variant ke baad ye jaroor ana chaie");
 	return null;
 }
 
 private List<List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
+  System.out.println("I am inside DirectRouteBetweenWays by currentway " + current.getUniqueId());
 	//trying to find the other route relations which can connect these ways
     List<List<Way>> list = new ArrayList<>();
     List<Relation> r1;
@@ -769,6 +785,7 @@ private List<List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
         lst = searchWayFromOtherRelations(r, current, next,true);
 
         if (lst != null) {
+          // System.out.println("My list is not null "+ lst.size());
             alreadyPresent = false;
             for (List<Way> l : list) {
                 if (l.containsAll(lst))
@@ -833,6 +850,8 @@ List<Way> searchWayFromOtherRelations(Relation r, Way current, Way next,boolean 
 
 void goToNextWay(Way way, Way prevWay, List<Way> wayList) {
     List<List<Way>> lst = new ArrayList<>();
+    System.out.println("gotonextway preway "+ prevWay.getUniqueId());
+    System.out.println("gotonextway curr"+ way.getUniqueId());
     previousWay = prevWay;
     Node node1 = null;
     for (Node n : way.getNodes()) {
@@ -856,6 +875,7 @@ void goToNextWay(Way way, Way prevWay, List<Way> wayList) {
     }
 
     Node node = getOtherNode(way, node1);
+    // System.out.println("goToNextWay node new " + node.getUniqueId());
     wayList.add(way);
     List<Way> parents = node.getParentWays();
     parents.remove(way);
@@ -919,16 +939,16 @@ void goToNextWay(Way way, Way prevWay, List<Way> wayList) {
 private List<Way> findNextWay(Way way, Node node) {
 	// TODO Auto-generated method stub
 	List<Way> parentWays = node.getParentWays();
-  for(int i=0;i<parentWays.size();i++){
-    System.out.println("AllparentId:"+parentWays.get(i).getUniqueId());
-  }
+  // for(int i=0;i<parentWays.size();i++){
+  //   System.out.println("AllparentId:"+parentWays.get(i).getUniqueId());
+  // }
 
   parentWays = removeInvalidWaysFromParentWays(parentWays, node, way);
 
-  System.out.println("total valid ways"+parentWays.size());
-  for(int i=0;i<parentWays.size();i++){
-    System.out.println("validparentId:"+parentWays.get(i).getUniqueId());
-  }
+  // System.out.println("total valid ways"+parentWays.size());
+  // for(int i=0;i<parentWays.size();i++){
+  //   System.out.println("validparentId:"+parentWays.get(i).getUniqueId());
+  // }
   // if the way is a roundabout but it has not find any suitable option for next
     // way, look at parents of all nodes
 	if(way.hasTag("junction","roundabout") && parentWays.size()==0) {
@@ -939,6 +959,7 @@ private List<Way> findNextWay(Way way, Node node) {
 	Way frontWay = parentWays.stream().filter(it->checkIfWayConnectsToNextWay(it,0,node)).findFirst().orElse(null);
 
 	if (frontWay == null && parentWays.size() > 0) {
+        // System.out.println("I am inside of null front way check me out");
         Way minWay = parentWays.get(0);
         double minLength = findDistanceBetweenWays(minWay, nextWay, node);
         for (int i = 1; i < parentWays.size(); i++) {
@@ -950,7 +971,7 @@ private List<Way> findNextWay(Way way, Node node) {
         }
         frontWay = minWay;
     }
-
+    // System.out.println("checking frontway " + frontWay.getUniqueId());
     if (frontWay != null) {
         parentWays.remove(frontWay);
         parentWays.add(0, frontWay);
@@ -968,7 +989,7 @@ List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way w
     List<Way> waysToBeAdded = new ArrayList<>();
     for (Way w : parentWays) {
         if (node != null && !w.isFirstLastNode(node)) {
-          System.out.println("Ouch");
+          // System.out.println("Ouch");
             Way w1 = new Way();
             Way w2 = new Way();
 
@@ -1013,7 +1034,7 @@ List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way w
         }
 
         if (nextWayNode != null) {
-          System.out.println("wooow");
+          // System.out.println("wooow");
             Way w1 = new Way();
             Way w2 = new Way();
 
@@ -1055,7 +1076,7 @@ List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way w
         .forEach(waysToBeRemoved::add);
 
     parentWays.removeAll(waysToBeRemoved);
-    System.out.println("inval:"+waysToBeRemoved.size());
+    // System.out.println("inval:"+waysToBeRemoved.size());
     waysToBeRemoved.clear();
 
     // check if both nodes of the ways are common, then remove
@@ -1065,9 +1086,9 @@ List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way w
         }
     }
 
-    for(int i=0;i<waysToBeRemoved.size();i++){
-      System.out.println("invalidparentId1:"+waysToBeRemoved.get(i).getUniqueId());
-    }
+    // for(int i=0;i<waysToBeRemoved.size();i++){
+    //   System.out.println("invalidparentId1:"+waysToBeRemoved.get(i).getUniqueId());
+    // }
 
     // check if any of them belong to roundabout, if yes then show ways accordingly
     parentWays.stream()
@@ -1075,16 +1096,16 @@ List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way w
         .forEach(waysToBeRemoved::add);
 
 
-    for(int i=0;i<waysToBeRemoved.size();i++){
-      System.out.println("invalidparentId2:"+waysToBeRemoved.get(i).getUniqueId());
-    }
+    // for(int i=0;i<waysToBeRemoved.size();i++){
+    //   System.out.println("invalidparentId2:"+waysToBeRemoved.get(i).getUniqueId());
+    // }
     // check mode of transport, also check if there is no loop
     if (relation.hasTag("route", "bicycle")) {
         parentWays.stream().filter(it -> !WayUtils.isSuitableForBicycle(it)).forEach(waysToBeRemoved::add);
     }
-    for(int i=0;i<waysToBeRemoved.size();i++){
-      System.out.println("invalidparentId3test:"+waysToBeRemoved.get(i).getUniqueId());
-    }
+    // for(int i=0;i<waysToBeRemoved.size();i++){
+    //   System.out.println("invalidparentId3test:"+waysToBeRemoved.get(i).getUniqueId());
+    // }
     parentWays.stream().filter(it -> it.equals(previousWay)).forEach(waysToBeRemoved::add);
 
     parentWays.removeAll(waysToBeRemoved);
@@ -1117,7 +1138,7 @@ List<Way> removeInvalidWaysFromParentWaysOfRoundabouts(List<Way> parents, Node n
             }
         }
     }
-
+// check if any of the way is joining with its intermediate nodes
     // check if any of them belong to roundabout, if yes then show ways accordingly
     for (Way w : parentWays) {
         if (w.hasTag("junction", "roundabout")) {
@@ -1149,13 +1170,16 @@ boolean checkIfWayConnectsToNextWay(Way way, int count, Node node) {
     if (count < 80) {
         if (way.equals(nextWay))
             return true;
-
+        // System.out.println("way ids for checks are : " + way.getUniqueId() );
         // check if way;s intermediate node is next way's first or last node
         if (way.getNodes().contains(nextWay.firstNode()) || way.getNodes().contains(nextWay.lastNode()))
             return true;
+        // if (Isthere.get(way.lastNode())!=null)
+        //     return true;
 
         node = getOtherNode(way, node);
         List<Way> parents = node.getParentWays();
+        // System.out.println("node Id is: "+ node.getUniqueId() + "Parent size is " + parents.size());
         if (parents.size() != 1)
             return false;
         else
@@ -1172,6 +1196,8 @@ double findDistanceBetweenWays(Way way, Way nextWay, Node node) {
     Node otherNode = getOtherNode(way, node);
     double Lat = (nextWay.firstNode().lat() + nextWay.lastNode().lat()) / 2;
     double Lon = (nextWay.firstNode().lon() + nextWay.lastNode().lon()) / 2;
+    double ans =(otherNode.lat() - Lat) * (otherNode.lat() - Lat) + (otherNode.lon() - Lon) * (otherNode.lon() - Lon);
+    // System.out.println("way id: " +way.getUniqueId()+" distance " + ans);
     return (otherNode.lat() - Lat) * (otherNode.lat() - Lat) + (otherNode.lon() - Lon) * (otherNode.lon() - Lon);
 }
 
@@ -1342,7 +1368,9 @@ void displayFixVariants(List<Way> fixVariants) {
     boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
     wayColoring = new HashMap<>();
     final List<Character> allowedCharacters = new ArrayList<>();
-
+    // System.out.println("sdddddddddddddddddddd");
+    System.out.println("cuuuuuuuurentway : "+ currentWay.getUniqueId());
+    System.out.println("nexxxxxxtway : "+ nextWay.getUniqueId());
     if (numeric) {
         alphabet = '1';
         allowedCharacters.add('7');
@@ -1370,14 +1398,17 @@ void displayFixVariants(List<Way> fixVariants) {
 
     // zoom to problem:
     AutoScaleAction.zoomTo(fixVariants);
-
     // display the fix variants:
     temporaryLayer = new MendRelationAddLayer();
     MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
-
+    // System.out.println("hollllllllllllaaaaaaaaa");
     // // add the key listener:
     MainApplication.getMap().mapView.requestFocus();
+    // for(Way x:fixVariants){
+    //   System.out.println("my fix variant is : " +x.getUniqueId());
+    // }
     MainApplication.getMap().mapView.addKeyListener(new KeyAdapter() {
+//      System.out.println("hiiiiiiiiiiiiiiiiii");
         @Override
         public void keyPressed(KeyEvent e) {
             downloadCounter = 0;
@@ -1519,6 +1550,7 @@ void displayFixVariantsWithOverlappingWays(List<List<Way>> fixVariants) {
 }
 
 void getNextWayAfterSelection(List<Way> ways) {
+  int flag=0;
     if (ways != null) {
         /*
          * check if the selected way is not a complete way but rather a part of a parent
@@ -1533,6 +1565,8 @@ void getNextWayAfterSelection(List<Way> ways) {
         Way prev = currentWay;
         for (int i = 0; i < ways.size(); i++) {
             Way w = ways.get(i);
+//            System.out.println(w.firstNode().getUniqueId() + " between  " + Isthere.get(w.firstNode()));
+//            System.out.println(w.lastNode().getUniqueId() + " between " + Isthere.get(w.lastNode()));
             Way w1 = null;
             List<Node> breakNode = null;
             boolean brk = false;
@@ -1543,6 +1577,7 @@ void getNextWayAfterSelection(List<Way> ways) {
                     for (Way v : par) {
                         if (v.getNodes().containsAll(w.getNodes())) {
                             if (w.equals(v)) {
+                                System.out.println(1);
                                 addNewWays(Collections.singletonList(v), ind);
                                 prev = v;
                                 ind++;
@@ -1573,6 +1608,7 @@ void getNextWayAfterSelection(List<Way> ways) {
                             breakNode = Collections.singletonList(nextWay.firstNode());
                             break;
                         } else if (w.equals(v)) {
+                          System.out.println(2);
                             addNewWays(Collections.singletonList(v), ind);
                             prev = v;
                             ind++;
@@ -1590,6 +1626,7 @@ void getNextWayAfterSelection(List<Way> ways) {
                             breakNode = Collections.singletonList(nextWay.lastNode());
                             break;
                         } else if (w.equals(v)) {
+                          System.out.println(3);
                             addNewWays(Collections.singletonList(v), ind);
                             ind++;
                             prev = v;
@@ -1608,7 +1645,7 @@ void getNextWayAfterSelection(List<Way> ways) {
                             w = result.getOriginalWay();
                         else
                             w = result.getNewWays().get(0);
-
+                        System.out.println(4);
                         addNewWays(Collections.singletonList(w), ind);
                         prev = w;
                         ind++;
@@ -1618,20 +1655,64 @@ void getNextWayAfterSelection(List<Way> ways) {
                     Logging.debug("none");
                 }
             } else {
+              System.out.println(5);
+             // System.out.println("printing current index: " + currentIndex + "and after what index member will be added "+ ind);
+                // if(IsWaythere.get(w)==null){
+                // }
                 addNewWays(Collections.singletonList(w), ind);
                 prev = w;
                 ind++;
+                // System.out.println("after every insertion currentNode :" + currentNode.getUniqueId());
+                // System.out.println("number of parents: " + findNextWay(w,currentNode).size());
+                // System.out.println("ohayoo");
+                if(findNextWay(w,currentNode).size()>=2){
+                  break;
+                }
+                // if(checkvalidityOfParents(currentNode)){
+                //   break;
+                // };
             }
         }
         Way way = members.get(currentIndex).getWay();
-        Way nextWay = members.get(currentIndex + 1).getWay();
-        Node n = WayUtils.findCommonFirstLastNode(nextWay, way, currentNode).orElse(null);
-        currentNode = getOtherNode(nextWay, n);
+        Way nextw = members.get(currentIndex + 1).getWay();
+        Node n = WayUtils.findCommonFirstLastNode(nextw, way, currentNode).orElse(null);
+        System.out.println("current Way: " + way.getUniqueId() + "nextWay: "+nextw.getUniqueId()+ "currentNode: "+currentNode.getUniqueId());
+
+        // System.out.println("current Way: " + way.getUniqueId() + "nextWay: "+nextWay.getUniqueId()+ "currentNode: "+currentNode.getUniqueId());
         if(n !=null){
-          System.out.println("when adding way common id " + n.getUniqueId() );
+          currentNode = getOtherNode(nextw, n);
+          // System.out.println("when adding way common id " + n.getUniqueId() );
         }
-        if(currentNode !=null){
-          System.out.println("after adding currentNode id " + currentNode.getUniqueId() );
+        else{
+          Node node1 = currentWay.firstNode();
+          Node node2 = currentWay.lastNode();
+          if(nextw.firstNode().equals(node1) || nextw.lastNode().equals(node1)){
+            currentNode = getOtherNode(nextw, node1);
+          }
+          else{
+            currentNode = getOtherNode(nextw, node2);
+          }
+          // if(Isthere.get(nextw.firstNode())!=null && Isthere.get(nextw.firstNode())!=0){
+          //   currentNode = getOtherNode(nextw, nextw.firstNode());
+          // }
+          // else{
+          //   currentNode = getOtherNode(nextw, nextw.lastNode());
+          // }
+        }
+        // if(currentNode !=null){
+        //   System.out.println("after adding currentNode id " + currentNode.getUniqueId() );
+        // }
+        System.out.println("check that have you traversed common node or not "+ currentNode.getUniqueId() + "value: "+Isthere.get(currentNode));
+        if(Isthere.get(currentNode)>=3){
+          currentIndex++;
+          if(currentIndex <= members.size()-1){
+            System.out.println("currentNode will be "+ currentNode.getUniqueId());
+            assignRolesafterloop(currentNode);
+            flag=1;
+          }
+          else{
+            deleteExtraWays();
+          }
         }
         savestateoneditor();
         try {
@@ -1643,10 +1724,18 @@ void getNextWayAfterSelection(List<Way> ways) {
         currentNode = null;
     }
     previousWay = currentWay;
-    if (currentIndex < members.size() - 1) {
+    // System.out.println("when fix variant doesnt work and previousway is "+ previousWay.getUniqueId());
+    // currentIndex++;
+    if(flag==1){
+      fixgapAfterlooping(brokenidx);
+      flag=0;
+    }
+    else if (currentIndex < members.size() - 1) {
         callNextWay(++currentIndex);
-    } else
-        deleteExtraWays();
+    } else{
+      deleteExtraWays();
+      makeNodesZeros();
+    }
 }
 
 void addNewWays(List<Way> ways, int i) {
@@ -1656,47 +1745,198 @@ void addNewWays(List<Way> ways, int i) {
         if(prelink.isOnewayLoopBackwardPart){
           s="forward";
         }
+        System.out.println("way size " + ways.size());
         int[] idx = new int[1];
         idx[0]=i+1;
         Way w = ways.get(0);
-        if(prelink.isOnewayLoopBackwardPart && currentNode.equals(w.firstNode())){
-          s="backward";
-        }
-        else if(prelink.isOnewayLoopBackwardPart && currentNode.equals(w.lastNode())){
-          s="forward";
-        }
-        else if(prelink.isOnewayLoopForwardPart && currentNode.equals(w.firstNode())){
-          s="forward";
-        }
-        else if(prelink.isOnewayLoopForwardPart && currentNode.equals(w.lastNode())){
-          s="backward";
-        }
-        else{
-          s="";
-        }
-        System.out.println("check this out:" + s);
+        s=assignRoles(w);
+        // System.out.println("check this out:" + s);
+        // System.out.println("check way is already travelled or not:" + IsWaythere.get(ways.get(0)) + " way id "+w.getUniqueId());
+        // System.out.println("check way is already travelled or not: "+ waysAlreadyPresent.containsKey(ways.get(0)));
         for (int k = 0; k < ways.size(); k++) {
             c.add(new RelationMember(s, ways.get(k)));
             // check if the way that is getting added is already present or not
-            if (!waysAlreadyPresent.containsKey(ways.get(k))) {
+            if (!waysAlreadyPresent.containsKey(ways.get(k)) && IsWaythere.get(ways.get(k))==null) {
                 waysAlreadyPresent.put(ways.get(k), 1);
-                for(Node node:ways.get(k).getNodes()){
-                  Isthere.put(node,1);
+                // System.out.println("I am adding " + ways.get(k).getUniqueId());
+               for(Node node:ways.get(k).getNodes()){
+                  if(Isthere.get(node)==null || Isthere.get(node)==0){
+                    Isthere.put(node,1);
+                  }
+                  else{
+                    Isthere.put(node,Isthere.get(node)+1);
+                  }
                 }
+                IsWaythere.put(ways.get(k),1);
             }
             else {
                 deleteWayAfterIndex(ways.get(k), i);
             }
         }
-
+        // if (!waysAlreadyPresent.containsKey(ways.get(0)) && IsWaythere.get(ways.get(0))==null){
+        // }
         memberTableModel.addMembersAfterIdx(ways, i);
         memberTableModel.updateRole(idx,s);
         members.addAll(i + 1, c);
+
         currentNode = getOtherNode(w,currentNode);
+         System.out.println("currentIndex is "+ currentIndex +" Way id is "+ members.get(currentIndex).getWay().getUniqueId());
         links = connectionTypeCalculator.updateLinks(members);
+        // if(Isthere.get(currentNode)!=null && Isthere.get(currentNode)!=0){
+        //   System.out.println("currentIndex is "+ currentIndex +" Way id is "+ members.get(currentIndex).getWay().getUniqueId());
+        // }
     } catch (Exception e) {
         Logging.error(e);
     }
+}
+String assignRoles(Way w){
+  int flag =0,flag2=0;
+  String s ="";
+  if(lastForWay != null && lastBackWay !=null) {
+  // System.out.println("last traversed backward edge: "+lastBackWay.getUniqueId());
+  // System.out.println("last traversed forward edge: "+lastForWay.getUniqueId());
+  // System.out.println("Current Node: "+currentNode.getUniqueId());
+  System.out.println("assigning roles uselessly");
+  NodePair pair = WayUtils.findCommonFirstLastNodes(lastForWay,lastBackWay);
+  int num = WayUtils.findNumberOfCommonFirstLastNodes(lastBackWay, lastForWay);
+  Node nod;
+  if(pair.getA()==null && pair.getB()!=null){
+    if(pair.getB().equals(currentNode)){
+      flag=1;
+    }
+  }
+  else if(pair.getB()==null && pair.getA()!=null){
+    if(pair.getA().equals(currentNode)){
+      flag=1;
+    }
+  }
+  else if(pair.getB()!=null && pair.getA()!=null){
+    if(pair.getA().equals(currentNode) || pair.getB().equals(currentNode)){
+      flag =1;
+    }
+  }
+}
+  if (flag==1){
+    s="";
+  }
+  else if(prelink.isOnewayLoopBackwardPart && currentNode.equals(w.firstNode())){
+   s="backward";
+ }
+ else if(prelink.isOnewayLoopBackwardPart && currentNode.equals(w.lastNode())){
+   s="forward";
+ }
+ else if(prelink.isOnewayLoopForwardPart && currentNode.equals(w.firstNode())){
+   s="forward";
+ }
+ else if(prelink.isOnewayLoopForwardPart && currentNode.equals(w.lastNode())){
+   s="backward";
+ }
+ else{
+   s="";
+ }
+ return s;
+}
+void assignRolesafterloop(Node jointNode){
+  System.out.println("assigning roles in loop");
+    int idx = currentIndex;
+    int[] idxlst = new int[1];
+    String[] roles = new String[20];
+    Node node1 ;
+    Node node2 ;
+    Way w = members.get(idx).getWay();
+    Node node = null;
+    String s ="";
+    if(w.firstNode().equals(jointNode)){
+      node =w.lastNode();
+      s="backward";
+    }
+    else{
+      s="forward";
+      node =w.firstNode();
+    }
+    idxlst[0]=idx;
+    idx--;
+//    System.out.println("node id: "+ node.getUniqueId()+"distance between them " +dist.compare(node,node1));
+    Way minWay = w;
+    double minLength = findDistanceBetweenWays(w, nextWay, jointNode);
+    memberTableModel.updateRole(idxlst,s);
+    while(true){
+      w = members.get(idx).getWay();
+      if(w.firstNode().equals(node)){
+        node =w.lastNode();
+        node1 = w.firstNode();
+        s="backward";
+        // roles[idx]=s;
+      }
+      else{
+        node =w.firstNode();
+        node1 = w.lastNode();
+        s="forward";
+        // roles[idx]=s;
+      }
+      idxlst[0]=idx;
+      double length = findDistanceBetweenWays(w, nextWay, node1);
+      if (minLength > length) {
+        minLength = length;
+        minWay = w;
+      }
+      memberTableModel.updateRole(idxlst,s);
+      // System.out.println("node id: "+ node.getUniqueId()+"distance between them " +dist.compare(node,node1));
+      if(w.firstNode().equals(jointNode) || w.lastNode().equals(jointNode)){
+        break;
+      }
+      idx--;
+      // if(idx<0){
+      //   System.out.println("out of bound exception: " +Isthere.get(currentWay.lastNode()));
+      //   System.out.println("out of bound exception ");
+      // }
+    }
+    // System.out.println("finally this is the nearest way: "+ minWay.getUniqueId());
+    // double a = findDistanceBetweenWays(minWay,nextWay,minWay.firstNode());
+    // double b = findDistanceBetweenWays(minWay,nextWay,minWay.lastNode());
+    // if(a>b){
+    //   System.out.println("nearest node " + minWay.firstNode().getUniqueId());
+    //   brokenNode = minWay.firstNode();
+    // }
+    // else{
+    //   brokenNode = minWay.lastNode();
+    //   System.out.println("nearest node " + minWay.lastNode().getUniqueId());
+    // }
+    currentNode = jointNode;
+    brokenidx = idx;
+    // fixgapAfterlooping(idx);
+    sortBelowidx(relation.getMembers(),0);
+}
+
+void fixgapAfterlooping(int idx){
+  Way w = members.get(idx).getWay();
+  currentWay =w;
+  int flag = 0;
+  Way minWay = w;
+  double minLength = findDistanceBetweenWays(w, nextWay, currentNode);
+  while(idx<=currentIndex){
+    w = members.get(idx).getWay();
+    // currentWay =w;
+    // System.out.println("iterating on way: "+w.getUniqueId());
+    List<Way> parentWays =findNextWay(w,w.lastNode());
+  	if(w.firstNode()!=null) {
+  		parentWays.addAll(findNextWay(w,w.firstNode()));
+  	}
+    for(int i=0;i<parentWays.size();i++){
+        if(IsWaythere.get(parentWays.get(i))==null){
+            Node node =getOtherNode(parentWays.get(i),null);
+            double dist = findDistanceBetweenWays(parentWays.get(i),nextWay,node);
+            if(dist<minLength){
+              minLength = dist;
+              minWay = w;
+            }
+        }
+    }
+    idx++;
+  }
+  w=minWay;
+  System.out.println("my nearest way is "+w.getUniqueId());
+  findNextWayAfterDownload(w,w.lastNode(),w.firstNode());
 }
 
 void deleteWayAfterIndex(Way way, int index) {
@@ -1719,6 +1959,8 @@ void deleteWayAfterIndex(Way way, int index) {
             }
             if (del) {
                 int[] x = {i };
+                Way w= members.get(i).getWay();
+                // for
                 memberTableModel.remove(x);
                 members.remove(i);
 
@@ -1819,12 +2061,13 @@ void RemoveWayAfterSelection(List<Integer> wayIndices, Character chr) {
     if (chr == 'A' || chr == '1') {
         // remove all the ways
         int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
-        // for (int i = 0; i < lst.length; i++) {
-        //     Way way = members.get(i).getWay();
-        //     for(Node node: way.getAllNodes()){
-        //       Isthere.put(node,0);
-        //     }
-        // }
+        for (int i = 0; i < lst.length; i++) {
+            Way way = members.get(i).getWay();
+            for(Node node: way.getNodes()){
+              Isthere.put(node,Isthere.get(node)-1);
+            }
+        }
+        // System.out.println("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
         memberTableModel.remove(lst);
         for (int i = 0; i < lst.length; i++) {
             members.remove(lst[i] - i);
@@ -2119,6 +2362,17 @@ int getPreviousWayIndex(int idx) {
       nextIndex = false;
       abort = true;
       removeTemporarylayers();
+  }
+
+  void makeNodesZeros(){
+    for(int i=0;i<members.size();i++){
+      Way n = members.get(i).getWay();
+      Node f = n.firstNode();
+      Node l = n.lastNode();
+      Isthere.put(f,0);
+      Isthere.put(l,0);
+      IsWaythere.put(n,null);
+    }
   }
   private class MendRelationAddLayer extends AbstractMapViewPaintable {
 
