@@ -691,17 +691,17 @@ private Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
   if(node2!=null) {
 		parentWays.addAll(findNextWay(way,node2));
 	}
-	// directroutes = getDirectRouteBetweenWays(currentWay,nextWay);
-	// if(directroutes == null || directroutes.size()==0) {
-	// 	showOption0 =false;
-	// }
-	// else {
-	// 	showOption0 = true;
-	// }
-	//  if(directroutes!=null  && directroutes.size() > 0 && !shorterRoutes && parentWays.size() > 0 && notice == null) {
-	//  	displayFixVariantsWithOverlappingWays(directroutes);
-  //    return null ;
-	//  }
+	directroutes = getDirectRouteBetweenWays(currentWay,nextWay);
+	if(directroutes == null || directroutes.size()==0) {
+		showOption0 =false;
+	}
+	else {
+		showOption0 = true;
+	}
+	 if(directroutes!=null  && directroutes.size() > 0 && !shorterRoutes && parentWays.size() > 0 && notice == null) {
+	 	displayFixVariantsWithOverlappingWays(directroutes);
+     return null ;
+	 }
 	if(parentWays.size()==1) {
 		goToNextWay(parentWays.get(0),way,new ArrayList<>());
 	}else if(parentWays.size()>1) {
@@ -1663,7 +1663,7 @@ void getNextWayAfterSelection(List<Way> ways) {
           }
         }
         System.out.println("check that have you traversed common node or not "+ currentNode.getUniqueId() + "value: "+Isthere.get(currentNode));
-        if(Isthere.get(currentNode)>=3){
+        if(Isthere.get(currentNode)!=null && Isthere.get(currentNode)>=3){
           currentIndex++;
           if(currentIndex <= members.size()-1){
             System.out.println("currentNode will be "+ currentNode.getUniqueId());

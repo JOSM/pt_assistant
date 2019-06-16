@@ -96,9 +96,9 @@ public final class WayUtils {
         return
             way.hasTag(
                 "highway",
-                "trunk", "primary", "secondary", "tertiary",
+                "trunk", "primary", "secondary", "tertiary","track",
                 "unclassified", "road", "residential", "service", "trunk_link", "primary_link",
-                "secondary_link", "tertiary_link", "living_street", "bus_guideway", "road","path"
+                "secondary_link", "tertiary_link", "living_street", "bus_guideway", "road","path","footway"
             )
             || way.hasTag(
                 "cycleway",
