@@ -137,14 +137,14 @@ public class Bicycle extends AbstractRelationEditorAction{
   private static final String I18N_TURN_BY_TURN_NEXT_INTERSECTION = I18n.marktr("turn-by-turn at next intersection");
 
   ////////////////////////Assigning Variables///////////////
-  Relation relation = null;
+  static Relation relation = null;
   MemberTableModel memberTableModel = null;
   GenericRelationEditor editor = null;
   HashMap<Way, Integer> waysAlreadyPresent = null;
   List<RelationMember> members = null;
-  Way previousWay;
+  static Way previousWay;
   Way currentWay;
-  Way nextWay;
+  static Way nextWay;
   Way lastForWay;
   Way lastBackWay;
   List<Integer> extraWaysToBeDeleted = null;
@@ -159,7 +159,7 @@ public class Bicycle extends AbstractRelationEditorAction{
   boolean setEnable = true;
   boolean firstCall = true;
   boolean halt = false;
-  boolean abort = false;
+  static boolean abort = false;
   boolean shorterRoutes = false;
   boolean showOption0 = false;
   boolean onFly = false;
@@ -168,12 +168,12 @@ public class Bicycle extends AbstractRelationEditorAction{
   HashMap<Way, Character> wayColoring;
   HashMap<Character, List<Way>> wayListColoring;
   AbstractMapViewPaintable temporaryLayer = null;
-  String notice = null;
+  static String notice = null;
   HashMap<Node, Integer> Isthere = new HashMap<>();
-  HashMap<Way, Integer> IsWaythere = new HashMap<>();
-  List<WayConnectionType> links;
-  WayConnectionType link;
-  WayConnectionType prelink;
+  static HashMap<Way, Integer> IsWaythere = new HashMap<>();
+  static List<WayConnectionType> links;
+  static WayConnectionType link;
+  static WayConnectionType prelink;
   Node brokenNode;
   List<List<Way>> directroutes;
   NodePositionComparator dist = new NodePositionComparator();
@@ -244,6 +244,7 @@ public class Bicycle extends AbstractRelationEditorAction{
 /////////////on action call init()/////////////
 
   public void init(){
+    System.out.println("I am cycle");
     savestateoneditor();
     sortBelowidx(relation.getMembers(),0);
     members = editor.getRelation().getMembers();
@@ -494,7 +495,7 @@ public void callNextWay(int idx){
 	}
 
 }
-boolean checkOneWaySatisfiability(Way way, Node node) {
+static boolean checkOneWaySatisfiability(Way way, Node node) {
     String[] acceptedTags = new String[] {"yes", "designated" };
 
     if((link.isOnewayLoopBackwardPart && relation.hasTag("route", "bicycle"))||prelink.isOnewayLoopBackwardPart){
@@ -709,6 +710,10 @@ private Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
     System.out.println("parents more than one: " + way.getUniqueId() );
     System.out.println("iteration on first node " +Isthere.get(way.firstNode()));
     System.out.println("iteration on last node "+ Isthere.get(way.lastNode()));
+    System.out.println("size of the parents"+ currentWay.getReferrers().size());
+    for(OsmPrimitive w:currentWay.getReferrers()){
+      System.out.println("wayIds: "+ w.getUniqueId());
+    }
 		displayFixVariants(parentWays);
 	}
 	else {
@@ -914,8 +919,7 @@ void goToNextWay(Way way, Way prevWay, List<Way> wayList) {
         return;
     }
 }
-
-private List<Way> findNextWay(Way way, Node node) {
+public static List<Way> findNextWay(Way way, Node node) {
 	// TODO Auto-generated method stub
 	List<Way> parentWays = node.getParentWays();
   parentWays = removeInvalidWaysFromParentWays(parentWays, node, way);
@@ -951,7 +955,7 @@ private List<Way> findNextWay(Way way, Node node) {
     return parentWays;
 }
 
-List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way way) {
+static List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way way) {
     parentWays.remove(way);
     if (abort)
         return null;
@@ -1101,7 +1105,7 @@ List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way w
     return parentWays;
 }
 
-List<Way> removeInvalidWaysFromParentWaysOfRoundabouts(List<Way> parents, Node node, Way way) {
+static List<Way> removeInvalidWaysFromParentWaysOfRoundabouts(List<Way> parents, Node node, Way way) {
     List<Way> parentWays = parents;
     parentWays.remove(way);
     if (abort)
@@ -1143,7 +1147,7 @@ List<Way> removeInvalidWaysFromParentWaysOfRoundabouts(List<Way> parents, Node n
     return parentWays;
 }
 
-boolean checkIfWayConnectsToNextWay(Way way, int count, Node node) {
+static boolean checkIfWayConnectsToNextWay(Way way, int count, Node node) {
 
     if (count < 80) {
         if (way.equals(nextWay))
@@ -1167,7 +1171,7 @@ boolean checkIfWayConnectsToNextWay(Way way, int count, Node node) {
     return false;
 }
 
-double findDistanceBetweenWays(Way way, Way nextWay, Node node) {
+static double findDistanceBetweenWays(Way way, Way nextWay, Node node) {
     Node otherNode = getOtherNode(way, node);
     double Lat = (nextWay.firstNode().lat() + nextWay.lastNode().lat()) / 2;
     double Lon = (nextWay.firstNode().lon() + nextWay.lastNode().lon()) / 2;
@@ -2100,7 +2104,7 @@ void RemoveWayAfterSelection(List<Integer> wayIndices, Character chr) {
 
 
 
-private boolean isNonSplitRoundAbout(final Way way) {
+private static boolean isNonSplitRoundAbout(final Way way) {
     return way.hasTag("junction", "roundabout") && way.firstNode().equals(way.lastNode());
 }
 
@@ -2108,7 +2112,7 @@ private boolean isSplitRoundAbout(final Way way) {
     return way.hasTag("junction", "roundabout") && !way.firstNode().equals(way.lastNode());
 }
 
-boolean isRestricted(Way currentWay, Way previousWay, Node commonNode) {
+static boolean isRestricted(Way currentWay, Way previousWay, Node commonNode) {
     Set<Relation> parentSet = OsmPrimitive.getParentRelations(previousWay.getNodes());
     if (parentSet == null || parentSet.isEmpty())
         return false;
@@ -2202,7 +2206,7 @@ boolean isRestricted(Way currentWay, Way previousWay, Node commonNode) {
     return false;
 }
 
-private Node getOtherNode(Way way, Node node) {
+private static Node getOtherNode(Way way, Node node) {
 	// TODO Auto-generated method stub
 	if(way.firstNode().equals(node)) {
 		return way.lastNode();

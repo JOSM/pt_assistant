@@ -230,6 +230,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     void initialise() {
+    	System.out.println("mai bus hun");
         save();
         sortBelow(relation.getMembers(), 0);
         members = editor.getRelation().getMembers();

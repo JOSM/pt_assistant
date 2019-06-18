@@ -16,7 +16,6 @@ import org.openstreetmap.josm.data.osm.SimplePrimitiveId;
 import org.openstreetmap.josm.io.IllegalDataException;
 import org.openstreetmap.josm.io.OsmReader;
 import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
-
 /**
  * Unit tests for class {@link SortPTRouteMembersAction}.
  *

@@ -28,15 +28,14 @@ import org.openstreetmap.josm.plugins.Plugin;
 import org.openstreetmap.josm.plugins.PluginInformation;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.CustomizeStopAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.AddStopPositionAction;
-import org.openstreetmap.josm.plugins.pt_assistant.actions.Bicycle;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.CreatePlatformNodeAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.CreatePlatformNodeThroughReplaceAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.CreatePlatformShortcutAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.DoubleSplitAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.EdgeSelectionAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.ExtractPlatformNodeAction;
-import org.openstreetmap.josm.plugins.pt_assistant.actions.MendRelationAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.PTWizardAction;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.RoutingAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersMenuBar;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SplitRoundaboutAction;
@@ -178,7 +177,7 @@ public class PTAssistantPlugin extends Plugin {
 
             @Override
             public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
-                return Arrays.asList(new MendRelationAction(editorAccess));
+                return Arrays.asList(new RoutingAction(editorAccess));
             }
         };
 
@@ -193,19 +192,19 @@ public class PTAssistantPlugin extends Plugin {
                 return Arrays.asList(new SortPTRouteMembersAction(editorAccess));
             }
         };
-        IRelationEditorActionGroup group3 = new IRelationEditorActionGroup() {
-            @Override
-            public int order() {
-                    return 20;
-               }
-
-            @Override
-            public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
-                return Arrays.asList(new Bicycle(editorAccess));
-            }
-        };
+//        IRelationEditorActionGroup group3 = new IRelationEditorActionGroup() {
+//            @Override
+//            public int order() {
+//                    return 20;
+//               }
+//
+//            @Override
+//            public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
+//                return Arrays.asList(new RoutingAction1(editorAccess));
+//            }
+//        };
         RelationEditorHooks.addActionsToMembers(group1);
         RelationEditorHooks.addActionsToMembers(group2);
-        RelationEditorHooks.addActionsToMembers(group3);
+//        RelationEditorHooks.addActionsToMembers(group3);
     }
 }
