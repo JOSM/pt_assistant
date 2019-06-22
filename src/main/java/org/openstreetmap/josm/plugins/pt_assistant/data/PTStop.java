@@ -55,6 +55,7 @@ public class PTStop extends RelationMember {
     /* indicates a stop where people can only entry the bus */
     private boolean entryOnly;
 
+    // public ArrayList<Way> WaysAssociatedtostop;
     /**
      * Constructor
      *

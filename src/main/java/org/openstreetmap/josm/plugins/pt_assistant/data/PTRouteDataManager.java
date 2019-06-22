@@ -1,6 +1,7 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.data;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,7 +30,7 @@ public class PTRouteDataManager {
     Relation relation;
 
     /* Stores all relation members that are PTStops */
-    private List<PTStop> ptStops = new ArrayList<>();
+    public List<PTStop> ptStops = new ArrayList<>();
 
     /* Stores all relation members that are PTWays */
     private List<PTWay> ptWays = new ArrayList<>();
@@ -43,6 +44,29 @@ public class PTRouteDataManager {
     private String routeNameFormat = "[operator] [ref] [from] - [via] - [to]";
 
     private HashMap<String, String> tags = new HashMap<>(30);
+
+     public HashMap<PTStop,Way> ptStopWays = new HashMap<>(110);
+     public HashMap<PTStop,Color> ptstopColors = new HashMap<>(110);
+     public HashMap<Way,PTStop> ptWayStops = new HashMap<>(110);
+     public HashMap<Way,Color> ptwayColors = new HashMap<>(110);
+
+    // public HashMap<RelationMember,RelationMember> ptStopWays = new HashMap<>(110);
+    // public HashMap<RelationMember,Color> ptstopColors = new HashMap<>(110);
+    // public HashMap<RelationMember,RelationMember> ptWayStops = new HashMap<>(110);
+
+
+    private static final Color[] RAINBOW_COLOR_PALETTE = {
+        new Color(0, 255, 0, 150),//GREEN 0
+        new Color(255, 0, 0, 150),//RED 1
+        new Color(0, 0, 255, 150),//BLUE 2
+        new Color(255, 255, 0, 150),//YELLOW 3
+        new Color(0, 255, 255, 150),//SKYBLUE 4
+        new Color(255, 127,0, 150),//ORANGE 5
+        new Color(148, 0, 211, 150),//VIOLET 6
+        new Color(255, 255, 255, 150),//WHITE 7
+        new Color(169, 169, 169, 210),//GREY 8
+        new Color(239, 167, 222,220)
+    };
 
     public PTRouteDataManager(Relation relation) {
 
@@ -149,6 +173,116 @@ public class PTRouteDataManager {
      * @return Squared distance between the centers of the bounding boxes of the
      *         given relation members
      */
+     public void assignColorstostops(){
+       PTStop prev =null;
+       Color prevcolor=null;
+       for(int i=0;i<ptStops.size();i++){
+         int j=i%10;
+         if(i!=0 && ptStopWays.get(ptStops.get(i))==ptStopWays.get(prev)){
+           ptstopColors.put(ptStops.get(i),prevcolor);
+         }
+         else{
+           ptstopColors.put(ptStops.get(i),RAINBOW_COLOR_PALETTE[j]);
+           prevcolor=RAINBOW_COLOR_PALETTE[j];
+         }
+         prev=ptStops.get(i);
+       }
+     }
+     public void assignColorstoways(){
+       int i=0;
+       for (RelationMember member : this.relation.getMembers()){
+         if (RouteUtils.isPTWay(member)) {
+           i=i%10;
+           if(ptwayColors.get(member.getWay())==null){
+             ptwayColors.put(member.getWay(),RAINBOW_COLOR_PALETTE[i]);
+           }
+           else{
+             System.out.println("hii my way id is: "+member.getWay().getUniqueId() );
+             ptstopColors.put(ptWayStops.get(member.getWay()),ptwayColors.get(member.getWay()));
+           }
+           i++;
+         }
+     }
+   }
+     public void assignstoptoways(){
+       PTStop prev =null;
+       for (RelationMember member : this.relation.getMembers()){
+         if (RouteUtils.isPTWay(member)) {
+           int flag=0;
+           for(PTStop pt:ptStops){
+             if(ptStopWays.get(pt)==member.getWay()){
+               ptWayStops.put(member.getWay(),pt);
+               prev = pt;
+               flag=1;
+               break;
+             }
+           }
+           if(flag==0){
+             ptWayStops.put(member.getWay(),prev);
+           }
+         }
+       }
+     }
+     public void WaysAssociatedtostop(){
+       for(int i=0;i<ptStops.size();i++){
+         PTStop p=ptStops.get(i);
+         Way w=checkNode(p);
+         ptStopWays.put( p,w);
+       }
+       for(PTStop pt:ptStops){
+         System.out.println("stop id "+pt.getUniqueId()+"serving way "+ptStopWays.get(pt).getUniqueId());
+       }
+     }
+
+    private Way checkNode(RelationMember p){
+      double mindist=1e5;
+      Way w= null,w1=null;
+      Node node1=null,node2=null;
+      int idx =0;
+      for (RelationMember member : this.relation.getMembers()){
+        if (RouteUtils.isPTWay(member)) {
+          for(Node nod:member.getWay().getNodes()){
+            LatLon coord1 = new LatLon(nod.lat(),nod.lon());
+            double d=calculateDistanceSq(p,coord1);
+            if(d < mindist){
+              mindist=d;
+              w=member.getWay();
+              node1 =nod;
+            }
+          }
+          idx++;
+        }
+      }
+      for (RelationMember member : this.relation.getMembers()){
+        if (RouteUtils.isPTWay(member)) {
+            if(member.getWay().firstNode()==node1){
+                w1=member.getWay();
+            }
+          }
+        }
+      if(node1==w.lastNode() && w1!=null && w1.firstNode()==node1){
+        LatLon coord1 = new LatLon(node1.lat(),node1.lon());
+        for(Node nod:w1.getNodes()){
+          if(nod!=node1){
+            node2 = nod;
+            break;
+          }
+        }
+        LatLon coord2 = new LatLon(node2.lat(),node2.lon());
+        LatLon coord3 = p.getMember().getBBox().getCenter();
+        if(calculateDistanceSq(coord1,coord2)>calculateDistanceSq(coord2,coord3)){
+          w=w1;
+        }
+      }
+      return w;
+   }
+   private double calculateDistanceSq(RelationMember member1, LatLon coord2) {
+       LatLon coord1 = member1.getMember().getBBox().getCenter();
+       return coord1.distanceSq(coord2);
+   }
+   private double calculateDistanceSq(LatLon coord1, LatLon coord2) {
+       return coord1.distanceSq(coord2);
+   }
     private double calculateDistanceSq(RelationMember member1, RelationMember member2) {
         LatLon coord1 = member1.getMember().getBBox().getCenter();
         LatLon coord2 = member2.getMember().getBBox().getCenter();
