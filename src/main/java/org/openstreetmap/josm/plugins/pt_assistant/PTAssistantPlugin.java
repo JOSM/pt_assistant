@@ -192,19 +192,7 @@ public class PTAssistantPlugin extends Plugin {
                 return Arrays.asList(new SortPTRouteMembersAction(editorAccess));
             }
         };
-//        IRelationEditorActionGroup group3 = new IRelationEditorActionGroup() {
-//            @Override
-//            public int order() {
-//                    return 20;
-//               }
-//
-//            @Override
-//            public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
-//                return Arrays.asList(new RoutingAction1(editorAccess));
-//            }
-//        };
         RelationEditorHooks.addActionsToMembers(group1);
         RelationEditorHooks.addActionsToMembers(group2);
-//        RelationEditorHooks.addActionsToMembers(group3);
     }
 }

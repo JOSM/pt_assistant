@@ -197,7 +197,7 @@ public class PTRouteDataManager {
              ptwayColors.put(member.getWay(),RAINBOW_COLOR_PALETTE[i]);
            }
            else{
-             System.out.println("hii my way id is: "+member.getWay().getUniqueId() );
+//             System.out.println("hii my way id is: "+member.getWay().getUniqueId() );
              ptstopColors.put(ptWayStops.get(member.getWay()),ptwayColors.get(member.getWay()));
            }
            i++;
@@ -229,9 +229,9 @@ public class PTRouteDataManager {
          Way w=checkNode(p);
          ptStopWays.put( p,w);
        }
-       for(PTStop pt:ptStops){
-         System.out.println("stop id "+pt.getUniqueId()+"serving way "+ptStopWays.get(pt).getUniqueId());
-       }
+//       for(PTStop pt:ptStops){
+//         System.out.println("stop id "+pt.getUniqueId()+"serving way "+ptStopWays.get(pt).getUniqueId());
+//       }
      }
 
     private Way checkNode(RelationMember p){
