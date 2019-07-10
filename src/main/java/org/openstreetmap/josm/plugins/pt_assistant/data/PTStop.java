@@ -24,6 +24,7 @@ public class PTStop extends RelationMember {
     /* stop_position element of this stop */
     private Node stopPosition = null;
 
+    private Node stopNode = null;
     /* platform element of this stop */
     private OsmPrimitive platform = null;
 
@@ -75,6 +76,7 @@ public class PTStop extends RelationMember {
             entryOnly = true;
             role = "_entry_only";
         }
+        stopNode = other.getNode();
 
         if (isPTStopPosition(other)) {
             stopPosition = other.getNode();
@@ -246,6 +248,15 @@ public class PTStop extends RelationMember {
      */
     public static boolean isPTStop(RelationMember rm) {
         return isPTStopPosition(rm) || isPTPlatform(rm);
+    }
+
+    /**
+     * returns the node related to stop.
+     *
+     * @return node of the PTstop
+     */
+    public Node getStopNode() {
+        return stopNode;
     }
 
     /**

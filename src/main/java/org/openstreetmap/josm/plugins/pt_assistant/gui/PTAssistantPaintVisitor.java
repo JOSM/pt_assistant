@@ -25,7 +25,6 @@ import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionType;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionTypeCalculator;
 import org.openstreetmap.josm.gui.layer.validation.PaintVisitor;
-import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteDataManager;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTWay;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
@@ -69,37 +68,33 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
             drawCycleRoute(r);
             return;
         }
-        // System.out.println("hii");
-        PTRouteDataManager ptroute = new PTRouteDataManager(r);
-        ptroute.WaysAssociatedtostop();
-        ptroute.assignstoptoways();
-        ptroute.assignColorstostops();
-        ptroute.assignColorstoways();
 
-        System.out.println(ptroute.ptStops.size());
+//        PTRouteDataManager ptroute = new PTRouteDataManager(r);
+//        System.out.println(ptroute.ptStops.size());
+//        for(PTStop pt:ptroute.ptStops) {
+//        	System.out.println(pt.getUniqueId());
+//        }
+//        ptroute.WaysAssociatedtostop();
+//        ptroute.assignstoptoways();
+//        ptroute.printWaysAssociatedtostops();
         List<RelationMember> rmList = new ArrayList<>();
         List<RelationMember> revisitedWayList = new ArrayList<>();
         // first, draw primitives:
         for (RelationMember rm : r.getMembers()) {
 
             if (PTStop.isPTStopPosition(rm)) {
-              PTStop xy = new PTStop(rm);
-              Color c = ptroute.ptstopColors.get(xy);
-                drawStop(rm.getMember(), true,c);
+                drawStop(rm.getMember(), true);
             } else if (PTStop.isPTPlatform(rm)) {
-              PTStop xy = new PTStop(rm);
-              Color c = ptroute.ptstopColors.get(xy);
-                drawStop(rm.getMember(), false,c);
+                drawStop(rm.getMember(), false);
             } else if (RouteUtils.isPTWay(rm)) {
                 if (rm.isWay()) {
-                    Color c = ptroute.ptstopColors.get(ptroute.ptWayStops.get(rm.getWay()));
                     if (rmList.contains(rm)) {
                         if (!revisitedWayList.contains(rm)) {
-                            visit(rm.getWay(), true,c);
+                            visit(rm.getWay(), true);
                             revisitedWayList.add(rm);
                         }
                     } else {
-                        visit(rm.getWay(), false,c);
+                        visit(rm.getWay(), false);
                     }
                 } else if (rm.isRelation()) {
                     visit(rm.getRelation());
@@ -205,7 +200,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
         }
     }
 
-    public void visit(Way w, boolean revisit,Color color) {
+    public void visit(Way w, boolean revisit) {
         if (w == null) {
             return;
         }
@@ -240,7 +235,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
             }
         }
 
-        visit(w.getNodes(), oneway, revisit,color);
+        visit(w.getNodes(), oneway, revisit);
 
     }
 
@@ -254,7 +249,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
      *            oneway
      * @param revisit if true, draw 3 separate lines
      */
-    public void visit(List<Node> nodes, int oneway, boolean revisit,Color color) {
+    public void visit(List<Node> nodes, int oneway, boolean revisit) {
         Node lastN = null;
         for (Node n : nodes) {
             if (lastN == null) {
@@ -262,7 +257,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
                 continue;
             }
             if (!revisit)
-                drawSegment(lastN, n, color, oneway, revisit);
+                drawSegment(lastN, n, new Color(128, 0, 128, 100), oneway, revisit);
             else
                 drawSegment(lastN, n, new Color(0, 0, 0, 180), oneway, revisit);
             lastN = n;
@@ -278,7 +273,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
     @Override
     public void visit(Node n) {
         if (n.isDrawable() && isNodeVisible(n)) {
-            drawNode(n,Color.BLUE);
+            drawNode(n, Color.BLUE);
         }
     }
 
@@ -308,6 +303,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
                 // do nothing
                 Logging.trace(ex);
             }
+
         }
     }
 
@@ -419,7 +415,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
      *            The circle color
      */
     @Override
-    protected void drawNode(Node n,Color color) {
+    protected void drawNode(Node n, Color color) {
         if (mv == null || g == null) {
             return;
         }
@@ -439,14 +435,14 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
      *            primitive
      * @param stopPosition whether to draw a circle (true) or square (false)
      */
-    protected void drawStop(OsmPrimitive primitive, Boolean stopPosition,Color color) {
+    protected void drawStop(OsmPrimitive primitive, Boolean stopPosition) {
 
         // find the point to which the stop visualization will be linked:
         Node n = new Node(primitive.getBBox().getCenter());
 
         Point p = mv.getPoint(n);
 
-        g.setColor(color);
+        g.setColor(Color.BLUE);
 
         if (stopPosition) {
             g.fillOval(p.x - 8, p.y - 8, 16, 16);

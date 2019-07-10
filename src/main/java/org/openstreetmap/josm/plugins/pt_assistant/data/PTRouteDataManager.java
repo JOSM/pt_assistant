@@ -27,8 +27,8 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 public class PTRouteDataManager {
 
     /* The route relation */
-    Relation relation;
-
+    public Relation relation;
+    // EdgeDataManager edges;
     /* Stores all relation members that are PTStops */
     public List<PTStop> ptStops = new ArrayList<>();
 
@@ -45,15 +45,12 @@ public class PTRouteDataManager {
 
     private HashMap<String, String> tags = new HashMap<>(30);
 
-     public HashMap<PTStop,Way> ptStopWays = new HashMap<>(110);
-     public HashMap<PTStop,Color> ptstopColors = new HashMap<>(110);
-     public HashMap<Way,PTStop> ptWayStops = new HashMap<>(110);
-     public HashMap<Way,Color> ptwayColors = new HashMap<>(110);
-
-    // public HashMap<RelationMember,RelationMember> ptStopWays = new HashMap<>(110);
-    // public HashMap<RelationMember,Color> ptstopColors = new HashMap<>(110);
-    // public HashMap<RelationMember,RelationMember> ptWayStops = new HashMap<>(110);
-
+    public HashMap<PTStop,Way> ptStopWays = new HashMap<>();
+    public HashMap<PTStop,Color> ptstopColors = new HashMap<>();
+    public HashMap<Way,PTStop> ptWayStops = new HashMap<>();
+    public HashMap<Way,Color> ptwayColors = new HashMap<>();
+    public HashMap<Way,ArrayList<PTStop>> RightSideStops = new HashMap<>();
+    public HashMap<Way,ArrayList<PTStop>> LeftSideStops = new HashMap<>();
 
     private static final Color[] RAINBOW_COLOR_PALETTE = {
         new Color(0, 255, 0, 150),//GREEN 0
@@ -76,25 +73,17 @@ public class PTRouteDataManager {
 
         this.relation = relation;
 
-//        String routeOperator = this.relation.get("operator");
-//        if (routeOperator == null) {
-//            routeOperator = "";
-//        }
-//        String network = this.relation.get("network");
-//        if (network == null) {
-//            network = "";
-//        }
-//        String routeRef = this.relation.get("ref");
-//        if (routeRef == null) {
-//            routeRef = "";
-//        }
+        // edges = new EdgeDataManager();
+        // edges.IterationOnAllExistingRoutes();
+        // edges.makingEdgesForRelations();
+        // List<Edge> listOfEdges = edges.getEdgeListOfRelation(relation);
+         System.out.println("Size of relation member is " + this.relation.getMembers().size());
 
         PTStop prev = null; // stores the last created PTStop
-
         for (RelationMember member : this.relation.getMembers()) {
 
             if (PTStop.isPTStop(member)) {
-
+                // System.out.println("i am inside");
                 // First, check if the stop already exists (i.e. there are
                 // consecutive elements that belong to the same stop:
                 boolean stopExists = false;
@@ -133,7 +122,6 @@ public class PTRouteDataManager {
                     // having >1 stop_position, platform or stop_area.
                 } else {
                     // this PTStop does not exist yet, so create it:
-
                     try {
                         PTStop ptstop = new PTStop(member);
                         ptStops.add(ptstop);
@@ -162,6 +150,116 @@ public class PTRouteDataManager {
 
         }
     }
+    public void WaysAssociatedtostop(){
+      System.out.println("stop size is pt-stops: "+ ptStops.size());
+        for(int i=0;i<ptStops.size();i++){
+          PTStop p=ptStops.get(i);
+          Way w=checkNode(relation,p);
+          ptStopWays.put( p,w);
+        }
+        //       for(PTStop pt:ptStops){
+        //         System.out.println("stop id "+pt.getUniqueId()+"serving way "+ptStopWays.get(pt).getUniqueId());
+        //       }
+    }
+     public void assignstoptoways(){
+           for(PTStop pts:ptStops){
+        	   Way ptway = ptStopWays.get(pts);
+             if(CrossProduct(ptway.firstNode(),ptway.lastNode(),pts)) {
+            	 if(!RightSideStops.containsKey(ptway)) {
+            		 RightSideStops.put(ptway, new ArrayList<PTStop>());
+            	 }
+            	 RightSideStops.get(ptway).add(pts);
+             }
+             else {
+            	 if(!LeftSideStops.containsKey(ptway)) {
+            		 LeftSideStops.put(ptway, new ArrayList<PTStop>());
+            	 }
+            	 LeftSideStops.get(ptway).add(pts);
+             }
+           }
+     }
+     public boolean CrossProduct(Node node1,Node node2,PTStop stop){
+       Node node3 = stop.getStopNode();
+       LatLon coord1 = new LatLon(node1.lat(),node1.lon());
+       LatLon coord2 = new LatLon(node2.lat(),node2.lon());
+       LatLon coord3 = new LatLon(node3.lat(),node3.lon());
+       double x1 = coord1.getX();
+       double y1 = coord1.getY();
+
+       double x2 = coord2.getX();
+       double y2 = coord2.getY();
+
+       double x3 = coord3.getX();
+       double y3 = coord3.getY();
+
+
+       x1-=x3;
+       y1-=y3;
+
+       x2-=x3;
+       y2-=y3;
+
+       double crossprod = x1*y2 - y1*x2;
+
+       //Right Direction
+       if(crossprod<=0){
+         return true;
+       }
+       //left Direction
+    	 return false;
+     }
+
+
+    public Way checkNode(Relation relat,RelationMember p){
+      double mindist=1e5;
+      Way w= null;
+      Node node1=null;
+      int idx =0,indx=0;
+      for (RelationMember member : relat.getMembers()){
+        if (RouteUtils.isPTWay(member)) {
+          for(Node nod:member.getWay().getNodes()){
+            LatLon coord1 = new LatLon(nod.lat(),nod.lon());
+            double d=calculateDistanceSq(p,coord1);
+            if(d < mindist){
+              mindist=d;
+              w=member.getWay();
+              node1 =nod;
+              indx =idx;
+            }
+          }
+          idx++;
+        }
+      }
+      List<Way> lis =findWaysThatContainAsEndNode(node1);
+      if(lis.size()>=2){
+        for(Way w1:lis){
+          LatLon coord1 = new LatLon(w.firstNode().lat(),w.firstNode().lon());
+          LatLon coord2 = new LatLon(w.lastNode().lat(),w.lastNode().lon());
+          LatLon coord3 = new LatLon(node1.lat(),node1.lon());
+
+          if(checkAcuteAngles(coord3,coord2,coord1) && checkAcuteAngles(coord3,coord1,coord2)){
+              return w1;
+          }
+        }
+        return w;
+      }
+      else{
+        return w;
+      }
+   }
+
+   public boolean checkAcuteAngles( LatLon a, LatLon b, LatLon c ){
+       double x1 = a.getX() - b.getX();
+       double y1 = a.getY() - b.getY();
+
+       double x2 = c.getX() - b.getX();
+       double y2 = c.getY() - b.getY();
+
+       if(x1*x2+y1*y2>=0){
+         return true;
+       }
+       return false;
+   }
 
     /**
      * Calculates the squared distance between the centers of bounding boxes of
@@ -173,114 +271,12 @@ public class PTRouteDataManager {
      * @return Squared distance between the centers of the bounding boxes of the
      *         given relation members
      */
-     public void assignColorstostops(){
-       PTStop prev =null;
-       Color prevcolor=null;
-       for(int i=0;i<ptStops.size();i++){
-         int j=i%10;
-         if(i!=0 && ptStopWays.get(ptStops.get(i))==ptStopWays.get(prev)){
-           ptstopColors.put(ptStops.get(i),prevcolor);
-         }
-         else{
-           ptstopColors.put(ptStops.get(i),RAINBOW_COLOR_PALETTE[j]);
-           prevcolor=RAINBOW_COLOR_PALETTE[j];
-         }
-         prev=ptStops.get(i);
-       }
-     }
-     public void assignColorstoways(){
-       int i=0;
-       for (RelationMember member : this.relation.getMembers()){
-         if (RouteUtils.isPTWay(member)) {
-           i=i%10;
-           if(ptwayColors.get(member.getWay())==null){
-             ptwayColors.put(member.getWay(),RAINBOW_COLOR_PALETTE[i]);
-           }
-           else{
-//             System.out.println("hii my way id is: "+member.getWay().getUniqueId() );
-             ptstopColors.put(ptWayStops.get(member.getWay()),ptwayColors.get(member.getWay()));
-           }
-           i++;
-         }
-     }
-   }
-     public void assignstoptoways(){
-       PTStop prev =null;
-       for (RelationMember member : this.relation.getMembers()){
-         if (RouteUtils.isPTWay(member)) {
-           int flag=0;
-           for(PTStop pt:ptStops){
-             if(ptStopWays.get(pt)==member.getWay()){
-               ptWayStops.put(member.getWay(),pt);
-               prev = pt;
-               flag=1;
-               break;
-             }
-           }
-           if(flag==0){
-             ptWayStops.put(member.getWay(),prev);
-           }
-         }
-       }
-     }
-     public void WaysAssociatedtostop(){
-       for(int i=0;i<ptStops.size();i++){
-         PTStop p=ptStops.get(i);
-         Way w=checkNode(p);
-         ptStopWays.put( p,w);
-       }
-//       for(PTStop pt:ptStops){
-//         System.out.println("stop id "+pt.getUniqueId()+"serving way "+ptStopWays.get(pt).getUniqueId());
-//       }
-     }
 
-    private Way checkNode(RelationMember p){
-      double mindist=1e5;
-      Way w= null,w1=null;
-      Node node1=null,node2=null;
-      int idx =0;
-      for (RelationMember member : this.relation.getMembers()){
-        if (RouteUtils.isPTWay(member)) {
-          for(Node nod:member.getWay().getNodes()){
-            LatLon coord1 = new LatLon(nod.lat(),nod.lon());
-            double d=calculateDistanceSq(p,coord1);
-            if(d < mindist){
-              mindist=d;
-              w=member.getWay();
-              node1 =nod;
-            }
-          }
-          idx++;
-        }
-      }
-      for (RelationMember member : this.relation.getMembers()){
-        if (RouteUtils.isPTWay(member)) {
-            if(member.getWay().firstNode()==node1){
-                w1=member.getWay();
-            }
-          }
-        }
-      if(node1==w.lastNode() && w1!=null && w1.firstNode()==node1){
-        LatLon coord1 = new LatLon(node1.lat(),node1.lon());
-        for(Node nod:w1.getNodes()){
-          if(nod!=node1){
-            node2 = nod;
-            break;
-          }
-        }
-        LatLon coord2 = new LatLon(node2.lat(),node2.lon());
-        LatLon coord3 = p.getMember().getBBox().getCenter();
-        if(calculateDistanceSq(coord1,coord2)>calculateDistanceSq(coord2,coord3)){
-          w=w1;
-        }
-      }
-      return w;
-   }
    private double calculateDistanceSq(RelationMember member1, LatLon coord2) {
        LatLon coord1 = member1.getMember().getBBox().getCenter();
        return coord1.distanceSq(coord2);
    }
-   private double calculateDistanceSq(LatLon coord1, LatLon coord2) {
+   public double calculateDistanceSq(LatLon coord1, LatLon coord2) {
        return coord1.distanceSq(coord2);
    }
     private double calculateDistanceSq(RelationMember member1, RelationMember member2) {
@@ -365,6 +361,13 @@ public class PTRouteDataManager {
         return ptStops.get(0);
     }
 
+    public Node getOtherNode(Way way, Node currentNode) {
+        if (way.firstNode().equals(currentNode))
+            return way.lastNode();
+        else
+            return way.firstNode();
+    }
+
     public PTStop getLastStop() {
         if (ptStops.isEmpty()) {
             return null;
@@ -444,6 +447,19 @@ public class PTRouteDataManager {
 
     }
 
+    public List<Way> findWaysThatContainAsEndNode(Node node) {
+
+        List<Way> ptwaysThatContain = new ArrayList<>();
+        for (PTWay ptway : ptWays) {
+            List<Way> ways = ptway.getWays();
+            if (ways.get(0).firstNode() == node || ways.get(0).lastNode() == node
+                    || ways.get(ways.size() - 1).firstNode() == node || ways.get(ways.size() - 1).lastNode() == node) {
+                ptwaysThatContain.addAll(ptway.getWays());
+            }
+        }
+        return ptwaysThatContain;
+
+    }
     /**
      * Checks if at most one PTWay of this route refers to the given node
      *

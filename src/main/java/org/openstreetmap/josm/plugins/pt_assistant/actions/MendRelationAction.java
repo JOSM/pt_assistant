@@ -121,14 +121,14 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     private static final String I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS = I18n.marktr("solutions based on other route relations");
     private static final String I18N_TURN_BY_TURN_NEXT_INTERSECTION = I18n.marktr("turn-by-turn at next intersection");
 
-    Relation relation = null;
+    static Relation relation = null;
     MemberTableModel memberTableModel = null;
     GenericRelationEditor editor = null;
     HashMap<Way, Integer> waysAlreadyPresent = null;
     List<RelationMember> members = null;
     Way previousWay;
     Way currentWay;
-    Way nextWay;
+    static Way nextWay;
     List<Integer> extraWaysToBeDeleted = null;
     Node currentNode = null;
     boolean noLinkToPreviousWay = true;
@@ -863,6 +863,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     List<Way> findNextWay(Way way, Node node) {
+//    	System.out.println("nextway will be: "+ nextWay.getUniqueId());
         List<Way> parentWays = node.getParentWays();
         parentWays = removeInvalidWaysFromParentWays(parentWays, node, way);
 

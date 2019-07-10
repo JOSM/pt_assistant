@@ -43,6 +43,7 @@ public abstract class AbstractTest {
  public static final String PATH_TO_ROUNDABOUT1_AFTER = "test/data/rdb1_fixed.osm";
 
  public static final String PATH_TO_SORT_PT_STOPS = "test/data/sort_test.osm";
+ public static final String PATH_TO_SORT_PT_STOPS_WITH_REPEATED_STOPS = "test/data/sort_test2.osm";
 
  public static final String PATH_TO_ROAD_TYPE_ERROR = "test/data/road-type.osm";
 
