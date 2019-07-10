@@ -30,7 +30,7 @@ import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
 public class RoutingAction extends AbstractRelationEditorAction{
-	static Relation relation = null;
+	Relation relation = null;
 	GenericRelationEditor editor = null;
 	boolean setEnable = true;
 

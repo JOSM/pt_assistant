@@ -125,7 +125,6 @@ public class BicycleMendRelation extends MendRelationAction {
         links = connectionTypeCalculator.updateLinks(super.members);
         if (super.halt == false) {
             updateStates();
-            System.out.println("kya ho rha hai");
             getListOfAllWays();
             makepanelanddownloadArea();
         } else {

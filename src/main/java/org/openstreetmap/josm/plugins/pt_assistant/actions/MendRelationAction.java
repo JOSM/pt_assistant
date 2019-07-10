@@ -121,14 +121,14 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     private static final String I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS = I18n.marktr("solutions based on other route relations");
     private static final String I18N_TURN_BY_TURN_NEXT_INTERSECTION = I18n.marktr("turn-by-turn at next intersection");
 
-    static Relation relation = null;
+    Relation relation = null;
     MemberTableModel memberTableModel = null;
     GenericRelationEditor editor = null;
     HashMap<Way, Integer> waysAlreadyPresent = null;
     List<RelationMember> members = null;
     Way previousWay;
     Way currentWay;
-    static Way nextWay;
+    Way nextWay;
     List<Integer> extraWaysToBeDeleted = null;
     Node currentNode = null;
     boolean noLinkToPreviousWay = true;
