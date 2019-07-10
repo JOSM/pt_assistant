@@ -264,7 +264,7 @@ public class CreatePlatformNodeAction extends JosmAction {
         return refs;
     }
 
-    private List<String> addRefs(String value) {
+    private static List<String> addRefs(String value) {
         List<String> refs = new ArrayList<>();
         if (new RegexValidator("\\w+([,;].+)*").isValid(value)) {
             for (String ref : value.split("[,;]")) {
@@ -274,7 +274,7 @@ public class CreatePlatformNodeAction extends JosmAction {
         return refs;
     }
 
-    private String getRefs(Set<String> refs) {
+    private static String getRefs(Set<String> refs) {
         StringBuilder sb = new StringBuilder();
         if (refs.isEmpty())
             return sb.toString();
@@ -286,7 +286,7 @@ public class CreatePlatformNodeAction extends JosmAction {
         return sb.toString().substring(0, sb.length() - 1);
     }
 
-    private List<Relation> removeWayFromRelationsCommand(Way way) {
+    private static List<Relation> removeWayFromRelationsCommand(Way way) {
         List<Command> commands = new ArrayList<>();
         List<Relation> referrers = new ArrayList<>(Utils.filteredCollection(way.getReferrers(), Relation.class));
         List<Relation> parentStopAreaRelation = new ArrayList<>();
@@ -304,7 +304,7 @@ public class CreatePlatformNodeAction extends JosmAction {
         return parentStopAreaRelation;
     }
 
-    private Map<Relation, List<Integer>> getSavedPositions(Way way) {
+    private static Map<Relation, List<Integer>> getSavedPositions(Way way) {
 
         Map<Relation, List<Integer>> savedPositions = new HashMap<>();
         List<Relation> referrers = new ArrayList<>(Utils.filteredCollection(way.getReferrers(), Relation.class));
@@ -322,7 +322,7 @@ public class CreatePlatformNodeAction extends JosmAction {
         return savedPositions;
     }
 
-    private List<Command> updateRelation(Map<Relation, List<Integer>> savedPositions, Node platformNode,
+    private static List<Command> updateRelation(Map<Relation, List<Integer>> savedPositions, Node platformNode,
             Way platformWay, List<Relation> parentStopAreaRelation) {
         Map<Relation, Relation> changingRelation = new HashMap<>();
         Map<Relation, Integer> memberOffset = new HashMap<>();
