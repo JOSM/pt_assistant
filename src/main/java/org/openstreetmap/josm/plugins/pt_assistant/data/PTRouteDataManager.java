@@ -77,7 +77,7 @@ public class PTRouteDataManager {
         // edges.IterationOnAllExistingRoutes();
         // edges.makingEdgesForRelations();
         // List<Edge> listOfEdges = edges.getEdgeListOfRelation(relation);
-         System.out.println("Size of relation member is " + this.relation.getMembers().size());
+         // System.out.println("Size of relation member is " + this.relation.getMembers().size());
 
         PTStop prev = null; // stores the last created PTStop
         for (RelationMember member : this.relation.getMembers()) {
@@ -150,34 +150,6 @@ public class PTRouteDataManager {
 
         }
     }
-    public void WaysAssociatedtostop(){
-      System.out.println("stop size is pt-stops: "+ ptStops.size());
-        for(int i=0;i<ptStops.size();i++){
-          PTStop p=ptStops.get(i);
-          Way w=checkNode(relation,p);
-          ptStopWays.put( p,w);
-        }
-        //       for(PTStop pt:ptStops){
-        //         System.out.println("stop id "+pt.getUniqueId()+"serving way "+ptStopWays.get(pt).getUniqueId());
-        //       }
-    }
-     public void assignstoptoways(){
-           for(PTStop pts:ptStops){
-        	   Way ptway = ptStopWays.get(pts);
-             if(CrossProduct(ptway.firstNode(),ptway.lastNode(),pts)) {
-            	 if(!RightSideStops.containsKey(ptway)) {
-            		 RightSideStops.put(ptway, new ArrayList<PTStop>());
-            	 }
-            	 RightSideStops.get(ptway).add(pts);
-             }
-             else {
-            	 if(!LeftSideStops.containsKey(ptway)) {
-            		 LeftSideStops.put(ptway, new ArrayList<PTStop>());
-            	 }
-            	 LeftSideStops.get(ptway).add(pts);
-             }
-           }
-     }
      public boolean CrossProduct(Node node1,Node node2,PTStop stop){
        Node node3 = stop.getStopNode();
        LatLon coord1 = new LatLon(node1.lat(),node1.lon());
