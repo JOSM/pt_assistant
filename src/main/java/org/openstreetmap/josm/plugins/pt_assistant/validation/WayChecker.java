@@ -431,5 +431,4 @@ public class WayChecker extends Checker {
 
         return new ChangeCommand(originalRelation, modifiedRelation);
     }
-
 }

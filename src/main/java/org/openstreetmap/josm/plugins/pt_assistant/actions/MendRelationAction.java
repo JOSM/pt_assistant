@@ -73,7 +73,6 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.I18n;
-import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
 import org.openstreetmap.josm.tools.Utils;
@@ -112,7 +111,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     private static final Color CURRENT_WAY_COLOR = new Color(255, 255, 255, 190);
     private static final Color NEXT_WAY_COLOR = new Color(169, 169, 169, 210);
 
-    private static final String I18N_ADD_ONEWAY_BUS_NO_TO_WAY = I18n.marktr("Add oneway:bus=no to way");
+    String I18N_ADD_ONEWAY_VEHICLE_NO_TO_WAY = I18n.marktr("Add oneway:bus=no to way");
     private static final String I18N_CLOSE_OPTIONS = I18n.marktr("Close the options");
     private static final String I18N_NOT_REMOVE_WAYS = I18n.marktr("Do not remove ways");
     private static final String I18N_REMOVE_CURRENT_EDGE = I18n.marktr("Remove current edge (white)");
@@ -153,18 +152,15 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
     public MendRelationAction(IRelationEditorActionAccess editorAccess) {
         super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
-        putValue(SHORT_DESCRIPTION, tr("Routing Helper"));
-        new ImageProvider("dialogs/relation", "routing_assistance.svg").getResource().attachImageIcon(this, true);
-        updateEnabledState();
         editor = (GenericRelationEditor) editorAccess.getEditor();
         memberTableModel = editorAccess.getMemberTableModel();
-        this.relation = editor.getRelation();
+        relation = editor.getRelation();
         editor.addWindowListener(new WindowEventHandler());
     }
 
 
 
-    private String getQuery() {
+    String getQuery() {
         final StringBuilder str = new StringBuilder("[timeout:100];\n(\n");
         final String wayFormatterString = "   way(%.6f,%.6f,%.6f,%.6f)\n";
         final String str3 = "   [\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n";
@@ -230,7 +226,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     void initialise() {
-    	System.out.println("mai bus hun");
         save();
         sortBelow(relation.getMembers(), 0);
         members = editor.getRelation().getMembers();
@@ -392,11 +387,11 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
     }
 
-    private boolean isNonSplitRoundAbout(final Way way) {
+    public static boolean isNonSplitRoundAbout(final Way way) {
         return way.hasTag("junction", "roundabout") && way.firstNode().equals(way.lastNode());
     }
 
-    private boolean isSplitRoundAbout(final Way way) {
+    public static boolean isSplitRoundAbout(final Way way) {
         return way.hasTag("junction", "roundabout") && !way.firstNode().equals(way.lastNode());
     }
 
@@ -499,6 +494,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     List<Way> getListOfAllWays() {
+      System.out.println("member inside mend " + members.size());
         List<Way> ways = new ArrayList<>();
         for (int i = 0; i < members.size(); i++) {
             if (members.get(i).isWay()) {
@@ -506,6 +502,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 ways.add(members.get(i).getWay());
             }
         }
+        System.out.println("ways size " + ways.size());
         return ways;
     }
 
@@ -866,6 +863,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     List<Way> findNextWay(Way way, Node node) {
+//    	System.out.println("nextway will be: "+ nextWay.getUniqueId());
         List<Way> parentWays = node.getParentWays();
         parentWays = removeInvalidWaysFromParentWays(parentWays, node, way);
 
@@ -2089,7 +2087,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 drawFixVariantLetter("3 : " + tr(I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY), FIVE_COLOR_PALETTE[4], letterX, letterY, 25);
                 letterY = letterY + 60;
                 if (notice.equals("vehicle travels against oneway restriction")) {
-                    drawFixVariantLetter("4 : " + tr(I18N_ADD_ONEWAY_BUS_NO_TO_WAY), FIVE_COLOR_PALETTE[3], letterX, letterY, 25);
+                    drawFixVariantLetter("4 : " + tr(I18N_ADD_ONEWAY_VEHICLE_NO_TO_WAY), FIVE_COLOR_PALETTE[3], letterX, letterY, 25);
                 }
             } else {
                 drawFixVariantLetter("A : " + tr(I18N_REMOVE_WAYS), FIVE_COLOR_PALETTE[0], letterX, letterY, 25);
@@ -2097,7 +2095,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 drawFixVariantLetter("B : " + tr(I18N_NOT_REMOVE_WAYS), FIVE_COLOR_PALETTE[1], letterX, letterY, 25);
                 letterY = letterY + 60;
                 if (notice.equals("vehicle travels against oneway restriction")) {
-                    drawFixVariantLetter("C : " + tr(I18N_ADD_ONEWAY_BUS_NO_TO_WAY), FIVE_COLOR_PALETTE[3], letterX, letterY, 25);
+                    drawFixVariantLetter("C : " + tr(I18N_ADD_ONEWAY_VEHICLE_NO_TO_WAY), FIVE_COLOR_PALETTE[3], letterX, letterY, 25);
                     letterY = letterY + 60;
                 }
                 drawFixVariantLetter("R : " + tr(I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY), FIVE_COLOR_PALETTE[4], letterX, letterY, 25);

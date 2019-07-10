@@ -23,7 +23,8 @@ public class PTWay extends RelationMember {
      * member is a nested relation, the list size is >= 1.
      */
     private List<Way> ways = new ArrayList<>();
-
+    public List<PTStop> RightStops = new ArrayList<>();
+    public List<PTStop> LeftStops = new ArrayList<>();
     /**
      *
      * @param other
@@ -164,4 +165,11 @@ public class PTWay extends RelationMember {
         return false;
     }
 
+    public void addLeftStop(PTStop stop) {
+        LeftStops.add(stop);
+    }
+
+    public void addRightStop(PTStop stop) {
+        RightStops.add(stop);
+    }
 }
