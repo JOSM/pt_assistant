@@ -605,14 +605,14 @@ public class SplitRoundaboutAction extends JosmAction {
         return savedPositions;
     }
 
-    private List<Relation> getPTRouteParents(Way roundabout) {
-    	 List<Relation> referrers = new ArrayList<>(Utils.filteredCollection(roundabout.getReferrers(), Relation.class));
+    private static List<Relation> getPTRouteParents(Way roundabout) {
+        List<Relation> referrers = new ArrayList<>(Utils.filteredCollection(roundabout.getReferrers(), Relation.class));
         referrers.removeIf(r -> (!RouteUtils.isPTRoute(r) && !RouteUtils.isBicycleRoute(r)));
         return referrers;
     }
 
-    private List<Relation> getRouteParents(Way roundabout) {
-    	 List<Relation> referrers = new ArrayList<>(Utils.filteredCollection(roundabout.getReferrers(), Relation.class));
+    private static List<Relation> getRouteParents(Way roundabout) {
+        List<Relation> referrers = new ArrayList<>(Utils.filteredCollection(roundabout.getReferrers(), Relation.class));
         referrers.removeIf(r -> !RouteUtils.isRoute(r));
         return referrers;
     }
