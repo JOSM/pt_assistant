@@ -83,7 +83,6 @@ public class PTRouteDataManager {
         for (RelationMember member : this.relation.getMembers()) {
 
             if (PTStop.isPTStop(member)) {
-                // System.out.println("i am inside");
                 // First, check if the stop already exists (i.e. there are
                 // consecutive elements that belong to the same stop:
                 boolean stopExists = false;
@@ -151,7 +150,7 @@ public class PTRouteDataManager {
         }
     }
      public boolean CrossProduct(Node node1,Node node2,PTStop stop){
-       Node node3 = stop.getStopNode();
+       Node node3 = stop.getNode();
        LatLon coord1 = new LatLon(node1.lat(),node1.lon());
        LatLon coord2 = new LatLon(node2.lat(),node2.lon());
        LatLon coord3 = new LatLon(node3.lat(),node3.lon());

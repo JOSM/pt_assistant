@@ -406,7 +406,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             if (wayStop.containsKey(w)) {
                 curr1 = w;
                 for (PTStop pts : wayStop.get(w)) {
-                    Node node3 = pts.getStopNode();
+                    Node node3 = pts.getNode();
                     Pair<Node, Node> segment = assigner.calculateNearestSegment(node3, w);
                     Node node1 = segment.a;
                     Node node2 = segment.b;
