@@ -99,18 +99,37 @@ public class StopToWay {
                 }
             }
         }
-
+        if (stop.getPlatform() != null) {
+            List<Way> lis = getAllWaystoTheNearestNode(new Node(stop.getPlatform().getBBox().getCenter()));
+//            System.out.println(stop.getNode().getUniqueId() +" "+ stop.getPlatform().getBBox().getCenter());
+//            System.out.println(stop.getNode().getUniqueId() +" "+stop.getNode().getCoor());
+            double minDistanceSqToWay = Double.MAX_VALUE;
+            Way closestWay = null;
+            for (Way way : lis) {
+                double distanceSq = calculateMinDistanceToSegment(new Node(stop.getPlatform().getBBox().getCenter()),
+                        way);
+                if (distanceSq < minDistanceSqToWay) {
+                    closestWay = way;
+                    minDistanceSqToWay = distanceSq;
+                }
+            }
+            if (closestWay != null) {
+                addAssignedWayToMap(stop, closestWay);
+                return closestWay;
+            }
+        }
+        // LatLon coord = stop.getPlatform().getBBox().getCenter();
         List<Way> lis = getAllWaystoTheNearestNode(stop.getNode());
         double dist = 10000000;
-        Way possibleway = null;
+        Way closestWay = null;
         for (Way w : lis) {
             if (dist > calculateMinDistanceToSegment(stop.getNode(), w)) {
                 dist = calculateMinDistanceToSegment(stop.getNode(), w);
-                possibleway = w;
+                closestWay = w;
             }
         }
-        addAssignedWayToMap(stop, possibleway);
-        return possibleway;
+        addAssignedWayToMap(stop, closestWay);
+        return closestWay;
     }
 
     /**
@@ -291,6 +310,28 @@ public class StopToWay {
     }
 
     //check the nearest node to the stop position or platformNode
+    public List<Way> getAllWaystoTheNearestNode(LatLon ptstop) {
+        double mindist = 1e5;
+        Way w = null;
+        Node node1 = null;
+        int idx = 0, indx = 0;
+        for (Way member : ways) {
+            for (Node nod : member.getNodes()) {
+                LatLon coord1 = new LatLon(nod.lat(), nod.lon());
+                double d = calculateDistanceSq(ptstop, coord1);
+                if (d < mindist) {
+                    mindist = d;
+                    w = member;
+                    node1 = nod;
+                    indx = idx;
+                }
+            }
+            idx++;
+        }
+        List<Way> lis = findWaysThatContainAsEndNode(node1);
+        return lis;
+    }
+
     public List<Way> getAllWaystoTheNearestNode(Node ptstop) {
         double mindist = 1e5;
         Way w = null;

@@ -104,6 +104,9 @@ public class StopToWayAssigner {
         // 4) Search if a stop position is in the vicinity of a platform:
         if (stop.getPlatform() != null) {
             List<Node> potentialStopPositionList = stop.findPotentialStopPositions();
+//            for(Node node:potentialStopPositionList){
+//              System.out.println("potential id for plateform "+stop.getNode().getUniqueId()+ "is "+node.getUniqueId());
+//            }
             Node closestStopPosition = null;
             double minDistanceSq = Double.MAX_VALUE;
             for (Node potentialStopPosition : potentialStopPositionList) {

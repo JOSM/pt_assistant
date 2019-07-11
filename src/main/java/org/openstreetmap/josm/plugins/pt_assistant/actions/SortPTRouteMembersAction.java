@@ -349,7 +349,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
         ptstops.forEach(stop -> {
             Way way = assigner2.get(stop);
-            System.out.println(stop.getUniqueId() + " serves to " + assigner2.get(stop).getUniqueId());
+//             System.out.println(stop.getUniqueId() + " serves to " + assigner2.get(stop).getUniqueId());
             // Way way = route.checkNode(rel,stop);
             if (way == null) {
                 addStopToRelation(rel, stop);
@@ -361,7 +361,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
         unnamed.forEach(stop -> {
             Way way = assigner2.get(stop);
-            System.out.println(stop.getUniqueId() + " serves to " + assigner2.get(stop).getUniqueId());
+//             System.out.println(stop.getUniqueId() + " serves to " + assigner2.get(stop).getUniqueId());
             // Way way = route.checkNode(rel,stop);
             if (way == null) {
                 addStopToRelation(rel, stop);
