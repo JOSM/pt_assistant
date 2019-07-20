@@ -52,6 +52,10 @@ public class StopToWayAssigner {
         this.ways.addAll(ways);
     }
 
+    public StopToWayAssigner() {
+        // TODO Auto-generated constructor stub
+    }
+
     /**
      * Returns the PTWay for the given PTStop
      *
@@ -104,9 +108,10 @@ public class StopToWayAssigner {
         // 4) Search if a stop position is in the vicinity of a platform:
         if (stop.getPlatform() != null) {
             List<Node> potentialStopPositionList = stop.findPotentialStopPositions();
-//            for(Node node:potentialStopPositionList){
-//              System.out.println("potential id for plateform "+stop.getNode().getUniqueId()+ "is "+node.getUniqueId());
-//            }
+            //            System.out.println("plateform is "+stop.getUniqueId());
+            //           for(Node node:potentialStopPositionList){
+            //             System.out.println("potential id for plateform "+stop.getNode().getUniqueId()+ "is "+node.getUniqueId());
+            //           }
             Node closestStopPosition = null;
             double minDistanceSq = Double.MAX_VALUE;
             for (Node potentialStopPosition : potentialStopPositionList) {
@@ -142,22 +147,14 @@ public class StopToWayAssigner {
         while (searchRadius < 0.005) {
 
             Way foundWay = this.findNearestWayInRadius(stop.getPlatform(), searchRadius);
-            // if(stop.getNode().getUniqueId()==4151880312L){
-            //   if(foundWay!=null){
-            //     System.out.println(foundWay.getUniqueId());
-            //   }
-            // }
+
             if (foundWay != null) {
                 addAssignedWayToMap(stop, foundWay);
                 return foundWay;
             }
 
             foundWay = this.findNearestWayInRadius(stop.getStopPosition(), searchRadius);
-            // if(stop.getNode().getUniqueId()==4151880312L){
-            //   if(foundWay!=null){
-            //     System.out.println(foundWay.getUniqueId());
-            //   }
-            // }
+
             if (foundWay != null) {
                 addAssignedWayToMap(stop, foundWay);
                 return foundWay;
@@ -194,6 +191,39 @@ public class StopToWayAssigner {
         }
 
         return null;
+    }
+
+    public Way findClosestWayFromRelation(Relation rel, PTStop stop, Node closestStopPosition) {
+        if (rel == null || stop == null || closestStopPosition == null) {
+            return null;
+        }
+        // System.out.println(1);
+        Way closestWay = null;
+        double minDistanceSqToWay = Double.MAX_VALUE;
+        List<Way> listways = new ArrayList<>();
+        for (RelationMember rm : rel.getMembers()) {
+            if (rm.getType() == OsmPrimitiveType.WAY) {
+                listways.add(rm.getWay());
+            }
+        }
+        // System.out.println(2);
+        for (Way way : listways) {
+            if (way.containsNode(closestStopPosition)) {
+                // System.out.println(3);
+                double distanceSq;
+                if (stop.getPlatform() != null) {
+                    distanceSq = calculateMinDistanceToSegment(new Node(stop.getPlatform().getBBox().getCenter()), way);
+                } else {
+                    distanceSq = calculateMinDistanceToSegment(new Node(stop.getNode()), way);
+                }
+                // System.out.println(5);
+                if (distanceSq < minDistanceSqToWay) {
+                    closestWay = way;
+                    minDistanceSqToWay = distanceSq;
+                }
+            }
+        }
+        return closestWay;
     }
 
     /**
@@ -262,7 +292,7 @@ public class StopToWayAssigner {
      * @param way way
      * @return the minimum distance between a node and a way
      */
-    private double calculateMinDistanceToSegment(Node node, Way way) {
+    public double calculateMinDistanceToSegment(Node node, Way way) {
 
         double minDistance = Double.MAX_VALUE;
 
@@ -289,8 +319,6 @@ public class StopToWayAssigner {
         Pair<Node, Node> minWaySegment = null;
         //        System.out.println("way id is "+way.getUniqueId());
         for (Pair<Node, Node> waySegment : waySegments) {
-            //          System.out.println(waySegment.a.getUniqueId()+" , "+ waySegment.b.getUniqueId());
-            //          System.out.println("hello " +node.getUniqueId());
             if (waySegment.a != node && waySegment.b != node) {
                 double distanceToLine = this.calculateDistanceToSegment(node, waySegment);
                 if (distanceToLine < minDistance) {

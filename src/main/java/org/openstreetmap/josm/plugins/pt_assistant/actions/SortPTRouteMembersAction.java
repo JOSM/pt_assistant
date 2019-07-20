@@ -348,24 +348,38 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         PTRouteDataManager route = new PTRouteDataManager(rel);
 
         ptstops.forEach(stop -> {
-            Way way = assigner2.get(stop);
-//             System.out.println(stop.getUniqueId() + " serves to " + assigner2.get(stop).getUniqueId());
-            // Way way = route.checkNode(rel,stop);
+            Way way = assigner.get(stop);
             if (way == null) {
                 addStopToRelation(rel, stop);
             }
+            // System.out.println("plateform is "+stop.getUniqueId()+" serving from old method to "+way.getUniqueId());
+            // System.out.println(stop.getUniqueId() + " serves first " + stop.findServingWays(stop).getUniqueId());
+            // if (stop.findSecondServingWay(stop) != null) {
+            //     System.out.println(
+            //             stop.getUniqueId() + " serves second to " + stop.findSecondServingWay(stop).getUniqueId());
+            // } else {
+            //     System.out.println("Second way null");
+            // }
+            // System.out.println("...");
             if (!wayStop.containsKey(way))
                 wayStop.put(way, new ArrayList<PTStop>());
             wayStop.get(way).add(stop);
         });
 
         unnamed.forEach(stop -> {
-            Way way = assigner2.get(stop);
-//             System.out.println(stop.getUniqueId() + " serves to " + assigner2.get(stop).getUniqueId());
-            // Way way = route.checkNode(rel,stop);
+            Way way = assigner.get(stop);
             if (way == null) {
                 addStopToRelation(rel, stop);
             }
+            // System.out.println("plateform is "+stop.getUniqueId()+" serving from old method to "+way.getUniqueId());
+            // System.out.println(stop.getUniqueId() + " serves first " + stop.findServingWays(stop).getUniqueId());
+            // if (stop.findSecondServingWay(stop) != null) {
+            //     System.out.println(
+            //             stop.getUniqueId() + " serves second to " + stop.findSecondServingWay(stop).getUniqueId());
+            // } else {
+            //     System.out.println("Second way null");
+            // }
+            // System.out.println("...");
             if (!wayStop.containsKey(way))
                 wayStop.put(way, new ArrayList<PTStop>());
             wayStop.get(way).add(stop);
@@ -452,7 +466,15 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             }
             prev1 = w;
         }
-        for (Way w : ways) {
+        for (RelationMember w : wayMembers) {
+            // PTWay ptw = new PTWay(w);
+            //  List<PTStop> lis = ptw.getAllStops(w.getWay());
+            //  System.out.println("Way Id: "+ w.getUniqueId());
+            //  if(lis!=null && lis.size()>0){
+            //      for(PTStop pts:lis){
+            //        System.out.println(pts.getUniqueId());
+            //      }
+            //  }
             if (RightSideStops.get(w) != null) {
                 for (PTStop pt : RightSideStops.get(w)) {
                     System.out.println("Way Id is " + w.getUniqueId() + " right stop " + pt.getUniqueId());
@@ -519,43 +541,6 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
         wayMembers.forEach(rel::addMember);
     }
-
-    ///official solution
-
-    //     for (int i = 0; i < wayMembers.size(); i++) {
-    //     RelationMember wm = wayMembers.get(i);
-    //     Way prev = null;
-    //     Way next = null;
-    //     if (i > 0) {
-    //         RelationMember wmp = wayMembers.get(i - 1);
-    //         if (wmp.getType() == OsmPrimitiveType.WAY)
-    //             prev = wmp.getWay();
-    //     }
-    //     if (i < wayMembers.size() - 1) {
-    //         RelationMember wmn = wayMembers.get(i + 1);
-    //         if (wmn.getType() == OsmPrimitiveType.WAY)
-    //             next = wmn.getWay();
-    //     }
-    //
-    //     if (wm.getType() == OsmPrimitiveType.WAY) {
-    //         Way curr = wm.getWay();
-    //         List<PTStop> stps = wayStop.get(curr);
-    //         if (stps != null) {
-    //             // if for one way there are more than one stop assigned to it,
-    //             // another sorting step is needed
-    //             if (stps.size() > 1)
-    //                 stps = sortSameWayStops(stps, curr, prev, next);
-    //             stps.forEach(stop -> {
-    //                 if (stop != null) {
-    //                     addStopToRelation(rel, stop);
-    //                 }
-    //             });
-    //         }
-    //     }
-    // }
-    //
-    // wayMembers.forEach(rel::addMember);
-    // }
 
     private static void addStopToRelation(Relation rel, PTStop stop) {
         if (stop.getStopPositionRM() != null)

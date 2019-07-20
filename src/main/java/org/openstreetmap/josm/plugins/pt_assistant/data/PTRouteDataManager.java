@@ -45,25 +45,23 @@ public class PTRouteDataManager {
 
     private HashMap<String, String> tags = new HashMap<>(30);
 
-    public HashMap<PTStop,Way> ptStopWays = new HashMap<>();
-    public HashMap<PTStop,Color> ptstopColors = new HashMap<>();
-    public HashMap<Way,PTStop> ptWayStops = new HashMap<>();
-    public HashMap<Way,Color> ptwayColors = new HashMap<>();
-    public HashMap<Way,ArrayList<PTStop>> RightSideStops = new HashMap<>();
-    public HashMap<Way,ArrayList<PTStop>> LeftSideStops = new HashMap<>();
+    public HashMap<PTStop, Way> ptStopWays = new HashMap<>();
+    public HashMap<PTStop, Color> ptstopColors = new HashMap<>();
+    public HashMap<Way, PTStop> ptWayStops = new HashMap<>();
+    public HashMap<Way, Color> ptwayColors = new HashMap<>();
+    public HashMap<Way, ArrayList<PTStop>> RightSideStops = new HashMap<>();
+    public HashMap<Way, ArrayList<PTStop>> LeftSideStops = new HashMap<>();
 
-    private static final Color[] RAINBOW_COLOR_PALETTE = {
-        new Color(0, 255, 0, 150),//GREEN 0
-        new Color(255, 0, 0, 150),//RED 1
-        new Color(0, 0, 255, 150),//BLUE 2
-        new Color(255, 255, 0, 150),//YELLOW 3
-        new Color(0, 255, 255, 150),//SKYBLUE 4
-        new Color(255, 127,0, 150),//ORANGE 5
-        new Color(148, 0, 211, 150),//VIOLET 6
-        new Color(255, 255, 255, 150),//WHITE 7
-        new Color(169, 169, 169, 210),//GREY 8
-        new Color(239, 167, 222,220)
-    };
+    private static final Color[] RAINBOW_COLOR_PALETTE = { new Color(0, 255, 0, 150), //GREEN 0
+            new Color(255, 0, 0, 150), //RED 1
+            new Color(0, 0, 255, 150), //BLUE 2
+            new Color(255, 255, 0, 150), //YELLOW 3
+            new Color(0, 255, 255, 150), //SKYBLUE 4
+            new Color(255, 127, 0, 150), //ORANGE 5
+            new Color(148, 0, 211, 150), //VIOLET 6
+            new Color(255, 255, 255, 150), //WHITE 7
+            new Color(169, 169, 169, 210), //GREY 8
+            new Color(239, 167, 222, 220) };
 
     public PTRouteDataManager(Relation relation) {
 
@@ -77,32 +75,26 @@ public class PTRouteDataManager {
         // edges.IterationOnAllExistingRoutes();
         // edges.makingEdgesForRelations();
         // List<Edge> listOfEdges = edges.getEdgeListOfRelation(relation);
-         // System.out.println("Size of relation member is " + this.relation.getMembers().size());
+        // System.out.println("Size of relation member is " + this.relation.getMembers().size());
 
         PTStop prev = null; // stores the last created PTStop
         for (RelationMember member : this.relation.getMembers()) {
-
             if (PTStop.isPTStop(member)) {
                 // First, check if the stop already exists (i.e. there are
                 // consecutive elements that belong to the same stop:
                 boolean stopExists = false;
-
                 if (prev != null) {
                     if (prev.getName() == null || prev.getName().equals("") || member.getMember().get("name") == null
                             || member.getMember().get("name").equals("")) {
-
                         // if there is no name, check by proximity:
                         // Squared distance of 0.000004 corresponds to
                         // around 100 m
                         if (calculateDistanceSq(member, prev) < 0.000001) {
                             stopExists = true;
                         }
-
                     } else {
-
                         // if there is a name, check by name comparison:
                         if (prev.getName().equalsIgnoreCase(member.getMember().get("name"))) {
-
                             stopExists = true;
                         }
                     }
@@ -139,98 +131,49 @@ public class PTRouteDataManager {
                 }
 
             } else if (RouteUtils.isPTWay(member)) {
-
                 PTWay ptway = new PTWay(member);
                 ptWays.add(ptway);
-
             } else {
                 failedMembers.add(member);
             }
-
         }
     }
-     public boolean CrossProduct(Node node1,Node node2,PTStop stop){
-       Node node3 = stop.getNode();
-       LatLon coord1 = new LatLon(node1.lat(),node1.lon());
-       LatLon coord2 = new LatLon(node2.lat(),node2.lon());
-       LatLon coord3 = new LatLon(node3.lat(),node3.lon());
-       double x1 = coord1.getX();
-       double y1 = coord1.getY();
 
-       double x2 = coord2.getX();
-       double y2 = coord2.getY();
-
-       double x3 = coord3.getX();
-       double y3 = coord3.getY();
-
-
-       x1-=x3;
-       y1-=y3;
-
-       x2-=x3;
-       y2-=y3;
-
-       double crossprod = x1*y2 - y1*x2;
-
-       //Right Direction
-       if(crossprod<=0){
-         return true;
-       }
-       //left Direction
-    	 return false;
-     }
-
-
-    public Way checkNode(Relation relat,RelationMember p){
-      double mindist=1e5;
-      Way w= null;
-      Node node1=null;
-      int idx =0,indx=0;
-      for (RelationMember member : relat.getMembers()){
-        if (RouteUtils.isPTWay(member)) {
-          for(Node nod:member.getWay().getNodes()){
-            LatLon coord1 = new LatLon(nod.lat(),nod.lon());
-            double d=calculateDistanceSq(p,coord1);
-            if(d < mindist){
-              mindist=d;
-              w=member.getWay();
-              node1 =nod;
-              indx =idx;
-            }
-          }
-          idx++;
+    public boolean CrossProduct(Node node1, Node node2, PTStop stop) {
+        LatLon coord3;
+        if (stop.getPlatform() != null) {
+            coord3 = stop.getPlatform().getBBox().getCenter();
+        } else {
+            Node node3 = stop.getNode();
+            coord3 = new LatLon(node3.lat(), node3.lon());
         }
-      }
-      List<Way> lis =findWaysThatContainAsEndNode(node1);
-      if(lis.size()>=2){
-        for(Way w1:lis){
-          LatLon coord1 = new LatLon(w.firstNode().lat(),w.firstNode().lon());
-          LatLon coord2 = new LatLon(w.lastNode().lat(),w.lastNode().lon());
-          LatLon coord3 = new LatLon(node1.lat(),node1.lon());
+        LatLon coord1 = new LatLon(node1.lat(), node1.lon());
+        LatLon coord2 = new LatLon(node2.lat(), node2.lon());
+        //       LatLon coord3 = new LatLon(node3.lat(),node3.lon());
+        double x1 = coord1.getX();
+        double y1 = coord1.getY();
 
-          if(checkAcuteAngles(coord3,coord2,coord1) && checkAcuteAngles(coord3,coord1,coord2)){
-              return w1;
-          }
+        double x2 = coord2.getX();
+        double y2 = coord2.getY();
+
+        double x3 = coord3.getX();
+        double y3 = coord3.getY();
+
+        x1 -= x3;
+        y1 -= y3;
+
+        x2 -= x3;
+        y2 -= y3;
+
+        double crossprod = x1 * y2 - y1 * x2;
+
+        //Right Direction
+        if (crossprod <= 0) {
+            return true;
         }
-        return w;
-      }
-      else{
-        return w;
-      }
-   }
-
-   public boolean checkAcuteAngles( LatLon a, LatLon b, LatLon c ){
-       double x1 = a.getX() - b.getX();
-       double y1 = a.getY() - b.getY();
-
-       double x2 = c.getX() - b.getX();
-       double y2 = c.getY() - b.getY();
-
-       if(x1*x2+y1*y2>=0){
-         return true;
-       }
-       return false;
-   }
+        //left Direction
+        return false;
+    }
 
     /**
      * Calculates the squared distance between the centers of bounding boxes of
@@ -243,13 +186,15 @@ public class PTRouteDataManager {
      *         given relation members
      */
 
-   private double calculateDistanceSq(RelationMember member1, LatLon coord2) {
-       LatLon coord1 = member1.getMember().getBBox().getCenter();
-       return coord1.distanceSq(coord2);
-   }
-   public double calculateDistanceSq(LatLon coord1, LatLon coord2) {
-       return coord1.distanceSq(coord2);
-   }
+    private double calculateDistanceSq(RelationMember member1, LatLon coord2) {
+        LatLon coord1 = member1.getMember().getBBox().getCenter();
+        return coord1.distanceSq(coord2);
+    }
+
+    public double calculateDistanceSq(LatLon coord1, LatLon coord2) {
+        return coord1.distanceSq(coord2);
+    }
+
     private double calculateDistanceSq(RelationMember member1, RelationMember member2) {
         LatLon coord1 = member1.getMember().getBBox().getCenter();
         LatLon coord2 = member2.getMember().getBBox().getCenter();
@@ -282,14 +227,14 @@ public class PTRouteDataManager {
         String v;
         for (String k : this.tags.keySet()) {
             v = this.tags.get(k);
-            if (v != null && v !="" && !v.isEmpty()) {
+            if (v != null && v != "" && !v.isEmpty()) {
                 tempRel.put(k, v);
             }
         }
         UndoRedoHandler.getInstance().add(new ChangeCommand(this.relation, tempRel));
     }
 
-    public String getComposedName( ) {
+    public String getComposedName() {
         String composedName = get("operator");
         if (composedName.isEmpty()) {
             composedName = get("network");
@@ -431,6 +376,7 @@ public class PTRouteDataManager {
         return ptwaysThatContain;
 
     }
+
     /**
      * Checks if at most one PTWay of this route refers to the given node
      *

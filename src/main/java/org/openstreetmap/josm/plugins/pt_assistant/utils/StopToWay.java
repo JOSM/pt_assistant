@@ -101,8 +101,6 @@ public class StopToWay {
         }
         if (stop.getPlatform() != null) {
             List<Way> lis = getAllWaystoTheNearestNode(new Node(stop.getPlatform().getBBox().getCenter()));
-//            System.out.println(stop.getNode().getUniqueId() +" "+ stop.getPlatform().getBBox().getCenter());
-//            System.out.println(stop.getNode().getUniqueId() +" "+stop.getNode().getCoor());
             double minDistanceSqToWay = Double.MAX_VALUE;
             Way closestWay = null;
             for (Way way : lis) {
@@ -183,6 +181,23 @@ public class StopToWay {
         return minDistance;
 
     }
+    private double calculateMinDistanceToSegment(LatLon node, Way way) {
+
+        double minDistance = Double.MAX_VALUE;
+
+        List<Pair<Node, Node>> waySegments = way.getNodePairs(false);
+        for (Pair<Node, Node> waySegment : waySegments) {
+            if (waySegment.a.getCoor() != node && waySegment.b.getCoor() != node) {
+                double distanceToLine = this.calculateDistanceToSegment(node, waySegment);
+                if (distanceToLine < minDistance) {
+                    minDistance = distanceToLine;
+                }
+            }
+        }
+
+        return minDistance;
+
+    }
 
     public Pair<Node, Node> calculateNearestSegment(Node node, Way way) {
         double minDistance = Double.MAX_VALUE;
@@ -202,6 +217,7 @@ public class StopToWay {
         }
         return minWaySegment;
     }
+
 
     /**
      * Calculates the distance from point to segment and differentiates between
@@ -234,6 +250,26 @@ public class StopToWay {
 
         return calculateDistanceToLine(node, segment);
     }
+    private double calculateDistanceToSegment(LatLon node, Pair<Node, Node> segment) {
+
+        if (node == segment.a.getCoor() || node == segment.b.getCoor()) {
+            return 0.0;
+        }
+
+        double lengthA = node.distance(segment.a.getCoor());
+        double lengthB = node.distance(segment.b.getCoor());
+        double lengthC = segment.a.getCoor().distance(segment.b.getCoor());
+
+        if (isObtuse(lengthC, lengthB, lengthA)) {
+            return lengthB;
+        }
+
+        if (isObtuse(lengthA, lengthC, lengthB)) {
+            return lengthA;
+        }
+
+        return calculateDistanceToLine(node, segment);
+    }
 
     /**
      * Calculates the distance from point to line using formulas for triangle
@@ -254,6 +290,27 @@ public class StopToWay {
 
         double lengthA = node.getCoor().distance(segment.a.getCoor());
         double lengthB = node.getCoor().distance(segment.b.getCoor());
+        double lengthC = segment.a.getCoor().distance(segment.b.getCoor());
+
+        // calculate triangle area using Heron's formula:
+        double p = (lengthA + lengthB + lengthC) / 2.0;
+        double triangleArea = Math.sqrt(p * (p - lengthA) * (p - lengthB) * (p - lengthC));
+
+        // calculate the distance from point to segment using the 0.5*c*h
+        // formula for triangle area:
+        return triangleArea * 2.0 / lengthC;
+    }
+    private double calculateDistanceToLine(LatLon node, Pair<Node, Node> segment) {
+
+        /*
+         * Let a be the triangle edge between the point and the first node of
+         * the segment. Let b be the triangle edge between the point and the
+         * second node of the segment. Let c be the triangle edge which is the
+         * segment.
+         */
+
+        double lengthA = node.distance(segment.a.getCoor());
+        double lengthB = node.distance(segment.b.getCoor());
         double lengthC = segment.a.getCoor().distance(segment.b.getCoor());
 
         // calculate triangle area using Heron's formula:

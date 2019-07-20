@@ -2,12 +2,18 @@
 package org.openstreetmap.josm.plugins.pt_assistant.data;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
+import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 
 /**
  * Representation of PTWays, which can be of OsmPrimitiveType Way or Relation
@@ -25,6 +31,8 @@ public class PTWay extends RelationMember {
     private List<Way> ways = new ArrayList<>();
     public List<PTStop> RightStops = new ArrayList<>();
     public List<PTStop> LeftStops = new ArrayList<>();
+    public List<PTStop> allStops = new ArrayList<>();
+
     /**
      *
      * @param other
@@ -62,6 +70,7 @@ public class PTWay extends RelationMember {
      *
      * @return the course of this PTWay
      */
+
     public List<Way> getWays() {
         return this.ways;
     }
@@ -95,9 +104,9 @@ public class PTWay extends RelationMember {
      *
      * @return the end nodes of this PTWay
      */
+
     public Node[] getEndNodes() {
         Node[] endNodes = new Node[2];
-
         if (this.isWay()) {
             endNodes[0] = this.getWay().firstNode();
             endNodes[1] = this.getWay().lastNode();
@@ -128,6 +137,7 @@ public class PTWay extends RelationMember {
      *
      * @return {@code true} if this PTWay contains an unsplit roundabout
      */
+
     public boolean containsUnsplitRoundabout() {
 
         List<Way> ways = this.getWays();
@@ -145,11 +155,112 @@ public class PTWay extends RelationMember {
      *
      * @return {@code true} if the first Way of this PTWay is an unsplit roundabout
      */
+
     public boolean startsWithUnsplitRoundabout() {
         if (this.ways.get(0).firstNode() == this.ways.get(0).lastNode()) {
             return true;
         }
         return false;
+    }
+
+    public List<PTStop> getAllStops(Way w) {
+        Collection<Node> allNodes = w.getDataSet().getNodes();
+        List<Node> potentialStops = new ArrayList<>();
+        for (Node currentNode : allNodes) {
+            String nodeName = currentNode.get("name");
+            if (StopUtils.isHighwayOrRailwayStopPosition(currentNode) || StopUtils.isStopPosition(currentNode)
+                    || StopUtils.verifyStopAreaPlatform(currentNode)
+                    || StopUtils.verifyIfMemberOfStopArea(currentNode)) {
+                potentialStops.add(currentNode);
+            }
+        }
+        for (Node node : potentialStops) {
+            if (CheckItIsPTStopOrNot(node) != null) {
+                PTStop pts = CheckItIsPTStopOrNot(node);
+                if (pts.findServingWays(pts) != null) {
+                    if (pts.findServingWays(pts).equals(w)) {
+                        allStops.add(pts);
+                    }
+                }
+            }
+        }
+        for (PTStop stop : allStops) {
+            if (CrossProduct(w.firstNode(), w.lastNode(), stop)) {
+                RightStops.add(stop);
+            } else {
+                LeftStops.add(stop);
+            }
+        }
+        return allStops;
+    }
+
+    public PTStop CheckItIsPTStopOrNot(Node stop) {
+        StopToWayAssigner assigner = new StopToWayAssigner();
+        List<OsmPrimitive> referrers = stop.getReferrers();
+        for (OsmPrimitive referredPrimitive : referrers) {
+            if (referredPrimitive.getType().equals(OsmPrimitiveType.RELATION)) {
+                List<OsmPrimitive> ways = new ArrayList<>(1);
+                Relation referredRelation = (Relation) referredPrimitive;
+                if (checkRelationContainsStop(referredRelation, stop) != null) {
+                    PTStop pts = new PTStop(checkRelationContainsStop(referredRelation, stop));
+                    return pts;
+                }
+            }
+        }
+        return null;
+    }
+
+    RelationMember checkRelationContainsStop(Relation rel, Node node) {
+        for (RelationMember rm : rel.getMembers()) {
+            if (rm.getUniqueId() == node.getUniqueId()) {
+                return rm;
+            }
+        }
+        return null;
+    }
+
+    public boolean CrossProduct(Node node1, Node node2, PTStop stop) {
+        LatLon coord3;
+        if (stop.getPlatform() != null) {
+            coord3 = stop.getPlatform().getBBox().getCenter();
+        } else {
+            Node node3 = stop.getNode();
+            coord3 = new LatLon(node3.lat(), node3.lon());
+        }
+        LatLon coord1 = new LatLon(node1.lat(), node1.lon());
+        LatLon coord2 = new LatLon(node2.lat(), node2.lon());
+        //       LatLon coord3 = new LatLon(node3.lat(),node3.lon());
+        double x1 = coord1.getX();
+        double y1 = coord1.getY();
+
+        double x2 = coord2.getX();
+        double y2 = coord2.getY();
+
+        double x3 = coord3.getX();
+        double y3 = coord3.getY();
+
+        x1 -= x3;
+        y1 -= y3;
+
+        x2 -= x3;
+        y2 -= y3;
+
+        double crossprod = x1 * y2 - y1 * x2;
+
+        //Right Direction
+        if (crossprod <= 0) {
+            return true;
+        }
+        //left Direction
+        return false;
+    }
+
+    public List<PTStop> getRightStops() {
+        return this.RightStops;
+    }
+
+    public List<PTStop> getLeftStops() {
+        return this.LeftStops;
     }
 
     /**
@@ -158,6 +269,7 @@ public class PTWay extends RelationMember {
      *
      * @return {@code true} if the last Way of this PTWay is an unsplit roundabout
      */
+
     public boolean endsWithUnsplitRoundabout() {
         if (this.ways.get(this.ways.size() - 1).firstNode() == this.ways.get(this.ways.size() - 1).lastNode()) {
             return true;
