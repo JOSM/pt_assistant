@@ -195,11 +195,9 @@ public class PTWay extends RelationMember {
     }
 
     public PTStop CheckItIsPTStopOrNot(Node stop) {
-        StopToWayAssigner assigner = new StopToWayAssigner();
         List<OsmPrimitive> referrers = stop.getReferrers();
         for (OsmPrimitive referredPrimitive : referrers) {
             if (referredPrimitive.getType().equals(OsmPrimitiveType.RELATION)) {
-                List<OsmPrimitive> ways = new ArrayList<>(1);
                 Relation referredRelation = (Relation) referredPrimitive;
                 if (checkRelationContainsStop(referredRelation, stop) != null) {
                     PTStop pts = new PTStop(checkRelationContainsStop(referredRelation, stop));
