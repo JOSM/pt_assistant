@@ -31,7 +31,11 @@ public class PTRouteSegment {
     /* fix variants available for this route segment */
     private List<List<PTWay>> fixVariants;
 
-    /* route relation for which this route segment was created */
+    private List<PTStop> AllStops;
+
+    /* route relations for which this route segment was created */
+    private List<Relation> relations;
+
     private Relation relation;
 
     /**
@@ -134,6 +138,7 @@ public class PTRouteSegment {
      *
      * @param list the PTWays of the new fix variant
      */
+
     public synchronized void addFixVariant(List<PTWay> list) {
         List<Way> otherWays = new ArrayList<>();
         for (PTWay ptway : list) {
@@ -184,6 +189,7 @@ public class PTRouteSegment {
      * @param other other route segment
      * @return {@code true} if this and the other route segments are equal
      */
+
     public boolean equalsRouteSegment(PTRouteSegment other) {
 
         List<Way> thisWays = new ArrayList<>();

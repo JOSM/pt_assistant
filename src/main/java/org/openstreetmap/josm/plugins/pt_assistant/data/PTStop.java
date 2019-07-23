@@ -3,6 +3,7 @@ package org.openstreetmap.josm.plugins.pt_assistant.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -287,7 +288,7 @@ public class PTStop extends RelationMember {
                 Way closestWay = findWayForNode(closestStopPosition, stop);
                 if (closestWay != null) {
                     this.serveWay = closestWay;
-                    tempStopPosition=closestStopPosition;
+                    tempStopPosition = closestStopPosition;
                     return closestWay;
                 }
             }
@@ -315,40 +316,43 @@ public class PTStop extends RelationMember {
         }
         return null;
     }
-    public Way findSecondServingWay(PTStop pts){
-      firstWay = findServingWays(pts);
-      if(firstWay==null){
-        return null;
-      }
-      if(tempStopPosition ==null){
-        Node closestStopPosition = null;
-        double minDistanceSq = Double.MAX_VALUE;
-        for (Node potentialStopPosition : firstWay.getNodes()) {
-            double distanceSq = potentialStopPosition.getCoor()
-                    .distanceSq(pts.getPlatform().getBBox().getCenter());
-            if (distanceSq < minDistanceSq) {
-                closestStopPosition = potentialStopPosition;
-                minDistanceSq = distanceSq;
+
+    public Way findSecondServingWay(PTStop pts) {
+        firstWay = findServingWays(pts);
+        if (firstWay == null) {
+            return null;
+        }
+        if (tempStopPosition == null) {
+            Node closestStopPosition = null;
+            double minDistanceSq = Double.MAX_VALUE;
+            for (Node potentialStopPosition : firstWay.getNodes()) {
+                double distanceSq = potentialStopPosition.getCoor().distanceSq(pts.getPlatform().getBBox().getCenter());
+                if (distanceSq < minDistanceSq) {
+                    closestStopPosition = potentialStopPosition;
+                    minDistanceSq = distanceSq;
+                }
+            }
+            tempStopPosition = closestStopPosition;
+        }
+        List<OsmPrimitive> referrers = tempStopPosition.getReferrers();
+        for (OsmPrimitive referrer : referrers) {
+            if (referrer.getType().equals(OsmPrimitiveType.WAY)) {
+                Way referredWay = (Way) referrer;
+                if (!referredWay.equals(firstWay) && (tempStopPosition.equals(referredWay.firstNode())
+                        || tempStopPosition.equals(referredWay.lastNode()))) {
+                    secondWay = referredWay;
+                    return referredWay;
+                }
             }
         }
-        tempStopPosition = closestStopPosition;
-      }
-      List<OsmPrimitive> referrers = tempStopPosition.getReferrers();
-      for (OsmPrimitive referrer : referrers) {
-          if (referrer.getType().equals(OsmPrimitiveType.WAY)) {
-              Way referredWay = (Way) referrer;
-              if(!referredWay.equals(firstWay) &&(tempStopPosition.equals(referredWay.firstNode()) ||tempStopPosition.equals(referredWay.lastNode()))){
-                secondWay = referredWay;
-                return referredWay;
-              }
-          }
-      }
-      return null;
+        return null;
     }
-    public void findAllServingWays(PTStop pts){
-      firstWay = findServingWays(pts);
-      secondWay = findSecondServingWay(pts);
+
+    public void findAllServingWays(PTStop pts) {
+        firstWay = findServingWays(pts);
+        secondWay = findSecondServingWay(pts);
     }
+
     /**
      * Finds the nearest Way in particular radius around the stop
      *
@@ -450,6 +454,14 @@ public class PTStop extends RelationMember {
         return null;
     }
 
+    Way findFirstWayofRelation(Relation rel){
+      PTRouteDataManager ptr = new PTRouteDataManager(rel);
+      return ptr.getFirstWay();
+    }
+    Way findlastWayofRelation(Relation rel){
+      PTRouteDataManager ptr = new PTRouteDataManager(rel);
+      return ptr.getLastWay();
+    }
     /**
     *check if relation contains the given stop or not
     *
@@ -464,6 +476,40 @@ public class PTStop extends RelationMember {
             }
         }
         return false;
+    }
+
+    public List<Way> servedWaysInOrder(PTStop pts) {
+        List<Way> lis = new ArrayList<>();
+        firstWay = findServingWays(pts);
+        secondWay = findSecondServingWay(pts);
+        lis.add(firstWay);
+        if (secondWay != null) {
+            lis.add(secondWay);
+            List<OsmPrimitive> ways = new ArrayList<>(1);
+            ways.add(firstWay);
+            Set<Relation> rels = Way.getParentRelations(ways);
+            int flag1 = 0, flag2 = 0;
+            for (Relation rel : rels) {
+                if (findFirstWayofRelation(rel).equals(firstWay)) {
+                    flag1 = 1;
+                    break;
+                }
+            }
+            if (flag1 == 1) {
+                return lis;
+            } else {
+                ways = new ArrayList<>(1);
+                ways.add(secondWay);
+                rels = Way.getParentRelations(ways);
+                for (Relation rel : rels) {
+                    if (findFirstWayofRelation(rel).equals(secondWay)) {
+                        Collections.swap(lis, 0, 1);
+                        break;
+                    }
+                }
+            }
+        }
+        return lis;
     }
 
     /**

@@ -352,6 +352,13 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             if (way == null) {
                 addStopToRelation(rel, stop);
             }
+            if(stop.getUniqueId()==4155886899L) {
+                List<Way> x=stop.servedWaysInOrder(stop);
+                System.out.println(x.get(0).getUniqueId());
+                if(x.size()>=2) {
+                    System.out.println(x.get(1).getUniqueId());
+                }
+            }
             // System.out.println("plateform is "+stop.getUniqueId()+" serving from old method to "+way.getUniqueId());
             // System.out.println(stop.getUniqueId() + " serves first " + stop.findServingWays(stop).getUniqueId());
             // if (stop.findSecondServingWay(stop) != null) {

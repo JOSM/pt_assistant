@@ -12,7 +12,6 @@ import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 
 /**
@@ -184,14 +183,30 @@ public class PTWay extends RelationMember {
                 }
             }
         }
-        for (PTStop stop : allStops) {
-            if (CrossProduct(w.firstNode(), w.lastNode(), stop)) {
-                RightStops.add(stop);
-            } else {
-                LeftStops.add(stop);
-            }
-        }
         return allStops;
+    }
+    public List<PTStop> getRightStops(Way w){
+      List<PTStop> allStp = getAllStops(w);
+      for (PTStop stop : allStp) {
+          if (CrossProduct(w.firstNode(), w.lastNode(), stop)) {
+              RightStops.add(stop);
+          } else {
+              LeftStops.add(stop);
+          }
+      }
+      return RightStops;
+    }
+
+    public List<PTStop> getLeftStops(Way w){
+      List<PTStop> allStp = getAllStops(w);
+      for (PTStop stop : allStp) {
+          if (CrossProduct(w.firstNode(), w.lastNode(), stop)) {
+              RightStops.add(stop);
+          } else {
+              LeftStops.add(stop);
+          }
+      }
+      return LeftStops;
     }
 
     public PTStop CheckItIsPTStopOrNot(Node stop) {
