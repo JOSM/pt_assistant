@@ -10,6 +10,7 @@ import java.util.Map;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.tools.Pair;
 
 /**
 * @author AshishSingh
@@ -20,21 +21,22 @@ public class EdgeDataManager {
     public HashMap<PTWay, Integer> NumberOfRoutesfromWay = new HashMap<>();
     public Map<PTWay, ArrayList<Relation>> relationsToWay = new HashMap<>();
     public Map<Relation, ArrayList<Edge>> edgesToRelation = new HashMap<>();
-    public Map<Relation,ArrayList<PTStop>> orderedStops = new HashMap<>();
+    public Map<Relation,ArrayList<Pair<Edge,Boolean>>> edgeDirections = new HashMap<>();
+    public Map<Relation, ArrayList<PTStop>> orderedStops = new HashMap<>();
     Collection<Relation> allRelations = null;
 
     public EdgeDataManager() {
-      if (MainApplication.getLayerManager().getEditLayer() != null
-              && MainApplication.getLayerManager().getEditLayer().getDataSet() != null){
-                allRelations = MainApplication.getLayerManager().getEditLayer().getDataSet().getRelations();
-              }
+        if (MainApplication.getLayerManager().getEditLayer() != null
+                && MainApplication.getLayerManager().getEditLayer().getDataSet() != null) {
+            allRelations = MainApplication.getLayerManager().getEditLayer().getDataSet().getRelations();
+        }
         for (Relation r : allRelations) {
             if (r.hasTag("route", "bus")) {
                 PTRelationList.add(r);
                 List<RelationMember> m = r.getMembers();
                 for (RelationMember rm : m) {
                     if (rm.isWay()) {
-                        PTWay way =  new PTWay(rm);
+                        PTWay way = new PTWay(rm);
                         NumberOfRoutesfromWay.put(way, 0);
                     }
                 }
@@ -51,7 +53,7 @@ public class EdgeDataManager {
             List<RelationMember> memb = rel.getMembers();
             for (RelationMember rm : memb) {
                 if (rm.isWay()) {
-                    PTWay way =  new PTWay(rm);
+                    PTWay way = new PTWay(rm);
                     ArrayList<Relation> lis = relationsToWay.get(way);
                     if (lis == null) {
                         lis = new ArrayList<>();
@@ -65,7 +67,7 @@ public class EdgeDataManager {
     }
 
     public void makingEdgesForRelations() {
-      IterationOnAllExistingRoutes();
+        IterationOnAllExistingRoutes();
         for (Relation rel : PTRelationList) {
             List<RelationMember> memb = rel.getMembers();
             PTWay prev = null;
@@ -73,7 +75,7 @@ public class EdgeDataManager {
             ArrayList<Edge> listOfEdges = new ArrayList<>();
             for (RelationMember rm : memb) {
                 if (rm.isWay()) {
-                    PTWay way =  new PTWay(rm);
+                    PTWay way = new PTWay(rm);
                     if (prev != null) {
                         if (NumberOfRoutesfromWay.get(way) == NumberOfRoutesfromWay.get(prev)) {
                             if (checkEqualityOfEdges(way, prev)) {
@@ -105,14 +107,27 @@ public class EdgeDataManager {
 
     public void printPTRelationList() {
         makingEdgesForRelations();
-        for(Relation r:PTRelationList) {
-         System.out.println("printing the relation: "+r.getName());
-         for(Edge edge:getEdgeListOfRelation(r)){
-           System.out.println("edge printing ");
-           for(PTWay w:edge.getAllWays()){
-             System.out.println("edge ways:"+w.getUniqueId());
-           }
-         }
+        for (Relation r : PTRelationList) {
+            System.out.println("printing the relation: " + r.getName());
+            int i=0;
+            for (Edge edge : getEdgeListOfRelation(r)) {
+              System.out.println("edge no: "+i);
+                List<PTStop> Rightstps= edge.getAllRightStops(true);
+                List<PTStop> Leftstps= edge.getAllLeftStops(true);
+                System.out.println("ways in the edge");
+                for(PTWay w:edge.getAllWays()){
+                  System.out.println("ways are: "+w.getUniqueId());
+                }
+                System.out.println("--right stops--");
+                for(PTStop pts:Rightstps){
+                  System.out.println(pts.getUniqueId());
+                }
+                System.out.println("--left stops--");
+                for(PTStop pts:Leftstps){
+                  System.out.println(pts.getUniqueId());
+                }
+                i++;
+            }
         }
 
     }

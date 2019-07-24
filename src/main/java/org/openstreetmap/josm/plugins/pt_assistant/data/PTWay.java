@@ -12,6 +12,7 @@ import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersAction;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 
 /**
@@ -163,6 +164,7 @@ public class PTWay extends RelationMember {
     }
 
     public List<PTStop> getAllStops(Way w) {
+        List<PTStop> stops = new ArrayList<>();
         Collection<Node> allNodes = w.getDataSet().getNodes();
         List<Node> potentialStops = new ArrayList<>();
         for (Node currentNode : allNodes) {
@@ -178,35 +180,127 @@ public class PTWay extends RelationMember {
                 PTStop pts = CheckItIsPTStopOrNot(node);
                 if (pts.findServingWays(pts) != null) {
                     if (pts.findServingWays(pts).equals(w)) {
-                        allStops.add(pts);
+                        stops.add(pts);
                     }
                 }
             }
         }
-        return allStops;
+        return stops;
     }
     public List<PTStop> getRightStops(Way w){
       List<PTStop> allStp = getAllStops(w);
+      List<PTStop> Rightstps = new ArrayList<>();
       for (PTStop stop : allStp) {
           if (CrossProduct(w.firstNode(), w.lastNode(), stop)) {
-              RightStops.add(stop);
-          } else {
-              LeftStops.add(stop);
+              Rightstps.add(stop);
           }
       }
-      return RightStops;
+      return Rightstps;
+    }
+    //will return the right stops in order
+    public List<PTStop> getPTWayRightStops(PTWay w){
+      List<Way> waylist=w.getWays();
+      List<PTStop> Rightstps = new ArrayList<>();
+      Way prev =null;
+      Way next = null;
+      for(int i=0;i<waylist.size();i++){
+        if(i>0){
+          prev = waylist.get(i-1);
+        }
+        if(i<waylist.size()-1){
+          next = waylist.get(i+1);
+        }
+        Way curr = waylist.get(i);
+        if(prev!=null){
+          Node node = findFirstCommonNode(curr,prev);
+          if(curr.firstNode().equals(node)){
+            List<PTStop> stps = getRightStops(curr);
+            stps = SortPTRouteMembersAction.sortSameWayStops(stps, curr, prev, next);
+            Rightstps.addAll(stps);
+          }
+          else{
+            List<PTStop> stps = getLeftStops(curr);
+            stps = SortPTRouteMembersAction.sortSameWayStops(stps, curr, prev, next);
+            Rightstps.addAll(stps);
+          }
+        }else if(next!=null){
+          Node node = findFirstCommonNode(curr,prev);
+          if(curr.lastNode().equals(node)){
+            List<PTStop> stps = getRightStops(curr);
+            stps = SortPTRouteMembersAction.sortSameWayStops(stps, curr, prev, next);
+            Rightstps.addAll(stps);
+          }
+          else{
+            List<PTStop> stps = getLeftStops(curr);
+            stps = SortPTRouteMembersAction.sortSameWayStops(stps, curr, prev, next);
+            Rightstps.addAll(stps);
+          }
+        }
+        else{
+          List<PTStop> stps = getRightStops(curr);
+          stps = SortPTRouteMembersAction.sortSameWayStops(stps, curr, prev, next);
+          Rightstps.addAll(stps);
+        }
+      }
+      return Rightstps;
     }
 
     public List<PTStop> getLeftStops(Way w){
       List<PTStop> allStp = getAllStops(w);
+      List<PTStop> LeftStps = new ArrayList<>();
       for (PTStop stop : allStp) {
-          if (CrossProduct(w.firstNode(), w.lastNode(), stop)) {
-              RightStops.add(stop);
-          } else {
-              LeftStops.add(stop);
+          if (!CrossProduct(w.firstNode(), w.lastNode(), stop)) {
+              LeftStps.add(stop);
           }
       }
-      return LeftStops;
+      return LeftStps;
+    }
+
+    public List<PTStop> getPTWayLeftStops(PTWay w){
+      List<Way> waylist=w.getWays();
+      List<PTStop> Leftstps = new ArrayList<>();
+      Way prev =null;
+      Way next = null;
+      for(int i=0;i<waylist.size();i++){
+        if(i>0){
+          prev = waylist.get(i-1);
+        }
+        if(i<waylist.size()-1){
+          next = waylist.get(i+1);
+        }
+        Way curr = waylist.get(i);
+        if(prev!=null){
+          Node node = findFirstCommonNode(curr,prev);
+          if(curr.firstNode().equals(node)){
+            List<PTStop> stps = getLeftStops(curr);
+            stps = SortPTRouteMembersAction.sortSameWayStops(stps, curr, prev, next);
+            Leftstps.addAll(stps);
+          }
+          else{
+            List<PTStop> stps = getRightStops(curr);
+            stps = SortPTRouteMembersAction.sortSameWayStops(stps, curr, prev, next);
+            Leftstps.addAll(stps);
+          }
+        }else if(next!=null){
+          Node node = findFirstCommonNode(curr,prev);
+          if(curr.lastNode().equals(node)){
+            List<PTStop> stps = getLeftStops(curr);
+            stps = SortPTRouteMembersAction.sortSameWayStops(stps, curr, prev, next);
+            Leftstps.addAll(stps);
+          }
+          else{
+            List<PTStop> stps = getRightStops(curr);
+            stps = SortPTRouteMembersAction.sortSameWayStops(stps, curr, prev, next);
+            Leftstps.addAll(stps);
+          }
+        }
+        else{
+          List<PTStop> stps = getLeftStops(curr);
+          stps = SortPTRouteMembersAction.sortSameWayStops(stps, curr, prev, next);
+          Leftstps.addAll(stps);
+        }
+      }
+      return Leftstps;
     }
 
     public PTStop CheckItIsPTStopOrNot(Node stop) {
@@ -222,7 +316,6 @@ public class PTWay extends RelationMember {
         }
         return null;
     }
-
     RelationMember checkRelationContainsStop(Relation rel, Node node) {
         for (RelationMember rm : rel.getMembers()) {
             if (rm.getUniqueId() == node.getUniqueId()) {
@@ -267,13 +360,14 @@ public class PTWay extends RelationMember {
         //left Direction
         return false;
     }
-
-    public List<PTStop> getRightStops() {
-        return this.RightStops;
-    }
-
-    public List<PTStop> getLeftStops() {
-        return this.LeftStops;
+    Node findFirstCommonNode(Way w1 ,Way w2){
+      if(w1.firstNode().equals(w2.firstNode())||w1.firstNode().equals(w2.lastNode())){
+        return w1.firstNode();
+      }
+      else if(w1.lastNode().equals(w2.firstNode())||w1.lastNode().equals(w2.lastNode())){
+        return w1.lastNode();
+      }
+      return null;
     }
 
     /**

@@ -69,8 +69,8 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
             return;
         }
         System.out.println("I am inside PaintVisitor");
-        EdgeDataManager edgeRelations = new EdgeDataManager();
-        edgeRelations.printPTRelationList();
+        // EdgeDataManager edgeRelations = new EdgeDataManager();
+        // edgeRelations.printPTRelationList();
         List<RelationMember> rmList = new ArrayList<>();
         List<RelationMember> revisitedWayList = new ArrayList<>();
         // first, draw primitives:
