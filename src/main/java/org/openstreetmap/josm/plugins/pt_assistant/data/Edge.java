@@ -2,6 +2,7 @@ package org.openstreetmap.josm.plugins.pt_assistant.data;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.openstreetmap.josm.data.osm.Node;
@@ -56,7 +57,9 @@ public class Edge {
               if(endNodes[0].equals(preendNodes[0])||endNodes[0].equals(preendNodes[1])){
                 allRightStops.addAll(curr.getPTWayRightStops(curr));
               }else{
-                allRightStops.addAll(curr.getPTWayLeftStops(curr));
+                List<PTStop> lis=curr.getPTWayLeftStops(curr);
+                Collections.reverse(lis);
+                allRightStops.addAll(lis);
               }
             }
             else if(next!=null){
@@ -65,7 +68,9 @@ public class Edge {
               if(endNodes[1].equals(nexendNodes[0])||endNodes[1].equals(nexendNodes[1])){
                 allRightStops.addAll(curr.getPTWayRightStops(curr));
               }else{
-                allRightStops.addAll(curr.getPTWayLeftStops(curr));
+                  List<PTStop> lis=curr.getPTWayLeftStops(curr);
+                  Collections.reverse(lis);
+                allRightStops.addAll(lis);
               }
             }
             else{
@@ -73,7 +78,9 @@ public class Edge {
                 allRightStops.addAll(curr.getPTWayRightStops(curr));
               }
               else{
-                allRightStops.addAll(curr.getPTWayLeftStops(curr));
+                List<PTStop> lis=curr.getPTWayLeftStops(curr);
+                Collections.reverse(lis);
+                allRightStops.addAll(lis);
               }
             }
         }
@@ -100,7 +107,9 @@ public class Edge {
               if(endNodes[0].equals(preendNodes[0])||endNodes[0].equals(preendNodes[1])){
                 allLeftStops.addAll(curr.getPTWayLeftStops(curr));
               }else{
-                allLeftStops.addAll(curr.getPTWayRightStops(curr));
+                  List<PTStop> lis=curr.getPTWayRightStops(curr);
+                  Collections.reverse(lis);
+                allLeftStops.addAll(lis);
               }
             }
             else if(next!=null){
@@ -109,7 +118,9 @@ public class Edge {
               if(endNodes[1].equals(nexendNodes[0])||endNodes[1].equals(nexendNodes[1])){
                 allLeftStops.addAll(curr.getPTWayLeftStops(curr));
               }else{
-                allLeftStops.addAll(curr.getPTWayRightStops(curr));
+                List<PTStop> lis=curr.getPTWayRightStops(curr);
+                Collections.reverse(lis);
+                allLeftStops.addAll(lis);
               }
             }
             else{
@@ -117,7 +128,9 @@ public class Edge {
                 allLeftStops.addAll(curr.getPTWayLeftStops(curr));
               }
               else{
-                allLeftStops.addAll(curr.getPTWayRightStops(curr));
+                List<PTStop> lis=curr.getPTWayRightStops(curr);
+                Collections.reverse(lis);
+                allLeftStops.addAll(lis);
               }
             }
         }

@@ -13,7 +13,9 @@ import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersAction;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
+import org.openstreetmap.josm.tools.Pair;
 
 /**
  * Representation of PTWays, which can be of OsmPrimitiveType Way or Relation
@@ -190,8 +192,19 @@ public class PTWay extends RelationMember {
     public List<PTStop> getRightStops(Way w){
       List<PTStop> allStp = getAllStops(w);
       List<PTStop> Rightstps = new ArrayList<>();
+      StopToWayAssigner assigner = new StopToWayAssigner();
       for (PTStop stop : allStp) {
-          if (CrossProduct(w.firstNode(), w.lastNode(), stop)) {
+          Node node3;
+          if(stop.getPlatform()!=null){
+            node3=new Node(stop.getPlatform().getBBox().getCenter());
+          }
+          else{
+            node3 = stop.getNode();
+          }
+          Pair<Node, Node> segment = assigner.calculateNearestSegment(node3, w);
+          Node node1 = segment.a;
+          Node node2 = segment.b;
+          if (CrossProduct(node1, node2, stop)) {
               Rightstps.add(stop);
           }
       }
@@ -248,8 +261,19 @@ public class PTWay extends RelationMember {
     public List<PTStop> getLeftStops(Way w){
       List<PTStop> allStp = getAllStops(w);
       List<PTStop> LeftStps = new ArrayList<>();
+      StopToWayAssigner assigner = new StopToWayAssigner();
       for (PTStop stop : allStp) {
-          if (!CrossProduct(w.firstNode(), w.lastNode(), stop)) {
+        Node node3;
+          if(stop.getPlatform()!=null){
+            node3=new Node(stop.getPlatform().getBBox().getCenter());
+          }
+          else{
+            node3 = stop.getNode();
+          }
+            Pair<Node, Node> segment = assigner.calculateNearestSegment(node3, w);
+            Node node1 = segment.a;
+            Node node2 = segment.b;
+          if (!CrossProduct(node1, node2, stop)) {
               LeftStps.add(stop);
           }
       }

@@ -25,7 +25,6 @@ import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionType;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionTypeCalculator;
 import org.openstreetmap.josm.gui.layer.validation.PaintVisitor;
-import org.openstreetmap.josm.plugins.pt_assistant.data.EdgeDataManager;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTWay;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
@@ -60,6 +59,9 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
         super((Graphics2D) g, mv);
         this.g = g;
         this.mv = mv;
+//        System.out.println("I am inside PaintVisitor");
+//         EdgeDataManager edgeRelations = new EdgeDataManager();
+//         edgeRelations.printPTRelationList();
     }
 
     @Override
@@ -68,9 +70,6 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
             drawCycleRoute(r);
             return;
         }
-        System.out.println("I am inside PaintVisitor");
-        // EdgeDataManager edgeRelations = new EdgeDataManager();
-        // edgeRelations.printPTRelationList();
         List<RelationMember> rmList = new ArrayList<>();
         List<RelationMember> revisitedWayList = new ArrayList<>();
         // first, draw primitives:
