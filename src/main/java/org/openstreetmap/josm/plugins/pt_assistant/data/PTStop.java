@@ -454,14 +454,16 @@ public class PTStop extends RelationMember {
         return null;
     }
 
-    Way findFirstWayofRelation(Relation rel){
-      PTRouteDataManager ptr = new PTRouteDataManager(rel);
-      return ptr.getFirstWay();
+    Way findFirstWayofRelation(Relation rel) {
+        PTRouteDataManager ptr = new PTRouteDataManager(rel);
+        return ptr.getFirstWay();
     }
-    Way findlastWayofRelation(Relation rel){
-      PTRouteDataManager ptr = new PTRouteDataManager(rel);
-      return ptr.getLastWay();
+
+    Way findlastWayofRelation(Relation rel) {
+        PTRouteDataManager ptr = new PTRouteDataManager(rel);
+        return ptr.getLastWay();
     }
+
     /**
     *check if relation contains the given stop or not
     *

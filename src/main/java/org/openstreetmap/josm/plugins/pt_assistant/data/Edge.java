@@ -27,7 +27,7 @@ public class Edge {
     }
 
     public List<PTStop> getAllStops() {
-      List<PTStop> allPTStops = new ArrayList<>();
+        List<PTStop> allPTStops = new ArrayList<>();
         for (PTWay w : containPTWays) {
             for (Way w1 : w.getWays()) {
                 allPTStops.addAll(w.getAllStops(w1));
@@ -36,102 +36,95 @@ public class Edge {
         return allPTStops;
     }
 
-
     public List<PTStop> getAllRightStops(boolean direc) {
-      List<PTStop> allRightStops = new ArrayList<>();
-      PTWay prev=null;
-      PTWay next=null;
-        for (int i=0;i<containPTWays.size();i++) {
-            if(i>0){
-              prev =containPTWays.get(i-1);
+        List<PTStop> allRightStops = new ArrayList<>();
+        PTWay prev = null;
+        PTWay next = null;
+        for (int i = 0; i < containPTWays.size(); i++) {
+            if (i > 0) {
+                prev = containPTWays.get(i - 1);
             }
-            if(i<containPTWays.size()-1){
-              next = containPTWays.get(i+1);
+            if (i < containPTWays.size() - 1) {
+                next = containPTWays.get(i + 1);
             }
-            PTWay curr =containPTWays.get(i);
+            PTWay curr = containPTWays.get(i);
             Node[] endNodes = new Node[2];
-            endNodes=curr.getEndNodes();
-            if(prev!=null){
-              Node[] preendNodes = new Node[2];
-              preendNodes=prev.getEndNodes();
-              if(endNodes[0].equals(preendNodes[0])||endNodes[0].equals(preendNodes[1])){
-                allRightStops.addAll(curr.getPTWayRightStops(curr));
-              }else{
-                List<PTStop> lis=curr.getPTWayLeftStops(curr);
-                Collections.reverse(lis);
-                allRightStops.addAll(lis);
-              }
-            }
-            else if(next!=null){
-              Node[] nexendNodes = new Node[2];
-              nexendNodes=next.getEndNodes();
-              if(endNodes[1].equals(nexendNodes[0])||endNodes[1].equals(nexendNodes[1])){
-                allRightStops.addAll(curr.getPTWayRightStops(curr));
-              }else{
-                  List<PTStop> lis=curr.getPTWayLeftStops(curr);
-                  Collections.reverse(lis);
-                allRightStops.addAll(lis);
-              }
-            }
-            else{
-              if(direc){
-                allRightStops.addAll(curr.getPTWayRightStops(curr));
-              }
-              else{
-                List<PTStop> lis=curr.getPTWayLeftStops(curr);
-                Collections.reverse(lis);
-                allRightStops.addAll(lis);
-              }
+            endNodes = curr.getEndNodes();
+            if (prev != null) {
+                Node[] preendNodes = new Node[2];
+                preendNodes = prev.getEndNodes();
+                if (endNodes[0].equals(preendNodes[0]) || endNodes[0].equals(preendNodes[1])) {
+                    allRightStops.addAll(curr.getPTWayRightStops(curr));
+                } else {
+                    List<PTStop> lis = curr.getPTWayLeftStops(curr);
+                    Collections.reverse(lis);
+                    allRightStops.addAll(lis);
+                }
+            } else if (next != null) {
+                Node[] nexendNodes = new Node[2];
+                nexendNodes = next.getEndNodes();
+                if (endNodes[1].equals(nexendNodes[0]) || endNodes[1].equals(nexendNodes[1])) {
+                    allRightStops.addAll(curr.getPTWayRightStops(curr));
+                } else {
+                    List<PTStop> lis = curr.getPTWayLeftStops(curr);
+                    Collections.reverse(lis);
+                    allRightStops.addAll(lis);
+                }
+            } else {
+                if (direc) {
+                    allRightStops.addAll(curr.getPTWayRightStops(curr));
+                } else {
+                    List<PTStop> lis = curr.getPTWayLeftStops(curr);
+                    Collections.reverse(lis);
+                    allRightStops.addAll(lis);
+                }
             }
         }
         return allRightStops;
     }
 
     public List<PTStop> getAllLeftStops(boolean direc) {
-      List<PTStop> allLeftStops = new ArrayList<>();
-      PTWay prev=null;
-      PTWay next=null;
-        for (int i=0;i<containPTWays.size();i++) {
-            if(i>0){
-              prev =containPTWays.get(i-1);
+        List<PTStop> allLeftStops = new ArrayList<>();
+        PTWay prev = null;
+        PTWay next = null;
+        for (int i = 0; i < containPTWays.size(); i++) {
+            if (i > 0) {
+                prev = containPTWays.get(i - 1);
             }
-            if(i<containPTWays.size()-1){
-              next = containPTWays.get(i+1);
+            if (i < containPTWays.size() - 1) {
+                next = containPTWays.get(i + 1);
             }
-            PTWay curr =containPTWays.get(i);
+            PTWay curr = containPTWays.get(i);
             Node[] endNodes = new Node[2];
-            endNodes=curr.getEndNodes();
-            if(prev!=null){
-              Node[] preendNodes = new Node[2];
-              preendNodes=prev.getEndNodes();
-              if(endNodes[0].equals(preendNodes[0])||endNodes[0].equals(preendNodes[1])){
-                allLeftStops.addAll(curr.getPTWayLeftStops(curr));
-              }else{
-                  List<PTStop> lis=curr.getPTWayRightStops(curr);
-                  Collections.reverse(lis);
-                allLeftStops.addAll(lis);
-              }
-            }
-            else if(next!=null){
-              Node[] nexendNodes = new Node[2];
-              nexendNodes=next.getEndNodes();
-              if(endNodes[1].equals(nexendNodes[0])||endNodes[1].equals(nexendNodes[1])){
-                allLeftStops.addAll(curr.getPTWayLeftStops(curr));
-              }else{
-                List<PTStop> lis=curr.getPTWayRightStops(curr);
-                Collections.reverse(lis);
-                allLeftStops.addAll(lis);
-              }
-            }
-            else{
-              if(direc){
-                allLeftStops.addAll(curr.getPTWayLeftStops(curr));
-              }
-              else{
-                List<PTStop> lis=curr.getPTWayRightStops(curr);
-                Collections.reverse(lis);
-                allLeftStops.addAll(lis);
-              }
+            endNodes = curr.getEndNodes();
+            if (prev != null) {
+                Node[] preendNodes = new Node[2];
+                preendNodes = prev.getEndNodes();
+                if (endNodes[0].equals(preendNodes[0]) || endNodes[0].equals(preendNodes[1])) {
+                    allLeftStops.addAll(curr.getPTWayLeftStops(curr));
+                } else {
+                    List<PTStop> lis = curr.getPTWayRightStops(curr);
+                    Collections.reverse(lis);
+                    allLeftStops.addAll(lis);
+                }
+            } else if (next != null) {
+                Node[] nexendNodes = new Node[2];
+                nexendNodes = next.getEndNodes();
+                if (endNodes[1].equals(nexendNodes[0]) || endNodes[1].equals(nexendNodes[1])) {
+                    allLeftStops.addAll(curr.getPTWayLeftStops(curr));
+                } else {
+                    List<PTStop> lis = curr.getPTWayRightStops(curr);
+                    Collections.reverse(lis);
+                    allLeftStops.addAll(lis);
+                }
+            } else {
+                if (direc) {
+                    allLeftStops.addAll(curr.getPTWayLeftStops(curr));
+                } else {
+                    List<PTStop> lis = curr.getPTWayRightStops(curr);
+                    Collections.reverse(lis);
+                    allLeftStops.addAll(lis);
+                }
             }
         }
         return allLeftStops;

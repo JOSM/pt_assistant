@@ -349,9 +349,9 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
         ptstops.forEach(stop -> {
             Way way = assigner.get(stop);
-//            if(way.getUniqueId()==193565406){
-//              System.out.println("first Node "+way.firstNode().getUniqueId())
-//            }
+            //            if(way.getUniqueId()==193565406){
+            //              System.out.println("first Node "+way.firstNode().getUniqueId())
+            //            }
             if (way == null) {
                 addStopToRelation(rel, stop);
             }
@@ -450,18 +450,18 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             }
             prev1 = w;
         }
-//       for (RelationMember w : wayMembers) {
-//           if (RightSideStops.get(w) != null) {
-//               for (PTStop pt : RightSideStops.get(w)) {
-//                   System.out.println("Way Id is " + w.getUniqueId() + " right stop " + pt.getUniqueId());
-//               }
-//           }
-//           if (LeftSideStops.get(w) != null) {
-//               for (PTStop pt : LeftSideStops.get(w)) {
-//                   System.out.println("Way Id is " + w.getUniqueId() + " left stop " + pt.getUniqueId());
-//               }
-//           }
-//       }
+        //       for (RelationMember w : wayMembers) {
+        //           if (RightSideStops.get(w) != null) {
+        //               for (PTStop pt : RightSideStops.get(w)) {
+        //                   System.out.println("Way Id is " + w.getUniqueId() + " right stop " + pt.getUniqueId());
+        //               }
+        //           }
+        //           if (LeftSideStops.get(w) != null) {
+        //               for (PTStop pt : LeftSideStops.get(w)) {
+        //                   System.out.println("Way Id is " + w.getUniqueId() + " left stop " + pt.getUniqueId());
+        //               }
+        //           }
+        //       }
         // based on the order of the ways, add the stops to the relation
         //my solution
         for (int i = 0; i < wayMembers.size(); i++) {

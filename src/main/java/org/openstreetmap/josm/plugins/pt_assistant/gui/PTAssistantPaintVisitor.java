@@ -59,9 +59,6 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
         super((Graphics2D) g, mv);
         this.g = g;
         this.mv = mv;
-//        System.out.println("I am inside PaintVisitor");
-//         EdgeDataManager edgeRelations = new EdgeDataManager();
-//         edgeRelations.printPTRelationList();
     }
 
     @Override
