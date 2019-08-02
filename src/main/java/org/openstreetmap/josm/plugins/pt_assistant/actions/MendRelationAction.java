@@ -141,10 +141,10 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     boolean onFly = false;
     boolean aroundGaps = false;
     boolean aroundStops = false;
-    Node prevCurrenNode=null;
+    Node prevCurrenNode = null;
     HashMap<Way, Character> wayColoring;
     HashMap<Character, List<Way>> wayListColoring;
-    int nodeIdx =0;
+    int nodeIdx = 0;
     AbstractMapViewPaintable temporaryLayer = null;
     String notice = null;
     List<Node> backnodes = new ArrayList<>();
@@ -1366,6 +1366,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         else
             return way.firstNode();
     }
+
     void displayFixVariants(List<Way> fixVariants) {
         // find the letters of the fix variants:
         char alphabet = 'A';
@@ -1462,100 +1463,101 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             }
         });
     }
-    void displayBacktrackFixVariant(List<Way>fixVariants,int idx1){
-      char alphabet = 'A';
-      boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
-      wayColoring = new HashMap<>();
-      final List<Character> allowedCharacters = new ArrayList<>();
-      if (numeric) {
-          alphabet = '1';
-          allowedCharacters.add('7');
-          if (showOption0)
-              allowedCharacters.add('0');
-          allowedCharacters.add('8');
-          allowedCharacters.add('9');
-      } else {
-          allowedCharacters.add('S');
-          if (showOption0)
-              allowedCharacters.add('W');
-          allowedCharacters.add('V');
-          allowedCharacters.add('Q');
-      }
 
-      for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
-          allowedCharacters.add(alphabet);
-          wayColoring.put(fixVariants.get(i), alphabet);
-          alphabet++;
-      }
+    void displayBacktrackFixVariant(List<Way> fixVariants, int idx1) {
+        char alphabet = 'A';
+        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
+        wayColoring = new HashMap<>();
+        final List<Character> allowedCharacters = new ArrayList<>();
+        if (numeric) {
+            alphabet = '1';
+            allowedCharacters.add('7');
+            if (showOption0)
+                allowedCharacters.add('0');
+            allowedCharacters.add('8');
+            allowedCharacters.add('9');
+        } else {
+            allowedCharacters.add('S');
+            if (showOption0)
+                allowedCharacters.add('W');
+            allowedCharacters.add('V');
+            allowedCharacters.add('Q');
+        }
 
-      // remove any existing temporary layer
-      removeTemporarylayers();
+        for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
+            allowedCharacters.add(alphabet);
+            wayColoring.put(fixVariants.get(i), alphabet);
+            alphabet++;
+        }
 
-      if (abort)
-          return;
+        // remove any existing temporary layer
+        removeTemporarylayers();
 
-      // zoom to problem:
-      AutoScaleAction.zoomTo(fixVariants);
+        if (abort)
+            return;
 
-      // display the fix variants:
-      temporaryLayer = new MendRelationAddLayer();
-      MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
+        // zoom to problem:
+        AutoScaleAction.zoomTo(fixVariants);
 
-      // // add the key listener:
-      MainApplication.getMap().mapView.requestFocus();
-      MainApplication.getMap().mapView.addKeyListener(new KeyAdapter(){
-          @Override
-          public void keyPressed(KeyEvent e) {
-              downloadCounter = 0;
-              if (abort) {
-                  removeKeyListenerAndTemporaryLayer(this);
-                  return;
-              }
-              Character typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
-              if (allowedCharacters.contains(typedKeyUpperCase)) {
-                  int idx = typedKeyUpperCase - 65;
-                  if (numeric) {
-                      // for numpad numerics and the plain numerics
-                      if (typedKeyUpperCase <= 57)
-                          idx = typedKeyUpperCase - 49;
-                      else
-                          idx = typedKeyUpperCase - 97;
-                  }
-                  nextIndex = true;
-                  if (typedKeyUpperCase == 'S' || typedKeyUpperCase == '7') {
-                      removeKeyListenerAndTemporaryLayer(this);
-                      shorterRoutes = false;
-                      getNextWayAfterSelection(null);
-                  } else if (typedKeyUpperCase == 'Q' || typedKeyUpperCase == '9') {
-                      removeKeyListenerAndTemporaryLayer(this);
-                      shorterRoutes = false;
-                      removeCurrentEdge();
-                  } else if (typedKeyUpperCase == 'W' || typedKeyUpperCase == '0') {
-                      shorterRoutes = !shorterRoutes;
-                      removeKeyListenerAndTemporaryLayer(this);
-                      callNextWay(currentIndex);
-                  } else if (typedKeyUpperCase == 'V' || typedKeyUpperCase == '8') {
-                      removeKeyListenerAndTemporaryLayer(this);
-                      shorterRoutes = false;
-                      backtrack(currentWay,idx1+1);
-                  } else {
+        // display the fix variants:
+        temporaryLayer = new MendRelationAddLayer();
+        MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
+
+        // // add the key listener:
+        MainApplication.getMap().mapView.requestFocus();
+        MainApplication.getMap().mapView.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                downloadCounter = 0;
+                if (abort) {
                     removeKeyListenerAndTemporaryLayer(this);
+                    return;
+                }
+                Character typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
+                if (allowedCharacters.contains(typedKeyUpperCase)) {
+                    int idx = typedKeyUpperCase - 65;
+                    if (numeric) {
+                        // for numpad numerics and the plain numerics
+                        if (typedKeyUpperCase <= 57)
+                            idx = typedKeyUpperCase - 49;
+                        else
+                            idx = typedKeyUpperCase - 97;
+                    }
+                    nextIndex = true;
+                    if (typedKeyUpperCase == 'S' || typedKeyUpperCase == '7') {
+                        removeKeyListenerAndTemporaryLayer(this);
+                        shorterRoutes = false;
+                        getNextWayAfterSelection(null);
+                    } else if (typedKeyUpperCase == 'Q' || typedKeyUpperCase == '9') {
+                        removeKeyListenerAndTemporaryLayer(this);
+                        shorterRoutes = false;
+                        removeCurrentEdge();
+                    } else if (typedKeyUpperCase == 'W' || typedKeyUpperCase == '0') {
+                        shorterRoutes = !shorterRoutes;
+                        removeKeyListenerAndTemporaryLayer(this);
+                        callNextWay(currentIndex);
+                    } else if (typedKeyUpperCase == 'V' || typedKeyUpperCase == '8') {
+                        removeKeyListenerAndTemporaryLayer(this);
+                        shorterRoutes = false;
+                        backtrack(currentWay, idx1 + 1);
+                    } else {
+                        removeKeyListenerAndTemporaryLayer(this);
+                        shorterRoutes = false;
+                        findWayafterchunk(currentWay);
+                        getNextWayAfterBackTrackSelection(fixVariants.get(idx));
+                    }
+                }
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    MainApplication.getMap().mapView.removeKeyListener(this);
+                    nextIndex = false;
                     shorterRoutes = false;
-                    findWayafterchunk(currentWay);
-                    getNextWayAfterBackTrackSelection(fixVariants.get(0));
-                  }
-              }
-              if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                  MainApplication.getMap().mapView.removeKeyListener(this);
-                  nextIndex = false;
-                  shorterRoutes = false;
-                  setEnable = true;
-                  halt = true;
-                  setEnabled(true);
-                  MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
-              }
-          }
-      });
+                    setEnable = true;
+                    halt = true;
+                    setEnabled(true);
+                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+                }
+            }
+        });
     }
 
     void backtrackCurrentEdge() {
@@ -1563,66 +1565,67 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         Way way = backTrackWay;
         backnodes = way.getNodes();
         if (currentNode.equals(way.lastNode())) {
-          Collections.reverse(backnodes);
+            Collections.reverse(backnodes);
         }
-        int idx=1;
+        int idx = 1;
         prevCurrenNode = currentNode;
-        backtrack(currentWay,idx);
-    }
-    private void backtrack(Way way,int idx){
-      if(idx>=backnodes.size()-1){
-        currentNode = prevCurrenNode;
-        callNextWay(currentIndex);
-        return;
-      }
-      Node nod =backnodes.get(idx);
-      if (way.isInnerNode(nod)) {
-          List<Way> fixVariants = new ArrayList<>();
-          List<Way> allWays = nod.getParentWays();
-          if (allWays != null) {
-            for(Way w:allWays) {
-              if(!w.equals(currentWay)){
-                fixVariants.add(w);
-              }
-            }
-          }
-          List<Node> n = new ArrayList<>();
-          n.add(nod);
-          currentNode = nod;
-          if (fixVariants.size() > 0) {
-             System.out.println(currentNode.getUniqueId());
-             displayBacktrackFixVariant(fixVariants,idx);
-          }
-          else{
-            backtrack(way,idx+1);
-          }
-      }
+        backtrack(currentWay, idx);
     }
 
-    private Way findWayafterchunk(Way way){
+    private void backtrack(Way way, int idx) {
+        if (idx >= backnodes.size() - 1) {
+            currentNode = prevCurrenNode;
+            callNextWay(currentIndex);
+            return;
+        }
+        Node nod = backnodes.get(idx);
+        if (way.isInnerNode(nod)) {
+            List<Way> fixVariants = new ArrayList<>();
+            List<Way> allWays = nod.getParentWays();
+            if (allWays != null) {
+                for (Way w : allWays) {
+                    if (!w.equals(currentWay)) {
+                        fixVariants.add(w);
+                    }
+                }
+            }
+            List<Node> n = new ArrayList<>();
+            n.add(nod);
+            currentNode = nod;
+            if (fixVariants.size() > 0) {
+                System.out.println(currentNode.getUniqueId());
+                displayBacktrackFixVariant(fixVariants, idx);
+            } else {
+                backtrack(way, idx + 1);
+            }
+        }
+    }
+
+    private Way findWayafterchunk(Way way) {
         Way w2 = null;
-        Way w1= null;
-        Way wayToKeep =null;
+        Way w1 = null;
+        Way wayToKeep = null;
         List<Node> breakNode = new ArrayList<>();
         breakNode.add(currentNode);
         Strategy strategy = new TempStrategy();
-        List<List<Node>> wayChunks =SplitWayCommand.buildSplitChunks(currentWay,breakNode);
-        SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(),strategy);
-        System.out.println("size "+result.getNewWays().size()+"on node "+ currentNode.getUniqueId());
+        List<List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(currentWay, breakNode);
+        SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
+        System.out.println("size " + result.getNewWays().size() + "on node " + currentNode.getUniqueId());
         if (result != null) {
             UndoRedoHandler.getInstance().add(result);
             w1 = result.getNewWays().get(0);
-            wayToKeep=w1;
-          }
+            wayToKeep = w1;
+        }
         return wayToKeep;
     }
+
     private void removeKeyListenerAndTemporaryLayer(KeyListener keyListener) {
         MainApplication.getMap().mapView.removeKeyListener(keyListener);
         MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
     }
 
     void displayFixVariantsWithOverlappingWays(List<List<Way>> fixVariants) {
-      // System.out.println("yoo");
+        // System.out.println("yoo");
         // find the letters of the fix variants:
         char alphabet = 'A';
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
@@ -1894,23 +1897,23 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     void getNextWayAfterBackTrackSelection(Way way) {
-      save();
-      List<Integer> lst = new ArrayList<>();
-      lst.add(currentIndex+1);
-      int []ind = lst.stream().mapToInt(Integer::intValue).toArray();
-      memberTableModel.remove(ind);
-      for (int i = 0; i < ind.length; i++) {
-          members.remove(ind[i] - i);
-      }
-      save();
-      int indx = currentIndex;
-      addNewWays(Collections.singletonList(way), indx);
-      currentNode =getOtherNode(way,currentNode);
-      if (currentIndex < members.size() - 1) {
-          callNextWay(++currentIndex);
-      } else{
-        deleteExtraWays();
-      }
+        save();
+        List<Integer> lst = new ArrayList<>();
+        lst.add(currentIndex + 1);
+        int[] ind = lst.stream().mapToInt(Integer::intValue).toArray();
+        memberTableModel.remove(ind);
+        for (int i = 0; i < ind.length; i++) {
+            members.remove(ind[i] - i);
+        }
+        save();
+        int indx = currentIndex;
+        addNewWays(Collections.singletonList(way), indx);
+        currentNode = getOtherNode(way, currentNode);
+        if (currentIndex < members.size() - 1) {
+            callNextWay(++currentIndex);
+        } else {
+            deleteExtraWays();
+        }
     }
 
     void getNextWayAfterSelection(List<Way> ways) {
@@ -2142,11 +2145,11 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         editor.apply();
     }
 
-    public class TempStrategy implements Strategy{
+    public class TempStrategy implements Strategy {
         @Override
         public Way determineWayToKeep(Iterable<Way> wayChunks) {
-            for(Way way:wayChunks) {
-                if(!way.containsNode(prevCurrenNode)) {
+            for (Way way : wayChunks) {
+                if (!way.containsNode(prevCurrenNode)) {
                     return way;
                 }
             }

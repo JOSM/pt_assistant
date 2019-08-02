@@ -126,17 +126,17 @@ public class EdgeDataManager {
                         list.add(pr);
                         edgeDirections.put(rel, list);
                     } else {
-                      Pair<Edge, Boolean> pr = new Pair<>(curr, false);
+                        Pair<Edge, Boolean> pr = new Pair<>(curr, false);
                         list.add(pr);
                         edgeDirections.put(rel, list);
                     }
                 } else if (next != null) {
                     if (curr.getLastWay().equals(next.getFirstWay()) || curr.getLastWay().equals(next.getLastWay())) {
-                      Pair<Edge, Boolean> pr = new Pair<>(curr, true);
+                        Pair<Edge, Boolean> pr = new Pair<>(curr, true);
                         list.add(pr);
                         edgeDirections.put(rel, list);
                     } else {
-                      Pair<Edge, Boolean> pr = new Pair<>(curr, false);
+                        Pair<Edge, Boolean> pr = new Pair<>(curr, false);
                         list.add(pr);
                         edgeDirections.put(rel, list);
                     }
@@ -149,7 +149,7 @@ public class EdgeDataManager {
                         }
                     }
                     if (curr.getFirstWay().equals(way)) {
-                      Pair<Edge, Boolean> pr = new Pair<>(curr, true);
+                        Pair<Edge, Boolean> pr = new Pair<>(curr, true);
                         list.add(pr);
                         edgeDirections.put(rel, list);
                     } else {

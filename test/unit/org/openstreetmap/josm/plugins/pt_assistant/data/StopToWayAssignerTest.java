@@ -25,7 +25,7 @@ public class StopToWayAssignerTest extends AbstractTest {
         DataSet ds = ImportUtils.importOsmFile(file, "testLayer");
 
         Relation route = null;
-        for (Relation r: ds.getRelations()) {
+        for (Relation r : ds.getRelations()) {
             if (r.getId() == 4552871) {
                 route = r;
                 break;

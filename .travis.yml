@@ -7,7 +7,7 @@ jdk:
   - openjdk10
 
 script: ./gradlew build compileJava_minJosm compileJava_latestJosm --stacktrace
-
+dist: trusty
 deploy:
   provider: releases
   file_glob: true
