@@ -117,7 +117,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     private static final String I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS = I18n
             .marktr("solutions based on other route relations");
     private static final String I18N_TURN_BY_TURN_NEXT_INTERSECTION = I18n.marktr("turn-by-turn at next intersection");
-    private static final String I18N_BACKTRACK_WHITE_EDGE = I18n.marktr("backtrack wihite edge");
+    private static final String I18N_BACKTRACK_WHITE_EDGE = I18n.marktr("Split white edge");
     Relation relation = null;
     MemberTableModel memberTableModel = null;
     GenericRelationEditor editor = null;
