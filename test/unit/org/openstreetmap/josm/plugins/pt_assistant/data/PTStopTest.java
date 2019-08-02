@@ -1,7 +1,7 @@
-// License: GPL. For details, see LICENSE file.
-package org.openstreetmap.josm.plugins.pt_assistant.data;
+ // License: GPL. For details, see LICENSE file.
+ package org.openstreetmap.josm.plugins.pt_assistant.data;
 
-import static org.junit.Assert.assertEquals;
+ import static org.junit.Assert.assertEquals;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,7 +17,6 @@ import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
-import org.openstreetmap.josm.data.osm.SimplePrimitiveId;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.io.IllegalDataException;
 import org.openstreetmap.josm.io.OsmReader;
@@ -25,10 +24,10 @@ import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 
-/**
+ /**
  * Unit tests of {@link StopToWayAssigner}.
  */
-public class PTStopTest extends AbstractTest {
+ public class PTStopTest extends AbstractTest {
 
   private DataSet ds;
 
@@ -38,12 +37,10 @@ public class PTStopTest extends AbstractTest {
   }
 
   List<PTStop> findAllStops(){
-    Way w = (Way) ds.getPrimitiveById(new SimplePrimitiveId(504377140L, OsmPrimitiveType.WAY));
-    Collection<Node> allNodes = w.getDataSet().getNodes();
+    Collection<Node> allNodes = ds.getNodes();
     List<PTStop> allStops = new ArrayList<>();
     List<Node> potentialStops = new ArrayList<>();
     for (Node currentNode : allNodes) {
-        String nodeName = currentNode.get("name");
         if (StopUtils.isHighwayOrRailwayStopPosition(currentNode) || StopUtils.isStopPosition(currentNode)
                 || StopUtils.verifyStopAreaPlatform(currentNode)
                 || StopUtils.verifyIfMemberOfStopArea(currentNode)) {
@@ -120,4 +117,4 @@ public class PTStopTest extends AbstractTest {
         assertEquals(98615522L, associatedWay.get(23).getUniqueId());
 
     }
-}
+ }
