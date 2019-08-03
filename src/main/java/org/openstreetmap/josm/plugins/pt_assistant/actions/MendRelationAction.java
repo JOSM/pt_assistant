@@ -142,6 +142,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     boolean aroundGaps = false;
     boolean aroundStops = false;
     Node prevCurrenNode = null;
+    Node splitNode = null;
     HashMap<Way, Character> wayColoring;
     HashMap<Character, List<Way>> wayListColoring;
     int nodeIdx = 0;
@@ -484,7 +485,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     List<Way> getListOfAllWays() {
-        System.out.println("member inside mend " + members.size());
         List<Way> ways = new ArrayList<>();
         for (int i = 0; i < members.size(); i++) {
             if (members.get(i).isWay()) {
@@ -492,7 +492,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 ways.add(members.get(i).getWay());
             }
         }
-        System.out.println("ways size " + ways.size());
         return ways;
     }
 
@@ -568,7 +567,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     deleteWayAfterIndex(ways.get(k), i);
                 }
             }
-
             memberTableModel.addMembersAfterIdx(ways, i);
             members.addAll(i + 1, c);
         } catch (Exception e) {
@@ -1373,7 +1371,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
         wayColoring = new HashMap<>();
         final List<Character> allowedCharacters = new ArrayList<>();
-        System.out.println("hii");
         if (numeric) {
             alphabet = '1';
             allowedCharacters.add('7');
@@ -1593,7 +1590,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             n.add(nod);
             currentNode = nod;
             if (fixVariants.size() > 0) {
-                System.out.println(currentNode.getUniqueId());
                 displayBacktrackFixVariant(fixVariants, idx);
             } else {
                 backtrack(way, idx + 1);
@@ -1610,13 +1606,27 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         Strategy strategy = new TempStrategy();
         List<List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(currentWay, breakNode);
         SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
-        System.out.println("size " + result.getNewWays().size() + "on node " + currentNode.getUniqueId());
         if (result != null) {
             UndoRedoHandler.getInstance().add(result);
             w1 = result.getNewWays().get(0);
             wayToKeep = w1;
         }
         return wayToKeep;
+    }
+    private void findWayafterchunkRoundabout(Way way) {
+        Way w1 = null;
+        Way wayToKeep = null;
+        List<Node> breakNode = new ArrayList<>();
+        breakNode.add(currentNode);
+        splitNode = way.lastNode();
+        Strategy strategy = new TempStrategyRoundabout();
+        List<List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(way, breakNode);
+        SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
+        if (result != null) {
+            UndoRedoHandler.getInstance().add(result);
+            w1 = result.getNewWays().get(0);
+            wayToKeep = w1;
+        }
     }
 
     private void removeKeyListenerAndTemporaryLayer(KeyListener keyListener) {
@@ -1702,12 +1712,10 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     } else if (typedKeyUpperCase == 'V' || typedKeyUpperCase == '8') {
                         removeKeyListenerAndTemporaryLayer(this);
                         shorterRoutes = false;
-                        System.out.println("check3");
                         backtrackCurrentEdge();
                     } else {
                         removeKeyListenerAndTemporaryLayer(this);
                         shorterRoutes = false;
-                        System.out.println("ohh bhai");
                         getNextWayAfterSelection(fixVariants.get(idx));
                     }
                 }
@@ -1722,7 +1730,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 }
             }
         });
-        System.out.println("check4");
     }
 
     void displayWaysToRemove(List<Integer> wayIndices) {
@@ -2017,15 +2024,18 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                         Logging.debug("none");
                     }
                 } else {
+                    if(w.isInnerNode(currentNode) && !w.firstNode().equals(w.lastNode())){
+                      findWayafterchunkRoundabout(w);
+                    }
                     addNewWays(Collections.singletonList(w), ind);
                     prev = w;
                     ind++;
                 }
             }
             Way way = members.get(currentIndex).getWay();
-            Way nextWay = members.get(currentIndex + 1).getWay();
-            Node n = WayUtils.findCommonFirstLastNode(nextWay, way, currentNode).orElse(null);
-            currentNode = getOtherNode(nextWay, n);
+            Way nexWay = members.get(currentIndex + 1).getWay();
+            Node n = WayUtils.findCommonFirstLastNode(nexWay, way, currentNode).orElse(null);
+            currentNode = getOtherNode(nexWay, n);
             save();
             try {
                 TimeUnit.SECONDS.sleep(2);
@@ -2150,6 +2160,17 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         public Way determineWayToKeep(Iterable<Way> wayChunks) {
             for (Way way : wayChunks) {
                 if (!way.containsNode(prevCurrenNode)) {
+                    return way;
+                }
+            }
+            return null;
+        }
+    }
+    public class TempStrategyRoundabout implements Strategy {
+        @Override
+        public Way determineWayToKeep(Iterable<Way> wayChunks) {
+            for (Way way : wayChunks) {
+                if (way.containsNode(splitNode)) {
                     return way;
                 }
             }
