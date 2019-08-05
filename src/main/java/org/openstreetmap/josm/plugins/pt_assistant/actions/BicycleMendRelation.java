@@ -87,9 +87,6 @@ public class BicycleMendRelation extends MendRelationAction {
         super.relation = editor.getRelation();
         super.I18N_ADD_ONEWAY_VEHICLE_NO_TO_WAY = I18n.marktr("Add oneway:bicycle=no to way");
         super.editor.addWindowListener(new WindowEventHandler());
-        if (super.relation.hasTag("route", "bicycle")) {
-            System.out.println("I am bike;");
-        }
     }
 
     /////////download all incomplete relations from member table////////
@@ -121,7 +118,6 @@ public class BicycleMendRelation extends MendRelationAction {
         sortBelow(super.relation.getMembers(), 0);
         super.members = super.editor.getRelation().getMembers();
         super.members.removeIf(m -> !m.isWay());
-        System.out.println("this is member size: " + super.members.size());
         links = connectionTypeCalculator.updateLinks(super.members);
         if (super.halt == false) {
             updateStates();
@@ -653,7 +649,6 @@ public class BicycleMendRelation extends MendRelationAction {
                         for (Way v : par) {
                             if (v.getNodes().containsAll(w.getNodes())) {
                                 if (w.equals(v)) {
-                                    // System.out.println(1);
                                     addNewWays(Collections.singletonList(v), ind);
                                     prev = v;
                                     ind++;
@@ -684,7 +679,6 @@ public class BicycleMendRelation extends MendRelationAction {
                                 breakNode = Collections.singletonList(super.nextWay.firstNode());
                                 break;
                             } else if (w.equals(v)) {
-                                // System.out.println(2);
                                 addNewWays(Collections.singletonList(v), ind);
                                 prev = v;
                                 ind++;
@@ -702,7 +696,6 @@ public class BicycleMendRelation extends MendRelationAction {
                                 breakNode = Collections.singletonList(super.nextWay.lastNode());
                                 break;
                             } else if (w.equals(v)) {
-                                // System.out.println(3);
                                 addNewWays(Collections.singletonList(v), ind);
                                 ind++;
                                 prev = v;
@@ -799,7 +792,6 @@ public class BicycleMendRelation extends MendRelationAction {
                 // check if the way that is getting added is already present or not
                 if (!super.waysAlreadyPresent.containsKey(ways.get(k)) && IsWaythere.get(ways.get(k)) == null) {
                     super.waysAlreadyPresent.put(ways.get(k), 1);
-                    // System.out.println("I am adding " + ways.get(k).getUniqueId());
                     for (Node node : ways.get(k).getNodes()) {
                         if (Isthere.get(node) == null || Isthere.get(node) == 0) {
                             Isthere.put(node, 1);
@@ -862,7 +854,6 @@ public class BicycleMendRelation extends MendRelationAction {
     }
 
     void assignRolesafterloop(Node jointNode) {
-        // System.out.println("assigning roles in loop");
         int idx = super.currentIndex;
         int[] idxlst = new int[1];
         String[] roles = new String[20];
@@ -880,7 +871,6 @@ public class BicycleMendRelation extends MendRelationAction {
         }
         idxlst[0] = idx;
         idx--;
-        //    System.out.println("node id: "+ node.getUniqueId()+"distance between them " +dist.compare(node,node1));
         Way minWay = w;
         double minLength = findDistance(w, super.nextWay, jointNode);
         super.memberTableModel.updateRole(idxlst, s);
@@ -904,7 +894,6 @@ public class BicycleMendRelation extends MendRelationAction {
                 minWay = w;
             }
             super.memberTableModel.updateRole(idxlst, s);
-            // System.out.println("node id: "+ node.getUniqueId()+"distance between them " +dist.compare(node,node1));
             if (w.firstNode().equals(jointNode) || w.lastNode().equals(jointNode)) {
                 break;
             }
@@ -940,7 +929,6 @@ public class BicycleMendRelation extends MendRelationAction {
             idx++;
         }
         w = minWay;
-        // System.out.println("my nearest way is "+w.getUniqueId());
         downloadAreaAroundWay(w, w.lastNode(), w.firstNode());
     }
 
@@ -1019,7 +1007,6 @@ public class BicycleMendRelation extends MendRelationAction {
             for (Node node : w.getNodes()) {
                 Isthere.put(node, Isthere.get(node) - 1);
             }
-            // System.out.println("super.currentNode yaar: " + super.currentNode);
             callNextWay(super.currentIndex);
         } else {
             notice = null;
@@ -1041,7 +1028,6 @@ public class BicycleMendRelation extends MendRelationAction {
                     Isthere.put(node, Isthere.get(node) - 1);
                 }
             }
-            // System.out.println("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
             super.memberTableModel.remove(lst);
             for (int i = 0; i < lst.length; i++) {
                 super.members.remove(lst[i] - i);

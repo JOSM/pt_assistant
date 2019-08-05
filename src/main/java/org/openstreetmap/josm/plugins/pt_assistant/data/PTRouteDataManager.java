@@ -71,12 +71,6 @@ public class PTRouteDataManager {
 
         this.relation = relation;
 
-        // edges = new EdgeDataManager();
-        // edges.IterationOnAllExistingRoutes();
-        // edges.makingEdgesForRelations();
-        // List<Edge> listOfEdges = edges.getEdgeListOfRelation(relation);
-        // System.out.println("Size of relation member is " + this.relation.getMembers().size());
-
         PTStop prev = null; // stores the last created PTStop
         for (RelationMember member : this.relation.getMembers()) {
             if (PTStop.isPTStop(member)) {

@@ -852,7 +852,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     List<Way> findNextWay(Way way, Node node) {
-        //    	System.out.println("nextway will be: "+ nextWay.getUniqueId());
         List<Way> parentWays = node.getParentWays();
         parentWays = removeInvalidWaysFromParentWays(parentWays, node, way);
 
@@ -1536,11 +1535,11 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     } else if (typedKeyUpperCase == 'V' || typedKeyUpperCase == '8') {
                         removeKeyListenerAndTemporaryLayer(this);
                         shorterRoutes = false;
-                        backtrack(currentWay, idx1 + 1);
+                        backTrack(currentWay, idx1 + 1);
                     } else {
                         removeKeyListenerAndTemporaryLayer(this);
                         shorterRoutes = false;
-                        findWayafterchunk(currentWay);
+                        findWayAfterChunk(currentWay);
                         getNextWayAfterBackTrackSelection(fixVariants.get(idx));
                     }
                 }
@@ -1566,10 +1565,10 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
         int idx = 1;
         prevCurrenNode = currentNode;
-        backtrack(currentWay, idx);
+        backTrack(currentWay, idx);
     }
 
-    private void backtrack(Way way, int idx) {
+    private void backTrack(Way way, int idx) {
         if (idx >= backnodes.size() - 1) {
             currentNode = prevCurrenNode;
             callNextWay(currentIndex);
@@ -1582,7 +1581,13 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             if (allWays != null) {
                 for (Way w : allWays) {
                     if (!w.equals(currentWay)) {
-                        fixVariants.add(w);
+                        if (!WayUtils.isOneWay(w)) {
+                            fixVariants.add(w);
+                        } else {
+                            if (w.firstNode().equals(nod)) {
+                                fixVariants.add(w);
+                            }
+                        }
                     }
                 }
             }
@@ -1592,12 +1597,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             if (fixVariants.size() > 0) {
                 displayBacktrackFixVariant(fixVariants, idx);
             } else {
-                backtrack(way, idx + 1);
+                backTrack(way, idx + 1);
             }
         }
     }
 
-    private Way findWayafterchunk(Way way) {
+    private Way findWayAfterChunk(Way way) {
         Way w2 = null;
         Way w1 = null;
         Way wayToKeep = null;
@@ -1613,6 +1618,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
         return wayToKeep;
     }
+
     private void findWayafterchunkRoundabout(Way way) {
         Way w1 = null;
         Way wayToKeep = null;
@@ -1635,7 +1641,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     void displayFixVariantsWithOverlappingWays(List<List<Way>> fixVariants) {
-        // System.out.println("yoo");
         // find the letters of the fix variants:
         char alphabet = 'A';
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
@@ -2024,8 +2029,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                         Logging.debug("none");
                     }
                 } else {
-                    if(w.isInnerNode(currentNode) && !w.firstNode().equals(w.lastNode())){
-                      findWayafterchunkRoundabout(w);
+                    if (w.isInnerNode(currentNode) && !w.firstNode().equals(w.lastNode())) {
+                        findWayafterchunkRoundabout(w);
                     }
                     addNewWays(Collections.singletonList(w), ind);
                     prev = w;
@@ -2166,6 +2171,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             return null;
         }
     }
+
     public class TempStrategyRoundabout implements Strategy {
         @Override
         public Way determineWayToKeep(Iterable<Way> wayChunks) {
