@@ -36,6 +36,7 @@ public class SortPTRouteMembersActionTest extends AbstractTest {
     public void test1() {
         Relation rel = (Relation) ds.getPrimitiveById(
                 new SimplePrimitiveId(7367762L, OsmPrimitiveType.RELATION));
+        SortPTRouteMembersAction.zooming=false;
         SortPTRouteMembersAction.sortPTRouteMembers(rel);
 
         assertEquals("Acitillo - Istituto Fortunato", rel.getMember(0).getNode().getName());

@@ -2089,7 +2089,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         lst.add(currentIndex);
         int j = currentIndex;
         Way curr = currentWay;
-        Node n = null;
+        Node n = getOtherNode(curr,currentNode);
 
         while (true) {
             int i = getPreviousWayIndex(j);
