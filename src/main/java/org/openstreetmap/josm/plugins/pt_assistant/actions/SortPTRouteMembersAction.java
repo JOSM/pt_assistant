@@ -507,7 +507,6 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                                 }
                                pt.add(nod);
                                if(pt.size()>0) {
-                                 System.out.println("pt size "+pt.size());
                                AutoScaleAction.zoomTo(pt);
                                }
                                final JPanel panel = new JPanel(new GridBagLayout());
