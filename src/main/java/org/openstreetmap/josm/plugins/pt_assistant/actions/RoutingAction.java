@@ -56,7 +56,8 @@ public class RoutingAction extends AbstractRelationEditorAction{
   }
 private void callAction(Relation relation){
 		if(relation.hasTag("route","bicycle")) {
-        BicycleMendRelation bike = new BicycleMendRelation(editorAccess);
+       BicycleMendRelation bike = new BicycleMendRelation(editorAccess);
+		    // MendRelationAction bike = new MendRelationAction(editorAccess);
         bike.initialise();
        }
     else {

@@ -157,6 +157,7 @@ public class BicycleMendRelation extends MendRelationAction {
     //so after every filtering this function has to be called with super.currentIndex+1
     @Override
     public void callNextWay(int idx) {
+        memberTableModel.fireTableDataChanged();
         Logging.debug("Index + " + idx);
         super.downloadCounter++;
         if (idx < super.members.size() && super.members.get(idx).isWay()) {
@@ -361,17 +362,17 @@ public class BicycleMendRelation extends MendRelationAction {
         if (node2 != null) {
             parentWays.addAll(findNextWay(way, node2));
         }
-        // directroutes = getDirectRouteBetweenWays(super.currentWay,super.nextWay);
-        // if(directroutes == null || directroutes.size()==0) {
-        // 	super.showOption0 =false;
-        // }
-        // else {
-        // 	super.showOption0 = true;
-        // }
-        //  if(directroutes!=null  && directroutes.size() > 0 && !super.shorterRoutes && parentWays.size() > 0 && notice == null) {
-        //  	displayFixVariantsWithOverlappingWays(directroutes);
-        //    return null ;
-        //  }
+        directroutes = getDirectRouteBetweenWays(super.currentWay, super.nextWay);
+        if (directroutes == null || directroutes.size() == 0) {
+            super.showOption0 = false;
+        } else {
+            super.showOption0 = true;
+        }
+        if (directroutes != null && directroutes.size() > 0 && !super.shorterRoutes && parentWays.size() > 0
+                && notice == null) {
+            displayFixVariantsWithOverlappingWays(directroutes);
+            return null;
+        }
         if (parentWays.size() == 1) {
             goToNextWays(parentWays.get(0), way, new ArrayList<>());
         } else if (parentWays.size() > 1) {
