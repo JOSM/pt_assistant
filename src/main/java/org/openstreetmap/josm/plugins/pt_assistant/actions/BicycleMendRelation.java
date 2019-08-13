@@ -157,7 +157,6 @@ public class BicycleMendRelation extends MendRelationAction {
     //so after every filtering this function has to be called with super.currentIndex+1
     @Override
     public void callNextWay(int idx) {
-        memberTableModel.fireTableDataChanged();
         Logging.debug("Index + " + idx);
         super.downloadCounter++;
         if (idx < super.members.size() && super.members.get(idx).isWay()) {

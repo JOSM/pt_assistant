@@ -1582,10 +1582,26 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 for (Way w : allWays) {
                     if (!w.equals(currentWay)) {
                         if (!WayUtils.isOneWay(w)) {
-                            fixVariants.add(w);
+                            if (relation.hasTag("route", "bus")) {
+                                if (WayUtils.isSuitableForBuses(w)) {
+                                    fixVariants.add(w);
+                                }
+                            } else if (relation.hasTag("route", "bicycle")) {
+                                if (WayUtils.isSuitableForBicycle(w)) {
+                                    fixVariants.add(w);
+                                }
+                            }
                         } else {
                             if (w.firstNode().equals(nod)) {
-                                fixVariants.add(w);
+                                if (relation.hasTag("bus")) {
+                                    if (WayUtils.isSuitableForBuses(w)) {
+                                        fixVariants.add(w);
+                                    }
+                                } else if (relation.hasTag("bicycle")) {
+                                    if (WayUtils.isSuitableForBicycle(w)) {
+                                        fixVariants.add(w);
+                                    }
+                                }
                             }
                         }
                     }
@@ -2089,7 +2105,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         lst.add(currentIndex);
         int j = currentIndex;
         Way curr = currentWay;
-        Node n = getOtherNode(curr,currentNode);
+        Node n = getOtherNode(curr, currentNode);
 
         while (true) {
             int i = getPreviousWayIndex(j);
