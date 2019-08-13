@@ -52,12 +52,17 @@ public class StopToWayAssigner {
         this.ways.addAll(ways);
     }
 
+    public StopToWayAssigner() {
+        // TODO Auto-generated constructor stub
+    }
+
     /**
      * Returns the PTWay for the given PTStop
      *
      * @param stop stop
      * @return the PTWay for the given PTStop
      */
+
     public Way get(PTStop stop) {
 
         // 1) Search if this stop has already been assigned:
@@ -116,9 +121,10 @@ public class StopToWayAssigner {
             if (closestStopPosition != null) {
                 Way closestWay = null;
                 double minDistanceSqToWay = Double.MAX_VALUE;
-                for (Way way: this.ways) {
+                for (Way way : this.ways) {
                     if (way.containsNode(closestStopPosition)) {
-                        double distanceSq = calculateMinDistanceToSegment(new Node(stop.getPlatform().getBBox().getCenter()), way);
+                        double distanceSq = calculateMinDistanceToSegment(
+                                new Node(stop.getPlatform().getBBox().getCenter()), way);
                         if (distanceSq < minDistanceSqToWay) {
                             closestWay = way;
                             minDistanceSqToWay = distanceSq;
@@ -137,12 +143,14 @@ public class StopToWayAssigner {
         while (searchRadius < 0.005) {
 
             Way foundWay = this.findNearestWayInRadius(stop.getPlatform(), searchRadius);
+
             if (foundWay != null) {
                 addAssignedWayToMap(stop, foundWay);
                 return foundWay;
             }
 
             foundWay = this.findNearestWayInRadius(stop.getStopPosition(), searchRadius);
+
             if (foundWay != null) {
                 addAssignedWayToMap(stop, foundWay);
                 return foundWay;
@@ -160,6 +168,7 @@ public class StopToWayAssigner {
      * @param stopPosition stop position
      * @return the PTWay of the given stop_position by looking at its referrers
      */
+
     private Way findWayForNode(Node stopPosition) {
 
         if (stopPosition == null) {
@@ -178,6 +187,35 @@ public class StopToWayAssigner {
         }
 
         return null;
+    }
+
+    public Way findClosestWayFromRelation(Relation rel, PTStop stop, Node closestStopPosition) {
+        if (rel == null || stop == null || closestStopPosition == null) {
+            return null;
+        }
+        Way closestWay = null;
+        double minDistanceSqToWay = Double.MAX_VALUE;
+        List<Way> listways = new ArrayList<>();
+        for (RelationMember rm : rel.getMembers()) {
+            if (rm.getType() == OsmPrimitiveType.WAY) {
+                listways.add(rm.getWay());
+            }
+        }
+        for (Way way : listways) {
+            if (way.containsNode(closestStopPosition)) {
+                double distanceSq;
+                if (stop.getPlatform() != null) {
+                    distanceSq = calculateMinDistanceToSegment(new Node(stop.getPlatform().getBBox().getCenter()), way);
+                } else {
+                    distanceSq = calculateMinDistanceToSegment(new Node(stop.getNode()), way);
+                }
+                if (distanceSq < minDistanceSqToWay) {
+                    closestWay = way;
+                    minDistanceSqToWay = distanceSq;
+                }
+            }
+        }
+        return closestWay;
     }
 
     /**
@@ -246,23 +284,43 @@ public class StopToWayAssigner {
      * @param way way
      * @return the minimum distance between a node and a way
      */
-    private double calculateMinDistanceToSegment(Node node, Way way) {
+    public double calculateMinDistanceToSegment(Node node, Way way) {
 
         double minDistance = Double.MAX_VALUE;
 
         List<Pair<Node, Node>> waySegments = way.getNodePairs(false);
-
+        Pair<Node, Node> minWaySegment;
         for (Pair<Node, Node> waySegment : waySegments) {
             if (waySegment.a != node && waySegment.b != node) {
                 double distanceToLine = this.calculateDistanceToSegment(node, waySegment);
                 if (distanceToLine < minDistance) {
                     minDistance = distanceToLine;
+                    minWaySegment = waySegment;
                 }
             }
         }
 
         return minDistance;
 
+    }
+
+    public Pair<Node, Node> calculateNearestSegment(Node node, Way way) {
+        double minDistance = Double.MAX_VALUE;
+
+        List<Pair<Node, Node>> waySegments = way.getNodePairs(false);
+        Pair<Node, Node> minWaySegment = null;
+        for (Pair<Node, Node> waySegment : waySegments) {
+            if (waySegment.a != node && waySegment.b != node) {
+                double distanceToLine = this.calculateDistanceToSegment(node, waySegment);
+                if (distanceToLine < minDistance) {
+                    minDistance = distanceToLine;
+                    minWaySegment = waySegment;
+                }
+            } else {
+                minWaySegment = waySegment;
+            }
+        }
+        return minWaySegment;
     }
 
     /**

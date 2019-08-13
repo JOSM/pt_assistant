@@ -34,8 +34,8 @@ import org.openstreetmap.josm.plugins.pt_assistant.actions.CreatePlatformShortcu
 import org.openstreetmap.josm.plugins.pt_assistant.actions.DoubleSplitAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.EdgeSelectionAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.ExtractPlatformNodeAction;
-import org.openstreetmap.josm.plugins.pt_assistant.actions.MendRelationAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.PTWizardAction;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.RoutingAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersMenuBar;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SplitRoundaboutAction;
@@ -177,7 +177,7 @@ public class PTAssistantPlugin extends Plugin {
 
             @Override
             public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
-                return Arrays.asList(new MendRelationAction(editorAccess));
+                return Arrays.asList(new RoutingAction(editorAccess));
             }
         };
 

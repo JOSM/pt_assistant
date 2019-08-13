@@ -21,6 +21,7 @@ public final class RouteUtils {
 
     private static final String PT_VERSION_TAG = "public_transport:version";
     public static final String TAG_ROUTE = "route";
+
     private RouteUtils() {
         // private constructor for util classes
     }
@@ -42,10 +43,8 @@ public final class RouteUtils {
         return isPTRoute(r) && (r.get(PT_VERSION_TAG) == null || r.hasTag(PT_VERSION_TAG, "1"));
     }
 
-    private static final String[] acceptedRouteTags = {
-        "bus", "trolleybus", "share_taxi",
-        "tram", "light_rail", "subway", "train"
-    };
+    private static final String[] acceptedRouteTags = { "bus", "trolleybus", "share_taxi", "tram", "light_rail",
+            "subway", "train" };
 
     /**
      * Adds the version of the PT route schema to the given PT route.
@@ -86,8 +85,7 @@ public final class RouteUtils {
         }
 
         if (rm.getType().equals(OsmPrimitiveType.WAY)) {
-            return !(rm.getWay().hasTag("public_transport", "platform")
-                    || rm.getWay().hasTag("highway", "platform")
+            return !(rm.getWay().hasTag("public_transport", "platform") || rm.getWay().hasTag("highway", "platform")
                     || rm.getWay().hasTag("railway", "platform"));
         }
 
@@ -114,17 +112,12 @@ public final class RouteUtils {
      */
     public static int isOnewayForPublicTransport(Way way) {
 
-        if (OsmUtils.isTrue(way.get("oneway"))
-                || OsmUtils.isReversed(way.get("oneway"))
-                || way.hasTag("junction", "roundabout")
-                || way.hasTag("highway", "motorway")) {
+        if (OsmUtils.isTrue(way.get("oneway")) || OsmUtils.isReversed(way.get("oneway"))
+                || way.hasTag("junction", "roundabout") || way.hasTag("highway", "motorway")) {
 
-            if (!way.hasTag("busway", "lane")
-                    && !way.hasTag("busway", "opposite_lane")
-                    && !way.hasTag("busway:left", "lane")
-                    && !way.hasTag("busway:right", "lane")
-                    && !way.hasTag("oneway:bus", "no")
-                    && !way.hasTag("oneway:psv", "no")
+            if (!way.hasTag("busway", "lane") && !way.hasTag("busway", "opposite_lane")
+                    && !way.hasTag("busway:left", "lane") && !way.hasTag("busway:right", "lane")
+                    && !way.hasTag("oneway:bus", "no") && !way.hasTag("oneway:psv", "no")
                     && !way.hasTag("trolley_wire", "backward")) {
 
                 if (OsmUtils.isReversed(way.get("oneway"))) {
@@ -148,14 +141,11 @@ public final class RouteUtils {
      */
     public static int isOnewayForBicycles(Way way) {
 
-        if (OsmUtils.isTrue(way.get("oneway"))
-                || OsmUtils.isReversed(way.get("oneway"))
+        if (OsmUtils.isTrue(way.get("oneway")) || OsmUtils.isReversed(way.get("oneway"))
                 || way.hasTag("junction", "roundabout")) {
 
-            if (!way.hasTag("busway", "lane")
-                    && !way.hasTag("cycleway", "opposite_lane")
-                    && !way.hasTag("cycleway:left", "lane")
-                    && !way.hasTag("cycleway:right", "lane")
+            if (!way.hasTag("busway", "lane") && !way.hasTag("cycleway", "opposite_lane")
+                    && !way.hasTag("cycleway:left", "lane") && !way.hasTag("cycleway:right", "lane")
                     && !way.hasTag("oneway:bicycle", "no")) {
 
                 if (OsmUtils.isReversed(way.get("oneway"))) {
@@ -166,7 +156,6 @@ public final class RouteUtils {
         }
         return 0;
     }
-
 
     /**
      * Checks if the ways have a common node
@@ -186,9 +175,7 @@ public final class RouteUtils {
         Node w2FirstNode = w2.firstNode();
         Node w2LastNode = w2.lastNode();
 
-        return w1FirstNode == w2FirstNode
-                || w1FirstNode == w2LastNode
-                || w1LastNode == w2FirstNode
+        return w1FirstNode == w2FirstNode || w1FirstNode == w2LastNode || w1LastNode == w2FirstNode
                 || w1LastNode == w2LastNode;
     }
 
@@ -227,21 +214,17 @@ public final class RouteUtils {
      */
     public static boolean isWaySuitableForBuses(Way way) {
 
-        String[] acceptedHighwayTags = new String[] {
-                "motorway", "trunk", "primary", "secondary", "tertiary",
-                "unclassified", "road", "residential", "service",
-                "motorway_link", "trunk_link", "primary_link", "secondary_link",
-                "tertiary_link", "living_street", "bus_guideway", "road"};
+        String[] acceptedHighwayTags = new String[] { "motorway", "trunk", "primary", "secondary", "tertiary",
+                "unclassified", "road", "residential", "service", "motorway_link", "trunk_link", "primary_link",
+                "secondary_link", "tertiary_link", "living_street", "bus_guideway", "road" };
 
-        if (way.hasTag("highway", acceptedHighwayTags)
-                || way.hasTag("cycleway", "share_busway")
+        if (way.hasTag("highway", acceptedHighwayTags) || way.hasTag("cycleway", "share_busway")
                 || way.hasTag("cycleway", "shared_lane")) {
             return true;
         }
 
         return (way.hasTag("highway", "pedestrian")
-                && (way.hasTag("bus", "yes", "designated")
-                    || way.hasTag("psv", "yes", "designated")));
+                && (way.hasTag("bus", "yes", "designated") || way.hasTag("psv", "yes", "designated")));
     }
 
     /**
@@ -250,12 +233,9 @@ public final class RouteUtils {
      * @return {@code true} if this way is suitable for public transport
      */
     public static boolean isWaySuitableForPublicTransport(Way way) {
+        String[] acceptedRailwayTags = new String[] { "tram", "subway", "light_rail", "rail" };
 
-        String[] acceptedRailwayTags = new String[] {
-                "tram", "subway", "light_rail", "rail"};
-
-        return isWaySuitableForBuses(way)
-                || way.hasTag("railway", acceptedRailwayTags);
+        return isWaySuitableForBuses(way) || way.hasTag("railway", acceptedRailwayTags);
     }
 
     public static boolean isBicycleRoute(Relation r) {
@@ -266,7 +246,6 @@ public final class RouteUtils {
         return r.hasTag(OSMTags.KEY_ROUTE, "bicycle", "mtb");
     }
 
-
     /**
      * Checks if this way is suitable for bicycles
      * @param way way
@@ -274,17 +253,14 @@ public final class RouteUtils {
      */
     public static boolean isWaySuitableForBicycle(Way way) {
 
-        return way.hasTag("highway", "cycleway")
-                || !(way.hasKey("highway", "motorway")
-                  || way.hasKey("bicycle", "no")
-                  || way.hasKey("bicycle", "use_sidepath"));
+        return way.hasTag("highway", "cycleway") || !(way.hasKey("highway", "motorway") || way.hasKey("bicycle", "no")
+                || way.hasKey("bicycle", "use_sidepath"));
     }
 
     public static boolean isFootRoute(Relation r) {
         if (r == null) {
             return false;
         }
-
         return r.hasTag(OSMTags.KEY_ROUTE, "foot", "walking", "hiking");
     }
 

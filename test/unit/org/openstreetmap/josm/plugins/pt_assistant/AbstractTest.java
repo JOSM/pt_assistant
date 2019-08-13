@@ -43,6 +43,7 @@ public abstract class AbstractTest {
  public static final String PATH_TO_ROUNDABOUT1_AFTER = "test/data/rdb1_fixed.osm";
 
  public static final String PATH_TO_SORT_PT_STOPS = "test/data/sort_test.osm";
+ public static final String PATH_TO_SORT_PT_STOPS_WITH_REPEATED_STOPS = "test/data/sort_test2.osm";
 
  public static final String PATH_TO_ROAD_TYPE_ERROR = "test/data/road-type.osm";
 
@@ -61,6 +62,8 @@ public abstract class AbstractTest {
  public static final String PATH_TO_STOP_AREA_MANY_PLATFORMS = "test/data/stop-area-many-platforms.osm";
 
  public static final String PATH_TO_SEGMENT_TEST = "test/data/segment-test.osm";
+
+ public static final String PATH_TO_BICYCLE_LOOP_BACK_TEST = "test/data/map4.osm";
 
   /**
    * Initiates the basic parts of JOSM.

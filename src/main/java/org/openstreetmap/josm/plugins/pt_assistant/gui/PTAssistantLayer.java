@@ -134,7 +134,12 @@ public final class PTAssistantLayer extends Layer implements LayerChangeListener
         paintVisitor = new PTAssistantPaintVisitor(g, mv);
 
         for (OsmPrimitive primitive : primitives) {
-            paintVisitor.visit(primitive);
+            // if(primitive.isRelation()){
+            //   paintVisitor.generatecolors(primitive);
+            // }
+            // else{
+              paintVisitor.visit(primitive);
+            // }
         }
 
         paintVisitor.visitFixVariants(fixVariants, wayColoring);

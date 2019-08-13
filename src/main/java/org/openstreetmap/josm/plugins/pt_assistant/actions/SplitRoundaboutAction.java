@@ -195,8 +195,9 @@ public class SplitRoundaboutAction extends JosmAction {
             Way afterExitWay = entryExitWays.get(1).b;
 
             if (entryWay == null || exitWay == null) {
-                openEditorsWithErrors(r,
-                        tr("The roundabout is not directly connected to either of the previous or next way in the relation"), changingRelation);
+                openEditorsWithErrors(r, tr(
+                        "The roundabout is not directly connected to either of the previous or next way in the relation"),
+                        changingRelation);
                 return;
             }
 
@@ -205,8 +206,9 @@ public class SplitRoundaboutAction extends JosmAction {
             Node exitNode = getNodeInCommon(splitNodes, exitWay);
 
             if (entryNode == null || exitNode == null) {
-                openEditorsWithErrors(r,
-                        tr("The roundabout is not directly connected to either of the previous or next way in the relation"), changingRelation);
+                openEditorsWithErrors(r, tr(
+                        "The roundabout is not directly connected to either of the previous or next way in the relation"),
+                        changingRelation);
                 return;
             }
 
@@ -265,7 +267,8 @@ public class SplitRoundaboutAction extends JosmAction {
                             || exitWay.hasTag("bicycle", "no", "use_sideway")
                             || beforeEntryWay.hasTag("bicycle", "no", "use_sideway")
                             || afterExitWay.hasTag("bicycle", "no", "use_sideway")) {
-                        openEditorsWithErrors(r, tr("Error: The paths connecting the roundabout in the relation do not allow bicycles."),
+                        openEditorsWithErrors(r,
+                                tr("Error: The paths connecting the roundabout in the relation do not allow bicycles."),
                                 changingRelation);
                         return;
                     }
@@ -585,8 +588,8 @@ public class SplitRoundaboutAction extends JosmAction {
         for (Relation curr : getPTRouteParents(roundabout)) {
             // look at the editors which are already open and refresh,update them before making any changes
             OsmDataLayer layer = MainApplication.getLayerManager().getEditLayer();
-            GenericRelationEditor editor = (GenericRelationEditor)
-                    RelationDialogManager.getRelationDialogManager().getEditorForRelation(layer, curr);
+            GenericRelationEditor editor = (GenericRelationEditor) RelationDialogManager.getRelationDialogManager()
+                    .getEditorForRelation(layer, curr);
             if (editor != null) {
                 editor.apply();
                 curr = editor.getRelation();
@@ -725,7 +728,7 @@ public class SplitRoundaboutAction extends JosmAction {
     protected void updateEnabledState(final Collection<? extends OsmPrimitive> selection) {
         if (selection != null && selection.size() == 1) {
             Optional<Way> selectedWay = Optional.ofNullable(selection.iterator().next())
-                .map(it -> it instanceof Way ? (Way) it : null);
+                    .map(it -> it instanceof Way ? (Way) it : null);
             selectedWay.ifPresent(way -> {
                 setEnabled(way.isClosed() && (way.hasTag("junction", "roundabout") || way.hasTag("oneway", "yes")));
             });
