@@ -1560,6 +1560,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         Way backTrackWay = currentWay;
         Way way = backTrackWay;
         backnodes = way.getNodes();
+        if(currentNode==null){
+          currentNode =currentWay.lastNode();
+        }
         if (currentNode.equals(way.lastNode())) {
             Collections.reverse(backnodes);
         }
