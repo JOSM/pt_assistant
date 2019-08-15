@@ -369,21 +369,16 @@ public class StopToWay {
     //check the nearest node to the stop position or platformNode
     public List<Way> getAllWaystoTheNearestNode(LatLon ptstop) {
         double mindist = 1e5;
-        Way w = null;
         Node node1 = null;
-        int idx = 0, indx = 0;
         for (Way member : ways) {
             for (Node nod : member.getNodes()) {
                 LatLon coord1 = new LatLon(nod.lat(), nod.lon());
                 double d = calculateDistanceSq(ptstop, coord1);
                 if (d < mindist) {
                     mindist = d;
-                    w = member;
                     node1 = nod;
-                    indx = idx;
                 }
             }
-            idx++;
         }
         List<Way> lis = findWaysThatContainAsEndNode(node1);
         return lis;
@@ -391,21 +386,16 @@ public class StopToWay {
 
     public List<Way> getAllWaystoTheNearestNode(Node ptstop) {
         double mindist = 1e5;
-        Way w = null;
         Node node1 = null;
-        int idx = 0, indx = 0;
         for (Way member : ways) {
             for (Node nod : member.getNodes()) {
                 LatLon coord1 = new LatLon(nod.lat(), nod.lon());
                 double d = calculateDistanceSq(ptstop.getCoor(), coord1);
                 if (d < mindist) {
                     mindist = d;
-                    w = member;
                     node1 = nod;
-                    indx = idx;
                 }
             }
-            idx++;
         }
         List<Way> lis = findWaysThatContainAsEndNode(node1);
         return lis;

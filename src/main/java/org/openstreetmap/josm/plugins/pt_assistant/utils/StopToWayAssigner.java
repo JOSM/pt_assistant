@@ -289,13 +289,11 @@ public class StopToWayAssigner {
         double minDistance = Double.MAX_VALUE;
 
         List<Pair<Node, Node>> waySegments = way.getNodePairs(false);
-        Pair<Node, Node> minWaySegment;
         for (Pair<Node, Node> waySegment : waySegments) {
             if (waySegment.a != node && waySegment.b != node) {
                 double distanceToLine = this.calculateDistanceToSegment(node, waySegment);
                 if (distanceToLine < minDistance) {
                     minDistance = distanceToLine;
-                    minWaySegment = waySegment;
                 }
             }
         }

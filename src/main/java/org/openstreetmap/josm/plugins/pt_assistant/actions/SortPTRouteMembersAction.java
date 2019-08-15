@@ -350,7 +350,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         StopToWayAssigner assigner = new StopToWayAssigner(ways);
         List<PTStop> ptstops = new ArrayList<>();
 
-        removeWrongSideStops(ptstops, wayMembers);
+        removeWrongSideStops(wayMembers);
         stopsByName.values().forEach(ptstops::addAll);
 
         Map<Way, List<PTStop>> wayStop = new HashMap<>();
@@ -709,7 +709,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         return p.getName();
     }
 
-    private static void removeWrongSideStops(List<PTStop> ptstop, List<RelationMember> wayMembers) {
+    private static void removeWrongSideStops(List<RelationMember> wayMembers) {
         for (int i = 0; i < wayMembers.size(); i++) {
             RelationMember wm = wayMembers.get(i);
             Way prev = null;
