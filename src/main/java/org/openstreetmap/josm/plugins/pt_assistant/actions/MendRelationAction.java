@@ -246,7 +246,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             final JCheckBox button1 = new JCheckBox("Around Stops");
             final JCheckBox button2 = new JCheckBox("Around Gaps");
             final JCheckBox button3 = new JCheckBox("On the fly");
-            button2.setSelected(true);
             button3.setSelected(true);
             panel.add(new JLabel(tr("How would you want the download to take place?")), GBC.eol().fill(GBC.HORIZONTAL));
             panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
@@ -1595,15 +1594,25 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                             }
                         } else {
                             if (w.firstNode().equals(nod)) {
-                                if (relation.hasTag("bus")) {
+                                if (relation.hasTag("route", "bus")) {
                                     if (WayUtils.isSuitableForBuses(w)) {
                                         fixVariants.add(w);
                                     }
-                                } else if (relation.hasTag("bicycle")) {
+                                } else if (relation.hasTag("route","bicycle")) {
                                     if (WayUtils.isSuitableForBicycle(w)) {
                                         fixVariants.add(w);
                                     }
                                 }
+                            }else{
+                              if (relation.hasTag("route", "bus")) {
+                                  if (RouteUtils.isOnewayForPublicTransport(w)==0) {
+                                      fixVariants.add(w);
+                                  }
+                              } else if (relation.hasTag("route","bicycle")) {
+                                  if (RouteUtils.isOnewayForBicycles(w) == 0) {
+                                      fixVariants.add(w);
+                                  }
+                              }
                             }
                         }
                     }
