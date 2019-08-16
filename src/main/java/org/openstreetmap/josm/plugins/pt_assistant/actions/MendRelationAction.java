@@ -1925,9 +1925,17 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         lst.add(currentIndex + 1);
         int[] ind = lst.stream().mapToInt(Integer::intValue).toArray();
         memberTableModel.remove(ind);
+        Way temp = members.get(ind[0]).getWay();
         for (int i = 0; i < ind.length; i++) {
             members.remove(ind[i] - i);
         }
+        save();
+        List<RelationMember> c = new ArrayList<>();
+        List<Way> ways = new ArrayList<>();
+        ways.add(temp);
+        int p = currentIndex;
+        c.add(new RelationMember("", ways.get(0)));
+        members.addAll(p + 1, c);
         save();
         int indx = currentIndex;
         addNewWays(Collections.singletonList(way), indx);

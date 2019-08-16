@@ -125,6 +125,7 @@ public class BicycleMendRelation extends MendRelationAction {
     //so after every filtering this function has to be called with super.currentIndex+1
     @Override
     public void callNextWay(int idx) {
+        save();
         Logging.debug("Index + " + idx);
         super.downloadCounter++;
         if (idx < super.members.size() && super.members.get(idx).isWay()) {
@@ -132,7 +133,6 @@ public class BicycleMendRelation extends MendRelationAction {
                 super.noLinkToPreviousWay = true;
 
             int nexidx = getNextWayIndex(idx);
-
             if (nexidx >= super.members.size()) {
                 deleteExtraWays();
                 makeNodesZeros();
@@ -679,16 +679,26 @@ public class BicycleMendRelation extends MendRelationAction {
         List<Integer> lst = new ArrayList<>();
         lst.add(super.currentIndex + 1);
         int[] ind = lst.stream().mapToInt(Integer::intValue).toArray();
+        Way temp = super.members.get(ind[0]).getWay();
         super.memberTableModel.remove(ind);
         for (int i = 0; i < ind.length; i++) {
-            members.remove(ind[i] - i);
+            super.members.remove(ind[i] - i);
         }
+        List<RelationMember> c = new ArrayList<>();
+        List<Way> ways = new ArrayList<>();
+        ways.add(temp);
+        int p = super.currentIndex;
+        c.add(new RelationMember("", ways.get(0)));
+        super.members.addAll(p + 1, c);
         save();
         int indx = super.currentIndex;
         addNewWays(Collections.singletonList(way), indx);
-        super.currentNode = getOtherNode(way, currentNode);
-        if (super.currentIndex < members.size() - 1) {
+        save();
+        super.memberTableModel.fireTableDataChanged();
+        super.currentNode = getOtherNode(way, super.currentNode);
+        if (super.currentIndex < super.members.size() - 1) {
             callNextWay(++super.currentIndex);
+            return;
         } else {
             deleteExtraWays();
         }
@@ -852,13 +862,9 @@ public class BicycleMendRelation extends MendRelationAction {
         try {
             List<RelationMember> c = new ArrayList<>();
             String s = "";
-            // if (prelink.isOnewayLoopBackwardPart) {
-            //     s = "forward";
-            // }
             int[] idx = new int[1];
             idx[0] = i + 1;
             Way w = ways.get(0);
-            // s = assignRoles(w);
             for (int k = 0; k < ways.size(); k++) {
                 c.add(new RelationMember(s, ways.get(k)));
                 // check if the way that is getting added is already present or not
@@ -879,7 +885,7 @@ public class BicycleMendRelation extends MendRelationAction {
             super.memberTableModel.addMembersAfterIdx(ways, i);
             super.memberTableModel.updateRole(idx, s);
             super.members.addAll(i + 1, c);
-
+            save();
             super.currentNode = getOtherNode(w, super.currentNode);
             links = connectionTypeCalculator.updateLinks(super.members);
         } catch (Exception e) {
