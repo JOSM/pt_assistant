@@ -170,7 +170,6 @@ public class PTWay extends RelationMember {
         Collection<Node> allNodes = w.getDataSet().getNodes();
         List<Node> potentialStops = new ArrayList<>();
         for (Node currentNode : allNodes) {
-            String nodeName = currentNode.get("name");
             if (StopUtils.isHighwayOrRailwayStopPosition(currentNode) || StopUtils.isStopPosition(currentNode)
                     || StopUtils.verifyStopAreaPlatform(currentNode)
                     || StopUtils.verifyIfMemberOfStopArea(currentNode)) {

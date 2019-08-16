@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -19,8 +17,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.openstreetmap.josm.actions.downloadtasks.DownloadParams;
-import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
 import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
@@ -29,18 +25,14 @@ import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.NodePair;
 import org.openstreetmap.josm.data.osm.NodePositionComparator;
-import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.TagMap;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.gui.MainApplication;
-import org.openstreetmap.josm.gui.dialogs.relation.DownloadRelationMemberTask;
 import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionType;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionTypeCalculator;
-import org.openstreetmap.josm.plugins.pt_assistant.utils.NotificationUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.GBC;
@@ -57,7 +49,6 @@ import org.openstreetmap.josm.tools.Utils;
  */
 
 public class BicycleMendRelation extends MendRelationAction {
-    private static final DownloadParams DEFAULT_DOWNLOAD_PARAMS = new DownloadParams();
 
     ////////////////////////Assigning Variables///////////////
 
@@ -89,27 +80,6 @@ public class BicycleMendRelation extends MendRelationAction {
         super.editor.addWindowListener(new WindowEventHandler());
     }
 
-    /////////download all incomplete relations from member table////////
-
-    private void downloadIncompleteRelations() {
-
-        List<Relation> parents = Collections.singletonList(super.relation);
-
-        Future<?> future = MainApplication.worker
-                .submit(new DownloadRelationMemberTask(parents,
-                        Utils.filteredCollection(DownloadSelectedIncompleteMembersAction
-                                .buildSetOfIncompleteMembers(new ArrayList<>(parents)), OsmPrimitive.class),
-                        MainApplication.getLayerManager().getEditLayer()));
-
-        MainApplication.worker.submit(() -> {
-            try {
-                NotificationUtils.downloadWithNotifications(future, tr("Incomplete relations"));
-                initialise();
-            } catch (InterruptedException | ExecutionException e1) {
-                Logging.error(e1);
-            }
-        });
-    }
     /////////////on action call initialise()/////////////
 
     @Override
@@ -274,7 +244,7 @@ public class BicycleMendRelation extends MendRelationAction {
             return true;
         }
 
-        if ((way.hasTag("oneway:bicycle", acceptedTags)) && way.lastNode().equals(node)
+        if (way.hasTag("oneway:bicycle", acceptedTags) && way.lastNode().equals(node)
                 && relation.hasTag("route", "bicycle"))
             return false;
 
@@ -403,9 +373,6 @@ public class BicycleMendRelation extends MendRelationAction {
             return list;
         }
 
-        if (r1 == null || r2 == null)
-            return list;
-
         List<Relation> rel = new ArrayList<>();
         //checking whether relations you are getting are bicycle routes or not
         String value = super.relation.get("route");
@@ -448,7 +415,6 @@ public class BicycleMendRelation extends MendRelationAction {
         List<Way> lst = new ArrayList<>();
         boolean canAdd = false;
         Way prev = null;
-        int flag = 0;
         for (int i = 0; i < member.size(); i++) {
             if (member.get(i).isWay()) {
                 Way w = member.get(i).getWay();
@@ -816,12 +782,10 @@ public class BicycleMendRelation extends MendRelationAction {
     }
 
     String assignRoles(Way w) {
-        int flag = 0, flag2 = 0;
+        int flag = 0;
         String s = "";
         if (lastForWay != null && lastBackWay != null) {
             NodePair pair = WayUtils.findCommonFirstLastNodes(lastForWay, lastBackWay);
-            int num = WayUtils.findNumberOfCommonFirstLastNodes(lastBackWay, lastForWay);
-            Node nod;
             if (pair.getA() == null && pair.getB() != null) {
                 if (pair.getB().equals(super.currentNode)) {
                     flag = 1;
@@ -856,9 +820,7 @@ public class BicycleMendRelation extends MendRelationAction {
     void assignRolesafterloop(Node jointNode) {
         int idx = super.currentIndex;
         int[] idxlst = new int[1];
-        String[] roles = new String[20];
         Node node1;
-        Node node2;
         Way w = super.members.get(idx).getWay();
         Node node = null;
         String s = "";
@@ -871,7 +833,6 @@ public class BicycleMendRelation extends MendRelationAction {
         }
         idxlst[0] = idx;
         idx--;
-        Way minWay = w;
         double minLength = findDistance(w, super.nextWay, jointNode);
         super.memberTableModel.updateRole(idxlst, s);
         while (true) {
@@ -891,7 +852,6 @@ public class BicycleMendRelation extends MendRelationAction {
             double length = findDistance(w, super.nextWay, node1);
             if (minLength > length) {
                 minLength = length;
-                minWay = w;
             }
             super.memberTableModel.updateRole(idxlst, s);
             if (w.firstNode().equals(jointNode) || w.lastNode().equals(jointNode)) {
@@ -907,7 +867,6 @@ public class BicycleMendRelation extends MendRelationAction {
     void fixgapAfterlooping(int idx) {
         Way w = super.members.get(idx).getWay();
         super.currentWay = w;
-        int flag = 0;
         Way minWay = w;
         double minLength = findDistance(w, super.nextWay, super.currentNode);
         while (idx <= super.currentIndex) {
@@ -953,8 +912,6 @@ public class BicycleMendRelation extends MendRelationAction {
                 }
                 if (del) {
                     int[] x = { i };
-                    Way w = super.members.get(i).getWay();
-                    // for
                     super.memberTableModel.remove(x);
                     super.members.remove(i);
 

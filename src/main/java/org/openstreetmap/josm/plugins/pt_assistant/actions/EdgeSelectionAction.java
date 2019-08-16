@@ -107,13 +107,13 @@ public class EdgeSelectionAction extends MapMode {
         return edge1;
     }
 
-    private List<Way> sortEdgeWays(List<Way> edge) {
+    private static List<Way> sortEdgeWays(List<Way> edge) {
         final List<RelationMember> members = edge.stream().map(w -> new RelationMember("", w)).collect(Collectors.toList());
         final List<RelationMember> sorted = new RelationSorter().sortMembers(members);
         return sorted.stream().map(RelationMember::getWay).collect(Collectors.toList());
     }
 
-    private Boolean isWaySuitableForMode(Way way, String modeOfTravel) {
+    private static Boolean isWaySuitableForMode(Way way, String modeOfTravel) {
         if ("bus".equals(modeOfTravel))
             return RouteUtils.isWaySuitableForBuses(way);
 
@@ -161,14 +161,14 @@ public class EdgeSelectionAction extends MapMode {
         return RouteUtils.isWaySuitableForPublicTransport(way);
     }
 
-    private Way chooseBestWay(final List<Way> ways, final String modeOfTravel) {
+    private static Way chooseBestWay(final List<Way> ways, final String modeOfTravel) {
         final List<Way> suitable = ways.stream()
             .filter(w -> isWaySuitableForMode(w, modeOfTravel))
             .collect(Collectors.toList());
         return suitable.size() == 1 ? suitable.get(0) : null;
     }
 
-    private String getModeOfTravel(Way initial) {
+    private static String getModeOfTravel() {
         // find a way to get the currently opened relation editor and get the
         // from there the current type of route
         return MainApplication.getLayerManager().getLayers().stream()
@@ -194,7 +194,7 @@ public class EdgeSelectionAction extends MapMode {
             edgeList.clear();
             ds.clearSelection();
             if (initial != null) {
-                modeOfTravel = getModeOfTravel(initial);
+                modeOfTravel = getModeOfTravel();
                 if ("mtb".equals(modeOfTravel))
                     modeOfTravel = "bicycle";
                 List<Way> edge = getEdgeFromWay(initial, modeOfTravel);
@@ -217,7 +217,7 @@ public class EdgeSelectionAction extends MapMode {
              * toggle mode where we can individually select and deselect the edges
              */
             if (edgeList.isEmpty() || modeOfTravel == null) {
-                modeOfTravel = getModeOfTravel(initial);
+                modeOfTravel = getModeOfTravel();
                 if ("mtb".equals(modeOfTravel))
                     modeOfTravel = "bicycle";
             }
@@ -251,7 +251,7 @@ public class EdgeSelectionAction extends MapMode {
              * add new selection to existing edges
              */
             if (edgeList.isEmpty() || modeOfTravel == null) {
-                modeOfTravel = getModeOfTravel(initial);
+                modeOfTravel = getModeOfTravel();
                 if ("mtb".equals(modeOfTravel))
                     modeOfTravel = "bicycle";
             }
@@ -278,10 +278,9 @@ public class EdgeSelectionAction extends MapMode {
                             .setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(900).show();
             ds.setSelected(edgeList);
         }
-
     }
 
-    private List<Way> waysToBeRemoved(List<Way> newEdges) {
+    private static List<Way> waysToBeRemoved(List<Way> newEdges) {
 
         final List<Way> waysToBeRemoved = new ArrayList<>();
 
@@ -305,7 +304,7 @@ public class EdgeSelectionAction extends MapMode {
         return waysToBeRemoved;
     }
 
-    private List<Way> findNewEdges(Way way, List<Way> edge, List<Way> edgeList) {
+    private static List<Way> findNewEdges(Way way, List<Way> edge, List<Way> edgeList) {
         List<Way> newEdges = new ArrayList<>();
 
         Node firstNode = way.firstNode();
@@ -371,5 +370,4 @@ public class EdgeSelectionAction extends MapMode {
         MainApplication.getMap().mapView.removeMouseListener(this);
         MainApplication.getMap().mapView.removeMouseMotionListener(this);
     }
-
 }

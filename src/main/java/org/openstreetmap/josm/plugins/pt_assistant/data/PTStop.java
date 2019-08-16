@@ -16,7 +16,6 @@ import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
@@ -51,21 +50,6 @@ public class PTStop extends RelationMember {
     /*check flag */
     public boolean flag = false;
 
-    /* the ref of this stop */
-    private String ref = "";
-
-    /* the local_ref of this stop */
-    private String localRef = "";
-
-    /* the route_ref of this stop */
-    private String routeRef = "";
-
-    /* the operator of this stop */
-    private String operator = "";
-
-    /* the network of this stop */
-    private String network = "";
-
     /* indicates a stop where people can only exit the bus */
     private boolean exitOnly;
 
@@ -91,7 +75,6 @@ public class PTStop extends RelationMember {
     public PTStop(RelationMember other) {
 
         super(other);
-        MapFrame map = MainApplication.getMap();
         String role = "";
         if (other.getRole().contains("_exit_only")) {
             exitOnly = true;
@@ -171,7 +154,7 @@ public class PTStop extends RelationMember {
     /**
      * Sets the name for this stop
      *
-     * @param name
+     * @param name name for this stop
      */
     public void setName(String name) {
         if (name == null) {
@@ -224,9 +207,7 @@ public class PTStop extends RelationMember {
         BBox platformBBox = new BBox(ax, ay, bx, by);
 
         Collection<Node> allNodes = platform.getDataSet().getNodes();
-        String platName = platform.get("name");
         for (Node currentNode : allNodes) {
-            String nodeName = currentNode.get("name");
             if (checkNodeBelongstoWayorNot(platformBBox, currentNode)) {
                 potentialStopPositions.add(currentNode);
             }
@@ -490,7 +471,7 @@ public class PTStop extends RelationMember {
             List<OsmPrimitive> ways = new ArrayList<>(1);
             ways.add(firstWay);
             Set<Relation> rels = Way.getParentRelations(ways);
-            int flag1 = 0, flag2 = 0;
+            int flag1 = 0;
             for (Relation rel : rels) {
                 if (findFirstWayofRelation(rel).equals(firstWay)) {
                     flag1 = 1;

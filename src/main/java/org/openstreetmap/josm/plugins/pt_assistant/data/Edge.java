@@ -15,7 +15,6 @@ public class Edge {
 
     public Edge(List<PTWay> ways) {
         containPTWays = ways;
-        color = color;
     }
 
     public Edge() {

@@ -104,9 +104,8 @@ public final class WayUtils {
                 "cycleway",
                 "share_busway", "shared_lane"
             )
-            || (
+            ||
                 way.hasTag("highway", "pedestrian")
-            )
             ||
               way.hasTag(
                   "cycleway"

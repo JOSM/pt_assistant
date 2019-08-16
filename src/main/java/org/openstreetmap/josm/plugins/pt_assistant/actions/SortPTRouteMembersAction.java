@@ -70,8 +70,9 @@ import org.openstreetmap.josm.tools.Utils;
  * @author giacomo, Polyglot
  *
  */
-
 public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
+
+    private static final long serialVersionUID = 1L;
 
     private GenericRelationEditor editor = null;
     public static boolean zooming =true;
@@ -350,7 +351,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         StopToWayAssigner assigner = new StopToWayAssigner(ways);
         List<PTStop> ptstops = new ArrayList<>();
 
-        removeWrongSideStops(ptstops, wayMembers);
+        removeWrongSideStops(wayMembers);
         stopsByName.values().forEach(ptstops::addAll);
 
         Map<Way, List<PTStop>> wayStop = new HashMap<>();
@@ -380,7 +381,6 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         HashMap<Way, Integer> wayAlreadyThere = new HashMap<>();
         HashMap<PTStop, Integer> StopHasBeenChecked = new HashMap<>();
         Way prev1 = null;
-        Way curr1 = null;
         Node strt = null;
         Node endn = null;
         Node tempstrt = null;
@@ -408,7 +408,6 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 tempend = endn;
             }
             if (wayStop.containsKey(w)) {
-                curr1 = w;
                 for (PTStop pts : wayStop.get(w)) {
                     Node node3 = pts.getNode();
                     Pair<Node, Node> segment = assigner.calculateNearestSegment(node3, w);
@@ -709,7 +708,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         return p.getName();
     }
 
-    private static void removeWrongSideStops(List<PTStop> ptstop, List<RelationMember> wayMembers) {
+    private static void removeWrongSideStops(List<RelationMember> wayMembers) {
         for (int i = 0; i < wayMembers.size(); i++) {
             RelationMember wm = wayMembers.get(i);
             Way prev = null;

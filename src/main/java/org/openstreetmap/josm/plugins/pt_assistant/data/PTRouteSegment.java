@@ -16,7 +16,6 @@ import org.openstreetmap.josm.data.osm.Way;
  * @author darya
  *
  */
-
 public class PTRouteSegment {
 
     /* first stop of the route segment */
@@ -30,11 +29,6 @@ public class PTRouteSegment {
 
     /* fix variants available for this route segment */
     private List<List<PTWay>> fixVariants;
-
-    private List<PTStop> AllStops;
-
-    /* route relations for which this route segment was created */
-    private List<Relation> relations;
 
     private Relation relation;
 

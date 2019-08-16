@@ -668,9 +668,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             return list;
         }
 
-        if (r1 == null || r2 == null)
-            return list;
-
         List<Relation> rel = new ArrayList<>();
         String value = relation.get("route");
 
@@ -1607,8 +1604,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     }
                 }
             }
-            List<Node> n = new ArrayList<>();
-            n.add(nod);
             currentNode = nod;
             if (fixVariants.size() > 0) {
                 displayBacktrackFixVariant(fixVariants, idx);
@@ -1619,7 +1614,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     private Way findWayAfterChunk(Way way) {
-        Way w2 = null;
         Way w1 = null;
         Way wayToKeep = null;
         List<Node> breakNode = new ArrayList<>();
@@ -1636,8 +1630,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     private void findWayafterchunkRoundabout(Way way) {
-        Way w1 = null;
-        Way wayToKeep = null;
         List<Node> breakNode = new ArrayList<>();
         breakNode.add(currentNode);
         splitNode = way.lastNode();
@@ -1646,8 +1638,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
         if (result != null) {
             UndoRedoHandler.getInstance().add(result);
-            w1 = result.getNewWays().get(0);
-            wayToKeep = w1;
         }
     }
 
