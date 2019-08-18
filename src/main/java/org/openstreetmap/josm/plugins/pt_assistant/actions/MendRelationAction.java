@@ -665,9 +665,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             return list;
         }
 
-        if (r1 == null || r2 == null)
-            return list;
-
         List<Relation> rel = new ArrayList<>();
         String value = relation.get("route");
 
@@ -1626,7 +1623,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             }
         }
     }
-
     public Way findWayAfterChunk(Way way) {
         Way w1 = null;
         Way wayToKeep = null;

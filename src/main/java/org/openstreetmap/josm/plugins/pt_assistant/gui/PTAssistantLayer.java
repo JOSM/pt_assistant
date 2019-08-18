@@ -83,13 +83,11 @@ public final class PTAssistantLayer extends Layer implements LayerChangeListener
      *            fix variants
      */
     public void addFixVariants(List<List<PTWay>> fixVariants) {
-        HashMap<List<PTWay>, Character> fixVariantLetterMap = new HashMap<>();
 
         char alphabet = 'A';
         for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
             List<PTWay> fixVariant = fixVariants.get(i);
             this.fixVariants.put(alphabet, fixVariant);
-            fixVariantLetterMap.put(fixVariant, alphabet);
             alphabet++;
         }
 

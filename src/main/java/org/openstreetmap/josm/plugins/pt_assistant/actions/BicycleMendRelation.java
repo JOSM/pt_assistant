@@ -243,7 +243,7 @@ public class BicycleMendRelation extends MendRelationAction {
             return true;
         }
 
-        if ((way.hasTag("oneway:bicycle", acceptedTags)) && way.lastNode().equals(node)
+        if (way.hasTag("oneway:bicycle", acceptedTags) && way.lastNode().equals(node)
                 && relation.hasTag("route", "bicycle"))
             return false;
 
@@ -370,9 +370,6 @@ public class BicycleMendRelation extends MendRelationAction {
         } catch (Exception e) {
             return list;
         }
-
-        if (r1 == null || r2 == null)
-            return list;
 
         List<Relation> rel = new ArrayList<>();
         //checking whether relations you are getting are bicycle routes or not

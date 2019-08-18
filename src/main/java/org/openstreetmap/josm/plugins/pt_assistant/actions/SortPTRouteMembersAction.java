@@ -70,8 +70,9 @@ import org.openstreetmap.josm.tools.Utils;
  * @author giacomo, Polyglot
  *
  */
-
 public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
+
+    private static final long serialVersionUID = 1L;
 
     private GenericRelationEditor editor = null;
     public static boolean zooming =true;
@@ -380,7 +381,6 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         HashMap<Way, Integer> wayAlreadyThere = new HashMap<>();
         HashMap<PTStop, Integer> StopHasBeenChecked = new HashMap<>();
         Way prev1 = null;
-        Way curr1 = null;
         Node strt = null;
         Node endn = null;
         Node tempstrt = null;
@@ -408,7 +408,6 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 tempend = endn;
             }
             if (wayStop.containsKey(w)) {
-                curr1 = w;
                 for (PTStop pts : wayStop.get(w)) {
                     Node node3 = pts.getNode();
                     Pair<Node, Node> segment = assigner.calculateNearestSegment(node3, w);
