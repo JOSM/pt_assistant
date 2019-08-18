@@ -41,8 +41,6 @@ public class PTRouteDataManager {
      */
     private Set<RelationMember> failedMembers = new HashSet<>();
 
-    private String routeNameFormat = "[operator] [ref] [from] - [via] - [to]";
-
     private HashMap<String, String> tags = new HashMap<>(30);
 
     public HashMap<PTStop, Way> ptStopWays = new HashMap<>();
@@ -51,17 +49,6 @@ public class PTRouteDataManager {
     public HashMap<Way, Color> ptwayColors = new HashMap<>();
     public HashMap<Way, ArrayList<PTStop>> RightSideStops = new HashMap<>();
     public HashMap<Way, ArrayList<PTStop>> LeftSideStops = new HashMap<>();
-
-    private static final Color[] RAINBOW_COLOR_PALETTE = { new Color(0, 255, 0, 150), //GREEN 0
-            new Color(255, 0, 0, 150), //RED 1
-            new Color(0, 0, 255, 150), //BLUE 2
-            new Color(255, 255, 0, 150), //YELLOW 3
-            new Color(0, 255, 255, 150), //SKYBLUE 4
-            new Color(255, 127, 0, 150), //ORANGE 5
-            new Color(148, 0, 211, 150), //VIOLET 6
-            new Color(255, 255, 255, 150), //WHITE 7
-            new Color(169, 169, 169, 210), //GREY 8
-            new Color(239, 167, 222, 220) };
 
     public PTRouteDataManager(Relation relation) {
 
@@ -169,27 +156,11 @@ public class PTRouteDataManager {
         return false;
     }
 
-    /**
-     * Calculates the squared distance between the centers of bounding boxes of
-     * two relation members (which are supposed to be platforms or
-     * stop_positions)
-     *
-     * @param member1 first member
-     * @param member2 second member
-     * @return Squared distance between the centers of the bounding boxes of the
-     *         given relation members
-     */
-
-    private double calculateDistanceSq(RelationMember member1, LatLon coord2) {
-        LatLon coord1 = member1.getMember().getBBox().getCenter();
-        return coord1.distanceSq(coord2);
-    }
-
     public double calculateDistanceSq(LatLon coord1, LatLon coord2) {
         return coord1.distanceSq(coord2);
     }
 
-    private double calculateDistanceSq(RelationMember member1, RelationMember member2) {
+    private static double calculateDistanceSq(RelationMember member1, RelationMember member2) {
         LatLon coord1 = member1.getMember().getBBox().getCenter();
         LatLon coord2 = member2.getMember().getBBox().getCenter();
         return coord1.distanceSq(coord2);

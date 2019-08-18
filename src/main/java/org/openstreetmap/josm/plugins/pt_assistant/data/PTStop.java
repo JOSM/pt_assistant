@@ -16,7 +16,6 @@ import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
@@ -153,7 +152,7 @@ public class PTStop extends RelationMember {
     /**
      * Sets the name for this stop
      *
-     * @param name
+     * @param name name for this stop
      */
     public void setName(String name) {
         if (name == null) {

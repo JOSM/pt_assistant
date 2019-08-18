@@ -16,7 +16,6 @@ import org.openstreetmap.josm.data.osm.Way;
  * @author darya
  *
  */
-
 public class PTRouteSegment {
 
     /* first stop of the route segment */

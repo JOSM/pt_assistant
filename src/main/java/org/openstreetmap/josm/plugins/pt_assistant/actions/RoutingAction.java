@@ -54,7 +54,7 @@ public class RoutingAction extends AbstractRelationEditorAction{
           )
       );
   }
-private void callAction(Relation relation){
+  private void callAction(Relation relation){
 		if(relation.hasTag("route","bicycle")) {
        BicycleMendRelation bike = new BicycleMendRelation(editorAccess);
 		    // MendRelationAction bike = new MendRelationAction(editorAccess);
@@ -94,6 +94,6 @@ private void callAction(Relation relation){
           }
       });
   }
-  class WindowEventHandler extends WindowAdapter {
+  static class WindowEventHandler extends WindowAdapter {
   }
 }

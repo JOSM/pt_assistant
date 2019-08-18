@@ -306,7 +306,7 @@ public class PTAssistantValidatorTest extends Test {
 
     }
 
-    private int showProceedDialog(long id, int numberOfDirectionErrors, int numberOfRoadTypeErrors) {
+    private static int showProceedDialog(long id, int numberOfDirectionErrors, int numberOfRoadTypeErrors) {
 
         if (numberOfDirectionErrors == 0 && numberOfRoadTypeErrors == 0) {
             return 2;

@@ -146,8 +146,6 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
             for (Way way : atNodes.get(0).getParentWays()) {
                 if (atNodes.get(1).getParentWays().contains(way)) {
                     if (way.isFirstLastNode(atNodes.get(0)) && way.isFirstLastNode(atNodes.get(1))) {
-                        List<TagMap> affectedKeysList = new ArrayList<>();
-                        affectedKeysList.add(way.getKeys());
                         newHighlights.add(way);
                         dialogBox(SelectFromOptionDialog.TYPE_NODES_ARE_ENDS_OF_SAME_WAY, null, way, way, commandList);
                         return true;
@@ -161,7 +159,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
         return false;
     }
 
-    private boolean firstNodeIsConnectionNode(Node node, Way affected, Way previousAffectedWay) {
+    private static boolean firstNodeIsConnectionNode(Node node, Way affected, Way previousAffectedWay) {
         if (node.isConnectionNode()) {
             if (node.getParentWays().contains(affected))
                 previousAffectedWay = affected;
@@ -172,9 +170,9 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
         return false;
     }
 
-    private boolean secondNodeIsConnectionNode(Node node, Way previousAffectedWay) {
-        if (atNodes.get(1).isConnectionNode()) {
-            if (atNodes.get(1).getParentWays().contains(previousAffectedWay))
+    private static boolean secondNodeIsConnectionNode(Node node, Way previousAffectedWay) {
+        if (node.isConnectionNode()) {
+            if (node.getParentWays().contains(previousAffectedWay))
                 return false;
             else {
                 return true;
@@ -356,7 +354,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
         // add the existing keys of the selected way to affectedKeysList
         if (selectedWay != null) {
             affectedKeysList.add(affected.getKeys());
-            addTags(affectedKeysList, Arrays.asList(selectedWay), keys, values, 0);
+            addTags(affectedKeysList, Arrays.asList(selectedWay), keys, values);
         } else {
             UndoRedoHandler.getInstance().undo();
             UndoRedoHandler.getInstance().undo();
@@ -458,7 +456,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
         if (way1 != null && way2 != null) {
             List<Way> selectedWays = Arrays.asList(way1, way2);
-            addTags(affectedKeysList, selectedWays, keys, values, 1);
+            addTags(affectedKeysList, selectedWays, keys, values);
         } else {
             UndoRedoHandler.getInstance().undo();
             UndoRedoHandler.getInstance().undo();
@@ -468,14 +466,14 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
     // this function is called when both nodes are starting and ending points of
     // same way, we dont split anything here
-    private void addKeysWhenStartEndPoint(Way affected, List<Command> commandList, JComboBox<String> keys, JComboBox<String> values) {
+    private void addKeysWhenStartEndPoint(Way affected, JComboBox<String> keys, JComboBox<String> values) {
         NodeUtils.moveOntoNearestWay(atNodes.get(0));
         NodeUtils.moveOntoNearestWay(atNodes.get(1));
 
         if (affected == null) {
             resetLayer();
         } else {
-            addTags(Collections.singletonList(affected.getKeys()), Collections.singletonList(affected), keys, values, 2);
+            addTags(Collections.singletonList(affected.getKeys()), Collections.singletonList(affected), keys, values);
         }
     }
 
@@ -500,7 +498,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
     // take key value pair from the dialog box and add it to the existing ways
     private void addTags(List<TagMap> affectedKeysList, List<Way> selectedWay, JComboBox<String> keys,
-            JComboBox<String> values, int type) {
+            JComboBox<String> values) {
 
         MainApplication.getLayerManager().getEditDataSet().setSelected(selectedWay);
 
@@ -920,14 +918,13 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
                 } else if (this.type == TYPE_NODES_ON_SAME_WAY) {
                     addKeys(this.affected, this.commandList, keys, values);
                 } else if (this.type == TYPE_NODES_ARE_ENDS_OF_SAME_WAY) {
-                    addKeysWhenStartEndPoint(this.affected, this.commandList, keys, values);
+                    addKeysWhenStartEndPoint(this.affected, keys, values);
                 }
 
             } else if (getValue() != 3) {
                 resetLayer();
             }
         }
-
     }
 
     private class DoubleSplitLayer extends AbstractMapViewPaintable {

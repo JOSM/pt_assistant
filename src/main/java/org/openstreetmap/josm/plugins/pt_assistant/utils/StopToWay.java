@@ -164,14 +164,14 @@ public class StopToWay {
      * @param way way
      * @return the minimum distance between a node and a way
      */
-    private double calculateMinDistanceToSegment(Node node, Way way) {
+    private static double calculateMinDistanceToSegment(Node node, Way way) {
 
         double minDistance = Double.MAX_VALUE;
 
         List<Pair<Node, Node>> waySegments = way.getNodePairs(false);
         for (Pair<Node, Node> waySegment : waySegments) {
             if (waySegment.a != node && waySegment.b != node) {
-                double distanceToLine = this.calculateDistanceToSegment(node, waySegment);
+                double distanceToLine = calculateDistanceToSegment(node, waySegment);
                 if (distanceToLine < minDistance) {
                     minDistance = distanceToLine;
                 }
@@ -179,24 +179,6 @@ public class StopToWay {
         }
 
         return minDistance;
-
-    }
-    private double calculateMinDistanceToSegment(LatLon node, Way way) {
-
-        double minDistance = Double.MAX_VALUE;
-
-        List<Pair<Node, Node>> waySegments = way.getNodePairs(false);
-        for (Pair<Node, Node> waySegment : waySegments) {
-            if (waySegment.a.getCoor() != node && waySegment.b.getCoor() != node) {
-                double distanceToLine = this.calculateDistanceToSegment(node, waySegment);
-                if (distanceToLine < minDistance) {
-                    minDistance = distanceToLine;
-                }
-            }
-        }
-
-        return minDistance;
-
     }
 
     public Pair<Node, Node> calculateNearestSegment(Node node, Way way) {
@@ -206,7 +188,7 @@ public class StopToWay {
         Pair<Node, Node> minWaySegment = null;
         for (Pair<Node, Node> waySegment : waySegments) {
             if (waySegment.a != node && waySegment.b != node) {
-                double distanceToLine = this.calculateDistanceToSegment(node, waySegment);
+                double distanceToLine = calculateDistanceToSegment(node, waySegment);
                 if (distanceToLine < minDistance) {
                     minDistance = distanceToLine;
                     minWaySegment = waySegment;
@@ -217,7 +199,6 @@ public class StopToWay {
         }
         return minWaySegment;
     }
-
 
     /**
      * Calculates the distance from point to segment and differentiates between
@@ -230,7 +211,7 @@ public class StopToWay {
      * @param segment segment
      * @return the distance from point to segment
      */
-    private double calculateDistanceToSegment(Node node, Pair<Node, Node> segment) {
+    private static double calculateDistanceToSegment(Node node, Pair<Node, Node> segment) {
 
         if (node == segment.a || node == segment.b) {
             return 0.0;
@@ -238,26 +219,6 @@ public class StopToWay {
 
         double lengthA = node.getCoor().distance(segment.a.getCoor());
         double lengthB = node.getCoor().distance(segment.b.getCoor());
-        double lengthC = segment.a.getCoor().distance(segment.b.getCoor());
-
-        if (isObtuse(lengthC, lengthB, lengthA)) {
-            return lengthB;
-        }
-
-        if (isObtuse(lengthA, lengthC, lengthB)) {
-            return lengthA;
-        }
-
-        return calculateDistanceToLine(node, segment);
-    }
-    private double calculateDistanceToSegment(LatLon node, Pair<Node, Node> segment) {
-
-        if (node == segment.a.getCoor() || node == segment.b.getCoor()) {
-            return 0.0;
-        }
-
-        double lengthA = node.distance(segment.a.getCoor());
-        double lengthB = node.distance(segment.b.getCoor());
         double lengthC = segment.a.getCoor().distance(segment.b.getCoor());
 
         if (isObtuse(lengthC, lengthB, lengthA)) {
@@ -279,7 +240,7 @@ public class StopToWay {
      * @param segment segment
      * @return the distance from point to line
      */
-    private double calculateDistanceToLine(Node node, Pair<Node, Node> segment) {
+    private static double calculateDistanceToLine(Node node, Pair<Node, Node> segment) {
 
         /*
          * Let a be the triangle edge between the point and the first node of
@@ -300,27 +261,6 @@ public class StopToWay {
         // formula for triangle area:
         return triangleArea * 2.0 / lengthC;
     }
-    private double calculateDistanceToLine(LatLon node, Pair<Node, Node> segment) {
-
-        /*
-         * Let a be the triangle edge between the point and the first node of
-         * the segment. Let b be the triangle edge between the point and the
-         * second node of the segment. Let c be the triangle edge which is the
-         * segment.
-         */
-
-        double lengthA = node.distance(segment.a.getCoor());
-        double lengthB = node.distance(segment.b.getCoor());
-        double lengthC = segment.a.getCoor().distance(segment.b.getCoor());
-
-        // calculate triangle area using Heron's formula:
-        double p = (lengthA + lengthB + lengthC) / 2.0;
-        double triangleArea = Math.sqrt(p * (p - lengthA) * (p - lengthB) * (p - lengthC));
-
-        // calculate the distance from point to segment using the 0.5*c*h
-        // formula for triangle area:
-        return triangleArea * 2.0 / lengthC;
-    }
 
     /**
      * Checks if the angle opposite of the edge c is obtuse. Uses the cosine
@@ -331,7 +271,7 @@ public class StopToWay {
      * @param lengthC length C
      * @return true if the angle opposite of the edge c is obtuse
      */
-    private boolean isObtuse(double lengthA, double lengthB, double lengthC) {
+    private static boolean isObtuse(double lengthA, double lengthB, double lengthC) {
 
         /*-
          * Law of cosines:
@@ -355,7 +295,7 @@ public class StopToWay {
      * @param stop stop
      * @param way way
      */
-    private void addAssignedWayToMap(PTStop stop, Way way) {
+    private static void addAssignedWayToMap(PTStop stop, Way way) {
         if (stopToWay.containsKey(stop)) {
             List<Way> assignedWays = stopToWay.get(stop);
             assignedWays.add(way);
@@ -380,8 +320,7 @@ public class StopToWay {
                 }
             }
         }
-        List<Way> lis = findWaysThatContainAsEndNode(node1);
-        return lis;
+        return findWaysThatContainAsEndNode(node1);
     }
 
     public List<Way> getAllWaystoTheNearestNode(Node ptstop) {
@@ -397,8 +336,7 @@ public class StopToWay {
                 }
             }
         }
-        List<Way> lis = findWaysThatContainAsEndNode(node1);
-        return lis;
+        return findWaysThatContainAsEndNode(node1);
     }
 
     public List<Way> findWaysThatContainAsEndNode(Node node) {
