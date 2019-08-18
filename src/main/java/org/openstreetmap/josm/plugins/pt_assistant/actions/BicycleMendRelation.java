@@ -50,6 +50,7 @@ import org.openstreetmap.josm.tools.Utils;
  */
 
 public class BicycleMendRelation extends MendRelationAction {
+
     ////////////////////////Assigning Variables///////////////
 
     Way lastForWay;
