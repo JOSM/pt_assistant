@@ -104,9 +104,7 @@ public class ExtractPlatformNodeAction extends JosmAction {
             for (OsmPrimitive pr : refs) {
                 if (pr instanceof Way) {
                     Way w = (Way) pr;
-                    Set<Node> rmNodes = new HashSet<>();
-                    rmNodes.add(nd);
-                    UndoRedoHandler.getInstance().add(new RemoveNodesCommand(w, rmNodes));
+                    UndoRedoHandler.getInstance().add(new RemoveNodesCommand(w, Collections.singleton(nd)));
                 }
             }
         } else {
