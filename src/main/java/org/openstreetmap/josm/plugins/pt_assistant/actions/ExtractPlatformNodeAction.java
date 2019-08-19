@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JOptionPane;
 
@@ -102,7 +104,9 @@ public class ExtractPlatformNodeAction extends JosmAction {
             for (OsmPrimitive pr : refs) {
                 if (pr instanceof Way) {
                     Way w = (Way) pr;
-                    UndoRedoHandler.getInstance().add(new RemoveNodesCommand(w, Collections.singleton(nd)));
+                    Set<Node> rmNode = new HashSet<>();
+                    rmNode.add(nd);
+                    UndoRedoHandler.getInstance().add(new RemoveNodesCommand(w, rmNode));
                 }
             }
         } else {
