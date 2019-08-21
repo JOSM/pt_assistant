@@ -616,21 +616,21 @@ public class BicycleMendRelation extends MendRelationAction {
                                     if (WayUtils.isSuitableForBuses(w)) {
                                         fixVariants.add(w);
                                     }
-                                } else if (relation.hasTag("route","bicycle")) {
+                                } else if (relation.hasTag("route", "bicycle")) {
                                     if (WayUtils.isSuitableForBicycle(w)) {
                                         fixVariants.add(w);
                                     }
                                 }
-                            }else{
-                              if (relation.hasTag("route", "bus")) {
-                                  if (RouteUtils.isOnewayForPublicTransport(w)==0) {
-                                      fixVariants.add(w);
-                                  }
-                              } else if (relation.hasTag("route","bicycle")) {
-                                  if (RouteUtils.isOnewayForBicycles(w) == 0) {
-                                      fixVariants.add(w);
-                                  }
-                              }
+                            } else {
+                                if (relation.hasTag("route", "bus")) {
+                                    if (RouteUtils.isOnewayForPublicTransport(w) == 0) {
+                                        fixVariants.add(w);
+                                    }
+                                } else if (relation.hasTag("route", "bicycle")) {
+                                    if (RouteUtils.isOnewayForBicycles(w) == 0) {
+                                        fixVariants.add(w);
+                                    }
+                                }
                             }
                         }
                     }
@@ -1102,9 +1102,9 @@ public class BicycleMendRelation extends MendRelationAction {
                     IsWaythere.put(way, null);
                 }
                 for (Node node : way.getNodes()) {
-                  if(Isthere.get(node)!=null){
-                    Isthere.put(node, Isthere.get(node) - 1);
-                  }
+                    if (Isthere.get(node) != null) {
+                        Isthere.put(node, Isthere.get(node) - 1);
+                    }
                 }
             }
             super.memberTableModel.remove(lst);
