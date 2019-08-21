@@ -567,6 +567,11 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
       Way next = null;
       HashMap<Way,Boolean> setWay = new HashMap<>();
       HashMap<Way,Pair<Node,Node>> checkWay = new HashMap<>();
+      System.out.println("way member size "+wayMembers.size());
+      for(int i=0;i<wayMembers.size();i++){
+        RelationMember pk = wayMembers.get(i);
+        System.out.println("Osm Relation member "+ (i+1) +" is "+pk.getUniqueId());
+      }
       for(int i=0;i<wayMembers.size();i++){
         Node node1=null;
         Node node2=null;
@@ -576,7 +581,11 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             node1 = findFirstCommonNode(curr,prev);
           }
           if(i<wayMembers.size()-1){
+            System.out.println("hola");
+            RelationMember pk = wayMembers.get(i+1);
+            System.out.println("Osm Relation member is "+pk.getUniqueId());
             next = wayMembers.get(i+1).getWay();
+            System.out.println("next way is "+next.getUniqueId());
             node2 = findFirstCommonNode(curr,next);
           }
           Pair<Node,Node> par =checkWay.get(curr);
