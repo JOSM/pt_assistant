@@ -733,6 +733,6 @@ public class SplitRoundaboutAction extends JosmAction {
                 setEnabled(way.isClosed() && (way.hasTag("junction", "roundabout") || way.hasTag("oneway", "yes")));
             });
         }
-        setEnabled(false);
+        // setEnabled(false);
     }
 }

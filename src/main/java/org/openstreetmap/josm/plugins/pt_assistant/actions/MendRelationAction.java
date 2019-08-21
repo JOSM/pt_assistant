@@ -246,7 +246,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             final JCheckBox button1 = new JCheckBox("Around Stops");
             final JCheckBox button2 = new JCheckBox("Around Gaps");
             final JCheckBox button3 = new JCheckBox("On the fly");
-            button2.setSelected(true);
             button3.setSelected(true);
             panel.add(new JLabel(tr("How would you want the download to take place?")), GBC.eol().fill(GBC.HORIZONTAL));
             panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
@@ -458,7 +457,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         List<Way> lst = new ArrayList<>();
         Int.add(j);
         lst.add(members.get(j).getWay());
-
         // if the way at members.get(j) is one way then check if the next ways are on
         // way, if so then remove them as well
         if (WayUtils.isOneWay(members.get(j).getWay())) {
@@ -480,7 +478,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         DataSet ds = MainApplication.getLayerManager().getEditDataSet();
         ds.setSelected(lst);
-
         downloadAreaBeforeRemovalOption(lst, Int);
     }
 
@@ -1172,8 +1169,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     void downloadAreaBeforeRemovalOption(List<Way> wayList, List<Integer> Int) {
-        if (abort)
+        if (abort) {
             return;
+        }
 
         if (!onFly) {
             displayWaysToRemove(Int);
@@ -1557,6 +1555,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         Way backTrackWay = currentWay;
         Way way = backTrackWay;
         backnodes = way.getNodes();
+        if (currentNode == null) {
+            currentNode = currentWay.lastNode();
+        }
         if (currentNode.equals(way.lastNode())) {
             Collections.reverse(backnodes);
         }
@@ -1565,7 +1566,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         backTrack(currentWay, idx);
     }
 
-    private void backTrack(Way way, int idx) {
+    public void backTrack(Way way, int idx) {
         if (idx >= backnodes.size() - 1) {
             currentNode = prevCurrenNode;
             callNextWay(currentIndex);
@@ -1590,15 +1591,25 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                             }
                         } else {
                             if (w.firstNode().equals(nod)) {
-                                if (relation.hasTag("bus")) {
+                                if (relation.hasTag("route", "bus")) {
                                     if (WayUtils.isSuitableForBuses(w)) {
                                         fixVariants.add(w);
                                     }
-                                } else if (relation.hasTag("bicycle")) {
+                                } else if (relation.hasTag("route","bicycle")) {
                                     if (WayUtils.isSuitableForBicycle(w)) {
                                         fixVariants.add(w);
                                     }
                                 }
+                            }else{
+                              if (relation.hasTag("route", "bus")) {
+                                  if (RouteUtils.isOnewayForPublicTransport(w)==0) {
+                                      fixVariants.add(w);
+                                  }
+                              } else if (relation.hasTag("route","bicycle")) {
+                                  if (RouteUtils.isOnewayForBicycles(w) == 0) {
+                                      fixVariants.add(w);
+                                  }
+                              }
                             }
                         }
                     }
@@ -1612,8 +1623,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             }
         }
     }
-
-    private Way findWayAfterChunk(Way way) {
+    public Way findWayAfterChunk(Way way) {
         Way w1 = null;
         Way wayToKeep = null;
         List<Node> breakNode = new ArrayList<>();
@@ -1920,9 +1930,17 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         lst.add(currentIndex + 1);
         int[] ind = lst.stream().mapToInt(Integer::intValue).toArray();
         memberTableModel.remove(ind);
+        Way temp = members.get(ind[0]).getWay();
         for (int i = 0; i < ind.length; i++) {
             members.remove(ind[i] - i);
         }
+        save();
+        List<RelationMember> c = new ArrayList<>();
+        List<Way> ways = new ArrayList<>();
+        ways.add(temp);
+        int p = currentIndex;
+        c.add(new RelationMember("", ways.get(0)));
+        members.addAll(p + 1, c);
         save();
         int indx = currentIndex;
         addNewWays(Collections.singletonList(way), indx);

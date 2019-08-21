@@ -21,6 +21,7 @@ import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.command.SplitWayCommand;
+import org.openstreetmap.josm.command.SplitWayCommand.Strategy;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.NodePair;
@@ -57,8 +58,6 @@ public class BicycleMendRelation extends MendRelationAction {
     Node pseudocurrentNode = null;
     int cnt = 0;
     int brokenidx = 0;
-    boolean setEnable = true;
-    static String notice = null;
     HashMap<Node, Integer> Isthere = new HashMap<>();
     static HashMap<Way, Integer> IsWaythere = new HashMap<>();
     static List<WayConnectionType> links;
@@ -127,6 +126,7 @@ public class BicycleMendRelation extends MendRelationAction {
     //so after every filtering this function has to be called with super.currentIndex+1
     @Override
     public void callNextWay(int idx) {
+        save();
         Logging.debug("Index + " + idx);
         super.downloadCounter++;
         if (idx < super.members.size() && super.members.get(idx).isWay()) {
@@ -134,7 +134,6 @@ public class BicycleMendRelation extends MendRelationAction {
                 super.noLinkToPreviousWay = true;
 
             int nexidx = getNextWayIndex(idx);
-
             if (nexidx >= super.members.size()) {
                 deleteExtraWays();
                 makeNodesZeros();
@@ -268,11 +267,11 @@ public class BicycleMendRelation extends MendRelationAction {
         boolean nexWayDelete = false;
         Node node = null;
         super.nextIndex = false;
-        notice = null;
+        super.notice = null;
         final NodePair commonEndNodes = WayUtils.findCommonFirstLastNodes(super.nextWay, way);
         if (commonEndNodes.getA() != null && commonEndNodes.getB() != null) {
             nexWayDelete = true;
-            notice = "Multiple common nodes found between current and next way";
+            super.notice = "Multiple common nodes found between current and next way";
         } else if (commonEndNodes.getA() != null) {
             node = commonEndNodes.getA();
         } else if (commonEndNodes.getB() != null) {
@@ -305,9 +304,8 @@ public class BicycleMendRelation extends MendRelationAction {
 
         if (node != null && !checkOneWaySatisfiability(super.nextWay, node)) {
             nexWayDelete = true;
-            notice = "bicycle travels against oneway restriction";
+            super.notice = "vehicle travels against oneway restriction";
         }
-
         if (nexWayDelete) {
             super.currentWay = way;
             super.nextIndex = true;
@@ -338,7 +336,7 @@ public class BicycleMendRelation extends MendRelationAction {
             super.showOption0 = true;
         }
         if (directroutes != null && directroutes.size() > 0 && !super.shorterRoutes && parentWays.size() > 0
-                && notice == null) {
+                && super.notice == null) {
             displayFixVariantsWithOverlappingWays(directroutes);
             return null;
         }
@@ -589,6 +587,132 @@ public class BicycleMendRelation extends MendRelationAction {
     }
 
     @Override
+    public void backTrack(Way way, int idx) {
+        if (idx >= super.backnodes.size() - 1) {
+            super.currentNode = prevCurrenNode;
+            callNextWay(super.currentIndex);
+            return;
+        }
+        Node nod = super.backnodes.get(idx);
+        if (way.isInnerNode(nod)) {
+            List<Way> fixVariants = new ArrayList<>();
+            List<Way> allWays = nod.getParentWays();
+            if (allWays != null) {
+                for (Way w : allWays) {
+                    if (!w.equals(super.currentWay)) {
+                        if (!WayUtils.isOneWay(w)) {
+                            if (relation.hasTag("route", "bus")) {
+                                if (WayUtils.isSuitableForBuses(w)) {
+                                    fixVariants.add(w);
+                                }
+                            } else if (relation.hasTag("route", "bicycle")) {
+                                if (WayUtils.isSuitableForBicycle(w)) {
+                                    fixVariants.add(w);
+                                }
+                            }
+                        } else {
+                            if (w.firstNode().equals(nod)) {
+                                if (relation.hasTag("route", "bus")) {
+                                    if (WayUtils.isSuitableForBuses(w)) {
+                                        fixVariants.add(w);
+                                    }
+                                } else if (relation.hasTag("route","bicycle")) {
+                                    if (WayUtils.isSuitableForBicycle(w)) {
+                                        fixVariants.add(w);
+                                    }
+                                }
+                            }else{
+                              if (relation.hasTag("route", "bus")) {
+                                  if (RouteUtils.isOnewayForPublicTransport(w)==0) {
+                                      fixVariants.add(w);
+                                  }
+                              } else if (relation.hasTag("route","bicycle")) {
+                                  if (RouteUtils.isOnewayForBicycles(w) == 0) {
+                                      fixVariants.add(w);
+                                  }
+                              }
+                            }
+                        }
+                    }
+                }
+            }
+            List<Node> n = new ArrayList<>();
+            n.add(nod);
+            super.currentNode = nod;
+            if (fixVariants.size() > 0) {
+                displayBacktrackFixVariant(fixVariants, idx);
+            } else {
+                backTrack(way, idx + 1);
+            }
+        }
+    }
+
+    @Override
+    public Way findWayAfterChunk(Way way) {
+        Way w2 = null;
+        Way w1 = null;
+        Way wayToKeep = null;
+        List<Node> breakNode = new ArrayList<>();
+        breakNode.add(super.currentNode);
+        Strategy strategy = new TempStrategy();
+        List<List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(super.currentWay, breakNode);
+        SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
+        if (result != null) {
+            UndoRedoHandler.getInstance().add(result);
+            w1 = result.getNewWays().get(0);
+            wayToKeep = w1;
+        }
+        return wayToKeep;
+    }
+
+    @Override
+    void backtrackCurrentEdge() {
+        Way backTrackWay = super.currentWay;
+        Way way = backTrackWay;
+        super.backnodes = way.getNodes();
+        if (super.currentNode == null) {
+            super.currentNode = super.currentWay.lastNode();
+        }
+        if (super.currentNode.equals(way.lastNode())) {
+            Collections.reverse(super.backnodes);
+        }
+        int idx = 1;
+        prevCurrenNode = super.currentNode;
+        backTrack(super.currentWay, idx);
+    }
+
+    @Override
+    void getNextWayAfterBackTrackSelection(Way way) {
+        save();
+        List<Integer> lst = new ArrayList<>();
+        lst.add(super.currentIndex + 1);
+        int[] ind = lst.stream().mapToInt(Integer::intValue).toArray();
+        Way temp = super.members.get(ind[0]).getWay();
+        super.memberTableModel.remove(ind);
+        for (int i = 0; i < ind.length; i++) {
+            super.members.remove(ind[i] - i);
+        }
+        List<RelationMember> c = new ArrayList<>();
+        List<Way> ways = new ArrayList<>();
+        ways.add(temp);
+        int p = super.currentIndex;
+        c.add(new RelationMember("", ways.get(0)));
+        super.members.addAll(p + 1, c);
+        save();
+        int indx = super.currentIndex;
+        addNewWays(Collections.singletonList(way), indx);
+        save();
+        super.memberTableModel.fireTableDataChanged();
+        super.currentNode = getOtherNode(way, super.currentNode);
+        if (super.currentIndex < super.members.size() - 1) {
+            callNextWay(++super.currentIndex);
+            return;
+        } else {
+            deleteExtraWays();
+        }
+    }
+
+    @Override
     void getNextWayAfterSelection(List<Way> ways) {
         int flag = 0;
         if (ways != null) {
@@ -746,13 +870,9 @@ public class BicycleMendRelation extends MendRelationAction {
         try {
             List<RelationMember> c = new ArrayList<>();
             String s = "";
-            if (prelink.isOnewayLoopBackwardPart) {
-                s = "forward";
-            }
             int[] idx = new int[1];
             idx[0] = i + 1;
             Way w = ways.get(0);
-            s = assignRoles(w);
             for (int k = 0; k < ways.size(); k++) {
                 c.add(new RelationMember(s, ways.get(k)));
                 // check if the way that is getting added is already present or not
@@ -773,7 +893,7 @@ public class BicycleMendRelation extends MendRelationAction {
             super.memberTableModel.addMembersAfterIdx(ways, i);
             super.memberTableModel.updateRole(idx, s);
             super.members.addAll(i + 1, c);
-
+            save();
             super.currentNode = getOtherNode(w, super.currentNode);
             links = connectionTypeCalculator.updateLinks(super.members);
         } catch (Exception e) {
@@ -800,6 +920,7 @@ public class BicycleMendRelation extends MendRelationAction {
                 }
             }
         }
+        // else if(lastForWay==null)
 
         if (flag == 1) {
             s = "";
@@ -914,7 +1035,6 @@ public class BicycleMendRelation extends MendRelationAction {
                     int[] x = { i };
                     super.memberTableModel.remove(x);
                     super.members.remove(i);
-
                     break;
                 }
             }
@@ -966,7 +1086,7 @@ public class BicycleMendRelation extends MendRelationAction {
             }
             callNextWay(super.currentIndex);
         } else {
-            notice = null;
+            super.notice = null;
             deleteExtraWays();
         }
     }
@@ -982,7 +1102,9 @@ public class BicycleMendRelation extends MendRelationAction {
                     IsWaythere.put(way, null);
                 }
                 for (Node node : way.getNodes()) {
+                  if(Isthere.get(node)!=null){
                     Isthere.put(node, Isthere.get(node) - 1);
+                  }
                 }
             }
             super.memberTableModel.remove(lst);
@@ -992,19 +1114,19 @@ public class BicycleMendRelation extends MendRelationAction {
             // OK.actionPerformed(null);
             save();
             if (super.currentIndex < super.members.size() - 1) {
-                notice = null;
+                super.notice = null;
                 callNextWay(super.currentIndex);
             } else {
-                notice = null;
+                super.notice = null;
                 deleteExtraWays();
             }
         } else if (chr == 'B' || chr == '2') {
             if (super.currentIndex < super.members.size() - 1) {
-                notice = null;
+                super.notice = null;
                 super.currentIndex = wayIndices.get(wayIndices.size() - 1);
                 callNextWay(super.currentIndex);
             } else {
-                notice = null;
+                super.notice = null;
                 deleteExtraWays();
             }
         } else if (chr == 'C' || chr == '4') {
@@ -1020,10 +1142,10 @@ public class BicycleMendRelation extends MendRelationAction {
             // OK.actionPerformed(null);
             save();
             if (super.currentIndex < super.members.size() - 1) {
-                notice = null;
+                super.notice = null;
                 callNextWay(super.currentIndex);
             } else {
-                notice = null;
+                super.notice = null;
                 deleteExtraWays();
             }
         }
@@ -1045,10 +1167,10 @@ public class BicycleMendRelation extends MendRelationAction {
             // OK.actionPerformed(null);
             save();
             if (prevIndex != -1) {
-                notice = null;
+                super.notice = null;
                 callNextWay(prevIndex);
             } else {
-                notice = null;
+                super.notice = null;
                 deleteExtraWays();
             }
         }
@@ -1076,7 +1198,6 @@ public class BicycleMendRelation extends MendRelationAction {
         final JCheckBox button1 = new JCheckBox("Around Stops");
         final JCheckBox button2 = new JCheckBox("Around Gaps");
         final JCheckBox button3 = new JCheckBox("On the fly");
-        button2.setSelected(true);
         button3.setSelected(true);
         panel.add(new JLabel(tr("How would you want the download to take place?")), GBC.eol().fill(GBC.HORIZONTAL));
         panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));

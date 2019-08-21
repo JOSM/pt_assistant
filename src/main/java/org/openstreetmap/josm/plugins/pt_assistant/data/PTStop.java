@@ -62,8 +62,6 @@ public class PTStop extends RelationMember {
     /*stop will serve this particular way*/
     public Way serveWay;
 
-    MapFrame map = null;
-
     /**
      * Constructor
      *
