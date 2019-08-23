@@ -30,6 +30,7 @@ public class SortPTRouteMembersActionTest extends AbstractTest {
     @Before
     public void init() throws FileNotFoundException, IllegalDataException {
         ds = OsmReader.parseDataSet(new FileInputStream(AbstractTest.PATH_TO_SORT_PT_STOPS), null);
+
     }
 
     @Test

@@ -156,6 +156,43 @@ public class PTRouteDataManager {
         return false;
     }
 
+    public double crossProductValue(Node node1, Node node2, PTStop stop) {
+        LatLon coord3;
+        if (stop.getPlatform() != null) {
+            coord3 = stop.getPlatform().getBBox().getCenter();
+        } else {
+            Node node3 = stop.getNode();
+            coord3 = new LatLon(node3.lat(), node3.lon());
+        }
+        LatLon coord1 = new LatLon(node1.lat(), node1.lon());
+        LatLon coord2 = new LatLon(node2.lat(), node2.lon());
+        //       LatLon coord3 = new LatLon(node3.lat(),node3.lon());
+        double x1 = coord1.getX();
+        double y1 = coord1.getY();
+
+        double x2 = coord2.getX();
+        double y2 = coord2.getY();
+
+        double x3 = coord3.getX();
+        double y3 = coord3.getY();
+
+        x1 -= x3;
+        y1 -= y3;
+
+        x2 -= x3;
+        y2 -= y3;
+
+        double crossprod = x1 * y2 - y1 * x2;
+
+        //Right Direction
+        return crossprod;
+        // if (crossprod <= 0) {
+        //     return true;
+        // }
+        //left Direction
+        // return false;
+    }
+
     public double calculateDistanceSq(LatLon coord1, LatLon coord2) {
         return coord1.distanceSq(coord2);
     }

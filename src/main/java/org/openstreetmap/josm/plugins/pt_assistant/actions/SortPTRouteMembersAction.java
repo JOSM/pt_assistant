@@ -62,6 +62,7 @@ import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
+import org.openstreetmap.josm.tools.RightAndLefthandTraffic;
 import org.openstreetmap.josm.tools.Utils;
 
 /**
@@ -78,6 +79,8 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
     private GenericRelationEditor editor = null;
     public static boolean zooming = true;
     public static HashMap<Long, String> stopOrderMap = new HashMap<>();
+    public static LatLon locat = null;
+    public static boolean rightSide = true;
 
     /**
      * Creates a new SortPTRouteMembersAction
@@ -88,7 +91,6 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
         putValue(SHORT_DESCRIPTION, tr("Sort PT Route Members Relation Editor"));
         new ImageProvider("icons", "sortptroutemembers").getResource().attachImageIcon(this, true);
-
         editor = (GenericRelationEditor) editorAccess.getEditor();
         updateEnabledState();
     }
@@ -139,6 +141,15 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 return;
             }
         }
+        for (RelationMember rm : newRel.getMembers()) {
+            if (rm.getType() == OsmPrimitiveType.WAY) {
+                locat = rm.getWay().firstNode().getCoor();
+                break;
+            }
+        }
+        RightAndLefthandTraffic.initialize();
+        rightSide = RightAndLefthandTraffic.isRightHandTraffic(locat);
+
         sortPTRouteMembers(newRel);
         UndoRedoHandler.getInstance().add(new ChangeCommand(rel, newRel));
         editor.reloadDataFromRelation();
@@ -310,20 +321,17 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         List<Way> ways = new ArrayList<>();
         // HashMap<Way,ArrayList<PTStop>> RightSideStops = new RightSideStops();
         // HashMap<Way,ArrayList<PTStop>> LeftSideStops = new LeftSideStops();
-
         for (int i = 0; i < members.size(); i++) {
             RelationMember rm = members.get(i);
             if (PTStop.isPTPlatform(rm) || PTStop.isPTStopPosition(rm))
                 stops.add(rm);
             else {
                 wayMembers.add(rm);
-                if (rm.getType() == OsmPrimitiveType.WAY)
+                if (rm.getType() == OsmPrimitiveType.WAY) {
                     ways.add(rm.getWay());
+                }
             }
         }
-        // for(RelationMember rs:stops){
-        //   System.out.println("woho "+stopOrderMap.get(rs.getUniqueId()));
-        // }
         // couple together stop positions and platforms that are part of the same
         // stop. the only way used to determine whether they are part of the same
         // stop or not is the name. this should be improved by using also the
@@ -438,19 +446,37 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                             }
                         }
                     }
-                    if (route.CrossProduct(tempstrt, tempend, pts)) {
-                        if (!RightSideStops.containsKey(w)) {
-                            RightSideStops.put(w, new ArrayList<PTStop>());
-                        }
-                        if (StopHasBeenChecked.get(pts) == null) {
-                            RightSideStops.get(w).add(pts);
+                    if (rightSide) {
+                        if (route.crossProductValue(tempstrt, tempend, pts) <= 0) {
+                            if (!RightSideStops.containsKey(w)) {
+                                RightSideStops.put(w, new ArrayList<PTStop>());
+                            }
+                            if (StopHasBeenChecked.get(pts) == null) {
+                                RightSideStops.get(w).add(pts);
+                            }
+                        } else {
+                            if (!LeftSideStops.containsKey(w)) {
+                                LeftSideStops.put(w, new ArrayList<PTStop>());
+                            }
+                            if (StopHasBeenChecked.get(pts) == null) {
+                                LeftSideStops.get(w).add(pts);
+                            }
                         }
                     } else {
-                        if (!LeftSideStops.containsKey(w)) {
-                            LeftSideStops.put(w, new ArrayList<PTStop>());
-                        }
-                        if (StopHasBeenChecked.get(pts) == null) {
-                            LeftSideStops.get(w).add(pts);
+                        if (route.crossProductValue(tempstrt, tempend, pts) >= 0) {
+                            if (!RightSideStops.containsKey(w)) {
+                                RightSideStops.put(w, new ArrayList<PTStop>());
+                            }
+                            if (StopHasBeenChecked.get(pts) == null) {
+                                RightSideStops.get(w).add(pts);
+                            }
+                        } else {
+                            if (!LeftSideStops.containsKey(w)) {
+                                LeftSideStops.put(w, new ArrayList<PTStop>());
+                            }
+                            if (StopHasBeenChecked.get(pts) == null) {
+                                LeftSideStops.get(w).add(pts);
+                            }
                         }
                     }
                     StopHasBeenChecked.put(pts, 1);
@@ -479,7 +505,8 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             if (wm.getType() == OsmPrimitiveType.WAY) {
                 Way curr = wm.getWay();
                 if (wayAlreadyThere.get(curr) == 0) {
-                    List<PTStop> stps = RightSideStops.get(curr);
+                    List<PTStop> stps;
+                    stps = RightSideStops.get(curr);
                     if (stps != null) {
                         // if for one way there are more than one stop assigned to it,
                         // another sorting step is needed
@@ -493,11 +520,12 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                     }
                     wayAlreadyThere.put(curr, 1);
                     if (checkValidityOfWrongStops.get(curr) == null && zooming) {
-                        List<PTStop> stp = LeftSideStops.get(curr);
+                        List<PTStop> stp;
+                        stp = LeftSideStops.get(curr);
                         if (stp != null) {
                             Collection<Node> pt = new ArrayList<>();
                             if (stp.size() > 1)
-                                stp = sortSameWayStops(stps, curr, prev, next);
+                                stp = sortSameWayStops(stp, curr, prev, next);
                             stp.forEach(stop -> {
                                 if (stop != null) {
                                     Node nod = null;
@@ -509,18 +537,19 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                                     }
                                     pt.add(nod);
                                     if (pt.size() > 0) {
-                                      BoundingXYVisitor bboxCalculator = new BoundingXYVisitor();
-                                      bboxCalculator.computeBoundingBox(pt);
-                                      for(int idx=0;idx<4;idx++) {
-                                          bboxCalculator.enlargeBoundingBox();
-                                      }
-                                      MainApplication.getMap().mapView.zoomTo(bboxCalculator);
-                                      // AutoScaleAction.zoomTo(pt);
+                                        BoundingXYVisitor bboxCalculator = new BoundingXYVisitor();
+                                        bboxCalculator.computeBoundingBox(pt);
+                                        for (int idx = 0; idx < 4; idx++) {
+                                            bboxCalculator.enlargeBoundingBox();
+                                        }
+                                        MainApplication.getMap().mapView.zoomTo(bboxCalculator);
+                                        // AutoScaleAction.zoomTo(pt);
                                     }
                                     final JPanel panel = new JPanel(new GridBagLayout());
                                     panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-                                    panel.add(new JLabel(tr(
-                                            " "+stopOrderMap.get(stop.getUniqueId()) +" can not be served in this route relation want to remove it?")),
+                                    panel.add(
+                                            new JLabel(tr(" " + stopOrderMap.get(stop.getUniqueId())
+                                                    + " can not be served in this route relation want to remove it?")),
                                             GBC.eol().fill(GBC.HORIZONTAL));
                                     panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
                                     int n = JOptionPane.showConfirmDialog((Component) null, panel);
@@ -534,7 +563,8 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                         }
                     }
                 } else {
-                    List<PTStop> stps = LeftSideStops.get(curr);
+                    List<PTStop> stps;
+                    stps = LeftSideStops.get(curr);
                     if (stps != null) {
                         // if for one way there are more than one stop assigned to it,
                         // another sorting step is needed
@@ -552,6 +582,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
         wayMembers.forEach(rel::addMember);
     }
+
     private static void computeRefs(Relation r) {
         // in the end, draw labels of the given route r:
         int stopCount = 1;
@@ -571,7 +602,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 stopCount++;
             }
         }
-      }
+    }
 
     static Node findFirstCommonNode(Way w1, Way w2) {
         if (w1.firstNode().equals(w2.firstNode()) || w1.firstNode().equals(w2.lastNode())) {
