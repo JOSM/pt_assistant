@@ -1595,21 +1595,21 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                                     if (WayUtils.isSuitableForBuses(w)) {
                                         fixVariants.add(w);
                                     }
-                                } else if (relation.hasTag("route","bicycle")) {
+                                } else if (relation.hasTag("route", "bicycle")) {
                                     if (WayUtils.isSuitableForBicycle(w)) {
                                         fixVariants.add(w);
                                     }
                                 }
-                            }else{
-                              if (relation.hasTag("route", "bus")) {
-                                  if (RouteUtils.isOnewayForPublicTransport(w)==0) {
-                                      fixVariants.add(w);
-                                  }
-                              } else if (relation.hasTag("route","bicycle")) {
-                                  if (RouteUtils.isOnewayForBicycles(w) == 0) {
-                                      fixVariants.add(w);
-                                  }
-                              }
+                            } else {
+                                if (relation.hasTag("route", "bus")) {
+                                    if (RouteUtils.isOnewayForPublicTransport(w) == 0) {
+                                        fixVariants.add(w);
+                                    }
+                                } else if (relation.hasTag("route", "bicycle")) {
+                                    if (RouteUtils.isOnewayForBicycles(w) == 0) {
+                                        fixVariants.add(w);
+                                    }
+                                }
                             }
                         }
                     }
@@ -1623,6 +1623,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             }
         }
     }
+
     public Way findWayAfterChunk(Way way) {
         Way w1 = null;
         Way wayToKeep = null;
