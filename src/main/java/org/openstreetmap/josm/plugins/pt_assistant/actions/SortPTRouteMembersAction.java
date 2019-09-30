@@ -634,7 +634,6 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 node1 = findFirstCommonNode(curr, prev);
             }
             if (i < wayMembers.size() - 1) {
-                RelationMember pk = wayMembers.get(i + 1);
                 next = wayMembers.get(i + 1).getWay();
                 node2 = findFirstCommonNode(curr, next);
             }

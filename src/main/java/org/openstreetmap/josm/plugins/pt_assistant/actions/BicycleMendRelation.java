@@ -48,7 +48,6 @@ import org.openstreetmap.josm.tools.Utils;
  *
  * @author Ashish Singh
  */
-
 public class BicycleMendRelation extends MendRelationAction {
 
     ////////////////////////Assigning Variables///////////////
@@ -636,8 +635,6 @@ public class BicycleMendRelation extends MendRelationAction {
                     }
                 }
             }
-            List<Node> n = new ArrayList<>();
-            n.add(nod);
             super.currentNode = nod;
             if (fixVariants.size() > 0) {
                 displayBacktrackFixVariant(fixVariants, idx);
@@ -649,7 +646,6 @@ public class BicycleMendRelation extends MendRelationAction {
 
     @Override
     public Way findWayAfterChunk(Way way) {
-        Way w2 = null;
         Way w1 = null;
         Way wayToKeep = null;
         List<Node> breakNode = new ArrayList<>();
