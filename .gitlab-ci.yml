@@ -1,0 +1,26 @@
+image: alpine:3.10
+
+stages:
+  - deploy
+  - trigger
+
+pages:
+  stage: deploy
+  environment:
+    name: pages site
+    url: https://josm.gitlab.io/plugin/pt_assistant
+  script:
+    - mkdir .public
+    - cp -r * .public
+    - mv .public public
+  artifacts:
+    paths:
+      - public
+  only:
+    - pages@JOSM/plugin/pt_assistant
+
+trigger update site:
+  stage: trigger
+  trigger: JOSM/josm.gitlab.io
+  only:
+    - pages@JOSM/plugin/pt_assistant
