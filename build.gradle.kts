@@ -5,16 +5,15 @@ import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 plugins {
   java
   jacoco
-  id("org.openstreetmap.josm") version "0.5.3"
-  id("com.github.ben-manes.versions") version "0.20.0"
+  id("org.openstreetmap.josm") version "0.6.5"
+  id("com.github.ben-manes.versions") version "0.27.0"
 }
 
 object Versions {
-  const val awaitility = "3.1.2"
+  const val awaitility = "4.0.1"
   const val jacoco = "0.8.2"
-  const val gradleJosmPlugin = "0.5.3"
-  const val junit = "5.3.1"
-  const val wiremock = "2.19.0"
+  const val junit = "5.5.2"
+  const val wiremock = "2.25.1"
 }
 
 repositories {
