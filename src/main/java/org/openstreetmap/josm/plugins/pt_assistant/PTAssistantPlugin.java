@@ -27,6 +27,7 @@ import org.openstreetmap.josm.gui.preferences.PreferenceSetting;
 import org.openstreetmap.josm.plugins.Plugin;
 import org.openstreetmap.josm.plugins.PluginInformation;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.CustomizeStopAction;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.AddNearestWayAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.AddStopPositionAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.CreatePlatformNodeAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.CreatePlatformNodeThroughReplaceAction;
@@ -194,7 +195,15 @@ public class PTAssistantPlugin extends Plugin {
                 return Arrays.asList(new SortPTRouteMembersAction(editorAccess));
             }
         };
+        IRelationEditorActionGroup group3 = new IRelationEditorActionGroup() {
+            @Override
+            public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
+                return Arrays.asList(new AddNearestWayAction(editorAccess));
+            }
+        };
         RelationEditorHooks.addActionsToMembers(group1);
         RelationEditorHooks.addActionsToMembers(group2);
+        RelationEditorHooks.addActionsToMembers(group3);
+
     }
 }
