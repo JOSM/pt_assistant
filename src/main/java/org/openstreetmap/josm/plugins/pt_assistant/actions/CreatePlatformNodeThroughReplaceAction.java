@@ -25,12 +25,7 @@ import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.coor.EastNorth;
-import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.OsmData;
-import org.openstreetmap.josm.data.osm.OsmPrimitive;
-import org.openstreetmap.josm.data.osm.Relation;
-import org.openstreetmap.josm.data.osm.RelationMember;
-import org.openstreetmap.josm.data.osm.RelationToChildReference;
+import org.openstreetmap.josm.data.osm.*;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.Notification;
@@ -81,7 +76,7 @@ public class CreatePlatformNodeThroughReplaceAction extends JosmAction {
         final OsmDataLayer editLayer = getLayerManager().getEditLayer();
         if (editLayer != null) {
             final Optional<Node> stopPositionNode = Optional.ofNullable(editLayer.getDataSet()) // dataset
-                .map(OsmData::getSelected) // selection
+                .map(DataSet::getSelected) // selection
                 .filter(it -> it.size() == 1) // only when exactly one primitive
                 .map(it -> it.iterator().next()) // get first and only one
                 .map(it -> it instanceof Node ? (Node) it : null) // only if it's a node
@@ -94,7 +89,7 @@ public class CreatePlatformNodeThroughReplaceAction extends JosmAction {
                 );
 
                 Optional.ofNullable(editLayer.getDataSet())
-                    .map(OsmData::getSelected)
+                    .map(DataSet::getSelected)
                     .flatMap(newSelection ->
                         newSelection.stream()
                             .map(primitive -> primitive instanceof Node ? (Node) primitive : null)
