@@ -147,7 +147,6 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 break;
             }
         }
-        RightAndLefthandTraffic.initialize();
         rightSide = RightAndLefthandTraffic.isRightHandTraffic(locat);
 
         sortPTRouteMembers(newRel);
