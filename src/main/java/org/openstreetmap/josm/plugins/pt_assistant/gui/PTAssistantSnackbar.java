@@ -5,10 +5,17 @@ package org.openstreetmap.josm.plugins.pt_assistant.gui;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.GridBagLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
 
+import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.widgets.JMultilineLabel;
+import org.openstreetmap.josm.tools.GBC;
+import org.openstreetmap.josm.gui.MapFrame;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
@@ -25,25 +32,36 @@ public class PTAssistantSnackbar extends JPanel {
      * @param message the plain text string to be displayed
      * @param delay time the message should be displayed for, set it to -1 for infinite (persist message)
      */
-    protected void showSnackbar(String message, long delay) {
+    public PTAssistantSnackbar(String message, long delay) {
         Font font = getFont().deriveFont(Font.PLAIN, 14.0f);
         JMultilineLabel snackBarLabel = new JMultilineLabel(tr(message));
         snackBarLabel.setFont(font);
         snackBarLabel.setForeground(Color.BLACK);
 
         // todo : replace the text with the close icon
-        JButton closeButton = new JButton("x");
+        JButton closeBtn = new JButton("x");
 
         // set button to transparent, rollover-able, and no border
-        closeButton.setContentAreaFilled(false);
-        closeButton.setRolloverEnabled(true);
-        closeButton.setBorderPainted(false);
+        closeBtn.setContentAreaFilled(false);
+        closeBtn.setRolloverEnabled(true);
+        closeBtn.setBorderPainted(false);
 
-        closeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        closeButton.setToolTipText(tr("Close this message"));
+        closeBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        closeBtn.setToolTipText(tr("Close this message"));
 
-        closeButton.addActionListener(e -> {
+        closeBtn.addActionListener(e -> {
             // todo : remove the message
         });
+
+        setLayout(new GridBagLayout());
+        add(snackBarLabel, GBC.std(1, 1).fill());
+        add(closeBtn, GBC.std(3, 1).anchor(GBC.EAST));
+        setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EmptyBorder(12, 12, 12, 12)));
+        setBackground(new Color(224, 236, 249));
+    }
+
+    public static void addBar() {
+        MapFrame map = MainApplication.getMap();
+        map.addTopPanel(new PTAssistantSnackbar("Downloading files ....", 0));
     }
 }
