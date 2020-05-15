@@ -25,7 +25,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
  *
  * @author sudhanshu2
  */
-public class PTAssistantSnackbar {
+public class PTAssistantSnackbar extends JPanel {
 
     /**
      * Creates a snackbar
@@ -33,10 +33,8 @@ public class PTAssistantSnackbar {
      * @param message the plain text string to be displayed
      * @param delay time the message should be displayed for, set it to -1 for infinite (persist message)
      */
-    public static void addSnackbar(String message, long delay) {
-        JPanel snackbarPanel = new JPanel();
-
-        Font font = snackbarPanel.getFont().deriveFont(Font.PLAIN, 14.0f);
+    public PTAssistantSnackbar(String message, long delay) {
+        Font font = getFont().deriveFont(Font.PLAIN, 14.0f);
         JMultilineLabel snackBarLabel = new JMultilineLabel(tr(message));
         snackBarLabel.setFont(font);
         snackBarLabel.setForeground(Color.BLACK);
@@ -55,13 +53,15 @@ public class PTAssistantSnackbar {
             // todo : remove the message
         });
 
-        snackbarPanel.setLayout(new GridBagLayout());
-        snackbarPanel.add(snackBarLabel, GBC.std(1, 1).fill());
-        snackbarPanel.add(closeBtn, GBC.std(1 , 1).span(1, 1).anchor(GBC.EAST));
-        snackbarPanel.setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EmptyBorder(12, 12, 12, 12)));
-        snackbarPanel.setBackground(new Color(224, 236, 249));
+        setLayout(new GridBagLayout());
+        add(snackBarLabel, GBC.std(1, 1).fill());
+        add(closeBtn, GBC.std(2 , 1).span(1, 1).anchor(GBC.EAST));
+        setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EmptyBorder(12, 12, 12, 12)));
+        setBackground(new Color(224, 236, 249));
 
         MapFrame map = MainApplication.getMap();
-        map.addTopPanel(snackbarPanel);
+        map.addTopPanel(this);
     }
+
+
 }

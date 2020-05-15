@@ -98,7 +98,7 @@ public class PTAssistantPlugin extends Plugin {
             MainApplication.getMap().addMapMode(new IconToggleButton(new AddStopPositionAction()));
             MainApplication.getMap().addMapMode(new IconToggleButton(new EdgeSelectionAction()));
             MainApplication.getMap().addMapMode(new IconToggleButton(new DoubleSplitAction()));
-            PTAssistantSnackbar.addSnackbar("Downloading files...", 0);
+            new PTAssistantSnackbar("Downloading files...", 0);
         }
     }
 
