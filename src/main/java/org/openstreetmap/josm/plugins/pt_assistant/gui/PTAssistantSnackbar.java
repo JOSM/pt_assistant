@@ -16,6 +16,7 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.widgets.JMultilineLabel;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.gui.MapFrame;
+import org.openstreetmap.josm.tools.ImageProvider;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
@@ -24,7 +25,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
  *
  * @author sudhanshu2
  */
-public class PTAssistantSnackbar extends JPanel {
+public class PTAssistantSnackbar {
 
     /**
      * Creates a snackbar
@@ -32,14 +33,15 @@ public class PTAssistantSnackbar extends JPanel {
      * @param message the plain text string to be displayed
      * @param delay time the message should be displayed for, set it to -1 for infinite (persist message)
      */
-    public PTAssistantSnackbar(String message, long delay) {
-        Font font = getFont().deriveFont(Font.PLAIN, 14.0f);
+    public static void addSnackbar(String message, long delay) {
+        JPanel snackbarPanel = new JPanel();
+
+        Font font = snackbarPanel.getFont().deriveFont(Font.PLAIN, 14.0f);
         JMultilineLabel snackBarLabel = new JMultilineLabel(tr(message));
         snackBarLabel.setFont(font);
         snackBarLabel.setForeground(Color.BLACK);
 
-        // todo : replace the text with the close icon
-        JButton closeBtn = new JButton("x");
+        JButton closeBtn = new JButton(ImageProvider.get("misc", "black_x"));
 
         // set button to transparent, rollover-able, and no border
         closeBtn.setContentAreaFilled(false);
@@ -53,15 +55,13 @@ public class PTAssistantSnackbar extends JPanel {
             // todo : remove the message
         });
 
-        setLayout(new GridBagLayout());
-        add(snackBarLabel, GBC.std(1, 1).fill());
-        add(closeBtn, GBC.std(3, 1).anchor(GBC.EAST));
-        setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EmptyBorder(12, 12, 12, 12)));
-        setBackground(new Color(224, 236, 249));
-    }
+        snackbarPanel.setLayout(new GridBagLayout());
+        snackbarPanel.add(snackBarLabel, GBC.std(1, 1).fill());
+        snackbarPanel.add(closeBtn, GBC.std(1 , 1).span(1, 1).anchor(GBC.EAST));
+        snackbarPanel.setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EmptyBorder(12, 12, 12, 12)));
+        snackbarPanel.setBackground(new Color(224, 236, 249));
 
-    public static void addBar() {
         MapFrame map = MainApplication.getMap();
-        map.addTopPanel(new PTAssistantSnackbar("Downloading files ....", 0));
+        map.addTopPanel(snackbarPanel);
     }
 }
