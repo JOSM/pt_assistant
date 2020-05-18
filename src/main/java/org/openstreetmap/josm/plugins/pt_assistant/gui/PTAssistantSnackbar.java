@@ -2,6 +2,8 @@
 
 package org.openstreetmap.josm.plugins.pt_assistant.gui;
 
+import static org.openstreetmap.josm.tools.I18n.tr;
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -20,8 +22,6 @@ import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.tools.ImageProvider;
-
-import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
  * Snackbars (or useful messages) that are displayed on the bottom of the map
@@ -82,7 +82,7 @@ public class PTAssistantSnackbar extends JPanel {
         }
     }
 
-    /* TODO: Removes 'a' component of type PTSnackBar instead of this specific instance of it */
+    /* TODO: It currently removes a component of type PTSnackbar instead of this specific instance of it */
 
     /**
      * Removes this snackbar instance
