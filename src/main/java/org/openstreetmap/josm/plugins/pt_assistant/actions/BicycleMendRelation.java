@@ -120,9 +120,9 @@ public class BicycleMendRelation extends MendRelationAction {
         return str.append(");\n(._;<;);\n(._;>;);\nout meta;").toString();
     }
 
-    ////////calling the nextway /////////
-    //this function has to iterate over all super.members of relation table doesn't matter they are broken or not
-    //so after every filtering this function has to be called with super.currentIndex+1
+    /** this function has to iterate over all super.members of relation table doesn't matter they are broken or not
+     * so after every filtering this function has to be called with super.currentIndex + 1
+     */
     @Override
     public void callNextWay(int idx) {
         save();
@@ -498,8 +498,10 @@ public class BicycleMendRelation extends MendRelationAction {
             }
         }
 
-        // check if one of the way's intermediate node equals the first or last node of next way,
-        // if so then break it(finally split in method getNextWayAfterSelection if the way is chosen)
+        /*
+         * check if one of the way's intermediate node equals the first or last node of next way,
+         * if so then break it(finally split in method getNextWayAfterSelection if the way is chosen)
+         */
         for (Way w : parentWays) {
             Node nextWayNode = null;
             if (w.getNodes().contains(super.nextWay.firstNode()) && !w.isFirstLastNode(super.nextWay.firstNode())) {
@@ -663,8 +665,7 @@ public class BicycleMendRelation extends MendRelationAction {
 
     @Override
     void backtrackCurrentEdge() {
-        Way backTrackWay = super.currentWay;
-        Way way = backTrackWay;
+        Way way = super.currentWay;
         super.backnodes = way.getNodes();
         if (super.currentNode == null) {
             super.currentNode = super.currentWay.lastNode();
