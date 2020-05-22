@@ -11,7 +11,7 @@ import org.openstreetmap.josm.gui.Notification;
 
 public final class NotificationUtils {
     private NotificationUtils() {
-        // Private constructor to avoid instatiation
+        /* Private constructor to avoid instantiation */
     }
 
     /**

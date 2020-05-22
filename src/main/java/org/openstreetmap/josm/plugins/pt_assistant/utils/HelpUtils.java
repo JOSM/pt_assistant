@@ -19,7 +19,7 @@ import java.awt.Font;
 import java.awt.GridBagLayout;
 
 /**
- * Snackbars (or useful messages) that are displayed on the bottom of the map
+ * Help messages that are displayed on the bottom of the map
  *
  * @author sudhanshu2
  */
