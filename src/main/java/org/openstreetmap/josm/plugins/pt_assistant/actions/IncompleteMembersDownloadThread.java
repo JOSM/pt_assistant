@@ -12,7 +12,6 @@ import org.openstreetmap.josm.data.osm.PrimitiveId;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.io.DownloadPrimitivesWithReferrersTask;
-import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantSnackbar;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 import org.openstreetmap.josm.tools.Logging;
@@ -34,7 +33,6 @@ public class IncompleteMembersDownloadThread extends Thread {
 
     @Override
     public void run() {
-        PTAssistantSnackbar downloadingSnackbar = new PTAssistantSnackbar("Downloading incomplete maps...", -1);
         try {
             synchronized (this) {
 
@@ -85,12 +83,9 @@ public class IncompleteMembersDownloadThread extends Thread {
                 t.start();
                 t.join();
             }
-            downloadingSnackbar.removeSnackbar();
         } catch (InterruptedException e) {
             // do nothing in case the download was interrupted
             Logging.trace(e);
-            downloadingSnackbar.removeSnackbar();
-            new PTAssistantSnackbar("Download interrupted", -1);
         }
 
     }
