@@ -33,8 +33,13 @@ public class HelpUtils {
         /* Empty to prevent initialization */
     }
 
+    /**
+     * Adds a help message on the top edge of the map window, persists and the message is updated if the UI element already exists
+     * @param message the string to be displayed
+     */
     public void addToJOSM(String message) {
         if (!doNotShow.get()) {
+            removePanel();
             Font font = currentPanel.getFont().deriveFont(Font.PLAIN, 14.0f);
             JMultilineLabel snackBarLabel = new JMultilineLabel(message);
             snackBarLabel.setFont(font);
@@ -55,7 +60,7 @@ public class HelpUtils {
             closeBtn.setToolTipText(tr("Close this message"));
 
             closeBtn.addActionListener(e -> {
-                removeSnackbar();
+                removePanel();
                 if (doNotShowBox.isSelected()) {
                     doNotShow.put(Boolean.TRUE);
                 }
@@ -73,9 +78,9 @@ public class HelpUtils {
     }
 
     /**
-     * Removes this snackbar instance
+     * Removes this message
      */
-    public void removeSnackbar() {
+    public void removePanel() {
         MapFrame map = MainApplication.getMap();
         // map.removeTopPanel(currentPanel);
     }

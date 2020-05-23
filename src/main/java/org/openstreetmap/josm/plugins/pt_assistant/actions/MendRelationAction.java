@@ -493,8 +493,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     int getNextWayIndex(int idx) {
-        int j = members.size();
-
+        int j;
         for (j = idx + 1; j < members.size(); j++) {
             if (members.get(j).isWay())
                 break;
@@ -503,11 +502,10 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     int getPreviousWayIndex(int idx) {
-        int j;
-
-        for (j = idx - 1; j >= 0; j--) {
-            if (members.get(j).isWay())
+        for (int j = idx - 1; j >= 0; j--) {
+            if (members.get(j).isWay()) {
                 return j;
+            }
         }
         return -1;
     }
@@ -599,41 +597,38 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
     }
 
-    Way findNextWayBeforeDownload(Way way, Node node) {
+    void findNextWayBeforeDownload(Way way, Node node) {
         nextIndex = false;
         DataSet ds = MainApplication.getLayerManager().getEditDataSet();
         ds.setSelected(way);
         AutoScaleAction.zoomTo(Collections.singletonList(way));
         downloadAreaAroundWay(way, node, null);
-        return null;
     }
 
-    Way findNextWayBeforeDownload(Way way, Node node1, Node node2) {
+    void findNextWayBeforeDownload(Way way, Node node1, Node node2) {
         nextIndex = false;
         AutoScaleAction.zoomTo(Collections.singletonList(way));
         downloadAreaAroundWay(way, node1, node2);
-        return null;
     }
 
-    Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
+    void findNextWayAfterDownload(Way way, Node node1, Node node2) {
         currentWay = way;
-        if (abort)
-            return null;
+        if (abort) {
+            return;
+        }
 
         List<Way> parentWays = findNextWay(way, node1);
-        if (node2 != null)
+        if (node2 != null) {
             parentWays.addAll(findNextWay(way, node2));
+        }
 
         List<List<Way>> directRoute = getDirectRouteBetweenWays(currentWay, nextWay);
-        if (directRoute == null || directRoute.size() == 0)
-            showOption0 = false;
-        else
-            showOption0 = true;
+        showOption0 = directRoute != null && directRoute.size() != 0;
 
         if (directRoute != null && directRoute.size() > 0 && !shorterRoutes && parentWays.size() > 0
                 && notice == null) {
             displayFixVariantsWithOverlappingWays(directRoute);
-            return null;
+            return;
         }
 
         if (parentWays.size() == 1) {
@@ -648,10 +643,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 deleteExtraWays();
             } else {
                 callNextWay(++currentIndex);
-                return null;
             }
         }
-        return null;
     }
 
     List<List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
@@ -841,6 +834,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             displayFixVariantsWithOverlappingWays(lst);
         }
     }
+
 
     List<Way> findNextWay(Way way, Node node) {
         List<Way> parentWays = node.getParentWays();
