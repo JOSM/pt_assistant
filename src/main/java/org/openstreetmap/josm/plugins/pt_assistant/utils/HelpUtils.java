@@ -18,23 +18,24 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 
+/* TODO : https://github.com/JOSM/pt_assistant/pull/12#discussion_r428548822 */
+
 /**
  * Help messages that are displayed on the bottom of the map
  *
  * @author sudhanshu2
  */
-public class HelpUtils extends JPanel {
-
-    private static final HelpUtils ClassInstance = new HelpUtils();
+public class HelpUtils {
     private static final BooleanProperty doNotShow = new BooleanProperty("message.ptassistant.helputil", false);
+    private static final JPanel currentPanel = new JPanel();
 
     private HelpUtils() {
         /* Empty to prevent initialization */
     }
 
     public void addToJOSM(String message) {
-        if (doNotShow.get() == Boolean.FALSE) {
-            Font font = getFont().deriveFont(Font.PLAIN, 14.0f);
+        if (!doNotShow.get()) {
+            Font font = currentPanel.getFont().deriveFont(Font.PLAIN, 14.0f);
             JMultilineLabel snackBarLabel = new JMultilineLabel(message);
             snackBarLabel.setFont(font);
             snackBarLabel.setForeground(Color.BLACK);
@@ -60,14 +61,14 @@ public class HelpUtils extends JPanel {
                 }
             });
 
-            setLayout(new GridBagLayout());
-            add(snackBarLabel, GBC.std(1, 1).fill());
-            add(closeBtn, GBC.std(2, 1).span(1, 1).anchor(GBC.EAST));
-            setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EmptyBorder(12, 12, 12, 12)));
-            setBackground(new Color(224, 236, 249));
+            currentPanel.setLayout(new GridBagLayout());
+            currentPanel.add(snackBarLabel, GBC.std(1, 1).fill());
+            currentPanel.add(closeBtn, GBC.std(2, 1).span(1, 1).anchor(GBC.EAST));
+            currentPanel.setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EmptyBorder(12, 12, 12, 12)));
+            currentPanel.setBackground(new Color(224, 236, 249));
 
             MapFrame map = MainApplication.getMap();
-            map.addTopPanel(this);
+            map.addTopPanel(currentPanel);
         }
     }
 
@@ -76,6 +77,6 @@ public class HelpUtils extends JPanel {
      */
     public void removeSnackbar() {
         MapFrame map = MainApplication.getMap();
-        map.removeTopPanel(this.getClass());
+        // map.removeTopPanel(currentPanel);
     }
 }

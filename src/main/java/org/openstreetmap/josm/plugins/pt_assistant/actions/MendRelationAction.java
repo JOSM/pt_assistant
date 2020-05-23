@@ -814,7 +814,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 return;
             }
             downloadAreaAroundWay(parents.get(0), way, wayList);
-            return;
         } else if (parents.size() > 1) {
             // keep the most probable option s option A
             Way minWay = parents.get(0);
@@ -837,11 +836,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             }
 
             displayFixVariantsWithOverlappingWays(lst);
-            return;
         } else {
             lst.add(wayList);
             displayFixVariantsWithOverlappingWays(lst);
-            return;
         }
     }
 
@@ -883,25 +880,28 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     boolean checkIfWayConnectsToNextWay(Way way, int count, Node node) {
-
         if (count < 50) {
-            if (way.equals(nextWay))
+            if (way.equals(nextWay)) {
                 return true;
-
+            }
             // check if way;s intermediate node is next way's first or last node
-            if (way.getNodes().contains(nextWay.firstNode()) || way.getNodes().contains(nextWay.lastNode()))
+            if (way.getNodes().contains(nextWay.firstNode()) || way.getNodes().contains(nextWay.lastNode())) {
                 return true;
+            }
 
             node = getOtherNode(way, node);
             List<Way> parents = node.getParentWays();
-            if (parents.size() != 1)
+
+            if (parents.size() != 1) {
                 return false;
-            else
+            } else {
                 way = parents.get(0);
+            }
 
             count += 1;
-            if (checkIfWayConnectsToNextWay(way, count, node))
+            if (checkIfWayConnectsToNextWay(way, count, node)) {
                 return true;
+            }
         }
         return false;
     }
@@ -1552,8 +1552,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     }
 
     void backtrackCurrentEdge() {
-        Way backTrackWay = currentWay;
-        Way way = backTrackWay;
+        Way way = currentWay;
         backnodes = way.getNodes();
         if (currentNode == null) {
             currentNode = currentWay.lastNode();
@@ -2049,7 +2048,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                             prev = w;
                             ind++;
                         }
-
                     } else if (!brk) {
                         Logging.debug("none");
                     }
