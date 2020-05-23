@@ -809,15 +809,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             downloadAreaAroundWay(parents.get(0), way, wayList);
         } else if (parents.size() > 1) {
             // keep the most probable option s option A
-            Way minWay = parents.get(0);
-            double minLength = findDistance(minWay, nextWay, node);
-            for (int k = 1; k < parents.size(); k++) {
-                double length = findDistance(parents.get(k), nextWay, node);
-                if (minLength > length) {
-                    minLength = length;
-                    minWay = parents.get(k);
-                }
-            }
+            Way minWay = minimumDistanceWay(node, parents);
             parents.remove(minWay);
             parents.add(0, minWay);
 
@@ -833,6 +825,25 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             lst.add(wayList);
             displayFixVariantsWithOverlappingWays(lst);
         }
+    }
+
+    /**
+     *
+     * @param node
+     * @param parents
+     * @return
+     */
+    private Way minimumDistanceWay(Node node, List<Way> parents) {
+        Way minWay = parents.get(0);
+        double minLength = findDistance(minWay, nextWay, node);
+        for (int k = 1; k < parents.size(); k++) {
+            double length = findDistance(parents.get(k), nextWay, node);
+            if (minLength > length) {
+                minLength = length;
+                minWay = parents.get(k);
+            }
+        }
+        return minWay;
     }
 
 
@@ -853,16 +864,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 .orElse(null);
 
         if (frontWay == null && parentWays.size() > 0) {
-            Way minWay = parentWays.get(0);
-            double minLength = findDistance(minWay, nextWay, node);
-            for (int i = 1; i < parentWays.size(); i++) {
-                double length = findDistance(parentWays.get(i), nextWay, node);
-                if (minLength > length) {
-                    minLength = length;
-                    minWay = parentWays.get(i);
-                }
-            }
-            frontWay = minWay;
+            frontWay = minimumDistanceWay(node, parentWays);
         }
 
         if (frontWay != null) {
