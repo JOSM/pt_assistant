@@ -318,26 +318,23 @@ public class BicycleMendRelation extends MendRelationAction {
     }
 
     @Override
-    Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
+    void findNextWayAfterDownload(Way way, Node node1, Node node2) {
         // TODO Auto-generated method stub
         super.currentWay = way;
-        if (super.abort)
-            return null;
+        if (super.abort) {
+            return;
+        }
         List<Way> parentWays = findNextWay(way, node1);
 
         if (node2 != null) {
             parentWays.addAll(findNextWay(way, node2));
         }
         directroutes = getDirectRouteBetweenWays(super.currentWay, super.nextWay);
-        if (directroutes == null || directroutes.size() == 0) {
-            super.showOption0 = false;
-        } else {
-            super.showOption0 = true;
-        }
+        super.showOption0 = directroutes != null && directroutes.size() != 0;
         if (directroutes != null && directroutes.size() > 0 && !super.shorterRoutes && parentWays.size() > 0
                 && super.notice == null) {
             displayFixVariantsWithOverlappingWays(directroutes);
-            return null;
+            return;
         }
         if (parentWays.size() == 1) {
             goToNextWays(parentWays.get(0), way, new ArrayList<>());
@@ -351,10 +348,8 @@ public class BicycleMendRelation extends MendRelationAction {
                 makeNodesZeros();
             } else {
                 callNextWay(++super.currentIndex);
-                return null;
             }
         }
-        return null;
     }
 
     @Override
