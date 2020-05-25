@@ -5,7 +5,7 @@ import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
 plugins {
   java
   jacoco
-  id("org.openstreetmap.josm") version "0.6.5"
+  id("org.openstreetmap.josm") version "0.7.0"
   id("com.github.ben-manes.versions") version "0.27.0"
 }
 
