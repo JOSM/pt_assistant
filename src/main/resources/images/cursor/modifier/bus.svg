@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32" width="16" height="16" version="1.1">
+<!-- Based on https://commons.wikimedia.org/wiki/File:Aiga_bus.svg (public domain) -->
+<use xlink:href="#shape" stroke-width="3.6" stroke="#fff" />
+<path id="shape" d="M9.6 26.6v2a1.6 1.6 0 0 1-3.2 0v-2h-2v-12L5.6 6q.5-2 2.9-2.8 4.9-1.3 7.5-1.3 2.6 0 7.5 1.3 2.8.7 2.9 2.8l1.2 8.6v12h-2v2a1.6 1.6 0 0 1-3.2 0v-2zM11.3 4a.7.7 0 0 0 0 1.4h9.4a.7.7 0 0 0 0-1.4zM8.6 6.8c-.2 0-1.1 0-1.3 1.3l-.8 6.5q-.1 1 .9 1h17.2s1 0 1-1l-.9-6.5q-.2-1.3-1.3-1.3zM8 19.7a1.6 1.6 0 0 0 0 3.2 1.6 1.6 0 0 0 0-3.2zm16 0a1.6 1.6 0 0 0 0 3.2 1.6 1.6 0 0 0 0-3.2z" fill="#000"/>
+</svg>
+
