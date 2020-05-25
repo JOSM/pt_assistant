@@ -826,13 +826,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             displayFixVariantsWithOverlappingWays(lst);
         }
     }
-
-    /**
-     *
-     * @param node
-     * @param parents
-     * @return
-     */
+    
     private Way minimumDistanceWay(Node node, List<Way> parents) {
         Way minWay = parents.get(0);
         double minLength = findDistance(minWay, nextWay, node);
