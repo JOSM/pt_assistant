@@ -92,7 +92,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
      * Creates a new DoubleSplitAction
      */
     public DoubleSplitAction() {
-        super(tr("Double Split"), "logo_double_split", tr("Double Split"), null, getCursor());
+        super(tr("Double Split"), "double_split", tr("Double Split"), null, getCursor());
         cursorJoinNode = ImageProvider.getCursor("crosshair", "joinnode");
         cursorJoinWay = ImageProvider.getCursor("crosshair", "joinway");
 
