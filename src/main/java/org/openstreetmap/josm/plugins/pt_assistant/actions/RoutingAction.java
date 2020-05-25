@@ -41,7 +41,6 @@ public class RoutingAction extends AbstractRelationEditorAction{
     updateEnabledState();
     editor = (GenericRelationEditor) editorAccess.getEditor();
     this.relation = editor.getRelation();
-    editor.addWindowListener(new WindowEventHandler());
   }
   @Override
   protected void updateEnabledState() {
@@ -93,7 +92,5 @@ public class RoutingAction extends AbstractRelationEditorAction{
               Logging.error(e1);
           }
       });
-  }
-  static class WindowEventHandler extends WindowAdapter {
   }
 }

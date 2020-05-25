@@ -8,6 +8,7 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JMenu;
@@ -198,7 +199,7 @@ public class PTAssistantPlugin extends Plugin {
         IRelationEditorActionGroup group3 = new IRelationEditorActionGroup() {
             @Override
             public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
-                return Arrays.asList(new AddNearestWayAction(editorAccess));
+                return Collections.singletonList(new AddNearestWayAction(editorAccess));
             }
         };
         RelationEditorHooks.addActionsToMembers(group1);
