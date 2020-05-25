@@ -28,7 +28,7 @@ public class PTRouteDataManager {
 
     /* The route relation */
     public Relation relation;
-    // EdgeDataManager edges;
+
     /* Stores all relation members that are PTStops */
     public List<PTStop> ptStops = new ArrayList<>();
 

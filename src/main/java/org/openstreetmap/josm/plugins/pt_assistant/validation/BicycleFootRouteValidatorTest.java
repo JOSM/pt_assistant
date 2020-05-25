@@ -24,11 +24,9 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 public class BicycleFootRouteValidatorTest extends Test {
 
     public static final int ERROR_CODE_CONTINUITY = 3701;
-    // List<RelationMember> members;
+
     public BicycleFootRouteValidatorTest() {
         super(tr("Bicycle and foot routes Tests"));
-        // members.removeIf(m -> !m.isWay());
-//        System.out.println("Bicycle and foot routes Tests");
     }
 
     @Override
@@ -61,10 +59,7 @@ public class BicycleFootRouteValidatorTest extends Test {
         List<Integer> gaps = new ArrayList<>();
 
         for (int i = 0; i < links.size() -1; i++) {
-//          System.out.println("printing way id: "+members.get(i).getWay().getUniqueId());
-//          System.out.println("printing nextway id: "+members.get(i+1).getWay().getUniqueId());
             if (!links.get(i).linkNext) {
-//              System.out.println("Isconnection: "+links.get(i).linkNext);
                 gaps.add(i);
             }
         }
