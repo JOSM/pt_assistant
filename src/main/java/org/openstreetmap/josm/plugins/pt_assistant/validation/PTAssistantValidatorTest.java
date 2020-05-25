@@ -233,10 +233,6 @@ public class PTAssistantValidatorTest extends Test {
      */
     private int showIncompleteMembersDownloadDialog() throws InterruptedException {
         return PTProperties.DOWNLOAD_INCOMPLETE.get() ? JOptionPane.YES_OPTION : JOptionPane.NO_OPTION;
-
-        // TODO: The following is dead code! Either revive it or throw it away.
-        // IncompleteMembersDownloadDialog incompleteMembersDownloadDialog = new IncompleteMembersDownloadDialog();
-        // return incompleteMembersDownloadDialog.getUserSelection();
     }
 
     /**
@@ -307,17 +303,11 @@ public class PTAssistantValidatorTest extends Test {
     }
 
     private static int showProceedDialog(long id, int numberOfDirectionErrors, int numberOfRoadTypeErrors) {
-
         if (numberOfDirectionErrors == 0 && numberOfRoadTypeErrors == 0) {
             return 2;
         }
 
         return PTProperties.PROCEED_WITHOUT_FIX.get() ? 2 : 0;
-
-        // TODO: The following is dead code! Either revive it or throw it away.
-        // ProceedDialog proceedDialog = new ProceedDialog(id, numberOfDirectionErrors, numberOfRoadTypeErrors);
-        // return proceedDialog.getUserSelection();
-
     }
 
     /**
