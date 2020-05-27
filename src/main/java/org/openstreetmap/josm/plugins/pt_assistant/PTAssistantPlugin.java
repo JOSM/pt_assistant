@@ -40,6 +40,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersAct
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersMenuBar;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SplitRoundaboutAction;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.ClickableRoutes;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.BicycleFootRouteValidatorTest;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.PTAssistantValidatorTest;
@@ -97,6 +98,7 @@ public class PTAssistantPlugin extends Plugin {
             MainApplication.getMap().addMapMode(new IconToggleButton(new AddStopPositionAction()));
             MainApplication.getMap().addMapMode(new IconToggleButton(new EdgeSelectionAction()));
             MainApplication.getMap().addMapMode(new IconToggleButton(new DoubleSplitAction()));
+            new ClickableRoutes().enterMode();
         }
     }
 

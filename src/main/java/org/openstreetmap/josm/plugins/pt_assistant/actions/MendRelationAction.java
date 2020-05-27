@@ -1399,6 +1399,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         temporaryLayer = new MendRelationAddLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
+        /* TODO : Move this temporary layer to ClickableRoutes */
+
         // // add the key listener:
         MainApplication.getMap().mapView.requestFocus();
         MainApplication.getMap().mapView.addKeyListener(new KeyAdapter() {
