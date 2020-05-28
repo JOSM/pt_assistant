@@ -15,6 +15,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.RuntimeException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,6 +29,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.naming.CannotProceedException;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -1359,8 +1361,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             return way.firstNode();
     }
 
-    void displayFixVariants(List<Way> fixVariants) {
-        // find the letters of the fix variants:
+    private List<Character> findLettersVariants(List<Way> fixVariants) throws CannotProceedException {
         char alphabet = 'A';
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
         wayColoring = new HashMap<>();
@@ -1389,8 +1390,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         // remove any existing temporary layer
         removeTemporarylayers();
 
-        if (abort)
-            return;
+        if (abort) {
+            throw new CannotProceedException("Aborted");
+        }
 
         // zoom to problem:
         AutoScaleAction.zoomTo(fixVariants);
@@ -1401,6 +1403,19 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         // // add the key listener:
         MainApplication.getMap().mapView.requestFocus();
+        return allowedCharacters;
+    }
+
+    void displayFixVariants(List<Way> fixVariants) {
+        final List<Character> allowedCharacters;
+        try {
+            allowedCharacters = findLettersVariants(fixVariants);
+        } catch (CannotProceedException e) {
+            return;
+        }
+
+        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
+
         MainApplication.getMap().mapView.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -1409,7 +1424,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     removeKeyListenerAndTemporaryLayer(this);
                     return;
                 }
-                Character typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
+                char typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
                 if (allowedCharacters.contains(typedKeyUpperCase)) {
                     int idx = typedKeyUpperCase - 65;
                     if (numeric) {
@@ -1504,11 +1519,11 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     removeKeyListenerAndTemporaryLayer(this);
                     return;
                 }
-                Character typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
+                char typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
                 if (allowedCharacters.contains(typedKeyUpperCase)) {
                     int idx = typedKeyUpperCase - 65;
                     if (numeric) {
-                        // for numpad numerics and the plain numerics
+                        // for numpad numbers and the plain numbers
                         if (typedKeyUpperCase <= 57)
                             idx = typedKeyUpperCase - 49;
                         else
