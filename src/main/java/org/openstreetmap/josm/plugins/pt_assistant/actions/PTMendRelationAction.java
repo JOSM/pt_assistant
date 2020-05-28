@@ -53,10 +53,16 @@ import org.openstreetmap.josm.data.osm.TagMap;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
+import org.openstreetmap.josm.gui.Notification;
+import org.openstreetmap.josm.gui.dialogs.relation.DownloadRelationMemberTask;
 import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
+import org.openstreetmap.josm.gui.dialogs.relation.MemberTableModel;
+import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
+import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
 import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
+import org.openstreetmap.josm.gui.layer.MapViewPaintable;
 import org.openstreetmap.josm.gui.layer.validation.PaintVisitor;
 import org.openstreetmap.josm.io.OverpassDownloadReader;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
@@ -65,47 +71,43 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.NotificationUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.GBC;
+import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
 import org.openstreetmap.josm.tools.Utils;
 
 /**
- * Implementation of {@code AbstractMendRelationAction} for Public
- * transit systems like PSV, buses, trains...
+ * Mend the relations by going through each way, sorting them and proposing
+ * fixes for the gaps that are found
  *
  * @author Biswesh
  */
 public class PTMendRelationAction extends AbstractMendRelationAction {
-    private static final DownloadParams DEFAULT_DOWNLOAD_PARAMS = new DownloadParams();
-
-    HashMap<Way, Integer> waysAlreadyPresent = null;
-    Way currentWay;
-    Way nextWay;
-
-    int currentIndex;
-    int downloadCounter;
 
 
     boolean firstCall = true;
-
-
     boolean shorterRoutes = false;
-    boolean onFly = false;
+
     Node prevCurrenNode = null;
     Node splitNode = null;
     HashMap<Way, Character> wayColoring;
     HashMap<Character, List<Way>> wayListColoring;
-
+    int nodeIdx = 0;
     String notice = null;
     List<Node> backnodes = new ArrayList<>();
 
+    /**
+     *
+     * @param editorAccess
+     */
     public PTMendRelationAction(IRelationEditorActionAccess editorAccess) {
-        super(editorAccess);
+        super(editorAccess, true);
     }
+
 
     protected void initialise() {
         save();
-        sortBelow(relation.getMembers(), 0);
+        sortBelow(relation.getMembers());
         members = editor.getRelation().getMembers();
 
         // halt is true indicates the action was paused
@@ -191,7 +193,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
 
     }
 
-    void callNextWay(int i) {
+    protected void callNextWay(int i) {
         Logging.debug("Index + " + i);
         downloadCounter++;
         if (i < members.size() && members.get(i).isWay()) {
@@ -329,14 +331,6 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         return node;
     }
 
-    void deleteExtraWays() {
-        int[] ints = extraWaysToBeDeleted.stream().mapToInt(Integer::intValue).toArray();
-        memberTableModel.remove(ints);
-        setEnable = true;
-        setEnabled(true);
-        halt = false;
-    }
-
     void removeWay(int j) {
         List<Integer> Int = new ArrayList<>();
         List<Way> lst = new ArrayList<>();
@@ -346,7 +340,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         // way, if so then remove them as well
         if (WayUtils.isOneWay(members.get(j).getWay())) {
             while (true) {
-                int k = getNextWayIndex(j);
+                int k = getnextWayIndex(j);
                 if (k == -1 || k >= members.size())
                     break;
 
@@ -366,17 +360,6 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         downloadAreaBeforeRemovalOption(lst, Int);
     }
 
-    List<Way> getListOfAllWays() {
-        List<Way> ways = new ArrayList<>();
-        for (int i = 0; i < members.size(); i++) {
-            if (members.get(i).isWay()) {
-                waysAlreadyPresent.put(members.get(i).getWay(), 1);
-                ways.add(members.get(i).getWay());
-            }
-        }
-        return ways;
-    }
-
     int getPreviousWayIndex(int idx) {
         int j;
 
@@ -385,15 +368,6 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
                 return j;
         }
         return -1;
-    }
-
-    void sortBelow(List<RelationMember> members, int index) {
-        RelationSorter relationSorter = new RelationSorter();
-        final List<RelationMember> subList = members.subList(Math.max(0, index), members.size());
-        final List<RelationMember> sorted = relationSorter.sortMembers(subList);
-        subList.clear();
-        subList.addAll(sorted);
-        memberTableModel.fireTableDataChanged();
     }
 
     void addNewWays(List<Way> ways, int i) {
@@ -441,22 +415,6 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
                 }
             }
         }
-    }
-
-    Way findNextWayBeforeDownload(Way way, Node node) {
-        nextIndex = false;
-        DataSet ds = MainApplication.getLayerManager().getEditDataSet();
-        ds.setSelected(way);
-        AutoScaleAction.zoomTo(Collections.singletonList(way));
-        downloadAreaAroundWay(way, node, null);
-        return null;
-    }
-
-    Way findNextWayBeforeDownload(Way way, Node node1, Node node2) {
-        nextIndex = false;
-        AutoScaleAction.zoomTo(Collections.singletonList(way));
-        downloadAreaAroundWay(way, node1, node2);
-        return null;
     }
 
     Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
@@ -602,91 +560,6 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
             }
         }
         return null;
-    }
-
-    void goToNextWays(Way way, Way prevWay, List<Way> wayList) {
-        List<List<Way>> lst = new ArrayList<>();
-        previousWay = prevWay;
-        Node node1 = null;
-        for (Node n : way.getNodes()) {
-            if (prevWay.getNodes().contains(n)) {
-                node1 = n;
-                break;
-            }
-        }
-
-        if (node1 == null) {
-            lst.add(wayList);
-            displayFixVariantsWithOverlappingWays(lst);
-            return;
-        }
-
-        // check if the way equals the next way, if so then don't add any new ways to the list
-        if (way == nextWay) {
-            lst.add(wayList);
-            displayFixVariantsWithOverlappingWays(lst);
-            return;
-        }
-
-        Node node = getOtherNode(way, node1);
-        wayList.add(way);
-        List<Way> parents = node.getParentWays();
-        parents.remove(way);
-
-        // if the ways directly touch the next way
-        if (way.isFirstLastNode(nextWay.firstNode()) || way.isFirstLastNode(nextWay.lastNode())) {
-            lst.add(wayList);
-            displayFixVariantsWithOverlappingWays(lst);
-            return;
-        }
-
-        // if next way turns out to be a roundabout
-        if (nextWay.containsNode(node) && nextWay.hasTag("junction", "roundabout")) {
-            lst.add(wayList);
-            displayFixVariantsWithOverlappingWays(lst);
-            return;
-        }
-
-        // remove all the invalid ways from the parent ways
-        parents = removeInvalidWaysFromParentWays(parents, node, way);
-
-        if (parents.size() == 1) {
-            // if (already the way exists in the ways to be added
-            if (wayList.contains(parents.get(0))) {
-                lst.add(wayList);
-                displayFixVariantsWithOverlappingWays(lst);
-                return;
-            }
-            downloadAreaAroundWay(parents.get(0), way, wayList);
-            return;
-        } else if (parents.size() > 1) {
-            // keep the most probable option s option A
-            Way minWay = parents.get(0);
-            double minLength = findDistance(minWay, nextWay, node);
-            for (int k = 1; k < parents.size(); k++) {
-                double length = findDistance(parents.get(k), nextWay, node);
-                if (minLength > length) {
-                    minLength = length;
-                    minWay = parents.get(k);
-                }
-            }
-            parents.remove(minWay);
-            parents.add(0, minWay);
-
-            // add all the list of ways to list of list of ways
-            for (int i = 0; i < parents.size(); i++) {
-                List<Way> wl = new ArrayList<>(wayList);
-                wl.add(parents.get(i));
-                lst.add(wl);
-            }
-
-            displayFixVariantsWithOverlappingWays(lst);
-            return;
-        } else {
-            lst.add(wayList);
-            displayFixVariantsWithOverlappingWays(lst);
-            return;
-        }
     }
 
     List<Way> findNextWay(Way way, Node node) {
@@ -927,91 +800,6 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         return (otherNode.lat() - Lat) * (otherNode.lat() - Lat) + (otherNode.lon() - Lon) * (otherNode.lon() - Lon);
     }
 
-    void downloadAreaAroundWay(Way way, Node node1, Node node2) {
-        if (abort)
-            return;
-
-        if ((downloadCounter > 160 || way.isOutsideDownloadArea() || way.isNew()) && onFly) {
-            downloadCounter = 0;
-
-            DownloadOsmTask task = new DownloadOsmTask();
-
-            BoundsUtils.createBoundsWithPadding(way.getBBox(), .4).ifPresent(area -> {
-                Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
-
-                MainApplication.worker.submit(() -> {
-                    try {
-                        NotificationUtils.downloadWithNotifications(future, tr("Area around way") + " (1)");
-                        findNextWayAfterDownload(way, node1, node2);
-                    } catch (InterruptedException | ExecutionException e1) {
-                        Logging.error(e1);
-                    }
-                });
-            });
-        } else {
-            findNextWayAfterDownload(way, node1, node2);
-        }
-    }
-
-    void downloadAreaAroundWay(Way way) {
-        if (abort)
-            return;
-
-        if (downloadCounter > 160 && onFly) {
-            downloadCounter = 0;
-
-            DownloadOsmTask task = new DownloadOsmTask();
-            BoundsUtils.createBoundsWithPadding(way.getBBox(), .1).ifPresent(area -> {
-                Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
-
-                MainApplication.worker.submit(() -> {
-                    try {
-                        NotificationUtils.downloadWithNotifications(future, tr("Area around way") + " (2)");
-                        if (currentIndex >= members.size() - 1) {
-                            deleteExtraWays();
-                        } else {
-                            callNextWay(++currentIndex);
-                        }
-                    } catch (InterruptedException | ExecutionException e1) {
-                        Logging.error(e1);
-                    }
-                });
-            });
-        } else {
-            if (currentIndex >= members.size() - 1) {
-                deleteExtraWays();
-            } else {
-                callNextWay(++currentIndex);
-            }
-        }
-    }
-
-    void downloadAreaAroundWay(Way way, Way prevWay, List<Way> ways) {
-        if (abort)
-            return;
-
-        if ((downloadCounter > 160 || way.isOutsideDownloadArea() || way.isNew()) && onFly) {
-            downloadCounter = 0;
-
-            DownloadOsmTask task = new DownloadOsmTask();
-
-            BoundsUtils.createBoundsWithPadding(way.getBBox(), .2).ifPresent(area -> {
-                Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
-
-                MainApplication.worker.submit(() -> {
-                    try {
-                        NotificationUtils.downloadWithNotifications(future, tr("Area around way") + " (3)");
-                        goToNextWays(way, prevWay, ways);
-                    } catch (InterruptedException | ExecutionException e1) {
-                        Logging.error(e1);
-                    }
-                });
-            });
-        } else {
-            goToNextWays(way, prevWay, ways);
-        }
-    }
-
     void downloadAreaBeforeRemovalOption(List<Way> wayList, List<Integer> Int) {
         if (abort) {
             return;
@@ -1203,9 +991,25 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
             return way.firstNode();
     }
 
-    void displayFixVariants(List<Way> fixVariants) {
-        char alphabet = findAllowedCharacters();
+    private List<Character> findLettersVariants(List<Way> fixVariants) throws CannotProceedException {
+        char alphabet = 'A';
+        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
         wayColoring = new HashMap<>();
+        final List<Character> allowedCharacters = new ArrayList<>();
+        if (numeric) {
+            alphabet = '1';
+            allowedCharacters.add('7');
+            if (showOption0)
+                allowedCharacters.add('0');
+            allowedCharacters.add('8');
+            allowedCharacters.add('9');
+        } else {
+            allowedCharacters.add('S');
+            if (showOption0)
+                allowedCharacters.add('W');
+            allowedCharacters.add('V');
+            allowedCharacters.add('Q');
+        }
 
         for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
             allowedCharacters.add(alphabet);
@@ -1217,18 +1021,30 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         removeTemporaryLayers();
 
         if (abort) {
-            return;
+            throw new CannotProceedException("Aborted");
         }
 
         // zoom to problem:
         AutoScaleAction.zoomTo(fixVariants);
 
         // display the fix variants:
-        temporaryLayer = new PTMendRelationAction.MendRelationAddLayer();
+        temporaryLayer = new MendRelationAddLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
         MainApplication.getMap().mapView.requestFocus();
+        return allowedCharacters;
+    }
+
+    void displayFixVariants(List<Way> fixVariants) {
+        final List<Character> allowedCharacters;
+        try {
+            allowedCharacters = findLettersVariants(fixVariants);
+        } catch (CannotProceedException e) {
+            return;
+        }
+
+        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
 
         MainApplication.getMap().mapView.addKeyListener(new KeyAdapter() {
             @Override
@@ -1285,8 +1101,24 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
     }
 
     void displayBacktrackFixVariant(List<Way> fixVariants, int idx1) {
-        char alphabet = findAllowedCharacters();
+        char alphabet = 'A';
+        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
         wayColoring = new HashMap<>();
+        final List<Character> allowedCharacters = new ArrayList<>();
+        if (numeric) {
+            alphabet = '1';
+            allowedCharacters.add('7');
+            if (showOption0)
+                allowedCharacters.add('0');
+            allowedCharacters.add('8');
+            allowedCharacters.add('9');
+        } else {
+            allowedCharacters.add('S');
+            if (showOption0)
+                allowedCharacters.add('W');
+            allowedCharacters.add('V');
+            allowedCharacters.add('Q');
+        }
 
         for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
             allowedCharacters.add(alphabet);
@@ -1304,12 +1136,11 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         AutoScaleAction.zoomTo(fixVariants);
 
         // display the fix variants:
-        temporaryLayer = new PTMendRelationAction.MendRelationAddLayer();
+        temporaryLayer = new MendRelationAddLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
         MainApplication.getMap().mapView.requestFocus();
-
         MainApplication.getMap().mapView.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -1473,8 +1304,25 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
 
     void displayFixVariantsWithOverlappingWays(List<List<Way>> fixVariants) {
         // find the letters of the fix variants:
-        char alphabet = findAllowedCharacters();
+        char alphabet = 'A';
+        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
         wayListColoring = new HashMap<>();
+        final List<Character> allowedCharacters = new ArrayList<>();
+
+        if (numeric) {
+            alphabet = '1';
+            allowedCharacters.add('7');
+            if (showOption0)
+                allowedCharacters.add('0');
+            allowedCharacters.add('8');
+            allowedCharacters.add('9');
+        } else {
+            allowedCharacters.add('S');
+            if (showOption0)
+                allowedCharacters.add('W');
+            allowedCharacters.add('V');
+            allowedCharacters.add('Q');
+        }
 
         for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
             allowedCharacters.add(alphabet);
@@ -1554,11 +1402,11 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
     void displayWaysToRemove(List<Integer> wayIndices) {
 
         // find the letters of the fix variants:
-
         char alphabet = 'A';
+        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
         if (numeric)
             alphabet = '1';
-
+        wayColoring = new HashMap<>();
         final List<Character> allowedCharacters = new ArrayList<>();
 
         if (numeric) {
@@ -1570,8 +1418,6 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
             allowedCharacters.add('B');
             allowedCharacters.add('R');
         }
-
-        wayColoring = new HashMap<>();
 
         for (int i = 0; i < 5 && i < wayIndices.size(); i++) {
             wayColoring.put(members.get(wayIndices.get(i)).getWay(), alphabet);
@@ -1956,10 +1802,6 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    public void save() {
-        editor.apply();
-    }
-
     public class TempStrategy implements Strategy {
         @Override
         public Way determineWayToKeep(Iterable<Way> wayChunks) {
@@ -2038,6 +1880,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
             double letterX = MainApplication.getMap().mapView.getBounds().getMinX() + 20;
             double letterY = MainApplication.getMap().mapView.getBounds().getMinY() + 100;
 
+            boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
             Character chr = 'A';
             if (numeric)
                 chr = '1';
@@ -2088,6 +1931,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
 
         void drawOptionsToRemoveWays() {
             drawFixVariantsWithParallelLines(false);
+            boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
 
             double letterX = MainApplication.getMap().mapView.getBounds().getMinX() + 20;
             double letterY = MainApplication.getMap().mapView.getBounds().getMinY() + 100;
@@ -2135,6 +1979,8 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
 
             double letterX = MainApplication.getMap().mapView.getBounds().getMinX() + 20;
             double letterY = MainApplication.getMap().mapView.getBounds().getMinY() + 100;
+
+            boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
 
             if (showOption0 && numeric) {
                 if (!shorterRoutes)
