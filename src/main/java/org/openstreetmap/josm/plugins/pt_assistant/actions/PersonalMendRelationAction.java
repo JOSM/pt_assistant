@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -37,7 +36,6 @@ import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionTypeCalcula
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.GBC;
-import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
 import org.openstreetmap.josm.tools.Utils;
@@ -204,8 +202,11 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    @Override
-    boolean checkOneWaySatisfiability(Way way, Node node) {
+    protected boolean isOneWayOrRoundabout(Way way) {
+        return RouteUtils.isOnewayForBicycles(way) == 0 && isSplitRoundabout(way);
+    }
+
+    protected boolean checkOneWaySatisfiability(Way way, Node node) {
         String[] acceptedTags = new String[] { "yes", "designated" };
 
         if ((link.isOnewayLoopBackwardPart && super.relation.hasTag("route", "bicycle"))
@@ -217,7 +218,7 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
             && relation.hasTag("route", "bicycle"))
             return false;
 
-        if (!isNonSplitRoundAbout(way) && way.hasTag("junction", "roundabout")) {
+        if (!isNonSplitRoundabout(way) && way.hasTag("junction", "roundabout")) {
             if (way.lastNode().equals(node))
                 return false;
         }
@@ -258,7 +259,7 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         if (node != null && isRestricted(super.nextWay, way, node)) {
             nexWayDelete = true;
         }
-        if (isNonSplitRoundAbout(way)) {
+        if (isNonSplitRoundabout(way)) {
             nexWayDelete = false;
             for (Node n : way.getNodes()) {
                 if (super.nextWay.firstNode().equals(n) || super.nextWay.lastNode().equals(n)) {
@@ -268,7 +269,7 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
             }
         }
 
-        if (isNonSplitRoundAbout(super.nextWay)) {
+        if (isNonSplitRoundabout(super.nextWay)) {
             nexWayDelete = false;
         }
 
@@ -328,8 +329,7 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         return null;
     }
 
-    @Override
-    List<List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
+    protected List<List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
         //trying to find the other route relations which can connect these ways
         List<List<Way>> list = new ArrayList<>();
         List<Relation> r1;
@@ -378,55 +378,7 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         return list;
     }
 
-    List<Way> searchWayFromOtherRelations(Relation r, Way current, Way next, boolean reverse) {
-        List<RelationMember> member = r.getMembers();
-        List<Way> lst = new ArrayList<>();
-        boolean canAdd = false;
-        Way prev = null;
-        for (int i = 0; i < member.size(); i++) {
-            if (member.get(i).isWay()) {
-                Way w = member.get(i).getWay();
-                if (!reverse) {
-                    if (w.equals(current)) {
-                        lst.clear();
-                        canAdd = true;
-                        prev = w;
-                    } else if (w.equals(next) && lst.size() > 0) {
-                        return lst;
-                    } else if (canAdd) {
-                        if (findNumberOfCommonNode(w, prev) != 0) {
-                            lst.add(w);
-                            prev = w;
-                        } else {
-                            break;
-                        }
-                    }
-                } else {
-                    if (w.equals(next)) {
-                        lst.clear();
-                        canAdd = true;
-                        prev = w;
-                    } else if (w.equals(current) && lst.size() > 0) {
-                        Collections.reverse(lst);
-                        return lst;
-                    } else if (canAdd) {
-                        // not valid in reverse if it is oneway or part of roundabout
-                        if (findNumberOfCommonNode(w, prev) != 0 && RouteUtils.isOnewayForBicycles(w) == 0
-                            && !isSplitRoundAbout(w)) {
-                            lst.add(w);
-                            prev = w;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way way) {
+    protected List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way way) {
         parentWays.remove(way);
         if (super.abort)
             return null;
@@ -556,14 +508,13 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         return parentWays;
     }
 
-    @Override
-    public void backTrack(Way way, int idx) {
-        if (idx >= super.backnodes.size() - 1) {
-            super.currentNode = prevCurrenNode;
-            callNextWay(super.currentIndex);
+    protected void backTrack(Way way, int idx) {
+        if (idx >= backNodes.size() - 1) {
+            currentNode = previousCurrentNode;
+            callNextWay(currentIndex);
             return;
         }
-        Node nod = super.backnodes.get(idx);
+        Node nod = backNodes.get(idx);
         if (way.isInnerNode(nod)) {
             List<Way> fixVariants = new ArrayList<>();
             List<Way> allWays = nod.getParentWays();
@@ -632,24 +583,21 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         return wayToKeep;
     }
 
-    @Override
-    void backtrackCurrentEdge() {
-        Way backTrackWay = super.currentWay;
-        Way way = backTrackWay;
-        super.backnodes = way.getNodes();
+    protected void backtrackCurrentEdge() {
+        Way way = super.currentWay;
+        backNodes = way.getNodes();
         if (super.currentNode == null) {
             super.currentNode = super.currentWay.lastNode();
         }
         if (super.currentNode.equals(way.lastNode())) {
-            Collections.reverse(super.backnodes);
+            Collections.reverse(backNodes);
         }
         int idx = 1;
-        prevCurrenNode = super.currentNode;
+        previousCurrentNode = super.currentNode;
         backTrack(super.currentWay, idx);
     }
 
-    @Override
-    void getNextWayAfterBackTrackSelection(Way way) {
+    protected void getNextWayAfterBackTrackSelection(Way way) {
         save();
         List<Integer> lst = new ArrayList<>();
         lst.add(super.currentIndex + 1);
@@ -679,8 +627,7 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    @Override
-    void getNextWayAfterSelection(List<Way> ways) {
+    protected void getNextWayAfterSelection(List<Way> ways) {
         int flag = 0;
         if (ways != null) {
             /*

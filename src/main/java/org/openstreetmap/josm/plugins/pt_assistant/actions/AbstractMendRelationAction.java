@@ -1,12 +1,14 @@
 // License: GPL. For details, see LICENSE file.
-
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
 import org.openstreetmap.josm.actions.AutoScaleAction;
+import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadParams;
 import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
+import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.osm.*;
 import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.Notification;
 import org.openstreetmap.josm.gui.dialogs.relation.DownloadRelationMemberTask;
 import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
@@ -18,22 +20,17 @@ import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
 import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
 import org.openstreetmap.josm.gui.layer.MapViewPaintable;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
-import org.openstreetmap.josm.plugins.pt_assistant.utils.NotificationUtils;
-import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.PTMendRelationPaintVisitor;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.*;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
 import javax.swing.JOptionPane;
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -79,11 +76,14 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     protected Way previousWay;
     protected List<Integer> extraWaysToBeDeleted;
     protected AbstractMapViewPaintable temporaryLayer;
-    protected List<Character> allowedCharacters;
     protected HashMap<Way, Integer> waysAlreadyPresent;
     protected Way nextWay;
     protected Way currentWay;
     protected String notice;
+    protected Node previousCurrentNode;
+    protected List<Node> backNodes;
+    protected HashMap<Way, Character> wayColoring;
+    protected HashMap<Character, List<Way>> wayListColoring;
 
     protected boolean setEnable = true;
     protected boolean nextIndex = true;
@@ -92,7 +92,6 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     protected boolean halt = false;
     protected boolean aroundGaps = false;
     protected boolean aroundStops = false;
-    protected boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
     protected boolean showOption0 = false;
     protected boolean onFly = false;
 
@@ -102,7 +101,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     /**
      *
      * @param editorAccess
-     * @param PTorNot is true is PTMendRelation is calling this function, false otherwise
+     * @param PTorNot
      */
     protected AbstractMendRelationAction(IRelationEditorActionAccess editorAccess, boolean PTorNot) {
         super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
@@ -130,9 +129,79 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     }
 
     /**
-     * Override method with initializing the values for the required mend relation function
+     *
      */
     protected abstract void initialise();
+
+    /**
+     *
+     * @param parentWays
+     * @param node
+     * @param way
+     * @return
+     */
+    protected abstract List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way way);
+
+    /**
+     *
+     * @param currentIndex
+     */
+    protected abstract void callNextWay(int currentIndex);
+
+    /**
+     *
+     * @param way
+     * @param node1
+     * @param node2
+     */
+    protected abstract void findNextWayAfterDownload(Way way, Node node1, Node node2);
+
+    /**
+     * This is a helper method for {@code searchWayFromOtherRelations} method
+     * @param way
+     * @return
+     */
+    protected abstract boolean isOneWayOrRoundabout(Way way);
+
+    /**
+     *
+     * @param current
+     * @param next
+     * @return
+     */
+    protected abstract List<List<Way>> getDirectRouteBetweenWays(Way current, Way next);
+
+    /**
+     *
+     * @param way
+     * @param index
+     */
+    protected abstract void backTrack(Way way, int index);
+
+    /**
+     *
+     */
+    protected abstract void backtrackCurrentEdge();
+
+    /**
+     *
+     * @param way
+     */
+    protected abstract void getNextWayAfterBackTrackSelection(Way way);
+
+    /**
+     *
+     * @param ways
+     */
+    protected abstract void getNextWayAfterSelection(List<Way> ways);
+
+    /**
+     *
+     * @param way
+     * @param node
+     * @return
+     */
+    protected abstract boolean checkOneWaySatisfiability(Way way, Node node);
 
     /**
      *
@@ -179,7 +248,6 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     }
 
     /**
-     *
      *
      * @param typeRoute
      * @return
@@ -345,7 +413,6 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
      * @param way
      * @param nodes
      */
-    // TODO IMPLEMENT downloadAreaAroundWay
     protected void findNextWayBeforeDownload(Way way, Node... nodes) {
         nextIndex = false;
         AutoScaleAction.zoomTo(Collections.singletonList(way));
@@ -362,31 +429,521 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
 
     /**
      *
-     * @param way
-     * @param nodes
      */
-
-
-    /**
-     *
-     * @param currentIndex
-     */
-    protected abstract void callNextWay(int currentIndex);
-
-    /**
-     *
-     * @param way
-     * @param node1
-     * @param node2
-     */
-    protected abstract void findNextWayAfterDownload(Way way, Node node1, Node node2);
-
     class WindowEventHandler extends WindowAdapter {
         @Override
         public void windowClosing(WindowEvent e) {
             editor.cancel();
             Logging.debug("close");
             stop();
+        }
+    }
+
+    /**
+     *
+     * @param relation
+     * @param current
+     * @param next
+     * @param reversed is true if the ways need to be searched in reverse order
+     * @return
+     */
+    protected List<Way> searchWayFromOtherRelations(Relation relation, Way current, Way next, boolean reversed) {
+        List<Way> listOfWays = new ArrayList<>();
+        boolean canAdd = false;
+        Way previousWay = null;
+
+        for (RelationMember relationMember : relation.getMembers()) {
+            if (relationMember.isWay()) {
+                Way currentWay = relationMember.getWay();
+                boolean optionalComparison;
+                boolean emptyListComparison;
+                boolean returnListComparison;
+
+                if (reversed) {
+                    optionalComparison = isOneWayOrRoundabout(current);
+                    emptyListComparison = currentWay.equals(next);
+                    returnListComparison = currentWay.equals(current);
+                } else {
+                    optionalComparison = true;
+                    emptyListComparison = currentWay.equals(current);
+                    returnListComparison = currentWay.equals(next);
+                }
+
+                if (emptyListComparison) {
+                    listOfWays.clear();
+                    canAdd = true;
+                    previousWay = currentWay;
+                } else if (returnListComparison && listOfWays.size() > 0) {
+                    if (reversed) {
+                        Collections.reverse(listOfWays);
+                    }
+                    return listOfWays;
+                } else if (canAdd) {
+                    if (findNumberOfCommonNodes(currentWay, previousWay) != 0 && optionalComparison) {
+                        listOfWays.add(currentWay);
+                        previousWay = currentWay;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @param way
+     * @param currentNode
+     * @return
+     */
+    protected Node getOtherNode(Way way, Node currentNode) {
+        if (way.firstNode().equals(currentNode))
+            return way.lastNode();
+        else
+            return way.firstNode();
+    }
+
+    /**
+     *
+     * @param way
+     * @return
+     */
+    protected boolean isSplitRoundabout(Way way) {
+        return way.hasTag("junction", "roundabout") && !way.firstNode().equals(way.lastNode());
+    }
+
+    /**
+     *
+     * @param way
+     * @return
+     */
+    public static boolean isNonSplitRoundabout(final Way way) {
+        return way.hasTag("junction", "roundabout") && way.firstNode().equals(way.lastNode());
+    }
+
+    /**
+     *
+     * @param way
+     * @param node
+     * @return
+     */
+    protected List<Way> findNextWay(Way way, Node node) {
+        List<Way> parentWays = node.getParentWays();
+        parentWays = removeInvalidWaysFromParentWays(parentWays, node, way);
+
+        // if the way is a roundabout but it has not find any suitable option for next
+        // way, look at parents of all nodes
+        if (way.hasTag("junction", "roundabout") && parentWays.size() == 0) {
+            for (Node n : way.getNodes()) {
+                parentWays.addAll(removeInvalidWaysFromParentWaysOfRoundabouts(n.getParentWays(), n, way));
+            }
+        }
+
+        // put the most possible answer in front
+        Way frontWay = parentWays.stream().filter(it -> checkIfWayConnectsToNextWay(it, 0, node)).findFirst()
+            .orElse(null);
+
+        if (frontWay == null && parentWays.size() > 0) {
+            Way minWay = parentWays.get(0);
+            double minLength = findDistance(minWay, nextWay, node);
+            for (int i = 1; i < parentWays.size(); i++) {
+                double length = findDistance(parentWays.get(i), nextWay, node);
+                if (minLength > length) {
+                    minLength = length;
+                    minWay = parentWays.get(i);
+                }
+            }
+            frontWay = minWay;
+        }
+
+        if (frontWay != null) {
+            parentWays.remove(frontWay);
+            parentWays.add(0, frontWay);
+        }
+
+        return parentWays;
+    }
+
+    /**
+     *
+     * @param parents
+     * @param node
+     * @param way
+     * @return
+     */
+    protected List<Way> removeInvalidWaysFromParentWaysOfRoundabouts (List<Way> parents, Node node, Way way) {
+        parents.remove(way);
+
+        if (abort) {
+            return null;
+        }
+
+        List<Way> waysToBeRemoved = new ArrayList<>();
+
+        /* One way direction do not match */
+
+        for (Way w : parents) {
+            if (w.isOneway() != 0) {
+                if (!checkOneWaySatisfiability(w, node)) {
+                    waysToBeRemoved.add(w);
+                }
+            }
+        }
+
+        /* Check if any of them belong to roundabout, if yes then show ways accordingly */
+        for (Way w : parents) {
+            if (w.hasTag("junction", "roundabout")) {
+                if (WayUtils.findNumberOfCommonFirstLastNodes(way, w) == 1) {
+                    if (w.lastNode().equals(node)) {
+                        waysToBeRemoved.add(w);
+                    }
+                }
+            }
+        }
+
+        /* Check mode of transport, also check if there is no loop */
+        for (Way w : parents) {
+            if (!WayUtils.isSuitableForBuses(w)) {
+                waysToBeRemoved.add(w);
+            }
+
+            if (w.equals(previousWay)) {
+                waysToBeRemoved.add(w);
+            }
+        }
+
+        parents.removeAll(waysToBeRemoved);
+        return parents;
+    }
+
+    /**
+     *
+     * @param way
+     * @param count
+     * @param node
+     * @return
+     */
+    boolean checkIfWayConnectsToNextWay(Way way, int count, Node node) {
+
+        if (count < 50) {
+            if (way.equals(nextWay)) {
+                return true;
+            }
+
+            /* Check if way's intermediate node is next way's first or last node */
+            if (way.getNodes().contains(nextWay.firstNode()) || way.getNodes().contains(nextWay.lastNode())) {
+                return true;
+            }
+
+            node = getOtherNode(way, node);
+            List<Way> parents = node.getParentWays();
+
+            if (parents.size() != 1) {
+                return false;
+            } else {
+                way = parents.get(0);
+            }
+
+            count += 1;
+
+            if (checkIfWayConnectsToNextWay(way, count, node)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param way
+     * @param nextWay
+     * @param node
+     * @return
+     */
+    double findDistance(Way way, Way nextWay, Node node) {
+        Node otherNode = getOtherNode(way, node);
+        double Lat = (nextWay.firstNode().lat() + nextWay.lastNode().lat()) / 2;
+        double Lon = (nextWay.firstNode().lon() + nextWay.lastNode().lon()) / 2;
+        return (otherNode.lat() - Lat) * (otherNode.lat() - Lat) + (otherNode.lon() - Lon) * (otherNode.lon() - Lon);
+    }
+
+    /**
+     *
+     * @param currentIsRestrictedentWay
+     * @param previousWay
+     * @param commonNode
+     * @return
+     */
+    protected boolean isRestricted(Way currentIsRestrictedentWay, Way previousWay, Node commonNode) {
+        Set<Relation> parentSet = OsmPrimitive.getParentRelations(previousWay.getNodes());
+        if (parentSet == null || parentSet.isEmpty())
+            return false;
+        List<Relation> parentRelation = new ArrayList<>(parentSet);
+
+        String[] restrictions = new String[] { "restriction", "restriction:bus", "restriction:trolleybus",
+            "restriction:tram", "restriction:subway", "restriction:light_rail", "restriction:rail",
+            "restriction:train", "restriction:trolleybus" };
+
+        parentRelation.removeIf(rel -> {
+            if (rel.hasKey("except")) {
+                String[] val = rel.get("except").split(";");
+                for (String s : val) {
+                    if (relation.hasTag("route", s))
+                        return true;
+                }
+            }
+
+            if (!rel.hasTag("type", restrictions))
+                return true;
+            else if (rel.hasTag("type", "restriction") && rel.hasKey("restriction"))
+                return false;
+            else {
+                boolean remove = true;
+                String routeValue = relation.get("route");
+                for (String s : restrictions) {
+                    String sub = s.substring(12);
+                    if (routeValue.equals(sub) && rel.hasTag("type", s))
+                        remove = false;
+                    else if (routeValue.equals(sub) && rel.hasKey("restriction:" + sub))
+                        remove = false;
+                }
+                return remove;
+            }
+        });
+
+        // check for "only" kind of restrictions
+        for (Relation r : parentRelation) {
+            Collection<RelationMember> prevMemberList = r.getMembersFor(Collections.singletonList(previousWay));
+            Collection<RelationMember> commonNodeList = r.getMembersFor(Collections.singletonList(commonNode));
+            // commonNode is not the node involved in the restriction relation then just continue
+            if (prevMemberList.isEmpty() || commonNodeList.isEmpty())
+                continue;
+
+            final String prevRole = prevMemberList.stream().findFirst().map(RelationMember::getRole).orElse(null);
+
+            if (prevRole.equals("from")) {
+                String[] acceptedTags = { "only_right_turn", "only_left_turn", "only_u_turn", "only_straight_on",
+                    "only_entry", "only_exit" };
+                for (String s : restrictions) {
+                    // if we have any "only" type restrictions then the current way should be in the
+                    // relation else it is restricted
+                    if (r.hasTag(s, acceptedTags)) {
+                        if (r.getMembersFor(Collections.singletonList(currentWay)).isEmpty()) {
+                            for (String str : acceptedTags) {
+                                if (r.hasTag(s, str))
+                                    notice = str + " restriction violated";
+                            }
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Relation r : parentRelation) {
+            Collection<RelationMember> curMemberList = r.getMembersFor(Collections.singletonList(currentWay));
+            Collection<RelationMember> prevMemberList = r.getMembersFor(Collections.singletonList(previousWay));
+
+            if (curMemberList.isEmpty() || prevMemberList.isEmpty())
+                continue;
+
+            final String curRole = curMemberList.stream().findFirst().map(RelationMember::getRole).orElse(null);
+            final String prevRole = prevMemberList.stream().findFirst().map(RelationMember::getRole).orElse(null);
+
+            if ("to".equals(curRole) && "from".equals(prevRole)) {
+                final String[] acceptedTags = { "no_right_turn", "no_left_turn", "no_u_turn", "no_straight_on",
+                    "no_entry", "no_exit" };
+                for (String s : restrictions) {
+                    if (r.hasTag(s, acceptedTags)) {
+                        for (String str : acceptedTags) {
+                            if (r.hasTag(s, str))
+                                notice = str + " restriction violated";
+                        }
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     *
+     * @param j
+     */
+    protected void removeWay(int j) {
+        List<Integer> Int = new ArrayList<>();
+        List<Way> lst = new ArrayList<>();
+        Int.add(j);
+        lst.add(members.get(j).getWay());
+        // if the way at members.get(j) is one way then check if the next ways are on
+        // way, if so then remove them as well
+        if (WayUtils.isOneWay(members.get(j).getWay())) {
+            while (true) {
+                int k = getNextWayIndex(j);
+                if (k == -1 || k >= members.size())
+                    break;
+
+                if (!WayUtils.isOneWay(members.get(k).getWay()))
+                    break;
+                if (WayUtils.findNumberOfCommonFirstLastNodes(members.get(k).getWay(), members.get(j).getWay()) == 0)
+                    break;
+
+                j = k;
+                Int.add(j);
+                lst.add(members.get(j).getWay());
+            }
+        }
+
+        DataSet ds = MainApplication.getLayerManager().getEditDataSet();
+        ds.setSelected(lst);
+        downloadAreaBeforeRemovalOption(lst, Int);
+    }
+
+    /**
+     *
+     * @param wayList
+     * @param Int
+     */
+    void downloadAreaBeforeRemovalOption(List<Way> wayList, List<Integer> Int) {
+        if (abort) {
+            return;
+        }
+
+        if (!onFly) {
+            displayWaysToRemove(Int);
+        }
+
+        downloadCounter = 0;
+
+        DownloadOsmTask task = new DownloadOsmTask();
+
+        BoundsUtils.createBoundsWithPadding(wayList, .4).ifPresent(area -> {
+            Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
+
+            MainApplication.worker.submit(() -> {
+                try {
+                    NotificationUtils.downloadWithNotifications(future, tr("Area before removal"));
+                    displayWaysToRemove(Int);
+                } catch (InterruptedException | ExecutionException e1) {
+                    Logging.error(e1);
+                }
+            });
+        });
+    }
+
+    /**
+     *
+     * @param wayIndices
+     */
+    void displayWaysToRemove(List<Integer> wayIndices) {
+
+        // find the letters of the fix variants:
+        char alphabet = 'A';
+        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
+        if (numeric)
+            alphabet = '1';
+        wayColoring = new HashMap<>();
+        final List<Character> allowedCharacters = new ArrayList<>();
+
+        if (numeric) {
+            allowedCharacters.add('1');
+            allowedCharacters.add('2');
+            allowedCharacters.add('3');
+        } else {
+            allowedCharacters.add('A');
+            allowedCharacters.add('B');
+            allowedCharacters.add('R');
+        }
+
+        for (int i = 0; i < 5 && i < wayIndices.size(); i++) {
+            wayColoring.put(members.get(wayIndices.get(i)).getWay(), alphabet);
+        }
+
+        if (notice.equals("vehicle travels against oneway restriction")) {
+            if (numeric) {
+                allowedCharacters.add('4');
+            } else {
+                allowedCharacters.add('C');
+            }
+        }
+
+        // remove any existing temporary layer
+        removeTemporaryLayers();
+
+        if (abort)
+            return;
+
+        // zoom to problem:
+        final Collection<OsmPrimitive> waysToZoom = new ArrayList<>();
+
+        for (Integer i : wayIndices) {
+            waysToZoom.add(members.get(i).getWay());
+        }
+
+        AutoScaleAction.zoomTo(waysToZoom);
+
+        // display the fix variants:
+        temporaryLayer = new PTMendRelationRemoveLayer();
+        MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
+
+        // // add the key listener:
+        MainApplication.getMap().mapView.requestFocus();
+        MainApplication.getMap().mapView.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                downloadCounter = 0;
+                if (abort) {
+                    MainApplication.getMap().mapView.removeKeyListener(this);
+                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+                    return;
+                }
+                Character typedKey = e.getKeyChar();
+                Character typedKeyUpperCase = typedKey.toString().toUpperCase().toCharArray()[0];
+                if (allowedCharacters.contains(typedKeyUpperCase)) {
+                    nextIndex = true;
+                    MainApplication.getMap().mapView.removeKeyListener(this);
+                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+                    Logging.debug(String.valueOf(typedKeyUpperCase));
+                    if (typedKeyUpperCase == 'R' || typedKeyUpperCase == '3') {
+                        wayIndices.add(0, currentIndex);
+                    }
+                    RemoveWayAfterSelection(wayIndices, typedKeyUpperCase);
+                }
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    MainApplication.getMap().mapView.removeKeyListener(this);
+                    Logging.debug("ESC");
+                    nextIndex = false;
+                    setEnable = true;
+                    halt = true;
+                    setEnabled(true);
+                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                // TODO Auto-generated method stub
+            }
+        });
+    }
+
+    /**
+     *
+     */
+    private static class PTMendRelationRemoveLayer extends AbstractMapViewPaintable {
+        @Override
+        public void paint(Graphics2D g, MapView mv, Bounds bbox) {
+            PTMendRelationPaintVisitor paintVisitor = new PTMendRelationPaintVisitor(g, mv);
+            paintVisitor.drawOptionsToRemoveWays();
         }
     }
 }
