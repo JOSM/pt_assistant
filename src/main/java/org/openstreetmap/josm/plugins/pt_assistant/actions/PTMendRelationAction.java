@@ -93,7 +93,6 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
     HashMap<Way, Character> wayColoring;
     HashMap<Character, List<Way>> wayListColoring;
     int nodeIdx = 0;
-    String notice = null;
     List<Node> backnodes = new ArrayList<>();
 
     /**
@@ -340,7 +339,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         // way, if so then remove them as well
         if (WayUtils.isOneWay(members.get(j).getWay())) {
             while (true) {
-                int k = getnextWayIndex(j);
+                int k = getNextWayIndex(j);
                 if (k == -1 || k >= members.size())
                     break;
 
@@ -417,10 +416,10 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
+    protected void findNextWayAfterDownload(Way way, Node node1, Node node2) {
         currentWay = way;
         if (abort)
-            return null;
+            return;
 
         List<Way> parentWays = findNextWay(way, node1);
         if (node2 != null)
@@ -450,10 +449,8 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
                 deleteExtraWays();
             } else {
                 callNextWay(++currentIndex);
-                return null;
             }
         }
-        return null;
     }
 
     List<List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
@@ -1373,7 +1370,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
                         shorterRoutes = false;
                         removeCurrentEdge();
                     } else if (typedKeyUpperCase == 'W' || typedKeyUpperCase == '0') {
-                        shorterRoutes = shorterRoutes ? false : true;
+                        shorterRoutes = !shorterRoutes;
                         removeKeyListenerAndTemporaryLayer(this);
                         callNextWay(currentIndex);
                     } else if (typedKeyUpperCase == 'V' || typedKeyUpperCase == '8') {
@@ -1495,6 +1492,186 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
                 // TODO Auto-generated method stub
             }
         });
+    }
+
+    protected void findNextWayBeforeDownload(Way way, Node... nodes) {
+        nextIndex = false;
+        AutoScaleAction.zoomTo(Collections.singletonList(way));
+        if (nodes.length == 1) {
+            DataSet ds = MainApplication.getLayerManager().getEditDataSet();
+            ds.setSelected(way);
+            downloadAreaAroundWay(way, nodes[0], null);
+        } else if (nodes.length == 2) {
+            downloadAreaAroundWay(way, nodes[0], nodes[1]);
+        } else {
+            Logging.error("Unexpected arguments");
+        }
+    }
+
+    protected void downloadAreaAroundWay(Way way) {
+        if (abort) {
+            return;
+        }
+
+        if (downloadCounter > 160 && onFly) {
+            downloadCounter = 0;
+            DownloadOsmTask task = new DownloadOsmTask();
+            BoundsUtils.createBoundsWithPadding(way.getBBox(), .1).ifPresent(area -> {
+                Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
+                MainApplication.worker.submit(() -> {
+                    try {
+                        NotificationUtils.downloadWithNotifications(future, tr("Area around way") + " (2)");
+                        if (currentIndex >= members.size() - 1) {
+                            deleteExtraWays();
+                        } else {
+                            callNextWay(++currentIndex);
+                        }
+                    } catch (InterruptedException | ExecutionException e1) {
+                        Logging.error(e1);
+                    }
+                });
+            });
+        } else {
+            if (currentIndex >= members.size() - 1) {
+                deleteExtraWays();
+            } else {
+                callNextWay(++currentIndex);
+            }
+        }
+    }
+
+    protected void downloadAreaAroundWay(Way way, Way prevWay, List<Way> ways) {
+        if (abort) {
+            return;
+        }
+
+        if ((downloadCounter > 160 || way.isOutsideDownloadArea() || way.isNew()) && onFly) {
+            downloadCounter = 0;
+            DownloadOsmTask task = new DownloadOsmTask();
+            BoundsUtils.createBoundsWithPadding(way.getBBox(), .2).ifPresent(area -> {
+                Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
+
+                MainApplication.worker.submit(() -> {
+                    try {
+                        NotificationUtils.downloadWithNotifications(future, tr("Area around way") + " (3)");
+                        goToNextWays(way, prevWay, ways);
+                    } catch (InterruptedException | ExecutionException e1) {
+                        Logging.error(e1);
+                    }
+                });
+            });
+        } else {
+            goToNextWays(way, prevWay, ways);
+        }
+    }
+
+    void downloadAreaAroundWay(Way way, Node node1, Node node2) {
+        if (abort) {
+            return;
+        }
+
+        if ((downloadCounter > 160 || way.isOutsideDownloadArea() || way.isNew()) && onFly) {
+            downloadCounter = 0;
+            DownloadOsmTask task = new DownloadOsmTask();
+            BoundsUtils.createBoundsWithPadding(way.getBBox(), .4).ifPresent(area -> {
+                Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
+                MainApplication.worker.submit(() -> {
+                    try {
+                        NotificationUtils.downloadWithNotifications(future, tr("Area around way") + " (1)");
+                        findNextWayAfterDownload(way, node1, node2);
+                    } catch (InterruptedException | ExecutionException e1) {
+                        Logging.error(e1);
+                    }
+                });
+            });
+        } else {
+            findNextWayAfterDownload(way, node1, node2);
+        }
+    }
+
+    void goToNextWays(Way way, Way prevWay, List<Way> wayList) {
+        List<List<Way>> lst = new ArrayList<>();
+        previousWay = prevWay;
+        Node node1 = null;
+        for (Node n : way.getNodes()) {
+            if (prevWay.getNodes().contains(n)) {
+                node1 = n;
+                break;
+            }
+        }
+
+        if (node1 == null) {
+            lst.add(wayList);
+            displayFixVariantsWithOverlappingWays(lst);
+            return;
+        }
+
+        // check if the way equals the next way, if so then don't add any new ways to the list
+        if (way == nextWay) {
+            lst.add(wayList);
+            displayFixVariantsWithOverlappingWays(lst);
+            return;
+        }
+
+        Node node = getOtherNode(way, node1);
+        wayList.add(way);
+        List<Way> parents = node.getParentWays();
+        parents.remove(way);
+
+        // if the ways directly touch the next way
+        if (way.isFirstLastNode(nextWay.firstNode()) || way.isFirstLastNode(nextWay.lastNode())) {
+            lst.add(wayList);
+            displayFixVariantsWithOverlappingWays(lst);
+            return;
+        }
+
+        // if next way turns out to be a roundabout
+        if (nextWay.containsNode(node) && nextWay.hasTag("junction", "roundabout")) {
+            lst.add(wayList);
+            displayFixVariantsWithOverlappingWays(lst);
+            return;
+        }
+
+        // remove all the invalid ways from the parent ways
+        parents = removeInvalidWaysFromParentWays(parents, node, way);
+
+        if (parents.size() == 1) {
+            // if (already the way exists in the ways to be added
+            if (wayList.contains(parents.get(0))) {
+                lst.add(wayList);
+                displayFixVariantsWithOverlappingWays(lst);
+                return;
+            }
+            downloadAreaAroundWay(parents.get(0), way, wayList);
+            return;
+        } else if (parents.size() > 1) {
+            // keep the most probable option s option A
+            Way minWay = parents.get(0);
+            double minLength = findDistance(minWay, nextWay, node);
+            for (int k = 1; k < parents.size(); k++) {
+                double length = findDistance(parents.get(k), nextWay, node);
+                if (minLength > length) {
+                    minLength = length;
+                    minWay = parents.get(k);
+                }
+            }
+            parents.remove(minWay);
+            parents.add(0, minWay);
+
+            // add all the list of ways to list of list of ways
+            for (int i = 0; i < parents.size(); i++) {
+                List<Way> wl = new ArrayList<>(wayList);
+                wl.add(parents.get(i));
+                lst.add(wl);
+            }
+
+            displayFixVariantsWithOverlappingWays(lst);
+            return;
+        } else {
+            lst.add(wayList);
+            displayFixVariantsWithOverlappingWays(lst);
+            return;
+        }
     }
 
     void RemoveWayAfterSelection(List<Integer> wayIndices, Character chr) {
