@@ -6,14 +6,14 @@ plugins {
   java
   jacoco
   id("org.openstreetmap.josm") version "0.7.0"
-  id("com.github.ben-manes.versions") version "0.27.0"
+  id("com.github.ben-manes.versions") version "0.28.0"
 }
 
 object Versions {
-  const val awaitility = "4.0.1"
-  const val jacoco = "0.8.2"
-  const val junit = "5.5.2"
-  const val wiremock = "2.25.1"
+  const val awaitility = "4.0.3"
+  const val jacoco = "0.8.4"
+  const val junit = "5.6.2"
+  const val wiremock = "2.26.3"
 }
 
 repositories {
