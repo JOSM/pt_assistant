@@ -3,7 +3,6 @@
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
 import org.openstreetmap.josm.actions.AutoScaleAction;
-import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadParams;
 import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
 import org.openstreetmap.josm.data.osm.*;
@@ -19,7 +18,6 @@ import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
 import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
 import org.openstreetmap.josm.gui.layer.MapViewPaintable;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
-import org.openstreetmap.josm.plugins.pt_assistant.utils.BoundsUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.NotificationUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.I18n;
@@ -49,7 +47,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
  * @author sudhanshu2
  */
 public abstract class AbstractMendRelationAction extends AbstractRelationEditorAction {
-    private static final DownloadParams DEFAULT_DOWNLOAD_PARAMS = new DownloadParams();
+    protected static final DownloadParams DEFAULT_DOWNLOAD_PARAMS = new DownloadParams();
     protected final Color[] FIVE_COLOR_PALETTE = {
         new Color(0, 255, 0, 150),
         new Color(255, 0, 0, 150),
@@ -85,6 +83,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     protected HashMap<Way, Integer> waysAlreadyPresent;
     protected Way nextWay;
     protected Way currentWay;
+    protected String notice;
 
     protected boolean setEnable = true;
     protected boolean nextIndex = true;
@@ -194,8 +193,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
             nodeList.addAll(members.stream().filter(RelationMember::isNode).map(RelationMember::getNode).collect(Collectors.toList()));
         }
 
-        for (int i = 0; i < nodeList.size(); i++) {
-            Node n = nodeList.get(i);
+        for (Node n : nodeList) {
             double maxLatitude = n.getBBox().getTopLeftLat() + 0.001;
             double minLatitude = n.getBBox().getBottomRightLat() - 0.001;
 
@@ -254,10 +252,8 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         int count = 0;
         List<Node> nodes = currentWay.getNodes();
         List<Node> previousWayNodes = previousWay.getNodes();
-        for (int i = 0; i < nodes.size(); i++) {
-            Node currentNode = nodes.get(i);
-            for (int j = 0; j < previousWayNodes.size(); j++) {
-                Node previousNode = previousWayNodes.get(j);
+        for (Node currentNode : nodes) {
+            for (Node previousNode : previousWayNodes) {
                 if (currentNode.equals(previousNode))
                     count = count + 1;
             }
@@ -293,8 +289,8 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
      */
     protected void removeTemporaryLayers() {
         List<MapViewPaintable> tempLayers = MainApplication.getMap().mapView.getTemporaryLayers();
-        for (int i = 0; i < tempLayers.size(); i++) {
-            MainApplication.getMap().mapView.removeTemporaryLayer(tempLayers.get(i));
+        for (MapViewPaintable tempLayer : tempLayers) {
+            MainApplication.getMap().mapView.removeTemporaryLayer(tempLayer);
         }
     }
 
@@ -324,10 +320,10 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
      */
     protected List<Way> getListOfAllWays() {
         List<Way> ways = new ArrayList<>();
-        for (int i = 0; i < members.size(); i++) {
-            if (members.get(i).isWay()) {
-                waysAlreadyPresent.put(members.get(i).getWay(), 1);
-                ways.add(members.get(i).getWay());
+        for (RelationMember member : members) {
+            if (member.isWay()) {
+                waysAlreadyPresent.put(member.getWay(), 1);
+                ways.add(member.getWay());
             }
         }
         return ways;
@@ -344,28 +340,21 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         halt = false;
     }
 
-    Way findNextWayBeforeDownload(Way way, Node node) {
-        nextIndex = false;
-
-        AutoScaleAction.zoomTo(Collections.singletonList(way));
-
-        return null;
-    }
-
     /**
      *
      * @param way
      * @param nodes
      */
+    // TODO IMPLEMENT downloadAreaAroundWay
     protected void findNextWayBeforeDownload(Way way, Node... nodes) {
         nextIndex = false;
         AutoScaleAction.zoomTo(Collections.singletonList(way));
         if (nodes.length == 1) {
             DataSet ds = MainApplication.getLayerManager().getEditDataSet();
             ds.setSelected(way);
-            downloadAreaAroundWay(way, nodes[0], null);
+            //downloadAreaAroundWay(way, nodes[0], null);
         } else if (nodes.length == 2) {
-            downloadAreaAroundWay(way, nodes[0], nodes[1]);
+            //downloadAreaAroundWay(way, nodes[0], nodes[1]);
         } else {
             Logging.error("Unexpected arguments");
         }
@@ -373,104 +362,10 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
 
     /**
      *
-     * @param objects is varible arguments for this function of the following types
-     *                1 Argument : {@code Way} (option 'a')
-     *                3 Arguments : They can be either {@code Way Way List<Way>} (option 'b') or {@code Way Node Node} (option 'c')
+     * @param way
+     * @param nodes
      */
-    @SuppressWarnings("unchecked")
-    void downloadAreaAroundWay(Object... objects) {
-        if (abort) {
-            return;
-        }
 
-        final DownloadOsmTask task = null;
-        char option = 0;
-        boolean optionalCheck = false;
-        Way way = null;
-        Way prevWay = null;
-        List<Way> ways = null;
-        Node[] node = new Node[2];
-        final String notificationText;
-
-        String loggingError = tr("Unexpected arguments");
-
-        if (objects.length == 1) {
-            if (objects[0] instanceof Way) {
-                option = 'a';
-                way = (Way) objects[0];
-                notificationText = " (2)";
-            } else {
-                Logging.error(loggingError);
-                return;
-            }
-        } else if (objects.length == 3) {
-            if (objects[0] instanceof Way) {
-                way = (Way) objects[0];
-                optionalCheck = way.isOutsideDownloadArea() || way.isNew();
-                if (objects[1] instanceof Way && objects[2] instanceof List) {
-                    option = 'b';
-                    prevWay = (Way) objects[1];
-                    ways = (List<Way>) objects[2];
-                    notificationText = " (3)";
-                } else if (objects[1] instanceof Node && objects[2] instanceof Node) {
-                    option = 'c';
-                    node[0] = (Node) objects[1];
-                    node[1] = (Node) objects[2];
-                    notificationText = " (1)";
-                } else {
-                    Logging.error(loggingError);
-                    return;
-                }
-            } else {
-                Logging.error(loggingError);
-                return;
-            }
-        }
-
-        if ((downloadCounter > 160 || optionalCheck) && onFly) {
-            downloadCounter = 0;
-            task = new DownloadOsmTask();
-        } else {
-            if (option == 'a') {
-                if (currentIndex >= members.size() - 1) {
-                    deleteExtraWays();
-                } else {
-                    currentIndex += 1;
-                    callNextWay(currentIndex);
-                }
-            } else if (option == 'b') {
-                goToNextWays(way, prevWay, ways);
-            } else if (option == 'c') {
-                findNextWayAfterDownload(way, node[0], node[1]);
-            } else {
-                Logging.error(loggingError);
-                return;
-            }
-        }
-
-        BoundsUtils.createBoundsWithPadding(way.getBBox(), .1).ifPresent(area -> {
-            Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
-            MainApplication.worker.submit(() -> {
-                try {
-                    NotificationUtils.downloadWithNotifications(future, tr("Area around way") + notificationText);
-                    if (option == 'a') {
-                        if (currentIndex >= members.size() - 1) {
-                            deleteExtraWays();
-                        } else {
-                            callNextWay(++currentIndex);
-                        }
-                    } else if (option == 'b') {
-                        goToNextWays(way, prevWay, ways);
-                    } else if (option == 'c') {
-                        findNextWayAfterDownload(way, node[0], node[1]);
-                    }
-
-                } catch (InterruptedException | ExecutionException e) {
-                    Logging.error(e);
-                }
-            });
-        });
-    }
 
     /**
      *

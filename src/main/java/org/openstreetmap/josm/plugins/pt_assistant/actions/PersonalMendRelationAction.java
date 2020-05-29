@@ -1134,10 +1134,10 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
             // OK.actionPerformed(null);
             save();
             if (prevIndex != -1) {
-                super.notice = null;
+                notice = null;
                 callNextWay(prevIndex);
             } else {
-                super.notice = null;
+                notice = null;
                 deleteExtraWays();
             }
         }
