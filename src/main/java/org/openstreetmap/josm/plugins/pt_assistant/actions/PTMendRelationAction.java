@@ -72,13 +72,7 @@ import org.openstreetmap.josm.tools.Utils;
  * @author Biswesh
  */
 public class PTMendRelationAction extends AbstractMendRelationAction {
-
-
     boolean firstCall = true;
-    boolean shorterRoutes = false;
-
-
-    Node splitNode = null;
     int nodeIdx = 0;
 
     /**
@@ -86,9 +80,8 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
      * @param editorAccess
      */
     public PTMendRelationAction(IRelationEditorActionAccess editorAccess) {
-        super(editorAccess, true);
+        super(editorAccess);
     }
-
 
     protected void initialise() {
         save();
@@ -96,11 +89,10 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         members = editor.getRelation().getMembers();
 
         // halt is true indicates the action was paused
-        if (halt == false) {
+        if (!halt) {
             downloadCounter = 0;
             firstCall = false;
             waysAlreadyPresent = new HashMap<>();
-            getListOfAllWays();
             extraWaysToBeDeleted = new ArrayList<>();
             setEnable = false;
             previousWay = null;
@@ -111,6 +103,8 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
             shorterRoutes = false;
             showOption0 = false;
             currentIndex = 0;
+
+            getListOfAllWays();
 
             final JPanel panel = new JPanel(new GridBagLayout());
             panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
@@ -139,43 +133,6 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
             halt = false;
             callNextWay(currentIndex);
         }
-    }
-
-    void downloadEntireArea() {
-        if (abort)
-            return;
-
-        DownloadOsmTask task = new DownloadOsmTask();
-        List<Way> wayList = getListOfAllWays();
-
-        if (wayList.isEmpty()) {
-            callNextWay(currentIndex);
-            return;
-        }
-
-        String typeRoute = "   [\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n";
-        String query = getQuery(typeRoute);
-        Logging.debug(query);
-
-        if (aroundStops || aroundGaps) {
-            BoundsUtils.createBoundsWithPadding(wayList, .1).ifPresent(area -> {
-                final Future<?> future = task.download(
-                    new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query),
-                    DEFAULT_DOWNLOAD_PARAMS, area, null);
-
-                MainApplication.worker.submit(() -> {
-                    try {
-                        NotificationUtils.downloadWithNotifications(future, tr("Entire area"));
-                        callNextWay(currentIndex);
-                    } catch (InterruptedException | ExecutionException e1) {
-                        Logging.error(e1);
-                    }
-                });
-            });
-        } else {
-            callNextWay(currentIndex);
-        }
-
     }
 
     protected void callNextWay(int i) {
@@ -312,17 +269,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         return node;
     }
 
-    int getPreviousWayIndex(int idx) {
-        int j;
-
-        for (j = idx - 1; j >= 0; j--) {
-            if (members.get(j).isWay())
-                return j;
-        }
-        return -1;
-    }
-
-    void addNewWays(List<Way> ways, int i) {
+    protected void addNewWays(List<Way> ways, int i) {
         try {
             List<RelationMember> c = new ArrayList<>();
             for (int k = 0; k < ways.size(); k++) {
@@ -341,7 +288,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    void deleteWayAfterIndex(Way way, int index) {
+    protected void deleteWayAfterIndex(Way way, int index) {
         for (int i = index + 1; i < members.size(); i++) {
             if (members.get(i).isWay() && members.get(i).getWay().equals(way)) {
                 Way prev = null;
@@ -427,7 +374,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         rel.remove(relation);
 
         for (Relation r : rel) {
-            List<Way> lst = searchWayFromOtherRelations(r, current, next);
+            List<Way> lst = searchWayFromOtherRelations(r, current, next, false);
             boolean alreadyPresent = false;
             if (lst != null) {
                 for (List<Way> l : list) {
@@ -437,7 +384,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
                 if (!alreadyPresent)
                     list.add(lst);
             }
-            lst = searchWayFromOtherRelationsReversed(r, current, next);
+            lst = searchWayFromOtherRelations(r, current, next, true);
 
             if (lst != null) {
                 alreadyPresent = false;
@@ -580,7 +527,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         waysToBeRemoved.clear();
 
         // check restrictions
-        parentWays.stream().filter(it -> isRestricted(it, way, node)).forEach(waysToBeRemoved::add);
+        parentWays.stream().filter(it -> isRestricted(way, node)).forEach(waysToBeRemoved::add);
 
         parentWays.removeAll(waysToBeRemoved);
 
@@ -1223,7 +1170,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    void RemoveWayAfterSelection(List<Integer> wayIndices, Character chr) {
+    protected void removeWayAfterSelection(List<Integer> wayIndices, Character chr) {
         if (chr == 'A' || chr == '1') {
             // remove all the ways
             int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
@@ -1296,7 +1243,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    void getNextWayAfterBackTrackSelection(Way way) {
+    protected void getNextWayAfterBackTrackSelection(Way way) {
         save();
         List<Integer> lst = new ArrayList<>();
         lst.add(currentIndex + 1);
@@ -1497,8 +1444,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
             if (prevWay == null)
                 break;
 
-            if (!WayUtils.findCommonFirstLastNode(curr, prevWay).filter(node -> node.getParentWays().size() <= 2)
-                .isPresent()) {
+            if (!WayUtils.findCommonFirstLastNode(curr, prevWay).filter(node -> node.getParentWays().size() <= 2).isPresent()) {
                 break;
             }
 
@@ -1525,48 +1471,6 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         } else {
             notice = null;
             deleteExtraWays();
-        }
-    }
-
-    public class TempStrategy implements Strategy {
-        @Override
-        public Way determineWayToKeep(Iterable<Way> wayChunks) {
-            for (Way way : wayChunks) {
-                if (!way.containsNode(previousCurrentNode)) {
-                    return way;
-                }
-            }
-            return null;
-        }
-    }
-
-    public class TempStrategyRoundabout implements Strategy {
-        @Override
-        public Way determineWayToKeep(Iterable<Way> wayChunks) {
-            for (Way way : wayChunks) {
-                if (way.containsNode(splitNode)) {
-                    return way;
-                }
-            }
-            return null;
-        }
-    }
-
-    private class MendRelationAddLayer extends AbstractMapViewPaintable {
-
-        @Override
-        public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv);
-            paintVisitor.drawVariants();
-        }
-    }
-
-    private class MendRelationAddMultipleLayer extends AbstractMapViewPaintable {
-
-        @Override
-        public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv);
-            paintVisitor.drawMultipleVariants(wayListColoring);
         }
     }
 }

@@ -5,6 +5,7 @@ import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadParams;
 import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
+import org.openstreetmap.josm.command.SplitWayCommand;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.osm.*;
 import org.openstreetmap.josm.gui.MainApplication;
@@ -19,18 +20,26 @@ import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdate
 import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
 import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
 import org.openstreetmap.josm.gui.layer.MapViewPaintable;
+import org.openstreetmap.josm.io.OverpassDownloadReader;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
-import org.openstreetmap.josm.plugins.pt_assistant.gui.PTMendRelationPaintVisitor;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.*;
-import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
 import javax.swing.JOptionPane;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -45,28 +54,11 @@ import static org.openstreetmap.josm.tools.I18n.tr;
  */
 public abstract class AbstractMendRelationAction extends AbstractRelationEditorAction {
     protected static final DownloadParams DEFAULT_DOWNLOAD_PARAMS = new DownloadParams();
-    protected final Color[] FIVE_COLOR_PALETTE = {
-        new Color(0, 255, 0, 150),
-        new Color(255, 0, 0, 150),
-        new Color(0, 0, 255, 150),
-        new Color(255, 255, 0, 150),
-        new Color(0, 255, 255, 150)};
-
-    protected final Map<Character, Color> CHARACTER_COLOR_MAP = new HashMap<>();
-
-    protected final Color CURRENT_WAY_COLOR = new Color(255, 255, 255, 190);
-    protected final Color NEXT_WAY_COLOR = new Color(169, 169, 169, 210);
-
-    protected final String I18N_ADD_ONEWAY_VEHICLE_NO_TWO_WAY;
-    protected final String I18N_CLOSE_OPTIONS = I18n.marktr("Close the options");
-    protected final String I18N_NOT_REMOVE_WAYS = I18n.marktr("Do not remove ways");
-    protected final String I18N_REMOVE_CURRENT_EDGE = I18n.marktr("Remove current edge (white)");
-    protected final String I18N_REMOVE_WAYS = I18n.marktr("Remove ways");
-    protected final String I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY = I18n.marktr("Remove ways along with previous way");
-    protected final String I18N_SKIP = I18n.marktr("Skip");
-    protected final String I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS = I18n.marktr("solutions based on other route relations");
-    protected final String I18N_TURN_BY_TURN_NEXT_INTERSECTION = I18n.marktr("turn-by-turn at next intersection");
-    protected final String I18N_BACKTRACK_WHITE_EDGE = I18n.marktr("Split white edge");
+    protected final String[] RESTRICTIONS = new String[] { "restriction", "restriction:bus", "restriction:trolleybus",
+        "restriction:tram", "restriction:subway", "restriction:light_rail", "restriction:rail",
+        "restriction:train", "restriction:trolleybus" };
+    protected final String[] ACCEPTED_TAGS = { "no_right_turn", "no_left_turn",
+        "no_u_turn", "no_straight_on", "no_entry", "no_exit" };
 
     protected GenericRelationEditor editor;
     protected Relation relation;
@@ -84,8 +76,8 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     protected List<Node> backNodes;
     protected HashMap<Way, Character> wayColoring;
     protected HashMap<Character, List<Way>> wayListColoring;
+    protected Node splitNode;
 
-    protected boolean setEnable = true;
     protected boolean nextIndex = true;
     protected boolean abort = false;
     protected boolean noLinkToPreviousWay = true;
@@ -94,6 +86,8 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     protected boolean aroundStops = false;
     protected boolean showOption0 = false;
     protected boolean onFly = false;
+    protected boolean shorterRoutes = false;
+    protected boolean setEnable = true;
 
     protected int currentIndex;
     protected int downloadCounter;
@@ -101,31 +95,13 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     /**
      *
      * @param editorAccess
-     * @param PTorNot
      */
-    protected AbstractMendRelationAction(IRelationEditorActionAccess editorAccess, boolean PTorNot) {
+    protected AbstractMendRelationAction(IRelationEditorActionAccess editorAccess) {
         super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
         editor = (GenericRelationEditor) editorAccess.getEditor();
         memberTableModel = editorAccess.getMemberTableModel();
         relation = editor.getRelation();
         editor.addWindowListener(new AbstractMendRelationAction.WindowEventHandler());
-        if (PTorNot) {
-            I18N_ADD_ONEWAY_VEHICLE_NO_TWO_WAY = I18n.marktr("Add oneway:bus=no to way");
-        } else {
-            I18N_ADD_ONEWAY_VEHICLE_NO_TWO_WAY = I18n.marktr("Add oneway:bicycle=no to way");
-        }
-
-
-        CHARACTER_COLOR_MAP.put('A', new Color(0, 255, 0, 200));
-        CHARACTER_COLOR_MAP.put('B', new Color(255, 0, 0, 200));
-        CHARACTER_COLOR_MAP.put('C', new Color(0, 0, 255, 200));
-        CHARACTER_COLOR_MAP.put('D', new Color(255, 255, 0, 200));
-        CHARACTER_COLOR_MAP.put('E', new Color(0, 255, 255, 200));
-        CHARACTER_COLOR_MAP.put('1', new Color(0, 255, 0, 200));
-        CHARACTER_COLOR_MAP.put('2', new Color(255, 0, 0, 200));
-        CHARACTER_COLOR_MAP.put('3', new Color(0, 0, 255, 200));
-        CHARACTER_COLOR_MAP.put('4', new Color(255, 255, 0, 200));
-        CHARACTER_COLOR_MAP.put('5', new Color(0, 255, 255, 200));
     }
 
     /**
@@ -202,6 +178,39 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
      * @return
      */
     protected abstract boolean checkOneWaySatisfiability(Way way, Node node);
+
+    /**
+     *
+     * @param wayIndices
+     * @param ch
+     */
+    protected abstract void removeWayAfterSelection(List<Integer> wayIndices, char ch);
+
+    /**
+     *
+     * @param way
+     * @return
+     */
+    protected abstract Way findWayAfterChunk(Way way);
+
+    /**
+     *
+     * @param ways
+     * @param index
+     */
+    protected abstract void addNewWays(List<Way> ways, int index);
+
+    /**
+     *
+     * @param way
+     * @param index
+     */
+    protected abstract void deleteWayAfterIndex(Way way, int index);
+
+    /**
+     *
+     */
+    protected abstract void removeCurrentEdge();
 
     /**
      *
@@ -424,18 +433,6 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
             //downloadAreaAroundWay(way, nodes[0], nodes[1]);
         } else {
             Logging.error("Unexpected arguments");
-        }
-    }
-
-    /**
-     *
-     */
-    class WindowEventHandler extends WindowAdapter {
-        @Override
-        public void windowClosing(WindowEvent e) {
-            editor.cancel();
-            Logging.debug("close");
-            stop();
         }
     }
 
@@ -670,68 +667,67 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
 
     /**
      *
-     * @param currentIsRestrictedentWay
      * @param previousWay
      * @param commonNode
      * @return
      */
-    protected boolean isRestricted(Way currentIsRestrictedentWay, Way previousWay, Node commonNode) {
+    protected boolean isRestricted(Way previousWay, Node commonNode) {
         Set<Relation> parentSet = OsmPrimitive.getParentRelations(previousWay.getNodes());
-        if (parentSet == null || parentSet.isEmpty())
+
+        if (parentSet == null || parentSet.isEmpty()) {
             return false;
+        }
+
         List<Relation> parentRelation = new ArrayList<>(parentSet);
 
-        String[] restrictions = new String[] { "restriction", "restriction:bus", "restriction:trolleybus",
-            "restriction:tram", "restriction:subway", "restriction:light_rail", "restriction:rail",
-            "restriction:train", "restriction:trolleybus" };
-
-        parentRelation.removeIf(rel -> {
-            if (rel.hasKey("except")) {
-                String[] val = rel.get("except").split(";");
+        parentRelation.removeIf(relation -> {
+            if (relation.hasKey("except")) {
+                String[] val = relation.get("except").split(";");
                 for (String s : val) {
                     if (relation.hasTag("route", s))
                         return true;
                 }
             }
 
-            if (!rel.hasTag("type", restrictions))
+            if (!relation.hasTag("type", RESTRICTIONS))
                 return true;
-            else if (rel.hasTag("type", "restriction") && rel.hasKey("restriction"))
+            else if (relation.hasTag("type", "restriction") && relation.hasKey("restriction"))
                 return false;
             else {
                 boolean remove = true;
                 String routeValue = relation.get("route");
-                for (String s : restrictions) {
+                for (String s : RESTRICTIONS) {
                     String sub = s.substring(12);
-                    if (routeValue.equals(sub) && rel.hasTag("type", s))
+                    if (routeValue.equals(sub) && relation.hasTag("type", s))
                         remove = false;
-                    else if (routeValue.equals(sub) && rel.hasKey("restriction:" + sub))
+                    else if (routeValue.equals(sub) && relation.hasKey("restriction:" + sub))
                         remove = false;
                 }
                 return remove;
             }
         });
 
-        // check for "only" kind of restrictions
-        for (Relation r : parentRelation) {
-            Collection<RelationMember> prevMemberList = r.getMembersFor(Collections.singletonList(previousWay));
-            Collection<RelationMember> commonNodeList = r.getMembersFor(Collections.singletonList(commonNode));
-            // commonNode is not the node involved in the restriction relation then just continue
-            if (prevMemberList.isEmpty() || commonNodeList.isEmpty())
-                continue;
+        /* check for "only" kind of restrictions */
+        for (Relation relation : parentRelation) {
+            Collection<RelationMember> prevMemberList = relation.getMembersFor(Collections.singletonList(previousWay));
+            Collection<RelationMember> commonNodeList = relation.getMembersFor(Collections.singletonList(commonNode));
+            Collection<RelationMember> curMemberList = relation.getMembersFor(Collections.singletonList(currentWay));
 
-            final String prevRole = prevMemberList.stream().findFirst().map(RelationMember::getRole).orElse(null);
+            /* if commonNode is not the node involved in the restriction relation then just continue */
+            if (prevMemberList.isEmpty() || commonNodeList.isEmpty()) {
+                continue;
+            }
+
+            String curRole = curMemberList.stream().findFirst().map(RelationMember::getRole).orElse(null);
+            String prevRole = prevMemberList.stream().findFirst().map(RelationMember::getRole).orElse(null);
 
             if (prevRole.equals("from")) {
-                String[] acceptedTags = { "only_right_turn", "only_left_turn", "only_u_turn", "only_straight_on",
-                    "only_entry", "only_exit" };
-                for (String s : restrictions) {
-                    // if we have any "only" type restrictions then the current way should be in the
-                    // relation else it is restricted
-                    if (r.hasTag(s, acceptedTags)) {
-                        if (r.getMembersFor(Collections.singletonList(currentWay)).isEmpty()) {
-                            for (String str : acceptedTags) {
-                                if (r.hasTag(s, str))
+                for (String s : RESTRICTIONS) {
+                    /* if we have any "only" type restrictions then the current way should be in the relation else it is restricted */
+                    if (relation.hasTag(s, ACCEPTED_TAGS)) {
+                        if (relation.getMembersFor(Collections.singletonList(currentWay)).isEmpty()) {
+                            for (String str : ACCEPTED_TAGS) {
+                                if (relation.hasTag(s, str))
                                     notice = str + " restriction violated";
                             }
                             return true;
@@ -739,25 +735,12 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
                     }
                 }
             }
-        }
-
-        for (Relation r : parentRelation) {
-            Collection<RelationMember> curMemberList = r.getMembersFor(Collections.singletonList(currentWay));
-            Collection<RelationMember> prevMemberList = r.getMembersFor(Collections.singletonList(previousWay));
-
-            if (curMemberList.isEmpty() || prevMemberList.isEmpty())
-                continue;
-
-            final String curRole = curMemberList.stream().findFirst().map(RelationMember::getRole).orElse(null);
-            final String prevRole = prevMemberList.stream().findFirst().map(RelationMember::getRole).orElse(null);
 
             if ("to".equals(curRole) && "from".equals(prevRole)) {
-                final String[] acceptedTags = { "no_right_turn", "no_left_turn", "no_u_turn", "no_straight_on",
-                    "no_entry", "no_exit" };
-                for (String s : restrictions) {
-                    if (r.hasTag(s, acceptedTags)) {
-                        for (String str : acceptedTags) {
-                            if (r.hasTag(s, str))
+                for (String s : RESTRICTIONS) {
+                    if (relation.hasTag(s, ACCEPTED_TAGS)) {
+                        for (String str : ACCEPTED_TAGS) {
+                            if (relation.hasTag(s, str))
                                 notice = str + " restriction violated";
                         }
                         return true;
@@ -774,12 +757,13 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
      * @param j
      */
     protected void removeWay(int j) {
-        List<Integer> Int = new ArrayList<>();
-        List<Way> lst = new ArrayList<>();
-        Int.add(j);
-        lst.add(members.get(j).getWay());
-        // if the way at members.get(j) is one way then check if the next ways are on
-        // way, if so then remove them as well
+        List<Integer> initial = new ArrayList<>();
+        List<Way> list = new ArrayList<>();
+        initial.add(j);
+        list.add(members.get(j).getWay());
+
+        /* if the way at members.get(j) is one way then check if the next ways are on
+        a way, if so then remove them as well */
         if (WayUtils.isOneWay(members.get(j).getWay())) {
             while (true) {
                 int k = getNextWayIndex(j);
@@ -792,14 +776,14 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
                     break;
 
                 j = k;
-                Int.add(j);
-                lst.add(members.get(j).getWay());
+                initial.add(j);
+                list.add(members.get(j).getWay());
             }
         }
 
         DataSet ds = MainApplication.getLayerManager().getEditDataSet();
-        ds.setSelected(lst);
-        downloadAreaBeforeRemovalOption(lst, Int);
+        ds.setSelected(list);
+        downloadAreaBeforeRemovalOption(list, initial);
     }
 
     /**
@@ -886,7 +870,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         AutoScaleAction.zoomTo(waysToZoom);
 
         // display the fix variants:
-        temporaryLayer = new PTMendRelationRemoveLayer();
+        temporaryLayer = new PTMendRelationSupportClasses.PTMendRelationRemoveLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
@@ -906,8 +890,9 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
                     MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
                     return;
                 }
-                Character typedKey = e.getKeyChar();
-                Character typedKeyUpperCase = typedKey.toString().toUpperCase().toCharArray()[0];
+                char typedKey = e.getKeyChar();
+                char typedKeyUpperCase = Character.toString(typedKey).toUpperCase().toCharArray()[0];
+
                 if (allowedCharacters.contains(typedKeyUpperCase)) {
                     nextIndex = true;
                     MainApplication.getMap().mapView.removeKeyListener(this);
@@ -916,13 +901,14 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
                     if (typedKeyUpperCase == 'R' || typedKeyUpperCase == '3') {
                         wayIndices.add(0, currentIndex);
                     }
-                    RemoveWayAfterSelection(wayIndices, typedKeyUpperCase);
+                    removeWayAfterSelection(wayIndices, typedKeyUpperCase);
                 }
+
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     MainApplication.getMap().mapView.removeKeyListener(this);
                     Logging.debug("ESC");
                     nextIndex = false;
-                    setEnable = true;
+                     = true;
                     halt = true;
                     setEnabled(true);
                     MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
@@ -939,11 +925,108 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     /**
      *
      */
-    private static class PTMendRelationRemoveLayer extends AbstractMapViewPaintable {
+    void downloadEntireArea() {
+        if (abort) {
+            return;
+        }
+
+        DownloadOsmTask task = new DownloadOsmTask();
+        List<Way> wayList = getListOfAllWays();
+
+        if (wayList.isEmpty()) {
+            callNextWay(currentIndex);
+            return;
+        }
+
+        String typeRoute = "   [\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n";
+        String query = getQuery(typeRoute);
+        Logging.debug(query);
+
+        if (aroundStops || aroundGaps) {
+            BoundsUtils.createBoundsWithPadding(wayList, .1).ifPresent(area -> {
+                final Future<?> future = task.download(
+                    new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query),
+                    DEFAULT_DOWNLOAD_PARAMS, area, null);
+
+                MainApplication.worker.submit(() -> {
+                    try {
+                        NotificationUtils.downloadWithNotifications(future, tr("Entire area"));
+                        callNextWay(currentIndex);
+                    } catch (InterruptedException | ExecutionException e1) {
+                        Logging.error(e1);
+                    }
+                });
+            });
+        } else {
+            callNextWay(currentIndex);
+        }
+    }
+
+    /**
+     *
+     * @param index
+     * @return
+     */
+    protected int getPreviousWayIndex(int index) {
+        for (int j = index - 1; j >= 0; j--) {
+            if (members.get(j).isWay()) {
+                return j;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     *
+     */
+    protected class WindowEventHandler extends WindowAdapter {
+        @Override
+        public void windowClosing(WindowEvent e) {
+            editor.cancel();
+            Logging.debug("close");
+            stop();
+        }
+    }
+
+    /**
+     *
+     */
+    private class TempStrategy implements SplitWayCommand.Strategy {
+        @Override
+        public Way determineWayToKeep(Iterable<Way> wayChunks) {
+            for (Way way : wayChunks) {
+                if (!way.containsNode(previousCurrentNode)) {
+                    return way;
+                }
+            }
+            return null;
+        }
+    }
+
+    /**
+     *
+     */
+    private class TempStrategyRoundabout implements SplitWayCommand.Strategy {
+        @Override
+        public Way determineWayToKeep(Iterable<Way> wayChunks) {
+            for (Way way : wayChunks) {
+                if (way.containsNode(splitNode)) {
+                    return way;
+                }
+            }
+            return null;
+        }
+    }
+
+    /**
+     *
+     */
+    protected class MendRelationAddMultipleLayer extends AbstractMapViewPaintable {
+
         @Override
         public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            PTMendRelationPaintVisitor paintVisitor = new PTMendRelationPaintVisitor(g, mv);
-            paintVisitor.drawOptionsToRemoveWays();
+            PTMendRelationSupportClasses.PTMendRelationPaintVisitor paintVisitor = new PTMendRelationSupportClasses.PTMendRelationPaintVisitor(g, mv);
+            paintVisitor.drawMultipleVariants(wayListColoring);
         }
     }
 }

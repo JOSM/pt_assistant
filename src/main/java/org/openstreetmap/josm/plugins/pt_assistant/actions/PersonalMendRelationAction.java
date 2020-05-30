@@ -48,20 +48,16 @@ import org.openstreetmap.josm.tools.Utils;
  */
 public class PersonalMendRelationAction extends AbstractMendRelationAction {
 
-
     Way lastForWay;
     Way lastBackWay;
-    Node pseudocurrentNode = null;
-    int cnt = 0;
     int brokenidx = 0;
     HashMap<Node, Integer> Isthere = new HashMap<>();
     static HashMap<Way, Integer> IsWaythere = new HashMap<>();
     static List<WayConnectionType> links;
     static WayConnectionType link;
     static WayConnectionType prelink;
-    Node brokenNode;
+
     List<List<Way>> directroutes;
-    NodePositionComparator dist = new NodePositionComparator();
     WayConnectionTypeCalculator connectionTypeCalculator = new WayConnectionTypeCalculator();
 
     public PersonalMendRelationAction(IRelationEditorActionAccess editorAccess) {
@@ -72,17 +68,49 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         super.editor.addWindowListener(new WindowEventHandler());
     }
 
-    @Override
     public void initialise() {
         save();
-        sortBelow(super.relation.getMembers());
-        super.members = super.editor.getRelation().getMembers();
-        super.members.removeIf(m -> !m.isWay());
-        links = connectionTypeCalculator.updateLinks(super.members);
-        if (super.halt == false) {
-            updateStates();
+        sortBelow(relation.getMembers());
+        members = editor.getRelation().getMembers();
+        members.removeIf(m -> !m.isWay());
+        links = connectionTypeCalculator.updateLinks(members);
+        if (!halt) {
+            downloadCounter = 0;
+            waysAlreadyPresent = new HashMap<>();
+            extraWaysToBeDeleted = new ArrayList<>();
+            setEnable = false;
+            previousWay = null;
+            currentWay = null;
+            nextWay = null;
+            noLinkToPreviousWay = true;
+            nextIndex = true;
+            shorterRoutes = false;
+            showOption0 = false;
+            currentIndex = 0;
             getListOfAllWays();
-            makepanelanddownloadArea();
+            final JPanel panel = new JPanel(new GridBagLayout());
+            panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+            final JCheckBox button1 = new JCheckBox("Around Stops");
+            final JCheckBox button2 = new JCheckBox("Around Gaps");
+            final JCheckBox button3 = new JCheckBox("On the fly");
+            button3.setSelected(true);
+            panel.add(new JLabel(tr("How would you want the download to take place?")), GBC.eol().fill(GBC.HORIZONTAL));
+            panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
+            panel.add(button1, GBC.eol().fill(GBC.HORIZONTAL));
+            panel.add(button2, GBC.eol().fill(GBC.HORIZONTAL));
+            panel.add(button3, GBC.eol().fill(GBC.HORIZONTAL));
+
+            int i = JOptionPane.showConfirmDialog(null, panel);
+            if (i == JOptionPane.OK_OPTION) {
+                if (button1.isSelected()) {
+                    super.aroundStops = true;
+                } else if (button2.isSelected()) {
+                    super.aroundGaps = true;
+                } else if (button3.isSelected()) {
+                    super.onFly = true;
+                }
+                downloadEntireArea();
+            }
         } else {
             super.halt = false;
             callNextWay(super.currentIndex);
@@ -92,8 +120,7 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
     ////////calling the nextway /////////
     //this function has to iterate over all super.members of relation table doesn't matter they are broken or not
     //so after every filtering this function has to be called with super.currentIndex+1
-    @Override
-    public void callNextWay(int idx) {
+    protected void callNextWay(int idx) {
         save();
         Logging.debug("Index + " + idx);
         super.downloadCounter++;
@@ -289,7 +316,6 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
 
     }
 
-    @Override
     Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
         // TODO Auto-generated method stub
         super.currentWay = way;
@@ -566,8 +592,7 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    @Override
-    public Way findWayAfterChunk(Way way) {
+    protected Way findWayAfterChunk(Way way) {
         Way w1 = null;
         Way wayToKeep = null;
         List<Node> breakNode = new ArrayList<>();
@@ -779,7 +804,6 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    @Override
     void addNewWays(List<Way> ways, int i) {
         try {
             List<RelationMember> c = new ArrayList<>();
@@ -926,7 +950,6 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         downloadAreaAroundWay(w, w.lastNode(), w.firstNode());
     }
 
-    @Override
     void deleteWayAfterIndex(Way way, int index) {
         for (int i = index + 1; i < super.members.size(); i++) {
             if (super.members.get(i).isWay() && super.members.get(i).getWay().equals(way)) {
@@ -956,8 +979,7 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         links = connectionTypeCalculator.updateLinks(super.members);
     }
 
-    @Override
-    void removeCurrentEdge() {
+    protected void removeCurrentEdge() {
         List<Integer> lst = new ArrayList<>();
         lst.add(super.currentIndex);
         int j = super.currentIndex;
@@ -1005,8 +1027,7 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    @Override
-    void RemoveWayAfterSelection(List<Integer> wayIndices, Character chr) {
+    protected void removeWayAfterSelection(List<Integer> wayIndices, Character chr) {
         if (chr == 'A' || chr == '1') {
             // remove all the ways
             int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
@@ -1046,8 +1067,8 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         } else if (chr == 'C' || chr == '4') {
             List<Command> cmdlst = new ArrayList<>();
             int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
-            for (int i = 0; i < lst.length; i++) {
-                Way w = super.members.get(lst[i]).getWay();
+            for (int value : lst) {
+                Way w = super.members.get(value).getWay();
                 TagMap newKeys = w.getKeys();
                 newKeys.put("oneway", "bicycle=no");
                 cmdlst.add(new ChangePropertyCommand(Collections.singleton(w), newKeys));
@@ -1090,51 +1111,9 @@ public class PersonalMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    public void updateStates() {
-        super.downloadCounter = 0;
-        super.waysAlreadyPresent = new HashMap<>();
-        super.extraWaysToBeDeleted = new ArrayList<>();
-        setEnable = false;
-        super.previousWay = null;
-        super.currentWay = null;
-        super.nextWay = null;
-        super.noLinkToPreviousWay = true;
-        super.nextIndex = true;
-        super.shorterRoutes = false;
-        super.showOption0 = false;
-        super.currentIndex = 0;
-    }
-
-    /////////make panel////////////
-    public void makepanelanddownloadArea() {
-        final JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-        final JCheckBox button1 = new JCheckBox("Around Stops");
-        final JCheckBox button2 = new JCheckBox("Around Gaps");
-        final JCheckBox button3 = new JCheckBox("On the fly");
-        button3.setSelected(true);
-        panel.add(new JLabel(tr("How would you want the download to take place?")), GBC.eol().fill(GBC.HORIZONTAL));
-        panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
-        panel.add(button1, GBC.eol().fill(GBC.HORIZONTAL));
-        panel.add(button2, GBC.eol().fill(GBC.HORIZONTAL));
-        panel.add(button3, GBC.eol().fill(GBC.HORIZONTAL));
-
-        int i = JOptionPane.showConfirmDialog(null, panel);
-        if (i == JOptionPane.OK_OPTION) {
-            if (button1.isSelected()) {
-                super.aroundStops = true;
-            } else if (button2.isSelected()) {
-                super.aroundGaps = true;
-            } else if (button3.isSelected()) {
-                super.onFly = true;
-            }
-            downloadEntireArea();
-        }
-    }
-
     void makeNodesZeros() {
-        for (int i = 0; i < super.members.size(); i++) {
-            Way n = super.members.get(i).getWay();
+        for (RelationMember member : super.members) {
+            Way n = member.getWay();
             Node f = n.firstNode();
             Node l = n.lastNode();
             Isthere.put(f, 0);
