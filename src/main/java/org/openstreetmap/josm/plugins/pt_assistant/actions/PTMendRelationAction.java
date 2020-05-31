@@ -71,7 +71,7 @@ import org.openstreetmap.josm.tools.Utils;
  *
  * @author Biswesh
  */
-public class PTMendRelationAction extends AbstractMendRelationAction {
+public class PTMendRelationAction extends AbstractMendRelationAction implements MendRelationInterface{
     boolean firstCall = true;
     int nodeIdx = 0;
 
@@ -83,7 +83,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         super(editorAccess);
     }
 
-    protected void initialise() {
+    public void initialise() {
         save();
         sortBelow(relation.getMembers());
         members = editor.getRelation().getMembers();
@@ -135,7 +135,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    protected void callNextWay(int i) {
+    public void callNextWay(int i) {
         Logging.debug("Index + " + i);
         downloadCounter++;
         if (i < members.size() && members.get(i).isWay()) {
@@ -207,69 +207,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
     }
 
 
-
-
-
-    Node checkValidityOfWays(Way way, int nextWayIndex) {
-        boolean nextWayDelete = false;
-        Node node = null;
-        nextIndex = false;
-        notice = null;
-
-        final NodePair commonEndNodes = WayUtils.findCommonFirstLastNodes(nextWay, way);
-        if (commonEndNodes.getA() != null && commonEndNodes.getB() != null) {
-            nextWayDelete = true;
-            notice = "Multiple common nodes found between current and next way";
-        } else if (commonEndNodes.getA() != null) {
-            node = commonEndNodes.getA();
-        } else if (commonEndNodes.getB() != null) {
-            node = commonEndNodes.getB();
-        } else {
-            // the nodes can be one of the intermediate nodes
-            for (Node n : nextWay.getNodes()) {
-                if (way.getNodes().contains(n)) {
-                    node = n;
-                    currentNode = n;
-                }
-            }
-        }
-
-        // check if there is a restricted relation that doesn't allow both the ways together
-        if (node != null && (nextWay, way, node)) {
-            nextWayDelete = true;
-        }
-
-        if (isNonSplitRoundabout(way)) {
-            nextWayDelete = false;
-            for (Node n : way.getNodes()) {
-                if (nextWay.firstNode().equals(n) || nextWay.lastNode().equals(n)) {
-                    node = n;
-                    currentNode = n;
-                }
-            }
-        }
-
-        if (isNonSplitRoundabout(nextWay)) {
-            nextWayDelete = false;
-        }
-
-        if (node != null && !checkOneWaySatisfiability(nextWay, node)) {
-            nextWayDelete = true;
-            notice = "vehicle travels against oneway restriction";
-        }
-
-        if (nextWayDelete) {
-            currentWay = way;
-            nextIndex = true;
-            removeWay(nextWayIndex);
-            return null;
-        }
-
-        nextIndex = false;
-        return node;
-    }
-
-    protected void addNewWays(List<Way> ways, int i) {
+    public void addNewWays(List<Way> ways, int i) {
         try {
             List<RelationMember> c = new ArrayList<>();
             for (int k = 0; k < ways.size(); k++) {
@@ -288,7 +226,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    protected void deleteWayAfterIndex(Way way, int index) {
+    public void deleteWayAfterIndex(Way way, int index) {
         for (int i = index + 1; i < members.size(); i++) {
             if (members.get(i).isWay() && members.get(i).getWay().equals(way)) {
                 Way prev = null;
@@ -316,7 +254,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    protected void findNextWayAfterDownload(Way way, Node node1, Node node2) {
+    public void findNextWayAfterDownload(Way way, Node node1, Node node2) {
         currentWay = way;
         if (abort)
             return;
@@ -353,7 +291,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    protected List<List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
+    public List<List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
         List<List<Way>> list = new ArrayList<>();
         List<Relation> r1;
         List<Relation> r2;
@@ -400,13 +338,13 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         return list;
     }
 
-    protected boolean isOneWayOrRoundabout(Way way) {
+    public boolean isOneWayOrRoundabout(Way way) {
         return currentWay.isOneway() == 0
             && RouteUtils.isOnewayForPublicTransport(currentWay) == 0
             && !isSplitRoundabout(currentWay);
     }
 
-    protected List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way way) {
+    public List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way way) {
         parentWays.remove(way);
         if (abort)
             return null;
@@ -534,48 +472,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         return parentWays;
     }
 
-    boolean isWaySuitableForOtherModes(Way way) {
-
-        if (relation.hasTag("route", "tram"))
-            return way.hasTag("railway", "tram");
-
-        if (relation.hasTag("route", "subway"))
-            return way.hasTag("railway", "subway");
-
-        if (relation.hasTag("route", "light_rail"))
-            return way.hasTag("railway", "light_rail");
-
-        if (relation.hasTag("route", "rail"))
-            return way.hasTag("railway", "rail");
-
-        if (relation.hasTag("route", "train"))
-            return way.hasTag("railway", "train");
-
-        if (relation.hasTag("route", "trolleybus"))
-            return way.hasTag("trolley_wire", "yes");
-
-        return false;
-    }
-
-    void addAlreadyExistingWay(Way w) {
-        // delete the way if only if we haven't crossed it yet
-        if (waysAlreadyPresent.get(w) == 1) {
-            deleteWay(w);
-        }
-    }
-
-    void deleteWay(Way w) {
-        for (int i = 0; i < members.size(); i++) {
-            if (members.get(i).isWay() && members.get(i).getWay().equals(w)) {
-                int[] x = { i };
-                memberTableModel.remove(x);
-                members.remove(i);
-                break;
-            }
-        }
-    }
-
-    protected boolean checkOneWaySatisfiability(Way way, Node node) {
+    public boolean checkOneWaySatisfiability(Way way, Node node) {
         String[] acceptedTags = new String[] { "yes", "designated" };
 
         if ((way.hasTag("oneway:bus", acceptedTags) || way.hasTag("oneway:psv", acceptedTags))
@@ -597,212 +494,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         return true;
     }
 
-    private List<Character> findLettersVariants(List<Way> fixVariants) throws CannotProceedException {
-        char alphabet = 'A';
-        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
-        wayColoring = new HashMap<>();
-        final List<Character> allowedCharacters = new ArrayList<>();
-        if (numeric) {
-            alphabet = '1';
-            allowedCharacters.add('7');
-            if (showOption0)
-                allowedCharacters.add('0');
-            allowedCharacters.add('8');
-            allowedCharacters.add('9');
-        } else {
-            allowedCharacters.add('S');
-            if (showOption0)
-                allowedCharacters.add('W');
-            allowedCharacters.add('V');
-            allowedCharacters.add('Q');
-        }
-
-        for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
-            allowedCharacters.add(alphabet);
-            wayColoring.put(fixVariants.get(i), alphabet);
-            alphabet++;
-        }
-
-        // remove any existing temporary layer
-        removeTemporaryLayers();
-
-        if (abort) {
-            throw new CannotProceedException("Aborted");
-        }
-
-        // zoom to problem:
-        AutoScaleAction.zoomTo(fixVariants);
-
-        // display the fix variants:
-        temporaryLayer = new MendRelationAddLayer();
-        MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
-
-        // // add the key listener:
-        MainApplication.getMap().mapView.requestFocus();
-        return allowedCharacters;
-    }
-
-    void displayFixVariants(List<Way> fixVariants) {
-        final List<Character> allowedCharacters;
-        try {
-            allowedCharacters = findLettersVariants(fixVariants);
-        } catch (CannotProceedException e) {
-            return;
-        }
-
-        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
-
-        MainApplication.getMap().mapView.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                downloadCounter = 0;
-                if (abort) {
-                    removeKeyListenerAndTemporaryLayer(this);
-                    return;
-                }
-                char typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
-                if (allowedCharacters.contains(typedKeyUpperCase)) {
-                    int idx = typedKeyUpperCase - 65;
-                    if (numeric) {
-                        // for numpad numerics and the plain numerics
-                        if (typedKeyUpperCase <= 57)
-                            idx = typedKeyUpperCase - 49;
-                        else
-                            idx = typedKeyUpperCase - 97;
-                    }
-                    nextIndex = true;
-                    if (typedKeyUpperCase == 'S' || typedKeyUpperCase == '7') {
-                        removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        getNextWayAfterSelection(null);
-                    } else if (typedKeyUpperCase == 'Q' || typedKeyUpperCase == '9') {
-                        removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        removeCurrentEdge();
-                    } else if (typedKeyUpperCase == 'W' || typedKeyUpperCase == '0') {
-                        shorterRoutes = !shorterRoutes;
-                        removeKeyListenerAndTemporaryLayer(this);
-                        callNextWay(currentIndex);
-                    } else if (typedKeyUpperCase == 'V' || typedKeyUpperCase == '8') {
-                        removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        backtrackCurrentEdge();
-                    } else {
-                        removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        getNextWayAfterSelection(Collections.singletonList(fixVariants.get(idx)));
-                    }
-                }
-                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    MainApplication.getMap().mapView.removeKeyListener(this);
-                    nextIndex = false;
-                    shorterRoutes = false;
-                    setEnable = true;
-                    halt = true;
-                    setEnabled(true);
-                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
-                }
-            }
-        });
-    }
-
-    void displayBacktrackFixVariant(List<Way> fixVariants, int idx1) {
-        char alphabet = 'A';
-        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
-        wayColoring = new HashMap<>();
-        final List<Character> allowedCharacters = new ArrayList<>();
-        if (numeric) {
-            alphabet = '1';
-            allowedCharacters.add('7');
-            if (showOption0)
-                allowedCharacters.add('0');
-            allowedCharacters.add('8');
-            allowedCharacters.add('9');
-        } else {
-            allowedCharacters.add('S');
-            if (showOption0)
-                allowedCharacters.add('W');
-            allowedCharacters.add('V');
-            allowedCharacters.add('Q');
-        }
-
-        for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
-            allowedCharacters.add(alphabet);
-            wayColoring.put(fixVariants.get(i), alphabet);
-            alphabet++;
-        }
-
-        // remove any existing temporary layer
-        removeTemporaryLayers();
-
-        if (abort)
-            return;
-
-        // zoom to problem:
-        AutoScaleAction.zoomTo(fixVariants);
-
-        // display the fix variants:
-        temporaryLayer = new MendRelationAddLayer();
-        MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
-
-        // // add the key listener:
-        MainApplication.getMap().mapView.requestFocus();
-        MainApplication.getMap().mapView.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                downloadCounter = 0;
-                if (abort) {
-                    removeKeyListenerAndTemporaryLayer(this);
-                    return;
-                }
-                char typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
-                if (allowedCharacters.contains(typedKeyUpperCase)) {
-                    int idx = typedKeyUpperCase - 65;
-                    if (numeric) {
-                        // for numpad numbers and the plain numbers
-                        if (typedKeyUpperCase <= 57)
-                            idx = typedKeyUpperCase - 49;
-                        else
-                            idx = typedKeyUpperCase - 97;
-                    }
-                    nextIndex = true;
-                    if (typedKeyUpperCase == 'S' || typedKeyUpperCase == '7') {
-                        removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        getNextWayAfterSelection(null);
-                    } else if (typedKeyUpperCase == 'Q' || typedKeyUpperCase == '9') {
-                        removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        removeCurrentEdge();
-                    } else if (typedKeyUpperCase == 'W' || typedKeyUpperCase == '0') {
-                        shorterRoutes = !shorterRoutes;
-                        removeKeyListenerAndTemporaryLayer(this);
-                        callNextWay(currentIndex);
-                    } else if (typedKeyUpperCase == 'V' || typedKeyUpperCase == '8') {
-                        removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        backTrack(currentWay, idx1 + 1);
-                    } else {
-                        removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        findWayAfterChunk(currentWay);
-                        getNextWayAfterBackTrackSelection(fixVariants.get(idx));
-                    }
-                }
-                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    MainApplication.getMap().mapView.removeKeyListener(this);
-                    nextIndex = false;
-                    shorterRoutes = false;
-                    setEnable = true;
-                    halt = true;
-                    setEnabled(true);
-                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
-                }
-            }
-        });
-    }
-
-    protected void backtrackCurrentEdge() {
+    public void backtrackCurrentEdge() {
         Way way = currentWay;
         backNodes = way.getNodes();
         if (currentNode == null) {
@@ -816,7 +508,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         backTrack(currentWay, idx);
     }
 
-    protected void backTrack(Way way, int idx) {
+    public void backTrack(Way way, int idx) {
         if (idx >= backNodes.size() - 1) {
             currentNode = previousCurrentNode;
             callNextWay(currentIndex);
@@ -889,6 +581,333 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         }
         return wayToKeep;
     }
+
+    public void getNextWayAfterBackTrackSelection(Way way) {
+        save();
+        List<Integer> lst = new ArrayList<>();
+        lst.add(currentIndex + 1);
+        int[] ind = lst.stream().mapToInt(Integer::intValue).toArray();
+        memberTableModel.remove(ind);
+        Way temp = members.get(ind[0]).getWay();
+        for (int i = 0; i < ind.length; i++) {
+            members.remove(ind[i] - i);
+        }
+        save();
+        List<RelationMember> c = new ArrayList<>();
+        List<Way> ways = new ArrayList<>();
+        ways.add(temp);
+        int p = currentIndex;
+        c.add(new RelationMember("", ways.get(0)));
+        members.addAll(p + 1, c);
+        save();
+        int indx = currentIndex;
+        addNewWays(Collections.singletonList(way), indx);
+        currentNode = getOtherNode(way, currentNode);
+        if (currentIndex < members.size() - 1) {
+            callNextWay(++currentIndex);
+        } else {
+            deleteExtraWays();
+        }
+    }
+
+    public void getNextWayAfterSelection(List<Way> ways) {
+        if (ways != null) {
+            /*
+             * check if the selected way is not a complete way but rather a part of a parent
+             * way, then split the actual way (the partial way was created in method
+             * removeViolatingWaysFromParentWays but here we are finally splitting the
+             * actual way and adding to the relation) here there can be 3 cases - 1) if the
+             * current node is the node splitting a certain way 2) if next way's first node
+             * is splitting the way 3) if next way's last node is splitting the way
+             */
+            Logging.debug("Number of ways " + ways.size());
+            int ind = currentIndex;
+            Way prev = currentWay;
+            for (int i = 0; i < ways.size(); i++) {
+                Way w = ways.get(i);
+                Way w1 = null;
+                List<Node> breakNode = null;
+                boolean brk = false;
+
+                if (w.isNew()) {
+                    if (prev != null) {
+                        List<Way> par = new ArrayList<>(prev.firstNode().getParentWays());
+                        par.addAll(prev.lastNode().getParentWays());
+                        for (Way v : par) {
+                            if (v.getNodes().containsAll(w.getNodes())) {
+                                if (w.equals(v)) {
+                                    addNewWays(Collections.singletonList(v), ind);
+                                    prev = v;
+                                    ind++;
+                                    brk = true;
+                                    break;
+                                } else {
+                                    List<Node> temp = new ArrayList<>();
+                                    if (!v.isFirstLastNode(w.firstNode()))
+                                        temp.add(w.firstNode());
+                                    if (!v.isFirstLastNode(w.lastNode()))
+                                        temp.add(w.lastNode());
+                                    if (temp.size() != 0) {
+                                        w1 = v;
+                                        breakNode = new ArrayList<>(temp);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // check if the new way is part of one of the parentWay of the nextWay's first
+                    // node
+                    for (Way v : nextWay.firstNode().getParentWays()) {
+                        if (v.getNodes().containsAll(w.getNodes()) && w1 == null) {
+                            if (!w.equals(v) && !v.isFirstLastNode(nextWay.firstNode())) {
+                                w1 = v;
+                                breakNode = Collections.singletonList(nextWay.firstNode());
+                                break;
+                            } else if (w.equals(v)) {
+                                addNewWays(Collections.singletonList(v), ind);
+                                prev = v;
+                                ind++;
+                                brk = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // check if the new way is part of one of the parentWay of the nextWay's first
+                    for (Way v : nextWay.lastNode().getParentWays()) {
+                        if (v.getNodes().containsAll(w.getNodes()) && w1 == null) {
+                            if (!w.equals(v) && !v.isFirstLastNode(nextWay.lastNode())) {
+                                w1 = v;
+                                breakNode = Collections.singletonList(nextWay.lastNode());
+                                break;
+                            } else if (w.equals(v)) {
+                                addNewWays(Collections.singletonList(v), ind);
+                                ind++;
+                                prev = v;
+                                brk = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (w1 != null && !brk) {
+                        SplitWayCommand result = SplitWayCommand.split(w1, breakNode, Collections.emptyList());
+                        if (result != null) {
+                            UndoRedoHandler.getInstance().add(result);
+                            if (result.getOriginalWay().getNodes().contains(w.firstNode())
+                                && result.getOriginalWay().getNodes().contains(w.lastNode()))
+                                w = result.getOriginalWay();
+                            else
+                                w = result.getNewWays().get(0);
+
+                            addNewWays(Collections.singletonList(w), ind);
+                            prev = w;
+                            ind++;
+                        }
+
+                    } else if (!brk) {
+                        Logging.debug("none");
+                    }
+                } else {
+                    if (w.isInnerNode(currentNode) && !w.firstNode().equals(w.lastNode())) {
+                        findWayafterchunkRoundabout(w);
+                    }
+                    addNewWays(Collections.singletonList(w), ind);
+                    prev = w;
+                    ind++;
+                }
+            }
+            Way way = members.get(currentIndex).getWay();
+            Way nexWay = members.get(currentIndex + 1).getWay();
+            Node n = WayUtils.findCommonFirstLastNode(nexWay, way, currentNode).orElse(null);
+            currentNode = getOtherNode(nexWay, n);
+            save();
+            try {
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException e) {
+                Logging.error(e);
+            }
+        } else {
+            currentNode = null;
+        }
+        previousWay = currentWay;
+        if (currentIndex < members.size() - 1) {
+            callNextWay(++currentIndex);
+        } else
+            deleteExtraWays();
+    }
+
+    public void removeCurrentEdge() {
+        List<Integer> lst = new ArrayList<>();
+        lst.add(currentIndex);
+        int j = currentIndex;
+        Way curr = currentWay;
+        Node n = getOtherNode(curr, currentNode);
+
+        while (true) {
+            int i = getPreviousWayIndex(j);
+            if (i == -1)
+                break;
+
+            Way prevWay = members.get(i).getWay();
+
+            if (prevWay == null)
+                break;
+
+            if (!WayUtils.findCommonFirstLastNode(curr, prevWay).filter(node -> node.getParentWays().size() <= 2).isPresent()) {
+                break;
+            }
+
+            lst.add(i);
+            curr = prevWay;
+            j = i;
+        }
+
+        int prevInd = getPreviousWayIndex(j);
+
+        Collections.reverse(lst);
+        int[] ind = lst.stream().mapToInt(Integer::intValue).toArray();
+        memberTableModel.remove(ind);
+        for (int i = 0; i < ind.length; i++) {
+            members.remove(ind[i] - i);
+        }
+
+        save();
+
+        if (prevInd >= 0) {
+            currentNode = n;
+            currentIndex = prevInd;
+            callNextWay(currentIndex);
+        } else {
+            notice = null;
+            deleteExtraWays();
+        }
+    }
+
+        /*
+        TODO : NOT IN INTERFACE
+         */
+
+    void addAlreadyExistingWay(Way w) {
+        // delete the way if only if we haven't crossed it yet
+        if (waysAlreadyPresent.get(w) == 1) {
+            deleteWay(w);
+        }
+    }
+
+    void deleteWay(Way w) {
+        for (int i = 0; i < members.size(); i++) {
+            if (members.get(i).isWay() && members.get(i).getWay().equals(w)) {
+                int[] x = { i };
+                memberTableModel.remove(x);
+                members.remove(i);
+                break;
+            }
+        }
+    }
+
+    List<Way> findCurrentEdge() {
+        List<Way> lst = new ArrayList<>();
+        lst.add(currentWay);
+        int j = currentIndex;
+        Way curr = currentWay;
+        while (true) {
+            int i = getPreviousWayIndex(j);
+            if (i == -1)
+                break;
+
+            Way prevWay = members.get(i).getWay();
+
+            if (prevWay == null)
+                break;
+
+            if (!WayUtils.findCommonFirstLastNode(curr, prevWay).filter(node -> node.getParentWays().size() <= 2)
+                .isPresent()) {
+                break;
+            }
+
+            lst.add(prevWay);
+            curr = prevWay;
+            j = i;
+        }
+        return lst;
+    }
+
+    protected void removeWayAfterSelection(List<Integer> wayIndices, Character chr) {
+        if (chr == 'A' || chr == '1') {
+            // remove all the ways
+            int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
+            memberTableModel.remove(lst);
+            for (int i = 0; i < lst.length; i++) {
+                members.remove(lst[i] - i);
+            }
+            // OK.actionPerformed(null);
+            save();
+            if (currentIndex < members.size() - 1) {
+                notice = null;
+                callNextWay(currentIndex);
+            } else {
+                notice = null;
+                deleteExtraWays();
+            }
+        } else if (chr == 'B' || chr == '2') {
+            if (currentIndex < members.size() - 1) {
+                notice = null;
+                currentIndex = wayIndices.get(wayIndices.size() - 1);
+                callNextWay(currentIndex);
+            } else {
+                notice = null;
+                deleteExtraWays();
+            }
+        } else if (chr == 'C' || chr == '4') {
+            List<Command> cmdlst = new ArrayList<>();
+            int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
+            for (int i = 0; i < lst.length; i++) {
+                Way w = members.get(lst[i]).getWay();
+                TagMap newKeys = w.getKeys();
+                newKeys.put("oneway", "bus=no");
+                cmdlst.add(new ChangePropertyCommand(Collections.singleton(w), newKeys));
+            }
+            UndoRedoHandler.getInstance().add(new SequenceCommand("Add tags", cmdlst));
+            // OK.actionPerformed(null);
+            save();
+            if (currentIndex < members.size() - 1) {
+                notice = null;
+                callNextWay(currentIndex);
+            } else {
+                notice = null;
+                deleteExtraWays();
+            }
+        }
+        if (chr == 'R' || chr == '3') {
+            // calculate the previous index
+            int prevIndex = -1;
+            for (int i = currentIndex - 1; i >= 0; i--) {
+                if (members.get(i).isWay()) {
+                    prevIndex = i;
+                    break;
+                }
+            }
+            // remove all the ways
+            int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
+            memberTableModel.remove(lst);
+            for (int i = 0; i < lst.length; i++) {
+                members.remove(lst[i] - i);
+            }
+            // OK.actionPerformed(null);
+            save();
+            if (prevIndex != -1) {
+                notice = null;
+                callNextWay(prevIndex);
+            } else {
+                notice = null;
+                deleteExtraWays();
+            }
+        }
+    }
+
 
     private void findWayafterchunkRoundabout(Way way) {
         List<Node> breakNode = new ArrayList<>();
@@ -1170,307 +1189,295 @@ public class PTMendRelationAction extends AbstractMendRelationAction {
         }
     }
 
-    protected void removeWayAfterSelection(List<Integer> wayIndices, Character chr) {
-        if (chr == 'A' || chr == '1') {
-            // remove all the ways
-            int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
-            memberTableModel.remove(lst);
-            for (int i = 0; i < lst.length; i++) {
-                members.remove(lst[i] - i);
-            }
-            // OK.actionPerformed(null);
-            save();
-            if (currentIndex < members.size() - 1) {
-                notice = null;
-                callNextWay(currentIndex);
-            } else {
-                notice = null;
-                deleteExtraWays();
-            }
-        } else if (chr == 'B' || chr == '2') {
-            if (currentIndex < members.size() - 1) {
-                notice = null;
-                currentIndex = wayIndices.get(wayIndices.size() - 1);
-                callNextWay(currentIndex);
-            } else {
-                notice = null;
-                deleteExtraWays();
-            }
-        } else if (chr == 'C' || chr == '4') {
-            List<Command> cmdlst = new ArrayList<>();
-            int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
-            for (int i = 0; i < lst.length; i++) {
-                Way w = members.get(lst[i]).getWay();
-                TagMap newKeys = w.getKeys();
-                newKeys.put("oneway", "bus=no");
-                cmdlst.add(new ChangePropertyCommand(Collections.singleton(w), newKeys));
-            }
-            UndoRedoHandler.getInstance().add(new SequenceCommand("Add tags", cmdlst));
-            // OK.actionPerformed(null);
-            save();
-            if (currentIndex < members.size() - 1) {
-                notice = null;
-                callNextWay(currentIndex);
-            } else {
-                notice = null;
-                deleteExtraWays();
-            }
+    void displayFixVariants(List<Way> fixVariants) {
+        final List<Character> allowedCharacters;
+        try {
+            allowedCharacters = findLettersVariants(fixVariants);
+        } catch (CannotProceedException e) {
+            return;
         }
-        if (chr == 'R' || chr == '3') {
-            // calculate the previous index
-            int prevIndex = -1;
-            for (int i = currentIndex - 1; i >= 0; i--) {
-                if (members.get(i).isWay()) {
-                    prevIndex = i;
-                    break;
+
+        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
+
+        MainApplication.getMap().mapView.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                downloadCounter = 0;
+                if (abort) {
+                    removeKeyListenerAndTemporaryLayer(this);
+                    return;
+                }
+                char typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
+                if (allowedCharacters.contains(typedKeyUpperCase)) {
+                    int idx = typedKeyUpperCase - 65;
+                    if (numeric) {
+                        // for numpad numerics and the plain numerics
+                        if (typedKeyUpperCase <= 57)
+                            idx = typedKeyUpperCase - 49;
+                        else
+                            idx = typedKeyUpperCase - 97;
+                    }
+                    nextIndex = true;
+                    if (typedKeyUpperCase == 'S' || typedKeyUpperCase == '7') {
+                        removeKeyListenerAndTemporaryLayer(this);
+                        shorterRoutes = false;
+                        getNextWayAfterSelection(null);
+                    } else if (typedKeyUpperCase == 'Q' || typedKeyUpperCase == '9') {
+                        removeKeyListenerAndTemporaryLayer(this);
+                        shorterRoutes = false;
+                        removeCurrentEdge();
+                    } else if (typedKeyUpperCase == 'W' || typedKeyUpperCase == '0') {
+                        shorterRoutes = !shorterRoutes;
+                        removeKeyListenerAndTemporaryLayer(this);
+                        callNextWay(currentIndex);
+                    } else if (typedKeyUpperCase == 'V' || typedKeyUpperCase == '8') {
+                        removeKeyListenerAndTemporaryLayer(this);
+                        shorterRoutes = false;
+                        backtrackCurrentEdge();
+                    } else {
+                        removeKeyListenerAndTemporaryLayer(this);
+                        shorterRoutes = false;
+                        getNextWayAfterSelection(Collections.singletonList(fixVariants.get(idx)));
+                    }
+                }
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    MainApplication.getMap().mapView.removeKeyListener(this);
+                    nextIndex = false;
+                    shorterRoutes = false;
+                    setEnable = true;
+                    halt = true;
+                    setEnabled(true);
+                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
                 }
             }
-            // remove all the ways
-            int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
-            memberTableModel.remove(lst);
-            for (int i = 0; i < lst.length; i++) {
-                members.remove(lst[i] - i);
-            }
-            // OK.actionPerformed(null);
-            save();
-            if (prevIndex != -1) {
-                notice = null;
-                callNextWay(prevIndex);
-            } else {
-                notice = null;
-                deleteExtraWays();
-            }
-        }
+        });
     }
 
-    protected void getNextWayAfterBackTrackSelection(Way way) {
-        save();
-        List<Integer> lst = new ArrayList<>();
-        lst.add(currentIndex + 1);
-        int[] ind = lst.stream().mapToInt(Integer::intValue).toArray();
-        memberTableModel.remove(ind);
-        Way temp = members.get(ind[0]).getWay();
-        for (int i = 0; i < ind.length; i++) {
-            members.remove(ind[i] - i);
-        }
-        save();
-        List<RelationMember> c = new ArrayList<>();
-        List<Way> ways = new ArrayList<>();
-        ways.add(temp);
-        int p = currentIndex;
-        c.add(new RelationMember("", ways.get(0)));
-        members.addAll(p + 1, c);
-        save();
-        int indx = currentIndex;
-        addNewWays(Collections.singletonList(way), indx);
-        currentNode = getOtherNode(way, currentNode);
-        if (currentIndex < members.size() - 1) {
-            callNextWay(++currentIndex);
+    void displayBacktrackFixVariant(List<Way> fixVariants, int idx1) {
+        char alphabet = 'A';
+        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
+        wayColoring = new HashMap<>();
+        final List<Character> allowedCharacters = new ArrayList<>();
+        if (numeric) {
+            alphabet = '1';
+            allowedCharacters.add('7');
+            if (showOption0)
+                allowedCharacters.add('0');
+            allowedCharacters.add('8');
+            allowedCharacters.add('9');
         } else {
-            deleteExtraWays();
+            allowedCharacters.add('S');
+            if (showOption0)
+                allowedCharacters.add('W');
+            allowedCharacters.add('V');
+            allowedCharacters.add('Q');
         }
-    }
 
-    protected void getNextWayAfterSelection(List<Way> ways) {
-        if (ways != null) {
-            /*
-             * check if the selected way is not a complete way but rather a part of a parent
-             * way, then split the actual way (the partial way was created in method
-             * removeViolatingWaysFromParentWays but here we are finally splitting the
-             * actual way and adding to the relation) here there can be 3 cases - 1) if the
-             * current node is the node splitting a certain way 2) if next way's first node
-             * is splitting the way 3) if next way's last node is splitting the way
-             */
-            Logging.debug("Number of ways " + ways.size());
-            int ind = currentIndex;
-            Way prev = currentWay;
-            for (int i = 0; i < ways.size(); i++) {
-                Way w = ways.get(i);
-                Way w1 = null;
-                List<Node> breakNode = null;
-                boolean brk = false;
+        for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
+            allowedCharacters.add(alphabet);
+            wayColoring.put(fixVariants.get(i), alphabet);
+            alphabet++;
+        }
 
-                if (w.isNew()) {
-                    if (prev != null) {
-                        List<Way> par = new ArrayList<>(prev.firstNode().getParentWays());
-                        par.addAll(prev.lastNode().getParentWays());
-                        for (Way v : par) {
-                            if (v.getNodes().containsAll(w.getNodes())) {
-                                if (w.equals(v)) {
-                                    addNewWays(Collections.singletonList(v), ind);
-                                    prev = v;
-                                    ind++;
-                                    brk = true;
-                                    break;
-                                } else {
-                                    List<Node> temp = new ArrayList<>();
-                                    if (!v.isFirstLastNode(w.firstNode()))
-                                        temp.add(w.firstNode());
-                                    if (!v.isFirstLastNode(w.lastNode()))
-                                        temp.add(w.lastNode());
-                                    if (temp.size() != 0) {
-                                        w1 = v;
-                                        breakNode = new ArrayList<>(temp);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
+        // remove any existing temporary layer
+        removeTemporaryLayers();
+
+        if (abort)
+            return;
+
+        // zoom to problem:
+        AutoScaleAction.zoomTo(fixVariants);
+
+        // display the fix variants:
+        temporaryLayer = new MendRelationAddLayer();
+        MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
+
+        // // add the key listener:
+        MainApplication.getMap().mapView.requestFocus();
+        MainApplication.getMap().mapView.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                downloadCounter = 0;
+                if (abort) {
+                    removeKeyListenerAndTemporaryLayer(this);
+                    return;
+                }
+                char typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
+                if (allowedCharacters.contains(typedKeyUpperCase)) {
+                    int idx = typedKeyUpperCase - 65;
+                    if (numeric) {
+                        // for numpad numbers and the plain numbers
+                        if (typedKeyUpperCase <= 57)
+                            idx = typedKeyUpperCase - 49;
+                        else
+                            idx = typedKeyUpperCase - 97;
                     }
-
-                    // check if the new way is part of one of the parentWay of the nextWay's first
-                    // node
-                    for (Way v : nextWay.firstNode().getParentWays()) {
-                        if (v.getNodes().containsAll(w.getNodes()) && w1 == null) {
-                            if (!w.equals(v) && !v.isFirstLastNode(nextWay.firstNode())) {
-                                w1 = v;
-                                breakNode = Collections.singletonList(nextWay.firstNode());
-                                break;
-                            } else if (w.equals(v)) {
-                                addNewWays(Collections.singletonList(v), ind);
-                                prev = v;
-                                ind++;
-                                brk = true;
-                                break;
-                            }
-                        }
+                    nextIndex = true;
+                    if (typedKeyUpperCase == 'S' || typedKeyUpperCase == '7') {
+                        removeKeyListenerAndTemporaryLayer(this);
+                        shorterRoutes = false;
+                        getNextWayAfterSelection(null);
+                    } else if (typedKeyUpperCase == 'Q' || typedKeyUpperCase == '9') {
+                        removeKeyListenerAndTemporaryLayer(this);
+                        shorterRoutes = false;
+                        removeCurrentEdge();
+                    } else if (typedKeyUpperCase == 'W' || typedKeyUpperCase == '0') {
+                        shorterRoutes = !shorterRoutes;
+                        removeKeyListenerAndTemporaryLayer(this);
+                        callNextWay(currentIndex);
+                    } else if (typedKeyUpperCase == 'V' || typedKeyUpperCase == '8') {
+                        removeKeyListenerAndTemporaryLayer(this);
+                        shorterRoutes = false;
+                        backTrack(currentWay, idx1 + 1);
+                    } else {
+                        removeKeyListenerAndTemporaryLayer(this);
+                        shorterRoutes = false;
+                        findWayAfterChunk(currentWay);
+                        getNextWayAfterBackTrackSelection(fixVariants.get(idx));
                     }
-
-                    // check if the new way is part of one of the parentWay of the nextWay's first
-                    for (Way v : nextWay.lastNode().getParentWays()) {
-                        if (v.getNodes().containsAll(w.getNodes()) && w1 == null) {
-                            if (!w.equals(v) && !v.isFirstLastNode(nextWay.lastNode())) {
-                                w1 = v;
-                                breakNode = Collections.singletonList(nextWay.lastNode());
-                                break;
-                            } else if (w.equals(v)) {
-                                addNewWays(Collections.singletonList(v), ind);
-                                ind++;
-                                prev = v;
-                                brk = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (w1 != null && !brk) {
-                        SplitWayCommand result = SplitWayCommand.split(w1, breakNode, Collections.emptyList());
-                        if (result != null) {
-                            UndoRedoHandler.getInstance().add(result);
-                            if (result.getOriginalWay().getNodes().contains(w.firstNode())
-                                && result.getOriginalWay().getNodes().contains(w.lastNode()))
-                                w = result.getOriginalWay();
-                            else
-                                w = result.getNewWays().get(0);
-
-                            addNewWays(Collections.singletonList(w), ind);
-                            prev = w;
-                            ind++;
-                        }
-
-                    } else if (!brk) {
-                        Logging.debug("none");
-                    }
-                } else {
-                    if (w.isInnerNode(currentNode) && !w.firstNode().equals(w.lastNode())) {
-                        findWayafterchunkRoundabout(w);
-                    }
-                    addNewWays(Collections.singletonList(w), ind);
-                    prev = w;
-                    ind++;
+                }
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    MainApplication.getMap().mapView.removeKeyListener(this);
+                    nextIndex = false;
+                    shorterRoutes = false;
+                    setEnable = true;
+                    halt = true;
+                    setEnabled(true);
+                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
                 }
             }
-            Way way = members.get(currentIndex).getWay();
-            Way nexWay = members.get(currentIndex + 1).getWay();
-            Node n = WayUtils.findCommonFirstLastNode(nexWay, way, currentNode).orElse(null);
-            currentNode = getOtherNode(nexWay, n);
-            save();
-            try {
-                TimeUnit.SECONDS.sleep(2);
-            } catch (InterruptedException e) {
-                Logging.error(e);
-            }
-        } else {
-            currentNode = null;
-        }
-        previousWay = currentWay;
-        if (currentIndex < members.size() - 1) {
-            callNextWay(++currentIndex);
-        } else
-            deleteExtraWays();
+        });
     }
 
-    List<Way> findCurrentEdge() {
-        List<Way> lst = new ArrayList<>();
-        lst.add(currentWay);
-        int j = currentIndex;
-        Way curr = currentWay;
-        while (true) {
-            int i = getPreviousWayIndex(j);
-            if (i == -1)
-                break;
+    boolean isWaySuitableForOtherModes(Way way) {
 
-            Way prevWay = members.get(i).getWay();
+        if (relation.hasTag("route", "tram"))
+            return way.hasTag("railway", "tram");
 
-            if (prevWay == null)
-                break;
+        if (relation.hasTag("route", "subway"))
+            return way.hasTag("railway", "subway");
 
-            if (!WayUtils.findCommonFirstLastNode(curr, prevWay).filter(node -> node.getParentWays().size() <= 2)
-                .isPresent()) {
-                break;
-            }
+        if (relation.hasTag("route", "light_rail"))
+            return way.hasTag("railway", "light_rail");
 
-            lst.add(prevWay);
-            curr = prevWay;
-            j = i;
-        }
-        return lst;
+        if (relation.hasTag("route", "rail"))
+            return way.hasTag("railway", "rail");
+
+        if (relation.hasTag("route", "train"))
+            return way.hasTag("railway", "train");
+
+        if (relation.hasTag("route", "trolleybus"))
+            return way.hasTag("trolley_wire", "yes");
+
+        return false;
     }
 
-    void removeCurrentEdge() {
-        List<Integer> lst = new ArrayList<>();
-        lst.add(currentIndex);
-        int j = currentIndex;
-        Way curr = currentWay;
-        Node n = getOtherNode(curr, currentNode);
-
-        while (true) {
-            int i = getPreviousWayIndex(j);
-            if (i == -1)
-                break;
-
-            Way prevWay = members.get(i).getWay();
-
-            if (prevWay == null)
-                break;
-
-            if (!WayUtils.findCommonFirstLastNode(curr, prevWay).filter(node -> node.getParentWays().size() <= 2).isPresent()) {
-                break;
-            }
-
-            lst.add(i);
-            curr = prevWay;
-            j = i;
-        }
-
-        int prevInd = getPreviousWayIndex(j);
-
-        Collections.reverse(lst);
-        int[] ind = lst.stream().mapToInt(Integer::intValue).toArray();
-        memberTableModel.remove(ind);
-        for (int i = 0; i < ind.length; i++) {
-            members.remove(ind[i] - i);
-        }
-
-        save();
-
-        if (prevInd >= 0) {
-            currentNode = n;
-            currentIndex = prevInd;
-            callNextWay(currentIndex);
+    private List<Character> findLettersVariants(List<Way> fixVariants) throws CannotProceedException {
+        char alphabet = 'A';
+        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
+        wayColoring = new HashMap<>();
+        final List<Character> allowedCharacters = new ArrayList<>();
+        if (numeric) {
+            alphabet = '1';
+            allowedCharacters.add('7');
+            if (showOption0)
+                allowedCharacters.add('0');
+            allowedCharacters.add('8');
+            allowedCharacters.add('9');
         } else {
-            notice = null;
-            deleteExtraWays();
+            allowedCharacters.add('S');
+            if (showOption0)
+                allowedCharacters.add('W');
+            allowedCharacters.add('V');
+            allowedCharacters.add('Q');
         }
+
+        for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
+            allowedCharacters.add(alphabet);
+            wayColoring.put(fixVariants.get(i), alphabet);
+            alphabet++;
+        }
+
+        // remove any existing temporary layer
+        removeTemporaryLayers();
+
+        if (abort) {
+            throw new CannotProceedException("Aborted");
+        }
+
+        // zoom to problem:
+        AutoScaleAction.zoomTo(fixVariants);
+
+        // display the fix variants:
+        temporaryLayer = new MendRelationAddLayer();
+        MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
+
+        // // add the key listener:
+        MainApplication.getMap().mapView.requestFocus();
+        return allowedCharacters;
+    }
+
+
+
+
+
+
+    Node checkValidityOfWays(Way way, int nextWayIndex) {
+        boolean nextWayDelete = false;
+        Node node = null;
+        nextIndex = false;
+        notice = null;
+
+        final NodePair commonEndNodes = WayUtils.findCommonFirstLastNodes(nextWay, way);
+        if (commonEndNodes.getA() != null && commonEndNodes.getB() != null) {
+            nextWayDelete = true;
+            notice = "Multiple common nodes found between current and next way";
+        } else if (commonEndNodes.getA() != null) {
+            node = commonEndNodes.getA();
+        } else if (commonEndNodes.getB() != null) {
+            node = commonEndNodes.getB();
+        } else {
+            // the nodes can be one of the intermediate nodes
+            for (Node n : nextWay.getNodes()) {
+                if (way.getNodes().contains(n)) {
+                    node = n;
+                    currentNode = n;
+                }
+            }
+        }
+
+        // check if there is a restricted relation that doesn't allow both the ways together
+        if (node != null && (nextWay, way, node)) {
+            nextWayDelete = true;
+        }
+
+        if (isNonSplitRoundabout(way)) {
+            nextWayDelete = false;
+            for (Node n : way.getNodes()) {
+                if (nextWay.firstNode().equals(n) || nextWay.lastNode().equals(n)) {
+                    node = n;
+                    currentNode = n;
+                }
+            }
+        }
+
+        if (isNonSplitRoundabout(nextWay)) {
+            nextWayDelete = false;
+        }
+
+        if (node != null && !checkOneWaySatisfiability(nextWay, node)) {
+            nextWayDelete = true;
+            notice = "vehicle travels against oneway restriction";
+        }
+
+        if (nextWayDelete) {
+            currentWay = way;
+            nextIndex = true;
+            removeWay(nextWayIndex);
+            return null;
+        }
+
+        nextIndex = false;
+        return node;
     }
 }
