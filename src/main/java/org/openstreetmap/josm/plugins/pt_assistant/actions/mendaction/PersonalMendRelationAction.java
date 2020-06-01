@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package org.openstreetmap.josm.plugins.pt_assistant.actions;
+package org.openstreetmap.josm.plugins.pt_assistant.actions.mendaction;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
@@ -24,7 +24,6 @@ import org.openstreetmap.josm.command.SplitWayCommand.Strategy;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.NodePair;
-import org.openstreetmap.josm.data.osm.NodePositionComparator;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.TagMap;
@@ -33,6 +32,8 @@ import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionType;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionTypeCalculator;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.mendaction.AbstractMendRelationAction;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.mendaction.MendRelationInterface;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.GBC;
@@ -46,7 +47,7 @@ import org.openstreetmap.josm.tools.Utils;
  *
  * @author Ashish Singh
  */
-public class PersonalMendRelationAction extends AbstractMendRelationAction implements MendRelationInterface{
+public class PersonalMendRelationAction extends AbstractMendRelationAction implements MendRelationInterface {
 
     Way lastForWay;
     Way lastBackWay;

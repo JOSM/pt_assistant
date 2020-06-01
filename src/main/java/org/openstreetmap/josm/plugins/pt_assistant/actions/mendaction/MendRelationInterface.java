@@ -1,4 +1,4 @@
-package org.openstreetmap.josm.plugins.pt_assistant.actions;
+package org.openstreetmap.josm.plugins.pt_assistant.actions.mendaction;
 
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Way;

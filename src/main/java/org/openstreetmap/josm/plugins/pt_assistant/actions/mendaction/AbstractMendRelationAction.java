@@ -1,17 +1,17 @@
 // License: GPL. For details, see LICENSE file.
-package org.openstreetmap.josm.plugins.pt_assistant.actions;
+package org.openstreetmap.josm.plugins.pt_assistant.actions.mendaction;
 
 import org.openstreetmap.josm.actions.AutoScaleAction;
-import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadParams;
-import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
 import org.openstreetmap.josm.command.SplitWayCommand;
-import org.openstreetmap.josm.data.Bounds;
-import org.openstreetmap.josm.data.osm.*;
+import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.OsmPrimitive;
+import org.openstreetmap.josm.data.osm.Relation;
+import org.openstreetmap.josm.data.osm.RelationMember;
+import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
-import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.Notification;
-import org.openstreetmap.josm.gui.dialogs.relation.DownloadRelationMemberTask;
 import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.MemberTableModel;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
@@ -20,15 +20,11 @@ import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdate
 import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
 import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
 import org.openstreetmap.josm.gui.layer.MapViewPaintable;
-import org.openstreetmap.josm.io.OverpassDownloadReader;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.*;
 import org.openstreetmap.josm.tools.Logging;
-import org.openstreetmap.josm.tools.Utils;
 
 import javax.swing.JOptionPane;
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -52,23 +48,29 @@ import static org.openstreetmap.josm.tools.I18n.tr;
  *
  * @author sudhanshu2
  */
-public abstract class AbstractMendRelationAction extends AbstractRelationEditorAction {
-    protected static final DownloadParams DEFAULT_DOWNLOAD_PARAMS = new DownloadParams();
-    protected final String[] RESTRICTIONS = new String[] { "restriction", "restriction:bus", "restriction:trolleybus",
-        "restriction:tram", "restriction:subway", "restriction:light_rail", "restriction:rail",
-        "restriction:train", "restriction:trolleybus" };
-    protected final String[] ACCEPTED_TAGS = { "no_right_turn", "no_left_turn",
-        "no_u_turn", "no_straight_on", "no_entry", "no_exit" };
+public abstract class AbstractMendRelationAction extends AbstractRelationEditorAction implements MendRelationInterface {
 
-    protected GenericRelationEditor editor;
-    protected Relation relation;
+    protected final String[] RESTRICTIONS = new String[] {"restriction", "restriction:bus", "restriction:trolleybus",
+        "restriction:tram", "restriction:subway", "restriction:light_rail", "restriction:rail",
+        "restriction:train", "restriction:trolleybus"};
+    protected final String[] ACCEPTED_TAGS = {"no_right_turn", "no_left_turn",
+        "no_u_turn", "no_straight_on", "no_entry", "no_exit"};
+
+    protected final GenericRelationEditor editor;
+    protected final Relation relation;
     protected MemberTableModel memberTableModel;
     protected List<RelationMember> members;
     protected Node currentNode;
     protected Way previousWay;
-    protected List<Integer> extraWaysToBeDeleted;
+
+    // TODO safe delete this variable
+    /* protected List<Integer> extraWaysToBeDeleted;*/
+
     protected AbstractMapViewPaintable temporaryLayer;
+
+    // TODO look at making this into a method variable
     protected HashMap<Way, Integer> waysAlreadyPresent;
+
     protected Way nextWay;
     protected Way currentWay;
     protected String notice;
@@ -90,7 +92,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     protected boolean setEnable = true;
 
     protected int currentIndex;
-    protected int downloadCounter;
+
 
     /**
      *
@@ -126,26 +128,6 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         } else {
             initialise();
         }
-    }
-
-    /**
-     *
-     */
-    private void downloadIncompleteRelations() {
-        List<Relation> parents = Collections.singletonList(relation);
-        Future<?> future = MainApplication.worker.submit(new DownloadRelationMemberTask(parents,
-                Utils.filteredCollection(DownloadSelectedIncompleteMembersAction
-                    .buildSetOfIncompleteMembers(new ArrayList<>(parents)), OsmPrimitive.class),
-                MainApplication.getLayerManager().getEditLayer()));
-
-        MainApplication.worker.submit(() -> {
-            try {
-                NotificationUtils.downloadWithNotifications(future, tr("Incomplete relations"));
-                initialise();
-            } catch (InterruptedException | ExecutionException e1) {
-                Logging.error(e1);
-            }
-        });
     }
 
     /**
@@ -241,7 +223,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     }
 
     /**
-     *
+     * Resets the variables to default state
      */
     protected void defaultStates() {
         currentIndex = 0;
@@ -249,7 +231,6 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         previousWay = null;
         noLinkToPreviousWay = true;
         nextIndex = true;
-        extraWaysToBeDeleted = new ArrayList<>();
         halt = false;
     }
 
@@ -299,11 +280,19 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     }
 
     /**
+     * Marks extra ways to delete
      *
      */
     void deleteExtraWays() {
-        int[] ints = extraWaysToBeDeleted.stream().mapToInt(Integer::intValue).toArray();
-        memberTableModel.remove(ints);
+        // TODO : Change function name and delete code
+        /*
+
+        The indexes array is always empty as extraWaysToBeDeleted is always empty
+
+        int[] indexes = extraWaysToBeDeleted.stream().mapToInt(Integer::intValue).toArray();
+        memberTableModel.remove(indexes);
+
+        */
         setEnable = true;
         setEnabled(true);
         halt = false;
@@ -320,9 +309,9 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         if (nodes.length == 1) {
             DataSet ds = MainApplication.getLayerManager().getEditDataSet();
             ds.setSelected(way);
-            //downloadAreaAroundWay(way, nodes[0], null);
+            downloadAreaAroundWay(way, nodes[0], null);
         } else if (nodes.length == 2) {
-            //downloadAreaAroundWay(way, nodes[0], nodes[1]);
+            downloadAreaAroundWay(way, nodes[0], nodes[1]);
         } else {
             Logging.error("Unexpected arguments");
         }
@@ -680,38 +669,6 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
 
     /**
      *
-     * @param wayList
-     * @param Int
-     */
-    void downloadAreaBeforeRemovalOption(List<Way> wayList, List<Integer> Int) {
-        if (abort) {
-            return;
-        }
-
-        if (!onFly) {
-            displayWaysToRemove(Int);
-        }
-
-        downloadCounter = 0;
-
-        DownloadOsmTask task = new DownloadOsmTask();
-
-        BoundsUtils.createBoundsWithPadding(wayList, .4).ifPresent(area -> {
-            Future<?> future = task.download(DEFAULT_DOWNLOAD_PARAMS, area, null);
-
-            MainApplication.worker.submit(() -> {
-                try {
-                    NotificationUtils.downloadWithNotifications(future, tr("Area before removal"));
-                    displayWaysToRemove(Int);
-                } catch (InterruptedException | ExecutionException e1) {
-                    Logging.error(e1);
-                }
-            });
-        });
-    }
-
-    /**
-     *
      * @param wayIndices
      */
     void displayWaysToRemove(List<Integer> wayIndices) {
@@ -800,7 +757,8 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
                     MainApplication.getMap().mapView.removeKeyListener(this);
                     Logging.debug("ESC");
                     nextIndex = false;
-                     = true;
+                    // TODO fix this
+                    /* shorterRoutes = true; */
                     halt = true;
                     setEnabled(true);
                     MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
@@ -812,46 +770,6 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
                 // TODO Auto-generated method stub
             }
         });
-    }
-
-    /**
-     *
-     */
-    void downloadEntireArea() {
-        if (abort) {
-            return;
-        }
-
-        DownloadOsmTask task = new DownloadOsmTask();
-        List<Way> wayList = getListOfAllWays();
-
-        if (wayList.isEmpty()) {
-            callNextWay(currentIndex);
-            return;
-        }
-
-        String typeRoute = "   [\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n";
-        String query = getQuery(typeRoute);
-        Logging.debug(query);
-
-        if (aroundStops || aroundGaps) {
-            BoundsUtils.createBoundsWithPadding(wayList, .1).ifPresent(area -> {
-                final Future<?> future = task.download(
-                    new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query),
-                    DEFAULT_DOWNLOAD_PARAMS, area, null);
-
-                MainApplication.worker.submit(() -> {
-                    try {
-                        NotificationUtils.downloadWithNotifications(future, tr("Entire area"));
-                        callNextWay(currentIndex);
-                    } catch (InterruptedException | ExecutionException e1) {
-                        Logging.error(e1);
-                    }
-                });
-            });
-        } else {
-            callNextWay(currentIndex);
-        }
     }
 
     /**
@@ -907,18 +825,6 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
                 }
             }
             return null;
-        }
-    }
-
-    /**
-     *
-     */
-    protected class MendRelationAddMultipleLayer extends AbstractMapViewPaintable {
-
-        @Override
-        public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            PTMendRelationSupportClasses.PTMendRelationPaintVisitor paintVisitor = new PTMendRelationSupportClasses.PTMendRelationPaintVisitor(g, mv);
-            paintVisitor.drawMultipleVariants(wayListColoring);
         }
     }
 }

@@ -1,14 +1,9 @@
 // License: GPL. For details, see LICENSE file.
-package org.openstreetmap.josm.plugins.pt_assistant.actions;
+package org.openstreetmap.josm.plugins.pt_assistant.actions.mendaction;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagLayout;
-import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -17,9 +12,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -39,23 +31,18 @@ import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.command.SplitWayCommand;
 import org.openstreetmap.josm.command.SplitWayCommand.Strategy;
-import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.UndoRedoHandler;
-import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.NodePair;
-import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.TagMap;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
-import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
-import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
-import org.openstreetmap.josm.gui.layer.validation.PaintVisitor;
-import org.openstreetmap.josm.io.OverpassDownloadReader;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.mendaction.AbstractMendRelationAction;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.mendaction.MendRelationInterface;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.BoundsUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.NotificationUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
@@ -71,7 +58,7 @@ import org.openstreetmap.josm.tools.Utils;
  *
  * @author Biswesh
  */
-public class PTMendRelationAction extends AbstractMendRelationAction implements MendRelationInterface{
+public class PTMendRelationAction extends AbstractMendRelationAction {
     boolean firstCall = true;
     int nodeIdx = 0;
 
@@ -1023,7 +1010,7 @@ public class PTMendRelationAction extends AbstractMendRelationAction implements 
         });
     }
 
-    protected void downloadAreaAroundWay(Way way) {
+    public void downloadAreaAroundWay(Way way) {
         if (abort) {
             return;
         }
