@@ -2,9 +2,6 @@
 package org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation_action;
 
 import org.openstreetmap.josm.actions.AutoScaleAction;
-import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
-import org.openstreetmap.josm.actions.downloadtasks.DownloadParams;
-import org.openstreetmap.josm.actions.relation.DownloadSelectedIncompleteMembersAction;
 import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
@@ -15,7 +12,6 @@ import org.openstreetmap.josm.data.osm.*;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.Notification;
-import org.openstreetmap.josm.gui.dialogs.relation.DownloadRelationMemberTask;
 import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.MemberTableModel;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
@@ -23,12 +19,7 @@ import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdate
 import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
 import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
 import org.openstreetmap.josm.gui.layer.MapViewPaintable;
-import org.openstreetmap.josm.gui.layer.validation.PaintVisitor;
-import org.openstreetmap.josm.io.OverpassDownloadReader;
-import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.MendRelationAction;
-import org.openstreetmap.josm.plugins.pt_assistant.utils.BoundsUtils;
-import org.openstreetmap.josm.plugins.pt_assistant.utils.NotificationUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.*;
@@ -37,9 +28,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -102,7 +90,7 @@ public class PublicTransportMendRelation {
     boolean aroundStops = false;
     Node prevCurrenNode = null;
     Node splitNode = null;
-    HashMap<Way, Character> wayColoring;
+
     HashMap<Character, java.util.List<Way>> wayListColoring;
     int nodeIdx = 0;
     AbstractMapViewPaintable temporaryLayer = null;
@@ -1534,11 +1522,6 @@ public class PublicTransportMendRelation {
         }
     }
 
-    private void removeKeyListenerAndTemporaryLayer(KeyListener keyListener) {
-        MainApplication.getMap().mapView.removeKeyListener(keyListener);
-        MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
-    }
-
     java.util.List<Way> findCurrentEdge() {
         java.util.List<Way> lst = new ArrayList<>();
         lst.add(currentWay);
@@ -1615,24 +1598,6 @@ public class PublicTransportMendRelation {
                 }
             }
             return null;
-        }
-    }
-
-    private class MendRelationAddLayer extends AbstractMapViewPaintable {
-
-        @Override
-        public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            MendRelationAction.MendRelationPaintVisitor paintVisitor = new MendRelationAction.MendRelationPaintVisitor(g, mv);
-            paintVisitor.drawVariants();
-        }
-    }
-
-    private class MendRelationRemoveLayer extends AbstractMapViewPaintable {
-
-        @Override
-        public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            MendRelationAction.MendRelationPaintVisitor paintVisitor = new MendRelationAction.MendRelationPaintVisitor(g, mv);
-            paintVisitor.drawOptionsToRemoveWays();
         }
     }
 

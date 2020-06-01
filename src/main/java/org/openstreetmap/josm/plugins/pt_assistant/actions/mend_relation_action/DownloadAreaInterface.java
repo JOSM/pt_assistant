@@ -8,7 +8,7 @@ import org.openstreetmap.josm.data.osm.Way;
 import java.util.List;
 
 /**
- * Interface that defines required methods to use to the {@code DownloadArea} class
+ * Interface required to be implemented in order to use {@code DownloadArea}
  *
  * @author sudhanshu2
  */

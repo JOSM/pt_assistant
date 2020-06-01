@@ -1,13 +1,18 @@
+// License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation_action;
 
 import org.openstreetmap.josm.actions.AutoScaleAction;
+import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.gui.MapView;
+import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.MendRelationAction;
 import org.openstreetmap.josm.tools.Logging;
 
+import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -15,26 +20,42 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Displays the routes on the map
+ *
+ * @author sudhanshu2
+ */
 public class DisplayWays {
+    private AbstractMapViewPaintable temporaryLayer;
+    private final DisplayWaysInterface display;
 
-    void displayFixVariants(java.util.List<Way> fixVariants) {
+    /**
+     *
+     * @param display
+     */
+    public DisplayWays(DisplayWaysInterface display) {
+        this.display = display;
+    }
+
+    void displayFixVariants(List<Way> fixVariants) {
         // find the letters of the fix variants:
         char alphabet = 'A';
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
-        wayColoring = new HashMap<>();
-        final java.util.List<Character> allowedCharacters = new ArrayList<>();
+        HashMap<Way, Character> wayColoring = new HashMap<>();
+        final List<Character> allowedCharacters = new ArrayList<>();
         if (numeric) {
             alphabet = '1';
             allowedCharacters.add('7');
-            if (showOption0)
+            if (display.getShowOption0())
                 allowedCharacters.add('0');
             allowedCharacters.add('8');
             allowedCharacters.add('9');
         } else {
             allowedCharacters.add('S');
-            if (showOption0)
+            if (display.getShowOption0())
                 allowedCharacters.add('W');
             allowedCharacters.add('V');
             allowedCharacters.add('Q');
@@ -46,17 +67,20 @@ public class DisplayWays {
             alphabet++;
         }
 
-        // remove any existing temporary layer
-        removeTemporarylayers();
+        display.setWayColoring(wayColoring);
 
-        if (abort)
+        // remove any existing temporary layer
+        display.removeTemporarylayers();
+
+        if (display.getAbort()) {
             return;
+        }
 
         // zoom to problem:
         AutoScaleAction.zoomTo(fixVariants);
 
         // display the fix variants:
-        temporaryLayer = new MendRelationAction.MendRelationAddLayer();
+        temporaryLayer = new MendRelationAddLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
@@ -65,11 +89,11 @@ public class DisplayWays {
             @Override
             public void keyPressed(KeyEvent e) {
                 downloadCounter = 0;
-                if (abort) {
+                if (display.getAbort()) {
                     removeKeyListenerAndTemporaryLayer(this);
                     return;
                 }
-                Character typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
+                char typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
                 if (allowedCharacters.contains(typedKeyUpperCase)) {
                     int idx = typedKeyUpperCase - 65;
                     if (numeric) {
@@ -115,21 +139,21 @@ public class DisplayWays {
         });
     }
 
-    void displayBacktrackFixVariant(java.util.List<Way> fixVariants, int idx1) {
+    void displayBacktrackFixVariant(List<Way> fixVariants, int idx1) {
         char alphabet = 'A';
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
-        wayColoring = new HashMap<>();
-        final java.util.List<Character> allowedCharacters = new ArrayList<>();
+        HashMap<Way, Character> wayColoring = new HashMap<>();
+        final List<Character> allowedCharacters = new ArrayList<>();
         if (numeric) {
             alphabet = '1';
             allowedCharacters.add('7');
-            if (showOption0)
+            if (display.getShowOption0())
                 allowedCharacters.add('0');
             allowedCharacters.add('8');
             allowedCharacters.add('9');
         } else {
             allowedCharacters.add('S');
-            if (showOption0)
+            if (display.getShowOption0())
                 allowedCharacters.add('W');
             allowedCharacters.add('V');
             allowedCharacters.add('Q');
@@ -141,11 +165,14 @@ public class DisplayWays {
             alphabet++;
         }
 
-        // remove any existing temporary layer
-        removeTemporarylayers();
+        display.setWayColoring(wayColoring);
 
-        if (abort)
+        // remove any existing temporary layer
+        display.removeTemporarylayers();
+
+        if (display.getShowOption0()) {
             return;
+        }
 
         // zoom to problem:
         AutoScaleAction.zoomTo(fixVariants);
@@ -160,11 +187,11 @@ public class DisplayWays {
             @Override
             public void keyPressed(KeyEvent e) {
                 downloadCounter = 0;
-                if (abort) {
+                if (display.getAbort()) {
                     removeKeyListenerAndTemporaryLayer(this);
                     return;
                 }
-                Character typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
+                char typedKeyUpperCase = Character.toString(e.getKeyChar()).toUpperCase().toCharArray()[0];
                 if (allowedCharacters.contains(typedKeyUpperCase)) {
                     int idx = typedKeyUpperCase - 65;
                     if (numeric) {
@@ -211,23 +238,23 @@ public class DisplayWays {
         });
     }
 
-    void displayFixVariantsWithOverlappingWays(java.util.List<java.util.List<Way>> fixVariants) {
+    void displayFixVariantsWithOverlappingWays(List<List<Way>> fixVariants) {
         // find the letters of the fix variants:
         char alphabet = 'A';
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
         wayListColoring = new HashMap<>();
-        final java.util.List<Character> allowedCharacters = new ArrayList<>();
+        final List<Character> allowedCharacters = new ArrayList<>();
 
         if (numeric) {
             alphabet = '1';
             allowedCharacters.add('7');
-            if (showOption0)
+            if (display.getShowOption0())
                 allowedCharacters.add('0');
             allowedCharacters.add('8');
             allowedCharacters.add('9');
         } else {
             allowedCharacters.add('S');
-            if (showOption0)
+            if (display.getShowOption0())
                 allowedCharacters.add('W');
             allowedCharacters.add('V');
             allowedCharacters.add('Q');
@@ -240,10 +267,11 @@ public class DisplayWays {
         }
 
         // remove any existing temporary layer
-        removeTemporarylayers();
+        display.removeTemporarylayers();
 
-        if (abort)
+        if (display.getAbort()) {
             return;
+        }
 
         // zoom to problem:
         AutoScaleAction.zoomTo(fixVariants.stream().flatMap(Collection::stream).collect(Collectors.toList()));
@@ -258,7 +286,7 @@ public class DisplayWays {
             @Override
             public void keyPressed(KeyEvent e) {
                 downloadCounter = 0;
-                if (abort) {
+                if (display.getAbort()) {
                     removeKeyListenerAndTemporaryLayer(this);
                     return;
                 }
@@ -308,15 +336,14 @@ public class DisplayWays {
         });
     }
 
-    void displayWaysToRemove(java.util.List<Integer> wayIndices) {
-
+    void displayWaysToRemove(List<Integer> wayIndices) {
         // find the letters of the fix variants:
         char alphabet = 'A';
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
         if (numeric)
             alphabet = '1';
-        wayColoring = new HashMap<>();
-        final java.util.List<Character> allowedCharacters = new ArrayList<>();
+        HashMap<Way, Character> wayColoring = new HashMap<>();
+        final List<Character> allowedCharacters = new ArrayList<>();
 
         if (numeric) {
             allowedCharacters.add('1');
@@ -332,6 +359,8 @@ public class DisplayWays {
             wayColoring.put(members.get(wayIndices.get(i)).getWay(), alphabet);
         }
 
+        display.setWayColoring(wayColoring);
+
         if (notice.equals("vehicle travels against oneway restriction")) {
             if (numeric) {
                 allowedCharacters.add('4');
@@ -341,10 +370,11 @@ public class DisplayWays {
         }
 
         // remove any existing temporary layer
-        removeTemporarylayers();
+        display.removeTemporarylayers();
 
-        if (abort)
+        if (display.getAbort()) {
             return;
+        }
 
         // zoom to problem:
         final Collection<OsmPrimitive> waysToZoom = new ArrayList<>();
@@ -356,7 +386,7 @@ public class DisplayWays {
         AutoScaleAction.zoomTo(waysToZoom);
 
         // display the fix variants:
-        temporaryLayer = new MendRelationAction.MendRelationRemoveLayer();
+        temporaryLayer = new MendRelationRemoveLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
@@ -371,7 +401,7 @@ public class DisplayWays {
             @Override
             public void keyPressed(KeyEvent e) {
                 downloadCounter = 0;
-                if (abort) {
+                if (display.getAbort()) {
                     MainApplication.getMap().mapView.removeKeyListener(this);
                     MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
                     return;
@@ -405,4 +435,28 @@ public class DisplayWays {
             }
         });
     }
+
+    private void removeKeyListenerAndTemporaryLayer(KeyListener keyListener) {
+        MainApplication.getMap().mapView.removeKeyListener(keyListener);
+        MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+    }
+
+    private class MendRelationAddLayer extends AbstractMapViewPaintable {
+
+        @Override
+        public void paint(Graphics2D g, MapView mv, Bounds bbox) {
+            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv);
+            paintVisitor.drawVariants();
+        }
+    }
+
+    private class MendRelationRemoveLayer extends AbstractMapViewPaintable {
+
+        @Override
+        public void paint(Graphics2D g, MapView mv, Bounds bbox) {
+            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv);
+            paintVisitor.drawOptionsToRemoveWays();
+        }
+    }
+
 }
