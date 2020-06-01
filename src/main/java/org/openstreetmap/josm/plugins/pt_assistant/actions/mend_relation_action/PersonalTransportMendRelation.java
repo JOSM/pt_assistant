@@ -240,62 +240,6 @@ public class PersonalTransportMendRelation {
         return true;
     }
 
-    private Node checkVaildityOfWays(Way way, int nexidx) {
-        // TODO Auto-generated method stub
-        boolean nexWayDelete = false;
-        Node node = null;
-        super.nextIndex = false;
-        super.notice = null;
-        final NodePair commonEndNodes = WayUtils.findCommonFirstLastNodes(super.nextWay, way);
-        if (commonEndNodes.getA() != null && commonEndNodes.getB() != null) {
-            nexWayDelete = true;
-            super.notice = "Multiple common nodes found between current and next way";
-        } else if (commonEndNodes.getA() != null) {
-            node = commonEndNodes.getA();
-        } else if (commonEndNodes.getB() != null) {
-            node = commonEndNodes.getB();
-        } else {
-            // the nodes can be one of the intermediate nodes
-            for (Node n : super.nextWay.getNodes()) {
-                if (way.getNodes().contains(n)) {
-                    node = n;
-                    super.currentNode = n;
-                }
-            }
-        }
-        if (node != null && isRestricted(super.nextWay, way, node)) {
-            nexWayDelete = true;
-        }
-        if (isNonSplitRoundAbout(way)) {
-            nexWayDelete = false;
-            for (Node n : way.getNodes()) {
-                if (super.nextWay.firstNode().equals(n) || super.nextWay.lastNode().equals(n)) {
-                    node = n;
-                    super.currentNode = n;
-                }
-            }
-        }
-
-        if (isNonSplitRoundAbout(super.nextWay)) {
-            nexWayDelete = false;
-        }
-
-        if (node != null && !checkOneWaySatisfiability(super.nextWay, node)) {
-            nexWayDelete = true;
-            super.notice = "vehicle travels against oneway restriction";
-        }
-        if (nexWayDelete) {
-            super.currentWay = way;
-            super.nextIndex = true;
-            removeWay(nexidx);
-            return null;
-        }
-
-        super.nextIndex = false;
-        return node;
-
-    }
-
     @Override
     Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
         // TODO Auto-generated method stub
@@ -384,53 +328,6 @@ public class PersonalTransportMendRelation {
         }
 
         return list;
-    }
-
-    List<Way> searchWayFromOtherRelations(Relation r, Way current, Way next, boolean reverse) {
-        List<RelationMember> member = r.getMembers();
-        List<Way> lst = new ArrayList<>();
-        boolean canAdd = false;
-        Way prev = null;
-        for (int i = 0; i < member.size(); i++) {
-            if (member.get(i).isWay()) {
-                Way w = member.get(i).getWay();
-                if (!reverse) {
-                    if (w.equals(current)) {
-                        lst.clear();
-                        canAdd = true;
-                        prev = w;
-                    } else if (w.equals(next) && lst.size() > 0) {
-                        return lst;
-                    } else if (canAdd) {
-                        if (findNumberOfCommonNode(w, prev) != 0) {
-                            lst.add(w);
-                            prev = w;
-                        } else {
-                            break;
-                        }
-                    }
-                } else {
-                    if (w.equals(next)) {
-                        lst.clear();
-                        canAdd = true;
-                        prev = w;
-                    } else if (w.equals(current) && lst.size() > 0) {
-                        Collections.reverse(lst);
-                        return lst;
-                    } else if (canAdd) {
-                        // not valid in reverse if it is oneway or part of roundabout
-                        if (findNumberOfCommonNode(w, prev) != 0 && RouteUtils.isOnewayForBicycles(w) == 0
-                            && !isSplitRoundAbout(w)) {
-                            lst.add(w);
-                            prev = w;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     @Override
@@ -876,117 +773,6 @@ public class PersonalTransportMendRelation {
         }
     }
 
-    String assignRoles(Way w) {
-        int flag = 0;
-        String s = "";
-        if (lastForWay != null && lastBackWay != null) {
-            NodePair pair = WayUtils.findCommonFirstLastNodes(lastForWay, lastBackWay);
-            if (pair.getA() == null && pair.getB() != null) {
-                if (pair.getB().equals(super.currentNode)) {
-                    flag = 1;
-                }
-            } else if (pair.getB() == null && pair.getA() != null) {
-                if (pair.getA().equals(super.currentNode)) {
-                    flag = 1;
-                }
-            } else if (pair.getB() != null && pair.getA() != null) {
-                if (pair.getA().equals(super.currentNode) || pair.getB().equals(super.currentNode)) {
-                    flag = 1;
-                }
-            }
-        }
-        // else if(lastForWay==null)
-
-        if (flag == 1) {
-            s = "";
-        } else if (prelink.isOnewayLoopBackwardPart && super.currentNode.equals(w.firstNode())) {
-            s = "backward";
-        } else if (prelink.isOnewayLoopBackwardPart && super.currentNode.equals(w.lastNode())) {
-            s = "forward";
-        } else if (prelink.isOnewayLoopForwardPart && super.currentNode.equals(w.firstNode())) {
-            s = "forward";
-        } else if (prelink.isOnewayLoopForwardPart && super.currentNode.equals(w.lastNode())) {
-            s = "backward";
-        } else {
-            s = "";
-        }
-        return s;
-    }
-
-    void assignRolesafterloop(Node jointNode) {
-        int idx = super.currentIndex;
-        int[] idxlst = new int[1];
-        Node node1;
-        Way w = super.members.get(idx).getWay();
-        Node node = null;
-        String s = "";
-        if (w.firstNode().equals(jointNode)) {
-            node = w.lastNode();
-            s = "backward";
-        } else {
-            s = "forward";
-            node = w.firstNode();
-        }
-        idxlst[0] = idx;
-        idx--;
-        double minLength = findDistance(w, super.nextWay, jointNode);
-        super.memberTableModel.updateRole(idxlst, s);
-        while (true) {
-            w = super.members.get(idx).getWay();
-            if (w.firstNode().equals(node)) {
-                node = w.lastNode();
-                node1 = w.firstNode();
-                s = "backward";
-                // roles[idx]=s;
-            } else {
-                node = w.firstNode();
-                node1 = w.lastNode();
-                s = "forward";
-                // roles[idx]=s;
-            }
-            idxlst[0] = idx;
-            double length = findDistance(w, super.nextWay, node1);
-            if (minLength > length) {
-                minLength = length;
-            }
-            super.memberTableModel.updateRole(idxlst, s);
-            if (w.firstNode().equals(jointNode) || w.lastNode().equals(jointNode)) {
-                break;
-            }
-            idx--;
-        }
-        super.currentNode = jointNode;
-        brokenidx = idx;
-        sortBelow(super.relation.getMembers(), 0);
-    }
-
-    void fixgapAfterlooping(int idx) {
-        Way w = super.members.get(idx).getWay();
-        super.currentWay = w;
-        Way minWay = w;
-        double minLength = findDistance(w, super.nextWay, super.currentNode);
-        while (idx <= super.currentIndex) {
-            w = super.members.get(idx).getWay();
-            List<Way> parentWays = findNextWay(w, w.lastNode());
-            if (w.firstNode() != null) {
-                parentWays.addAll(findNextWay(w, w.firstNode()));
-            }
-            for (int i = 0; i < parentWays.size(); i++) {
-                if (IsWaythere.get(parentWays.get(i)) == null) {
-                    Node node = getOtherNode(parentWays.get(i), null);
-                    double dist = findDistance(parentWays.get(i), super.nextWay, node);
-                    if (dist < minLength) {
-                        minLength = dist;
-                        minWay = w;
-                    }
-                }
-            }
-            idx++;
-        }
-        w = minWay;
-        downloadAreaAroundWay(w, w.lastNode(), w.firstNode());
-    }
-
     @Override
     void deleteWayAfterIndex(Way way, int index) {
         for (int i = index + 1; i < super.members.size(); i++) {
@@ -1150,6 +936,221 @@ public class PersonalTransportMendRelation {
             }
         }
     }
+
+    List<Way> searchWayFromOtherRelations(Relation r, Way current, Way next, boolean reverse) {
+        List<RelationMember> member = r.getMembers();
+        List<Way> lst = new ArrayList<>();
+        boolean canAdd = false;
+        Way prev = null;
+        for (int i = 0; i < member.size(); i++) {
+            if (member.get(i).isWay()) {
+                Way w = member.get(i).getWay();
+                if (!reverse) {
+                    if (w.equals(current)) {
+                        lst.clear();
+                        canAdd = true;
+                        prev = w;
+                    } else if (w.equals(next) && lst.size() > 0) {
+                        return lst;
+                    } else if (canAdd) {
+                        if (findNumberOfCommonNode(w, prev) != 0) {
+                            lst.add(w);
+                            prev = w;
+                        } else {
+                            break;
+                        }
+                    }
+                } else {
+                    if (w.equals(next)) {
+                        lst.clear();
+                        canAdd = true;
+                        prev = w;
+                    } else if (w.equals(current) && lst.size() > 0) {
+                        Collections.reverse(lst);
+                        return lst;
+                    } else if (canAdd) {
+                        // not valid in reverse if it is oneway or part of roundabout
+                        if (findNumberOfCommonNode(w, prev) != 0 && RouteUtils.isOnewayForBicycles(w) == 0
+                            && !isSplitRoundAbout(w)) {
+                            lst.add(w);
+                            prev = w;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private Node checkVaildityOfWays(Way way, int nexidx) {
+        // TODO Auto-generated method stub
+        boolean nexWayDelete = false;
+        Node node = null;
+        super.nextIndex = false;
+        super.notice = null;
+        final NodePair commonEndNodes = WayUtils.findCommonFirstLastNodes(super.nextWay, way);
+        if (commonEndNodes.getA() != null && commonEndNodes.getB() != null) {
+            nexWayDelete = true;
+            super.notice = "Multiple common nodes found between current and next way";
+        } else if (commonEndNodes.getA() != null) {
+            node = commonEndNodes.getA();
+        } else if (commonEndNodes.getB() != null) {
+            node = commonEndNodes.getB();
+        } else {
+            // the nodes can be one of the intermediate nodes
+            for (Node n : super.nextWay.getNodes()) {
+                if (way.getNodes().contains(n)) {
+                    node = n;
+                    super.currentNode = n;
+                }
+            }
+        }
+        if (node != null && isRestricted(super.nextWay, way, node)) {
+            nexWayDelete = true;
+        }
+        if (isNonSplitRoundAbout(way)) {
+            nexWayDelete = false;
+            for (Node n : way.getNodes()) {
+                if (super.nextWay.firstNode().equals(n) || super.nextWay.lastNode().equals(n)) {
+                    node = n;
+                    super.currentNode = n;
+                }
+            }
+        }
+
+        if (isNonSplitRoundAbout(super.nextWay)) {
+            nexWayDelete = false;
+        }
+
+        if (node != null && !checkOneWaySatisfiability(super.nextWay, node)) {
+            nexWayDelete = true;
+            super.notice = "vehicle travels against oneway restriction";
+        }
+        if (nexWayDelete) {
+            super.currentWay = way;
+            super.nextIndex = true;
+            removeWay(nexidx);
+            return null;
+        }
+
+        super.nextIndex = false;
+        return node;
+
+    }
+
+    String assignRoles(Way w) {
+        int flag = 0;
+        String s = "";
+        if (lastForWay != null && lastBackWay != null) {
+            NodePair pair = WayUtils.findCommonFirstLastNodes(lastForWay, lastBackWay);
+            if (pair.getA() == null && pair.getB() != null) {
+                if (pair.getB().equals(super.currentNode)) {
+                    flag = 1;
+                }
+            } else if (pair.getB() == null && pair.getA() != null) {
+                if (pair.getA().equals(super.currentNode)) {
+                    flag = 1;
+                }
+            } else if (pair.getB() != null && pair.getA() != null) {
+                if (pair.getA().equals(super.currentNode) || pair.getB().equals(super.currentNode)) {
+                    flag = 1;
+                }
+            }
+        }
+        // else if(lastForWay==null)
+
+        if (flag == 1) {
+            s = "";
+        } else if (prelink.isOnewayLoopBackwardPart && super.currentNode.equals(w.firstNode())) {
+            s = "backward";
+        } else if (prelink.isOnewayLoopBackwardPart && super.currentNode.equals(w.lastNode())) {
+            s = "forward";
+        } else if (prelink.isOnewayLoopForwardPart && super.currentNode.equals(w.firstNode())) {
+            s = "forward";
+        } else if (prelink.isOnewayLoopForwardPart && super.currentNode.equals(w.lastNode())) {
+            s = "backward";
+        } else {
+            s = "";
+        }
+        return s;
+    }
+
+    void assignRolesafterloop(Node jointNode) {
+        int idx = super.currentIndex;
+        int[] idxlst = new int[1];
+        Node node1;
+        Way w = super.members.get(idx).getWay();
+        Node node = null;
+        String s = "";
+        if (w.firstNode().equals(jointNode)) {
+            node = w.lastNode();
+            s = "backward";
+        } else {
+            s = "forward";
+            node = w.firstNode();
+        }
+        idxlst[0] = idx;
+        idx--;
+        double minLength = findDistance(w, super.nextWay, jointNode);
+        super.memberTableModel.updateRole(idxlst, s);
+        while (true) {
+            w = super.members.get(idx).getWay();
+            if (w.firstNode().equals(node)) {
+                node = w.lastNode();
+                node1 = w.firstNode();
+                s = "backward";
+                // roles[idx]=s;
+            } else {
+                node = w.firstNode();
+                node1 = w.lastNode();
+                s = "forward";
+                // roles[idx]=s;
+            }
+            idxlst[0] = idx;
+            double length = findDistance(w, super.nextWay, node1);
+            if (minLength > length) {
+                minLength = length;
+            }
+            super.memberTableModel.updateRole(idxlst, s);
+            if (w.firstNode().equals(jointNode) || w.lastNode().equals(jointNode)) {
+                break;
+            }
+            idx--;
+        }
+        super.currentNode = jointNode;
+        brokenidx = idx;
+        sortBelow(super.relation.getMembers(), 0);
+    }
+
+    void fixgapAfterlooping(int idx) {
+        Way w = super.members.get(idx).getWay();
+        super.currentWay = w;
+        Way minWay = w;
+        double minLength = findDistance(w, super.nextWay, super.currentNode);
+        while (idx <= super.currentIndex) {
+            w = super.members.get(idx).getWay();
+            List<Way> parentWays = findNextWay(w, w.lastNode());
+            if (w.firstNode() != null) {
+                parentWays.addAll(findNextWay(w, w.firstNode()));
+            }
+            for (int i = 0; i < parentWays.size(); i++) {
+                if (IsWaythere.get(parentWays.get(i)) == null) {
+                    Node node = getOtherNode(parentWays.get(i), null);
+                    double dist = findDistance(parentWays.get(i), super.nextWay, node);
+                    if (dist < minLength) {
+                        minLength = dist;
+                        minWay = w;
+                    }
+                }
+            }
+            idx++;
+        }
+        w = minWay;
+        downloadAreaAroundWay(w, w.lastNode(), w.firstNode());
+    }
+
 
     public void updateStates() {
         super.downloadCounter = 0;

@@ -5,6 +5,14 @@ import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEdito
 
 import java.awt.event.ActionEvent;
 
-public abstract class AbstractMendRelationAction {
-    protected boolean abort = false;
+public class MendRelationCommonActions  extends AbstractRelationEditorAction {
+    @Override
+    protected void updateEnabledState() {
+
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+    }
 }
