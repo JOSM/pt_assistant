@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation_action;
+package org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation;
 
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.command.ChangePropertyCommand;
@@ -28,12 +28,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-public class PublicTransportMendRelation {
+public class PublicTransportMendRelation extends AbstractMendRelationAction {
 
     private static final Color[] FIVE_COLOR_PALETTE = { new Color(0, 255, 0, 150), new Color(255, 0, 0, 150),
         new Color(0, 0, 255, 150), new Color(255, 255, 0, 150), new Color(0, 255, 255, 150) };
@@ -97,7 +98,7 @@ public class PublicTransportMendRelation {
     String notice = null;
     java.util.List<Node> backnodes = new ArrayList<>();
 
-    public MendRelationAction(IRelationEditorActionAccess editorAccess) {
+    public PublicTransportMendRelationAction(IRelationEditorActionAccess editorAccess) {
         super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
         editor = (GenericRelationEditor) editorAccess.getEditor();
         memberTableModel = editorAccess.getMemberTableModel();
@@ -313,7 +314,7 @@ public class PublicTransportMendRelation {
         return null;
     }
 
-    java.util.List<java.util.List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
+    List<java.util.List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
         java.util.List<java.util.List<Way>> list = new ArrayList<>();
         java.util.List<Relation> r1;
         java.util.List<Relation> r2;
@@ -360,7 +361,7 @@ public class PublicTransportMendRelation {
         return list;
     }
 
-    java.util.List<Way> removeInvalidWaysFromParentWays(java.util.List<Way> parentWays, Node node, Way way) {
+    List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way way) {
         parentWays.remove(way);
         if (abort)
             return null;
@@ -1522,7 +1523,7 @@ public class PublicTransportMendRelation {
         }
     }
 
-    java.util.List<Way> findCurrentEdge() {
+    List<Way> findCurrentEdge() {
         java.util.List<Way> lst = new ArrayList<>();
         lst.add(currentWay);
         int j = currentIndex;
@@ -1598,15 +1599,6 @@ public class PublicTransportMendRelation {
                 }
             }
             return null;
-        }
-    }
-
-    private class MendRelationAddMultipleLayer extends AbstractMapViewPaintable {
-
-        @Override
-        public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            MendRelationAction.MendRelationPaintVisitor paintVisitor = new MendRelationAction.MendRelationPaintVisitor(g, mv);
-            paintVisitor.drawMultipleVariants(wayListColoring);
         }
     }
 

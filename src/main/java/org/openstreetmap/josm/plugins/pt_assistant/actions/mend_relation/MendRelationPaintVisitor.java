@@ -1,4 +1,4 @@
-package org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation_action;
+package org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation;
 
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Way;

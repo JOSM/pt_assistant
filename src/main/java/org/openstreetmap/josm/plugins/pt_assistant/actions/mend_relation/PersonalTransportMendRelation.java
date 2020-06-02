@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation_action;
+package org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation;
 
 import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-public class PersonalTransportMendRelation {
+public class PersonalTransportMendRelation extends AbstractMendRelationAction {
 
     ////////////////////////Assigning Variables///////////////
 

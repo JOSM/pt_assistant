@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation_action;
+package org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation;
 
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.data.Bounds;
@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 public class DisplayWays {
     private AbstractMapViewPaintable temporaryLayer;
     private final DisplayWaysInterface display;
+    private  HashMap<Character, List<Way>> wayListColoring;
 
     /**
      *
@@ -40,25 +41,59 @@ public class DisplayWays {
         this.display = display;
     }
 
-    void displayFixVariants(List<Way> fixVariants) {
-        // find the letters of the fix variants:
-        char alphabet = 'A';
+    /**
+     * This method specifies what happens when the escape key is pressed (the routing helper is exited)
+     */
+    private void escapeSequence() {
+        display.setNextIndex(false);
+        display.setShorterRoutes(false);
+        display.setSetEnable(true);
+        display.setHalt(true);
+        display.setEnabled(true);
+        MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+    }
+
+    /**
+     * Returns list of letters/numbers to be displayed for the ways
+     *
+     * @return allowedCharacters which contains list of allowed character for the ways
+     */
+    private List<Character> getAllowedCharacters() {
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
-        HashMap<Way, Character> wayColoring = new HashMap<>();
-        final List<Character> allowedCharacters = new ArrayList<>();
+        List<Character> allowedCharacters = new ArrayList<>();
+
         if (numeric) {
-            alphabet = '1';
             allowedCharacters.add('7');
-            if (display.getShowOption0())
+            if (display.getShowOption0()) {
                 allowedCharacters.add('0');
+            }
             allowedCharacters.add('8');
             allowedCharacters.add('9');
         } else {
             allowedCharacters.add('S');
-            if (display.getShowOption0())
+            if (display.getShowOption0()) {
                 allowedCharacters.add('W');
+            }
             allowedCharacters.add('V');
             allowedCharacters.add('Q');
+        }
+
+        return allowedCharacters;
+    }
+
+    /**
+     *
+     * @param fixVariants
+     */
+    void displayFixVariants(List<Way> fixVariants) {
+        List<Character> allowedCharacters = getAllowedCharacters();
+        HashMap<Way, Character> wayColoring = new HashMap<>();
+        char alphabet;
+        boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
+        if (numeric) {
+            alphabet = '1';
+        } else {
+            alphabet = 'A';
         }
 
         for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
@@ -70,7 +105,7 @@ public class DisplayWays {
         display.setWayColoring(wayColoring);
 
         // remove any existing temporary layer
-        display.removeTemporarylayers();
+        display.removeTemporaryLayers();
 
         if (display.getAbort()) {
             return;
@@ -88,7 +123,7 @@ public class DisplayWays {
         MainApplication.getMap().mapView.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                downloadCounter = 0;
+                display.setDownloadCounter(0);
                 if (display.getAbort()) {
                     removeKeyListenerAndTemporaryLayer(this);
                     return;
@@ -103,42 +138,42 @@ public class DisplayWays {
                         else
                             idx = typedKeyUpperCase - 97;
                     }
-                    nextIndex = true;
+                    display.setNextIndex(true);
                     if (typedKeyUpperCase == 'S' || typedKeyUpperCase == '7') {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        getNextWayAfterSelection(null);
+                        display.setShorterRoutes(false);
+                        display.getNextWayAfterSelection(null);
                     } else if (typedKeyUpperCase == 'Q' || typedKeyUpperCase == '9') {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        removeCurrentEdge();
+                        display.setShorterRoutes(false);
+                        display.removeCurrentEdge();
                     } else if (typedKeyUpperCase == 'W' || typedKeyUpperCase == '0') {
-                        shorterRoutes = !shorterRoutes;
+                        display.setShorterRoutes(!display.getShorterRoutes());
                         removeKeyListenerAndTemporaryLayer(this);
-                        callNextWay(currentIndex);
+                        display.callNextWay(display.getCurrentIndex());
                     } else if (typedKeyUpperCase == 'V' || typedKeyUpperCase == '8') {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        backtrackCurrentEdge();
+                        display.setShorterRoutes(false);
+                        display.backtrackCurrentEdge();
                     } else {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        getNextWayAfterSelection(Collections.singletonList(fixVariants.get(idx)));
+                        display.setShorterRoutes(false);
+                        display.getNextWayAfterSelection(Collections.singletonList(fixVariants.get(idx)));
                     }
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     MainApplication.getMap().mapView.removeKeyListener(this);
-                    nextIndex = false;
-                    shorterRoutes = false;
-                    setEnable = true;
-                    halt = true;
-                    setEnabled(true);
-                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+                    escapeSequence();
                 }
             }
         });
     }
 
+    /**
+     *
+     * @param fixVariants
+     * @param idx1
+     */
     void displayBacktrackFixVariant(List<Way> fixVariants, int idx1) {
         char alphabet = 'A';
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
@@ -168,7 +203,7 @@ public class DisplayWays {
         display.setWayColoring(wayColoring);
 
         // remove any existing temporary layer
-        display.removeTemporarylayers();
+        display.removeTemporaryLayers();
 
         if (display.getShowOption0()) {
             return;
@@ -178,7 +213,7 @@ public class DisplayWays {
         AutoScaleAction.zoomTo(fixVariants);
 
         // display the fix variants:
-        temporaryLayer = new MendRelationAction.MendRelationAddLayer();
+        temporaryLayer = new MendRelationAddLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
@@ -186,7 +221,7 @@ public class DisplayWays {
         MainApplication.getMap().mapView.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                downloadCounter = 0;
+                display.setDownloadCounter(0);
                 if (display.getAbort()) {
                     removeKeyListenerAndTemporaryLayer(this);
                     return;
@@ -201,43 +236,42 @@ public class DisplayWays {
                         else
                             idx = typedKeyUpperCase - 97;
                     }
-                    nextIndex = true;
+                    display.setNextIndex(true);
                     if (typedKeyUpperCase == 'S' || typedKeyUpperCase == '7') {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        getNextWayAfterSelection(null);
+                        display.setShorterRoutes(false);
+                        display.getNextWayAfterSelection(null);
                     } else if (typedKeyUpperCase == 'Q' || typedKeyUpperCase == '9') {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        removeCurrentEdge();
+                        display.setShorterRoutes(false);
+                        display.removeCurrentEdge();
                     } else if (typedKeyUpperCase == 'W' || typedKeyUpperCase == '0') {
-                        shorterRoutes = !shorterRoutes;
+                        display.setShorterRoutes(!display.getShorterRoutes());
                         removeKeyListenerAndTemporaryLayer(this);
-                        callNextWay(currentIndex);
+                        display.callNextWay(display.getCurrentIndex());
                     } else if (typedKeyUpperCase == 'V' || typedKeyUpperCase == '8') {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        backTrack(currentWay, idx1 + 1);
+                        display.setShorterRoutes(false);
+                        display.backTrack(display.getCurrentWay(), idx1 + 1);
                     } else {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        findWayAfterChunk(currentWay);
-                        getNextWayAfterBackTrackSelection(fixVariants.get(idx));
+                        display.setShorterRoutes(false);
+                        display.findWayAfterChunk(display.getCurrentWay());
+                        display.getNextWayAfterBackTrackSelection(fixVariants.get(idx));
                     }
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     MainApplication.getMap().mapView.removeKeyListener(this);
-                    nextIndex = false;
-                    shorterRoutes = false;
-                    setEnable = true;
-                    halt = true;
-                    setEnabled(true);
-                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+                    escapeSequence();
                 }
             }
         });
     }
 
+    /**
+     *
+     * @param fixVariants
+     */
     void displayFixVariantsWithOverlappingWays(List<List<Way>> fixVariants) {
         // find the letters of the fix variants:
         char alphabet = 'A';
@@ -267,7 +301,7 @@ public class DisplayWays {
         }
 
         // remove any existing temporary layer
-        display.removeTemporarylayers();
+        display.removeTemporaryLayers();
 
         if (display.getAbort()) {
             return;
@@ -277,7 +311,7 @@ public class DisplayWays {
         AutoScaleAction.zoomTo(fixVariants.stream().flatMap(Collection::stream).collect(Collectors.toList()));
 
         // display the fix variants:
-        temporaryLayer = new MendRelationAction.MendRelationAddMultipleLayer();
+        temporaryLayer = new MendRelationAddMultipleLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
@@ -285,7 +319,7 @@ public class DisplayWays {
         MainApplication.getMap().mapView.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                downloadCounter = 0;
+                display.setDownloadCounter(0);
                 if (display.getAbort()) {
                     removeKeyListenerAndTemporaryLayer(this);
                     return;
@@ -300,37 +334,32 @@ public class DisplayWays {
                         else
                             idx = typedKeyUpperCase - 97;
                     }
-                    nextIndex = true;
+                    display.setNextIndex(true);
                     if (typedKeyUpperCase == 'S' || typedKeyUpperCase == '7') {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        getNextWayAfterSelection(null);
+                        display.setShorterRoutes(false);
+                        display.getNextWayAfterSelection(null);
                     } else if (typedKeyUpperCase == 'Q' || typedKeyUpperCase == '9') {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        removeCurrentEdge();
+                        display.setShorterRoutes(false);
+                        display.removeCurrentEdge();
                     } else if (typedKeyUpperCase == 'W' || typedKeyUpperCase == '0') {
-                        shorterRoutes = shorterRoutes ? false : true;
+                        display.setShorterRoutes(!display.getShorterRoutes());
                         removeKeyListenerAndTemporaryLayer(this);
-                        callNextWay(currentIndex);
+                        display.callNextWay(display.getCurrentIndex());
                     } else if (typedKeyUpperCase == 'V' || typedKeyUpperCase == '8') {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        backtrackCurrentEdge();
+                        display.setShorterRoutes(false);
+                        display.backtrackCurrentEdge();
                     } else {
                         removeKeyListenerAndTemporaryLayer(this);
-                        shorterRoutes = false;
-                        getNextWayAfterSelection(fixVariants.get(idx));
+                        display.setShorterRoutes(false);
+                        display.getNextWayAfterSelection(fixVariants.get(idx));
                     }
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     MainApplication.getMap().mapView.removeKeyListener(this);
-                    nextIndex = false;
-                    setEnable = true;
-                    shorterRoutes = false;
-                    halt = true;
-                    setEnabled(true);
-                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+                    escapeSequence();
                 }
             }
         });
@@ -356,12 +385,12 @@ public class DisplayWays {
         }
 
         for (int i = 0; i < 5 && i < wayIndices.size(); i++) {
-            wayColoring.put(members.get(wayIndices.get(i)).getWay(), alphabet);
+            wayColoring.put(display.getMembers().get(wayIndices.get(i)).getWay(), alphabet);
         }
 
         display.setWayColoring(wayColoring);
 
-        if (notice.equals("vehicle travels against oneway restriction")) {
+        if (display.getNotice().equals("vehicle travels against oneway restriction")) {
             if (numeric) {
                 allowedCharacters.add('4');
             } else {
@@ -370,7 +399,7 @@ public class DisplayWays {
         }
 
         // remove any existing temporary layer
-        display.removeTemporarylayers();
+        display.removeTemporaryLayers();
 
         if (display.getAbort()) {
             return;
@@ -380,7 +409,7 @@ public class DisplayWays {
         final Collection<OsmPrimitive> waysToZoom = new ArrayList<>();
 
         for (Integer i : wayIndices) {
-            waysToZoom.add(members.get(i).getWay());
+            waysToZoom.add(display.getMembers().get(i).getWay());
         }
 
         AutoScaleAction.zoomTo(waysToZoom);
@@ -400,7 +429,7 @@ public class DisplayWays {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                downloadCounter = 0;
+                display.setDownloadCounter(0);
                 if (display.getAbort()) {
                     MainApplication.getMap().mapView.removeKeyListener(this);
                     MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
@@ -409,22 +438,22 @@ public class DisplayWays {
                 Character typedKey = e.getKeyChar();
                 Character typedKeyUpperCase = typedKey.toString().toUpperCase().toCharArray()[0];
                 if (allowedCharacters.contains(typedKeyUpperCase)) {
-                    nextIndex = true;
+                    display.setNextIndex(true);
                     MainApplication.getMap().mapView.removeKeyListener(this);
                     MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
                     Logging.debug(String.valueOf(typedKeyUpperCase));
                     if (typedKeyUpperCase == 'R' || typedKeyUpperCase == '3') {
-                        wayIndices.add(0, currentIndex);
+                        waDyIndices.add(0, display.getCurrentIndex());
                     }
-                    RemoveWayAfterSelection(wayIndices, typedKeyUpperCase);
+                    display.removeWayAfterSelection(wayIndices, typedKeyUpperCase);
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     MainApplication.getMap().mapView.removeKeyListener(this);
                     Logging.debug("ESC");
-                    nextIndex = false;
-                    setEnable = true;
-                    halt = true;
-                    setEnabled(true);
+                    display.setNextIndex(false);
+                    display.setSetEnable(true);
+                    display.setHalt(true);
+                    display.setEnabled(true);
                     MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
                 }
             }
@@ -459,4 +488,12 @@ public class DisplayWays {
         }
     }
 
+    private class MendRelationAddMultipleLayer extends AbstractMapViewPaintable {
+
+        @Override
+        public void paint(Graphics2D g, MapView mv, Bounds bbox) {
+            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv);
+            paintVisitor.drawMultipleVariants(wayListColoring);
+        }
+    }
 }
