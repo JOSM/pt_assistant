@@ -9,7 +9,6 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
-import org.openstreetmap.josm.plugins.pt_assistant.actions.MendRelationAction;
 import org.openstreetmap.josm.tools.Logging;
 
 import java.awt.Graphics2D;
@@ -365,6 +364,10 @@ public class DisplayWays {
         });
     }
 
+    /**
+     *
+     * @param wayIndices
+     */
     void displayWaysToRemove(List<Integer> wayIndices) {
         // find the letters of the fix variants:
         char alphabet = 'A';
@@ -422,6 +425,8 @@ public class DisplayWays {
         MainApplication.getMap().mapView.requestFocus();
         MainApplication.getMap().mapView.addKeyListener(new KeyListener() {
 
+            /* TODO: Use KeyAdapter instead of KeyListener, and make a new private class*/
+
             @Override
             public void keyTyped(KeyEvent e) {
                 // TODO Auto-generated method stub
@@ -443,7 +448,7 @@ public class DisplayWays {
                     MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
                     Logging.debug(String.valueOf(typedKeyUpperCase));
                     if (typedKeyUpperCase == 'R' || typedKeyUpperCase == '3') {
-                        waDyIndices.add(0, display.getCurrentIndex());
+                        wayIndices.add(0, display.getCurrentIndex());
                     }
                     display.removeWayAfterSelection(wayIndices, typedKeyUpperCase);
                 }
@@ -465,11 +470,18 @@ public class DisplayWays {
         });
     }
 
+    /**
+     *
+     * @param keyListener
+     */
     private void removeKeyListenerAndTemporaryLayer(KeyListener keyListener) {
         MainApplication.getMap().mapView.removeKeyListener(keyListener);
         MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
     }
 
+    /**
+     *
+     */
     private class MendRelationAddLayer extends AbstractMapViewPaintable {
 
         @Override
@@ -479,6 +491,9 @@ public class DisplayWays {
         }
     }
 
+    /**
+     *
+     */
     private class MendRelationRemoveLayer extends AbstractMapViewPaintable {
 
         @Override
@@ -488,6 +503,9 @@ public class DisplayWays {
         }
     }
 
+    /**
+     *
+     */
     private class MendRelationAddMultipleLayer extends AbstractMapViewPaintable {
 
         @Override

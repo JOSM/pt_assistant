@@ -1,3 +1,4 @@
+// License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation;
 
 import org.openstreetmap.josm.data.osm.Node;
@@ -6,39 +7,98 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.layer.validation.PaintVisitor;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
+import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
+/**
+ * This class is heavily adapted from code in {@code PTAssistantPaintVisitor}
+ *
+ * @author sudhanshu2
+ */
 public class MendRelationPaintVisitor extends PaintVisitor {
-    /** The graphics */
-    private final Graphics g;
-    /** The MapView */
-    private final MapView mv;
-    private HashMap<Way, java.util.List<Character>> waysColoring;
+    private static final Color[] FIVE_COLOR_PALETTE = {
+        new Color(0, 255, 0, 150),
+        new Color(255, 0, 0, 150),
+        new Color(0, 0, 255, 150),
+        new Color(255, 255, 0, 150),
+        new Color(0, 255, 255, 150) };
 
-    MendRelationPaintVisitor(Graphics2D g, MapView mv) {
+    private static final Map<Character, Color> CHARACTER_COLOR_MAP = new HashMap<>();
+    private final Color CURRENT_WAY_COLOR = new Color(255, 255, 255, 190);
+    private final Color NEXT_WAY_COLOR = new Color(169, 169, 169, 210);
+
+    private final String ADD_ONEWAY_VEHICLE_NO_TWO_WAY;
+    private final String CLOSE_OPTIONS = I18n.marktr("Close the options");
+    private final String NOT_REMOVE_WAYS = I18n.marktr("Do not remove ways");
+    private final String REMOVE_CURRENT_EDGE = I18n.marktr("Remove current edge (white)");
+    private final String REMOVE_WAYS = I18n.marktr("Remove ways");
+    private final String REMOVE_WAYS_WITH_PREVIOUS_WAY = I18n.marktr("Remove ways along with previous way");
+    private final String SKIP = I18n.marktr("Skip");
+    private final String SOLUTIONS_BASED_ON_OTHER_RELATIONS = I18n.marktr("solutions based on other route relations");
+    private final String TURN_BY_TURN_NEXT_INTERSECTION = I18n.marktr("turn-by-turn at next intersection");
+    private final String BACKTRACK_WHITE_EDGE = I18n.marktr("Split white edge");
+
+    private MendRelationPaintVisitorInterface paint;
+
+    private final Graphics g;
+    private final MapView mv;
+
+    /**
+     * Static initialization block for CHARACTER_COLOR_MAP
+     */
+    static {
+        CHARACTER_COLOR_MAP.put('A', new Color(0, 255, 0, 200));
+        CHARACTER_COLOR_MAP.put('B', new Color(255, 0, 0, 200));
+        CHARACTER_COLOR_MAP.put('C', new Color(0, 0, 255, 200));
+        CHARACTER_COLOR_MAP.put('D', new Color(255, 255, 0, 200));
+        CHARACTER_COLOR_MAP.put('E', new Color(0, 255, 255, 200));
+        CHARACTER_COLOR_MAP.put('1', new Color(0, 255, 0, 200));
+        CHARACTER_COLOR_MAP.put('2', new Color(255, 0, 0, 200));
+        CHARACTER_COLOR_MAP.put('3', new Color(0, 0, 255, 200));
+        CHARACTER_COLOR_MAP.put('4', new Color(255, 255, 0, 200));
+        CHARACTER_COLOR_MAP.put('5', new Color(0, 255, 255, 200));
+    }
+
+    /**
+     *
+     * @param g
+     * @param mv
+     * @param paint
+     */
+    public MendRelationPaintVisitor(Graphics2D g, MapView mv, MendRelationPaintVisitorInterface paint) {
         super(g, mv);
         this.g = g;
         this.mv = mv;
+        this.paint = paint;
+        ADD_ONEWAY_VEHICLE_NO_TWO_WAY = paint.getOneWayString();
     }
 
-    /*
-     * Functions in this class are directly taken from PTAssistantPaintVisitor with
-     * some slight modification
+    /**
+     *
      */
-
     void drawVariants() {
         drawFixVariantsWithParallelLines(true);
 
-        Color[] colors = { new Color(0, 255, 150), new Color(255, 0, 0, 150), new Color(0, 0, 255, 150),
-            new Color(255, 255, 0, 150), new Color(0, 255, 255, 150) };
+        Color[] colors = {new Color(0, 255, 150),
+            new Color(255, 0, 0, 150),
+            new Color(0, 0, 255, 150),
+            new Color(255, 255, 0, 150),
+            new Color(0, 255, 255, 150) };
 
         double letterX = MainApplication.getMap().mapView.getBounds().getMinX() + 20;
         double letterY = MainApplication.getMap().mapView.getBounds().getMinY() + 100;
@@ -48,26 +108,26 @@ public class MendRelationPaintVisitor extends PaintVisitor {
         if (numeric)
             chr = '1';
 
-        if (showOption0 && numeric) {
-            if (!shorterRoutes)
-                drawFixVariantLetter("0 : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
+        if (paint.getShowOption0() && numeric) {
+            if (!paint.getShorterRoutes())
+                drawFixVariantLetter("0 : " + tr(TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
                     letterY, 25);
             else
-                drawFixVariantLetter("0 : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
+                drawFixVariantLetter("0 : " + tr(SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
                     letterY, 25);
             letterY = letterY + 60;
-        } else if (showOption0) {
-            if (!shorterRoutes)
-                drawFixVariantLetter("W : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
+        } else if (paint.getShowOption0()) {
+            if (!paint.getShorterRoutes())
+                drawFixVariantLetter("W : " + tr(TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
                     letterY, 25);
             else
-                drawFixVariantLetter("W : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
+                drawFixVariantLetter("W : " + tr(SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
                     letterY, 25);
             letterY = letterY + 60;
         }
 
         for (int i = 0; i < 5; i++) {
-            if (wayColoring.containsValue(chr)) {
+            if (paint.getWayColoring().containsValue(chr)) {
                 drawFixVariantLetter(chr.toString(), colors[i], letterX, letterY, 35);
                 letterY = letterY + 60;
             }
@@ -75,20 +135,20 @@ public class MendRelationPaintVisitor extends PaintVisitor {
         }
 
         // display the "Esc", "Skip" label:
-        drawFixVariantLetter("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 25);
+        drawFixVariantLetter("Esc : " + tr(CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 25);
         letterY = letterY + 60;
         if (numeric) {
-            drawFixVariantLetter("7 : " + tr(I18N_SKIP), Color.WHITE, letterX, letterY, 25);
+            drawFixVariantLetter("7 : " + tr(SKIP), Color.WHITE, letterX, letterY, 25);
             letterY = letterY + 60;
-            drawFixVariantLetter("8 : " + tr(I18N_BACKTRACK_WHITE_EDGE), Color.WHITE, letterX, letterY, 25);
+            drawFixVariantLetter("8 : " + tr(BACKTRACK_WHITE_EDGE), Color.WHITE, letterX, letterY, 25);
             letterY = letterY + 60;
-            drawFixVariantLetter("9 : " + tr(I18N_REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
+            drawFixVariantLetter("9 : " + tr(REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
         } else {
-            drawFixVariantLetter("S : " + tr(I18N_SKIP), Color.WHITE, letterX, letterY, 25);
+            drawFixVariantLetter("S : " + tr(SKIP), Color.WHITE, letterX, letterY, 25);
             letterY = letterY + 60;
-            drawFixVariantLetter("V : " + tr(I18N_BACKTRACK_WHITE_EDGE), Color.WHITE, letterX, letterY, 25);
+            drawFixVariantLetter("V : " + tr(BACKTRACK_WHITE_EDGE), Color.WHITE, letterX, letterY, 25);
             letterY = letterY + 60;
-            drawFixVariantLetter("Q : " + tr(I18N_REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
+            drawFixVariantLetter("Q : " + tr(REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
         }
     }
 
@@ -104,39 +164,39 @@ public class MendRelationPaintVisitor extends PaintVisitor {
             letterY = letterY + 60;
         }
         if (numeric) {
-            drawFixVariantLetter("1 : " + tr(I18N_REMOVE_WAYS), FIVE_COLOR_PALETTE[0], letterX, letterY, 25);
+            drawFixVariantLetter("1 : " + tr(REMOVE_WAYS), FIVE_COLOR_PALETTE[0], letterX, letterY, 25);
             letterY = letterY + 60;
-            drawFixVariantLetter("2 : " + tr(I18N_NOT_REMOVE_WAYS), FIVE_COLOR_PALETTE[1], letterX, letterY, 25);
+            drawFixVariantLetter("2 : " + tr(NOT_REMOVE_WAYS), FIVE_COLOR_PALETTE[1], letterX, letterY, 25);
             letterY = letterY + 60;
-            drawFixVariantLetter("3 : " + tr(I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY), FIVE_COLOR_PALETTE[4], letterX,
+            drawFixVariantLetter("3 : " + tr(REMOVE_WAYS_WITH_PREVIOUS_WAY), FIVE_COLOR_PALETTE[4], letterX,
                 letterY, 25);
             letterY = letterY + 60;
             if (notice.equals("vehicle travels against oneway restriction")) {
-                drawFixVariantLetter("4 : " + tr(I18N_ADD_ONEWAY_VEHICLE_NO_TO_WAY), FIVE_COLOR_PALETTE[3], letterX,
+                drawFixVariantLetter("4 : " + tr(ADD_ONEWAY_VEHICLE_NO_TWO_WAY), FIVE_COLOR_PALETTE[3], letterX,
                     letterY, 25);
             }
         } else {
-            drawFixVariantLetter("A : " + tr(I18N_REMOVE_WAYS), FIVE_COLOR_PALETTE[0], letterX, letterY, 25);
+            drawFixVariantLetter("A : " + tr(REMOVE_WAYS), FIVE_COLOR_PALETTE[0], letterX, letterY, 25);
             letterY = letterY + 60;
-            drawFixVariantLetter("B : " + tr(I18N_NOT_REMOVE_WAYS), FIVE_COLOR_PALETTE[1], letterX, letterY, 25);
+            drawFixVariantLetter("B : " + tr(NOT_REMOVE_WAYS), FIVE_COLOR_PALETTE[1], letterX, letterY, 25);
             letterY = letterY + 60;
             if (notice.equals("vehicle travels against oneway restriction")) {
-                drawFixVariantLetter("C : " + tr(I18N_ADD_ONEWAY_VEHICLE_NO_TO_WAY), FIVE_COLOR_PALETTE[3], letterX,
+                drawFixVariantLetter("C : " + tr(ADD_ONEWAY_VEHICLE_NO_TWO_WAY), FIVE_COLOR_PALETTE[3], letterX,
                     letterY, 25);
                 letterY = letterY + 60;
             }
-            drawFixVariantLetter("R : " + tr(I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY), FIVE_COLOR_PALETTE[4], letterX,
+            drawFixVariantLetter("R : " + tr(REMOVE_WAYS_WITH_PREVIOUS_WAY), FIVE_COLOR_PALETTE[4], letterX,
                 letterY, 25);
         }
 
         letterY = letterY + 60;
-        drawFixVariantLetter("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 30);
+        drawFixVariantLetter("Esc : " + tr(CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 30);
     }
 
-    void drawMultipleVariants(HashMap<Character, java.util.List<Way>> fixVariants) {
-        waysColoring = new HashMap<>();
+    void drawMultipleVariants(HashMap<Character, List<Way>> fixVariants) {
+        HashMap<Way, List<Character>> wayListColoring = new HashMap<>();
         addFixVariants(fixVariants);
-        drawFixVariantsWithParallelLines(waysColoring);
+        drawFixVariantsWithParallelLines(wayListColoring);
 
         int colorIndex = 0;
 
@@ -145,20 +205,20 @@ public class MendRelationPaintVisitor extends PaintVisitor {
 
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
 
-        if (showOption0 && numeric) {
+        if (paint.getShowOption0() && numeric) {
             if (!shorterRoutes)
-                drawFixVariantLetter("0 : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
+                drawFixVariantLetter("0 : " + tr(TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
                     letterY, 25);
             else
-                drawFixVariantLetter("0 : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
+                drawFixVariantLetter("0 : " + tr(SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
                     letterY, 25);
             letterY = letterY + 60;
-        } else if (showOption0) {
+        } else if (paint.getShowOption0()) {
             if (!shorterRoutes)
-                drawFixVariantLetter("W : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
+                drawFixVariantLetter("W : " + tr(TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
                     letterY, 25);
             else
-                drawFixVariantLetter("W : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
+                drawFixVariantLetter("W : " + tr(SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
                     letterY, 25);
             letterY = letterY + 60;
         }
@@ -173,25 +233,25 @@ public class MendRelationPaintVisitor extends PaintVisitor {
         }
 
         // display the "Esc", "Skip" label:
-        drawFixVariantLetter("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 25);
+        drawFixVariantLetter("Esc : " + tr(CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 25);
         letterY = letterY + 60;
         if (numeric) {
-            drawFixVariantLetter("7 : " + tr(I18N_SKIP), Color.WHITE, letterX, letterY, 25);
+            drawFixVariantLetter("7 : " + tr(SKIP), Color.WHITE, letterX, letterY, 25);
             letterY = letterY + 60;
-            drawFixVariantLetter("8 : " + tr(I18N_BACKTRACK_WHITE_EDGE), Color.WHITE, letterX, letterY, 25);
+            drawFixVariantLetter("8 : " + tr(BACKTRACK_WHITE_EDGE), Color.WHITE, letterX, letterY, 25);
             letterY = letterY + 60;
-            drawFixVariantLetter("9 : " + tr(I18N_REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
+            drawFixVariantLetter("9 : " + tr(REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
         } else {
-            drawFixVariantLetter("S : " + tr(I18N_SKIP), Color.WHITE, letterX, letterY, 25);
+            drawFixVariantLetter("S : " + tr(SKIP), Color.WHITE, letterX, letterY, 25);
             letterY = letterY + 60;
-            drawFixVariantLetter("V : " + tr(I18N_BACKTRACK_WHITE_EDGE), Color.WHITE, letterX, letterY, 25);
+            drawFixVariantLetter("V : " + tr(BACKTRACK_WHITE_EDGE), Color.WHITE, letterX, letterY, 25);
             letterY = letterY + 60;
-            drawFixVariantLetter("Q : " + tr(I18N_REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
+            drawFixVariantLetter("Q : " + tr(REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
         }
 
     }
 
-    protected void drawFixVariantsWithParallelLines(final boolean drawNextWay) {
+    protected void drawFixVariantsWithParallelLines(boolean drawNextWay) {
         wayColoring.entrySet().stream()
             // Create pairs of a color and an associated pair of nodes
             .flatMap(entry -> entry.getKey().getNodePairs(false).stream()
@@ -205,11 +265,10 @@ public class MendRelationPaintVisitor extends PaintVisitor {
         }
     }
 
-    protected void drawFixVariantsWithParallelLines(Map<Way, java.util.List<Character>> waysColoring) {
-        for (final Map.Entry<Way, java.util.List<Character>> entry : waysColoring.entrySet()) {
-            final java.util.List<Color> wayColors = entry.getValue().stream().map(CHARACTER_COLOR_MAP::get)
-                .collect(Collectors.toList());
-            for (final Pair<Node, Node> nodePair : entry.getKey().getNodePairs(false)) {
+    protected void drawFixVariantsWithParallelLines(Map<Way, List<Character>> waysColoring) {
+        for (Map.Entry<Way, List<Character>> entry : waysColoring.entrySet()) {
+            List<Color> wayColors = entry.getValue().stream().map(CHARACTER_COLOR_MAP::get).collect(Collectors.toList());
+            for (Pair<Node, Node> nodePair : entry.getKey().getNodePairs(false)) {
                 drawSegmentWithParallelLines(nodePair.a, nodePair.b, wayColors);
             }
         }
@@ -224,11 +283,17 @@ public class MendRelationPaintVisitor extends PaintVisitor {
     /**
      * Convenience method for {@link #drawSegmentWithParallelLines(Node, Node, java.util.List)}.
      */
-    private void drawSegmentsWithParallelLines(java.util.List<Pair<Node, Node>> nodePairs, final Color color) {
+    private void drawSegmentsWithParallelLines(List<Pair<Node, Node>> nodePairs, final Color color) {
         final java.util.List<Color> colorList = Collections.singletonList(color);
         nodePairs.forEach(it -> drawSegmentWithParallelLines(it.a, it.b, colorList));
     }
 
+    /**
+     *
+     * @param n1
+     * @param n2
+     * @param colors
+     */
     void drawSegmentWithParallelLines(Node n1, Node n2, java.util.List<Color> colors) {
         if (!n1.isDrawable() || !n2.isDrawable() || !isSegmentVisible(n1, n2)) {
             return;
@@ -253,8 +318,8 @@ public class MendRelationPaintVisitor extends PaintVisitor {
         g.fillOval(p1.x - 9, p1.y - 9, 18, 18);
 
         if (colors.size() == 1) {
-            int[] xPoints = { (int) (p1.x + cosT), (int) (p2.x + cosT), (int) (p2.x - cosT), (int) (p1.x - cosT) };
-            int[] yPoints = { (int) (p1.y - sinT), (int) (p2.y - sinT), (int) (p2.y + sinT), (int) (p1.y + sinT) };
+            int[] xPoints = {(int) (p1.x + cosT), (int) (p2.x + cosT), (int) (p2.x - cosT), (int) (p1.x - cosT) };
+            int[] yPoints = {(int) (p1.y - sinT), (int) (p2.y - sinT), (int) (p2.y + sinT), (int) (p1.y + sinT) };
             g.setColor(currentColor);
             g.fillPolygon(xPoints, yPoints, 4);
         } else if (colors.size() > 1) {
@@ -262,9 +327,9 @@ public class MendRelationPaintVisitor extends PaintVisitor {
             while (iterate) {
                 currentColor = colors.get(i % colors.size());
 
-                int[] xPoints = { (int) (prevPointX + cosT), (int) (nextPointX + cosT), (int) (nextPointX - cosT),
+                int[] xPoints = {(int) (prevPointX + cosT), (int) (nextPointX + cosT), (int) (nextPointX - cosT),
                     (int) (prevPointX - cosT) };
-                int[] yPoints = { (int) (prevPointY - sinT), (int) (nextPointY - sinT), (int) (nextPointY + sinT),
+                int[] yPoints = {(int) (prevPointY - sinT), (int) (nextPointY - sinT), (int) (nextPointY + sinT),
                     (int) (prevPointY + sinT) };
                 g.setColor(currentColor);
                 g.fillPolygon(xPoints, yPoints, 4);
@@ -279,9 +344,9 @@ public class MendRelationPaintVisitor extends PaintVisitor {
                 }
             }
 
-            int[] lastXPoints = { (int) (prevPointX + cosT), (int) (p2.x + cosT), (int) (p2.x - cosT),
+            int[] lastXPoints = {(int) (prevPointX + cosT), (int) (p2.x + cosT), (int) (p2.x - cosT),
                 (int) (prevPointX - cosT) };
-            int[] lastYPoints = { (int) (prevPointY - sinT), (int) (p2.y - sinT), (int) (p2.y + sinT),
+            int[] lastYPoints = {(int) (prevPointY - sinT), (int) (p2.y - sinT), (int) (p2.y + sinT),
                 (int) (prevPointY + sinT) };
             g.setColor(currentColor);
             g.fillPolygon(lastXPoints, lastYPoints, 4);
@@ -291,7 +356,11 @@ public class MendRelationPaintVisitor extends PaintVisitor {
         g.fillOval(p2.x - 9, p2.y - 9, 18, 18);
     }
 
-    void addFixVariants(HashMap<Character, java.util.List<Way>> fixVariants) {
+    /**
+     *
+     * @param fixVariants
+     */
+    void addFixVariants(HashMap<Character, List<Way>> fixVariants) {
         for (Map.Entry<Character, java.util.List<Way>> entry : fixVariants.entrySet()) {
             Character currentFixVariantLetter = entry.getKey();
             java.util.List<Way> fixVariant = entry.getValue();

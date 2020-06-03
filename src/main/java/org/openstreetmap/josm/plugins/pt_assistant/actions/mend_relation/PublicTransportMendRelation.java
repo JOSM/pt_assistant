@@ -35,38 +35,6 @@ import java.util.stream.Collectors;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 public class PublicTransportMendRelation extends AbstractMendRelationAction {
-
-    private static final Color[] FIVE_COLOR_PALETTE = { new Color(0, 255, 0, 150), new Color(255, 0, 0, 150),
-        new Color(0, 0, 255, 150), new Color(255, 255, 0, 150), new Color(0, 255, 255, 150) };
-
-    private static final Map<Character, Color> CHARACTER_COLOR_MAP = new HashMap<>();
-    static {
-        CHARACTER_COLOR_MAP.put('A', new Color(0, 255, 0, 200));
-        CHARACTER_COLOR_MAP.put('B', new Color(255, 0, 0, 200));
-        CHARACTER_COLOR_MAP.put('C', new Color(0, 0, 255, 200));
-        CHARACTER_COLOR_MAP.put('D', new Color(255, 255, 0, 200));
-        CHARACTER_COLOR_MAP.put('E', new Color(0, 255, 255, 200));
-        CHARACTER_COLOR_MAP.put('1', new Color(0, 255, 0, 200));
-        CHARACTER_COLOR_MAP.put('2', new Color(255, 0, 0, 200));
-        CHARACTER_COLOR_MAP.put('3', new Color(0, 0, 255, 200));
-        CHARACTER_COLOR_MAP.put('4', new Color(255, 255, 0, 200));
-        CHARACTER_COLOR_MAP.put('5', new Color(0, 255, 255, 200));
-    }
-
-    private static final Color CURRENT_WAY_COLOR = new Color(255, 255, 255, 190);
-    private static final Color NEXT_WAY_COLOR = new Color(169, 169, 169, 210);
-
-    String I18N_ADD_ONEWAY_VEHICLE_NO_TO_WAY = I18n.marktr("Add oneway:bus=no to way");
-    private static final String I18N_CLOSE_OPTIONS = I18n.marktr("Close the options");
-    private static final String I18N_NOT_REMOVE_WAYS = I18n.marktr("Do not remove ways");
-    private static final String I18N_REMOVE_CURRENT_EDGE = I18n.marktr("Remove current edge (white)");
-    private static final String I18N_REMOVE_WAYS = I18n.marktr("Remove ways");
-    private static final String I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY = I18n.marktr("Remove ways along with previous way");
-    private static final String I18N_SKIP = I18n.marktr("Skip");
-    private static final String I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS = I18n
-        .marktr("solutions based on other route relations");
-    private static final String I18N_TURN_BY_TURN_NEXT_INTERSECTION = I18n.marktr("turn-by-turn at next intersection");
-    private static final String I18N_BACKTRACK_WHITE_EDGE = I18n.marktr("Split white edge");
     Relation relation = null;
     MemberTableModel memberTableModel = null;
     GenericRelationEditor editor = null;
@@ -91,6 +59,8 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
     boolean aroundStops = false;
     Node prevCurrenNode = null;
     Node splitNode = null;
+    boolean abort = false;
+
 
     HashMap<Character, java.util.List<Way>> wayListColoring;
     int nodeIdx = 0;
@@ -98,8 +68,8 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
     String notice = null;
     java.util.List<Node> backnodes = new ArrayList<>();
 
-    public PublicTransportMendRelationAction(IRelationEditorActionAccess editorAccess) {
-        super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
+    public PublicTransportMendRelation(IRelationEditorActionAccess editorAccess) {
+        super(editorAccess);
         editor = (GenericRelationEditor) editorAccess.getEditor();
         memberTableModel = editorAccess.getMemberTableModel();
         relation = editor.getRelation();
