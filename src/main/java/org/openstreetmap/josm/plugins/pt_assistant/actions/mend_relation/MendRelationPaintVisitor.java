@@ -7,6 +7,7 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.layer.validation.PaintVisitor;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
@@ -53,7 +54,8 @@ public class MendRelationPaintVisitor extends PaintVisitor {
     private final String TURN_BY_TURN_NEXT_INTERSECTION = I18n.marktr("turn-by-turn at next intersection");
     private final String BACKTRACK_WHITE_EDGE = I18n.marktr("Split white edge");
 
-    private MendRelationPaintVisitorInterface paint;
+    private final MendRelationPaintVisitorInterface paint;
+    private HashMap<Way, List<Character>> waysColoring;
 
     private final Graphics g;
     private final MapView mv;
@@ -159,8 +161,8 @@ public class MendRelationPaintVisitor extends PaintVisitor {
         double letterX = MainApplication.getMap().mapView.getBounds().getMinX() + 20;
         double letterY = MainApplication.getMap().mapView.getBounds().getMinY() + 100;
 
-        if (notice != null) {
-            drawFixVariantLetter("Error:  " + notice, Color.WHITE, letterX, letterY, 25);
+        if (paint.getNotice() != null) {
+            drawFixVariantLetter("Error:  " + paint.getNotice(), Color.WHITE, letterX, letterY, 25);
             letterY = letterY + 60;
         }
         if (numeric) {
@@ -171,7 +173,7 @@ public class MendRelationPaintVisitor extends PaintVisitor {
             drawFixVariantLetter("3 : " + tr(REMOVE_WAYS_WITH_PREVIOUS_WAY), FIVE_COLOR_PALETTE[4], letterX,
                 letterY, 25);
             letterY = letterY + 60;
-            if (notice.equals("vehicle travels against oneway restriction")) {
+            if (paint.getNotice().equals("vehicle travels against oneway restriction")) {
                 drawFixVariantLetter("4 : " + tr(ADD_ONEWAY_VEHICLE_NO_TWO_WAY), FIVE_COLOR_PALETTE[3], letterX,
                     letterY, 25);
             }
@@ -180,7 +182,7 @@ public class MendRelationPaintVisitor extends PaintVisitor {
             letterY = letterY + 60;
             drawFixVariantLetter("B : " + tr(NOT_REMOVE_WAYS), FIVE_COLOR_PALETTE[1], letterX, letterY, 25);
             letterY = letterY + 60;
-            if (notice.equals("vehicle travels against oneway restriction")) {
+            if (paint.getNotice().equals("vehicle travels against oneway restriction")) {
                 drawFixVariantLetter("C : " + tr(ADD_ONEWAY_VEHICLE_NO_TWO_WAY), FIVE_COLOR_PALETTE[3], letterX,
                     letterY, 25);
                 letterY = letterY + 60;
@@ -206,7 +208,7 @@ public class MendRelationPaintVisitor extends PaintVisitor {
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
 
         if (paint.getShowOption0() && numeric) {
-            if (!shorterRoutes)
+            if (!paint.getShorterRoutes())
                 drawFixVariantLetter("0 : " + tr(TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
                     letterY, 25);
             else
@@ -214,7 +216,7 @@ public class MendRelationPaintVisitor extends PaintVisitor {
                     letterY, 25);
             letterY = letterY + 60;
         } else if (paint.getShowOption0()) {
-            if (!shorterRoutes)
+            if (!paint.getShorterRoutes())
                 drawFixVariantLetter("W : " + tr(TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
                     letterY, 25);
             else
@@ -252,16 +254,16 @@ public class MendRelationPaintVisitor extends PaintVisitor {
     }
 
     protected void drawFixVariantsWithParallelLines(boolean drawNextWay) {
-        wayColoring.entrySet().stream()
+        paint.getWayColoring().entrySet().stream()
             // Create pairs of a color and an associated pair of nodes
             .flatMap(entry -> entry.getKey().getNodePairs(false).stream()
                 .map(it -> Pair.create(CHARACTER_COLOR_MAP.get(entry.getValue()), it)))
             // Grouping by color: groups stream into a map, each map entry has a color and all associated pairs of nodes
             .collect(Collectors.groupingBy(it -> it.a, Collectors.mapping(it -> it.b, Collectors.toList())))
             .forEach((color, nodePairs) -> drawSegmentsWithParallelLines(nodePairs, color));
-        drawSegmentsWithParallelLines(currentWay.getNodePairs(false), CURRENT_WAY_COLOR);
+        drawSegmentsWithParallelLines(paint.getCurrentWay().getNodePairs(false), CURRENT_WAY_COLOR);
         if (drawNextWay) {
-            drawSegmentsWithParallelLines(nextWay.getNodePairs(false), NEXT_WAY_COLOR);
+            drawSegmentsWithParallelLines(paint.getNextWay().getNodePairs(false), NEXT_WAY_COLOR);
         }
     }
 
@@ -276,7 +278,7 @@ public class MendRelationPaintVisitor extends PaintVisitor {
         drawSegmentsWithParallelLines(findCurrentEdge().stream().flatMap(it -> it.getNodePairs(false).stream())
             .collect(Collectors.toList()), CURRENT_WAY_COLOR);
 
-        drawSegmentsWithParallelLines(nextWay.getNodePairs(false), NEXT_WAY_COLOR);
+        drawSegmentsWithParallelLines(paint.getNextWay().getNodePairs(false), NEXT_WAY_COLOR);
 
     }
 
@@ -363,7 +365,7 @@ public class MendRelationPaintVisitor extends PaintVisitor {
     void addFixVariants(HashMap<Character, List<Way>> fixVariants) {
         for (Map.Entry<Character, java.util.List<Way>> entry : fixVariants.entrySet()) {
             Character currentFixVariantLetter = entry.getKey();
-            java.util.List<Way> fixVariant = entry.getValue();
+            List<Way> fixVariant = entry.getValue();
             for (Way way : fixVariant) {
                 if (waysColoring.containsKey(way)) {
                     if (!waysColoring.get(way).contains(currentFixVariantLetter)) {
@@ -397,7 +399,37 @@ public class MendRelationPaintVisitor extends PaintVisitor {
             // do nothing
             Logging.trace(ex);
         }
+    }
 
+    /**
+     *
+     * @return
+     */
+    List<Way> findCurrentEdge() {
+        java.util.List<Way> lst = new ArrayList<>();
+        lst.add(paint.getCurrentWay());
+        int j = paint.getCurrentIndex();
+        Way curr = paint.getCurrentWay();
+        while (true) {
+            int i = paint.getPreviousWayIndex(j);
+            if (i == -1)
+                break;
+
+            Way prevWay = paint.getMembersList().get(i).getWay();
+
+            if (prevWay == null)
+                break;
+
+            if (!WayUtils.findCommonFirstLastNode(curr, prevWay).filter(node -> node.getParentWays().size() <= 2)
+                .isPresent()) {
+                break;
+            }
+
+            lst.add(prevWay);
+            curr = prevWay;
+            j = i;
+        }
+        return lst;
     }
 }
 

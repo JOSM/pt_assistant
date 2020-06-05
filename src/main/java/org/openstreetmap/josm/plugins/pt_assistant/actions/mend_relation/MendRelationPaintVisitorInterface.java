@@ -1,13 +1,16 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation;
 
+import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 
 import java.util.HashMap;
 import java.util.List;
 
 /**
+ * Interface required to be implemented in order to use {@code MendRelationPaintVisitor}
  *
+ * @author sudhanshu2
  */
 public interface MendRelationPaintVisitorInterface {
 
@@ -46,6 +49,43 @@ public interface MendRelationPaintVisitorInterface {
      * @return
      */
     HashMap<Character, List<Way>> getWayListColoring();
+
+    /**
+     *
+     * @return
+     */
+    Way getCurrentWay();
+
+    /**
+     *
+     * @return
+     */
+    Way getNextWay();
+
+    /**
+     *
+     * @return
+     */
+    String getNotice();
+
+    /**
+     *
+     * @param index
+     * @return
+     */
+    int getPreviousWayIndex(int index);
+
+    /**
+     *
+     * @return
+     */
+    int getCurrentIndex();
+
+    /**
+     *
+     * @return
+     */
+    List<RelationMember> getMembersList();
 
     /**
      *

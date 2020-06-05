@@ -58,7 +58,7 @@ public class BicycleMendRelation extends MendRelationAction {
     int cnt = 0;
     int brokenidx = 0;
     HashMap<Node, Integer> Isthere = new HashMap<>();
-    static HashMap<Way, Integer> IsWaythere = new HashMap<>();
+    static HashMa<Way, Integer> IsWaythere = new HashMap<>();
     static List<WayConnectionType> links;
     static WayConnectionType link;
     static WayConnectionType prelink;

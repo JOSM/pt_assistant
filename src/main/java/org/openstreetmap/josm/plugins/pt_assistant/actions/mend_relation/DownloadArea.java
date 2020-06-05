@@ -215,13 +215,13 @@ public class DownloadArea {
      * @param wayList
      * @param Int
      */
-    protected void downloadAreaBeforeRemovalOption(java.util.List<Way> wayList, java.util.List<Integer> Int) {
+    protected void downloadAreaBeforeRemovalOption(List<Way> wayList, List<Integer> Int) {
         if (download.getAbort()) {
             return;
         }
 
         if (!download.getOnFly()) {
-            new DisplayWays().displayWaysToRemove(Int);
+            download.callDisplayWaysToRemove(Int);
         }
 
         download.setDownloadCounter(0);
@@ -232,7 +232,7 @@ public class DownloadArea {
             MainApplication.worker.submit(() -> {
                 try {
                     NotificationUtils.downloadWithNotifications(future, tr("Area before removal"));
-                    new DisplayWays().displayWaysToRemove(Int);
+                    download.callDisplayWaysToRemove(Int);
                 } catch (InterruptedException | ExecutionException e1) {
                     Logging.error(e1);
                 }

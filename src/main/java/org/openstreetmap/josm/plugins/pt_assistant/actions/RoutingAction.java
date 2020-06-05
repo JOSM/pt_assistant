@@ -23,18 +23,20 @@ import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation.PersonalTransportMendRelation;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation.PublicTransportMendRelation;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.NotificationUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
-public class RoutingAction extends AbstractRelationEditorAction{
+public class RoutingAction extends AbstractRelationEditorAction {
 	Relation relation = null;
 	GenericRelationEditor editor = null;
 	boolean setEnable = true;
 
-  public RoutingAction(IRelationEditorActionAccess editorAccess){
+  public RoutingAction(IRelationEditorActionAccess editorAccess) {
     super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
     putValue(SHORT_DESCRIPTION, tr("Routing Helper"));
     new ImageProvider("dialogs/relation", "routing_assistance.svg").getResource().attachImageIcon(this, true);
@@ -43,6 +45,7 @@ public class RoutingAction extends AbstractRelationEditorAction{
     this.relation = editor.getRelation();
     editor.addWindowListener(new WindowEventHandler());
   }
+
   @Override
   protected void updateEnabledState() {
       final Relation curRel = relation;
@@ -54,17 +57,17 @@ public class RoutingAction extends AbstractRelationEditorAction{
           )
       );
   }
-  private void callAction(Relation relation){
-		if(relation.hasTag("route","bicycle")) {
-       BicycleMendRelation bike = new BicycleMendRelation(editorAccess);
-		    // MendRelationAction bike = new MendRelationAction(editorAccess);
-        bike.initialise();
-       }
-    else {
-        MendRelationAction pt_transport = new MendRelationAction(editorAccess);
+
+  private void callAction(Relation relation) {
+      if (relation.hasTag("route", "bicycle")) {
+       PersonalTransportMendRelation personal = new PersonalTransportMendRelation(editorAccess);
+       personal.initialise();
+       } else {
+        PublicTransportMendRelation pt_transport = new PublicTransportMendRelation(editorAccess);
         pt_transport.initialise();
     }
 	}
+
   @Override
   public void actionPerformed(ActionEvent e) {
        if (relation.hasIncompleteMembers()) {
@@ -73,8 +76,9 @@ public class RoutingAction extends AbstractRelationEditorAction{
                    .setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(3600).show();
        } else {
 				 callAction(relation);
+       }
   }
-  }
+
   private void downloadIncompleteRelations() {
 
       List<Relation> parents = Collections.singletonList(relation);

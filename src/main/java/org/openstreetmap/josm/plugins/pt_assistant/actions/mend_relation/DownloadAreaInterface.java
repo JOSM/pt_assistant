@@ -117,4 +117,10 @@ public interface DownloadAreaInterface {
      *
      */
     void deleteExtraWays();
+
+    /**
+     *
+     * @param wayIndices
+     */
+    void callDisplayWaysToRemove(List<Integer> wayIndices);
 }
