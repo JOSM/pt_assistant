@@ -1,38 +1,32 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.actions.mend_relation;
 
-import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.command.SplitWayCommand;
-import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.UndoRedoHandler;
-import org.openstreetmap.josm.data.osm.*;
-import org.openstreetmap.josm.gui.MainApplication;
-import org.openstreetmap.josm.gui.MapView;
-import org.openstreetmap.josm.gui.Notification;
+import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.Relation;
+import org.openstreetmap.josm.data.osm.RelationMember;
+import org.openstreetmap.josm.data.osm.TagMap;
+import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
-import org.openstreetmap.josm.gui.dialogs.relation.MemberTableModel;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
-import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
-import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
 import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
-import org.openstreetmap.josm.gui.layer.MapViewPaintable;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.MendRelationAction;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
-import org.openstreetmap.josm.tools.*;
+import org.openstreetmap.josm.tools.I18n;
+import org.openstreetmap.josm.tools.Logging;
+import org.openstreetmap.josm.tools.Pair;
+import org.openstreetmap.josm.tools.Utils;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
  *
@@ -42,13 +36,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 public class PublicTransportMendRelation extends AbstractMendRelationAction {
     HashMap<Way, Integer> waysAlreadyPresent = null;
 
-    boolean showOption0 = false;
-    Node prevCurrenNode = null;
-    Node splitNode = null;
-    boolean abort = false;
-
-
-    HashMap<Character, java.util.List<Way>> wayListColoring;
     int nodeIdx = 0;
     AbstractMapViewPaintable temporaryLayer = null;
     java.util.List<Node> backnodes = new ArrayList<>();
@@ -67,7 +54,7 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
     /**
      * Initializes the Public Transport Mend Relation
      */
-    public void initialize() {
+    public void initialise() {
         save();
         sortBelow(relation.getMembers(), 0);
         members = editor.getRelation().getMembers();
@@ -80,6 +67,18 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
             callNextWay(currentIndex);
         }
     }
+
+    /**
+     *
+     * @param way
+     * @return
+     */
+    protected boolean isOneWayOrRoundabout(Way way) {
+        return currentWay.isOneway() == 0
+            && RouteUtils.isOnewayForPublicTransport(currentWay) == 0
+            && !isSplitRoundAbout(currentWay);
+    }
+
 
 
 
@@ -104,6 +103,11 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
 
     /* Overriden in PersonalTransport */
 
+
+    @Override
+    public List<Way> getListOfAllWays() {
+        return null;
+    }
 
     void callNextWay(int i) {
         Logging.debug("Index + " + i);
@@ -144,7 +148,7 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
                     currentNode = getOtherNode(nextWay, node);
                     previousWay = way;
                     nextIndex = false;
-                    downloadAreaAroundWay(way);
+                    downloadArea.downloadAreaAroundWay(way);
                 }
             } else {
                 if (node == null) {
@@ -155,12 +159,12 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
                     currentNode = nextWay.firstNode();
                     previousWay = way;
                     nextIndex = false;
-                    downloadAreaAroundWay(way);
+                    downloadArea.downloadAreaAroundWay(way);
                 } else {
                     currentNode = nextWay.lastNode();
                     previousWay = way;
                     nextIndex = false;
-                    downloadAreaAroundWay(way);
+                    downloadArea.downloadAreaAroundWay(way);
                 }
             }
         }
@@ -235,6 +239,16 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
             }
         }
         return null;
+    }
+
+    @Override
+    public int getMemberSize() {
+        return 0;
+    }
+
+    @Override
+    public void callDisplayWaysToRemove(List<Integer> wayIndices) {
+
     }
 
     List<java.util.List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
@@ -470,6 +484,16 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
         }
     }
 
+    @Override
+    public Way getCurrentWay() {
+        return null;
+    }
+
+    @Override
+    public Way getNextWay() {
+        return null;
+    }
+
     public Way findWayAfterChunk(Way way) {
         Way w1 = null;
         Way wayToKeep = null;
@@ -527,6 +551,21 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
         } else {
             deleteExtraWays();
         }
+    }
+
+    @Override
+    public List<RelationMember> getMembers() {
+        return null;
+    }
+
+    @Override
+    public String getNotice() {
+        return null;
+    }
+
+    @Override
+    public void removeWayAfterSelection(List<Integer> wayIndices, char ch) {
+
     }
 
     void getNextWayAfterSelection(java.util.List<Way> ways) {
@@ -658,6 +697,11 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
             deleteExtraWays();
     }
 
+    @Override
+    public void removeTemporaryLayers() {
+
+    }
+
     void addNewWays(java.util.List<Way> ways, int i) {
         try {
             java.util.List<RelationMember> c = new ArrayList<>();
@@ -704,6 +748,8 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
             }
         }
     }
+
+
 
     void removeCurrentEdge() {
         java.util.List<Integer> lst = new ArrayList<>();

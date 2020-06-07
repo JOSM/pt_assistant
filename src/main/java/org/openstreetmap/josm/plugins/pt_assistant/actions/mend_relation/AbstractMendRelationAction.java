@@ -19,8 +19,8 @@ import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEdito
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
+import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionType;
 import org.openstreetmap.josm.gui.layer.MapViewPaintable;
-import org.openstreetmap.josm.plugins.pt_assistant.actions.MendRelationAction;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.GBC;
@@ -67,10 +67,21 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     protected String notice;
     protected Node currentNode;
     protected List<Integer> extraWaysToBeDeleted;
+    protected Node splitNode;
+    protected Node prevCurrentNode;
+    protected Way lastForWay;
+    protected Way lastBackWay;
+
+    protected static WayConnectionType prelink;
+    protected int brokenidx;
+    protected HashMap<Node, Integer> Isthere = new HashMap<>();
+    protected static HashMap<Way, Integer> IsWaythere = new HashMap<>();
+    protected HashMap<Character, java.util.List<Way>> wayListColoring;
+    protected HashMap<Way, List<Character>> wayColoring;
 
     protected DownloadArea downloadArea;
     protected DisplayWays displayWays;
-    protected MendRelationPaintVisitor paintVisitor;
+    //protected MendRelationPaintVisitor paintVisitor;
 
     protected int downloadCounter;
     protected int currentIndex;
@@ -84,17 +95,22 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     protected boolean aroundGaps;
     protected boolean aroundStops;
     protected boolean halt;
+    protected boolean abort;
 
     /* Abstract methods */
 
-    protected abstract void initialize();
+    public abstract void initialise();
+    protected abstract boolean checkOneWaySatisfiability(Way way, Node node);
+    protected abstract boolean isOneWayOrRoundabout(Way way);
+    protected abstract List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way way);
 
     /**
      * Constructor for AbstractMendRelationAction class
      * @param editorAccess is the IRelationEditorActionAccess for mend relation action
      * @param addOneWay sets the string which is displayed for one way option in mend relation
      */
-    protected AbstractMendRelationAction(IRelationEditorActionAccess editorAccess, String addOneWay, String downloadAreaString) {
+    protected AbstractMendRelationAction(IRelationEditorActionAccess editorAccess,
+                                         String addOneWay, String downloadAreaString) {
         super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
 
         setEnable = true;
@@ -106,12 +122,17 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         aroundGaps = false;
         aroundStops = false;
         halt = false;
-
-        downloadArea = new DownloadArea(this);
-        displayWays = new DisplayWays(this);
-        paintVisitor = new MendRelationPaintVisitor(g, mv, this);
+        abort = false;
+        brokenidx = 0;
 
         this.addOneWay = addOneWay;
+        this.downloadAreaString = downloadAreaString;
+    }
+
+    protected void setHelperClasses(AbstractMendRelationAction abstractMendRelation) {
+        downloadArea = new DownloadArea(abstractMendRelation);
+        displayWays = new DisplayWays(abstractMendRelation, abstractMendRelation);
+        //paintVisitor = new MendRelationPaintVisitor(g, mv, abstractMendRelation);
     }
 
     /**
@@ -265,6 +286,66 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         }
     }
 
+    // TODO: Merge with searchWayFromOtherRelationsReversed(Relation r, Way current, Way next)! These seem to do largely the same thing.
+
+    protected List<Way> searchWayFromOtherRelations(Relation relation, Way current, Way next) {
+        java.util.List<RelationMember> member = relation.getMembers();
+        java.util.List<Way> lst = new ArrayList<>();
+        boolean canAdd = false;
+        Way prev = null;
+        for (RelationMember relationMember : member) {
+            if (relationMember.isWay()) {
+                Way w = relationMember.getWay();
+                if (w.equals(current)) {
+                    lst.clear();
+                    canAdd = true;
+                    prev = w;
+                } else if (w.equals(next) && lst.size() > 0) {
+                    return lst;
+                } else if (canAdd) {
+                    if (findNumberOfCommonNode(w, prev) != 0) {
+                        lst.add(w);
+                        prev = w;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    // TODO: Merge with searchWayFromOtherRelations(Relation r, Way current, Way next)! These seem to do largely the same thing.
+    protected List<Way> searchWayFromOtherRelationsReversed(Relation r, Way current, Way next) {
+        List<RelationMember> member = r.getMembers();
+        List<Way> lst = new ArrayList<>();
+        boolean canAdd = false;
+        Way prev = null;
+        for (RelationMember relationMember : member) {
+            if (relationMember.isWay()) {
+                Way w = relationMember.getWay();
+                if (w.equals(next)) {
+                    lst.clear();
+                    canAdd = true;
+                    prev = w;
+                } else if (w.equals(current) && lst.size() > 0) {
+                    Collections.reverse(lst);
+                    return lst;
+                } else if (canAdd) {
+                    // not valid in reverse if it is oneway or part of roundabout
+                    if (findNumberOfCommonNode(w, prev) != 0 && w.isOneway() == 0
+                        && RouteUtils.isOnewayForPublicTransport(w) == 0 && !isSplitRoundAbout(w)) {
+                        lst.add(w);
+                        prev = w;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * Class to determine what happens when mend relation action is closed
      */
@@ -281,6 +362,107 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
 
 
 
+
+
+
+
+
+
+
+    @Override
+    public String getOneWayString() {
+        return addOneWay;
+    }
+
+    @Override
+    public boolean getShowOption0() {
+        return showOption0;
+    }
+
+    @Override
+    public boolean getAbort() {
+        return abort;
+    }
+
+    @Override
+    public boolean getShorterRoutes() {
+        return shorterRoutes;
+    }
+
+    @Override
+    public void setDownloadCounter(int downloadCounter) {
+        this.downloadCounter = downloadCounter;
+    }
+
+    @Override
+    public Relation getRelation() {
+        return relation;
+    }
+
+    @Override
+    public void setSetEnable(boolean setEnable) {
+        this.setEnable = setEnable;
+    }
+
+    @Override
+    public void setNextIndex(boolean nextIndex) {
+        this.nextIndex = nextIndex;
+    }
+
+    @Override
+    public void setHalt(boolean halt) {
+        this.halt = halt;
+    }
+
+    @Override
+    public void setShorterRoutes(boolean shorterRoutes) {
+        this.shorterRoutes = shorterRoutes;
+    }
+
+    @Override
+    public HashMap<Character, List<Way>> getWayListColoring() {
+        return wayListColoring;
+    }
+
+    @Override
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
+    @Override
+    public List<RelationMember> getMembersList() {
+        return members;
+    }
+
+    @Override
+    public void setWayListColoring(HashMap<Character, List<Way>> wayListColoring) {
+        this.wayListColoring = wayListColoring;
+    }
+
+    @Override
+    public void setCurrentIndex(int currentIndex) {
+        this.currentIndex = currentIndex;
+    }
+
+    @Override
+    public boolean getAroundStops() {
+        return aroundStops;
+    }
+
+    @Override
+    public boolean getAroundGaps() {
+        return aroundGaps;
+    }
+
+    @Override
+    public boolean getOnFly() {
+        return onFly;
+    }
+
+    @Override
+    public int getDownloadCounter() {
+        return downloadCounter;
+    }
 
 
 
@@ -397,7 +579,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
 
         DataSet ds = MainApplication.getLayerManager().getEditDataSet();
         ds.setSelected(lst);
-        downloadAreaBeforeRemovalOption(lst, Int);
+        downloadArea.downloadAreaBeforeRemovalOption(lst, Int);
     }
 
     int getNextWayIndex(int idx) {
@@ -410,7 +592,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         return j;
     }
 
-    int getPreviousWayIndex(int idx) {
+    public int getPreviousWayIndex(int idx) {
         int j;
 
         for (j = idx - 1; j >= 0; j--) {
@@ -445,77 +627,18 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         DataSet ds = MainApplication.getLayerManager().getEditDataSet();
         ds.setSelected(way);
         AutoScaleAction.zoomTo(Collections.singletonList(way));
-        downloadAreaAroundWay(way, node, null);
+        downloadArea.downloadAreaAroundWay(way, node, null);
         return null;
     }
 
     Way findNextWayBeforeDownload(Way way, Node node1, Node node2) {
         nextIndex = false;
         AutoScaleAction.zoomTo(Collections.singletonList(way));
-        downloadAreaAroundWay(way, node1, node2);
+        downloadArea.downloadAreaAroundWay(way, node1, node2);
         return null;
     }
 
-    // TODO: Merge with searchWayFromOtherRelationsReversed(Relation r, Way current, Way next)! These seem to do largely the same thing.
-    java.util.List<Way> searchWayFromOtherRelations(Relation r, Way current, Way next) {
-        java.util.List<RelationMember> member = r.getMembers();
-        java.util.List<Way> lst = new ArrayList<>();
-        boolean canAdd = false;
-        Way prev = null;
-        for (int i = 0; i < member.size(); i++) {
-            if (member.get(i).isWay()) {
-                Way w = member.get(i).getWay();
-                if (w.equals(current)) {
-                    lst.clear();
-                    canAdd = true;
-                    prev = w;
-                } else if (w.equals(next) && lst.size() > 0) {
-                    return lst;
-                } else if (canAdd) {
-                    if (findNumberOfCommonNode(w, prev) != 0) {
-                        lst.add(w);
-                        prev = w;
-                    } else {
-                        break;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    // TODO: Merge with searchWayFromOtherRelations(Relation r, Way current, Way next)! These seem to do largely the same thing.
-    java.util.List<Way> searchWayFromOtherRelationsReversed(Relation r, Way current, Way next) {
-        java.util.List<RelationMember> member = r.getMembers();
-        java.util.List<Way> lst = new ArrayList<>();
-        boolean canAdd = false;
-        Way prev = null;
-        for (int i = 0; i < member.size(); i++) {
-            if (member.get(i).isWay()) {
-                Way w = member.get(i).getWay();
-                if (w.equals(next)) {
-                    lst.clear();
-                    canAdd = true;
-                    prev = w;
-                } else if (w.equals(current) && lst.size() > 0) {
-                    Collections.reverse(lst);
-                    return lst;
-                } else if (canAdd) {
-                    // not valid in reverse if it is oneway or part of roundabout
-                    if (findNumberOfCommonNode(w, prev) != 0 && w.isOneway() == 0
-                        && RouteUtils.isOnewayForPublicTransport(w) == 0 && !isSplitRoundAbout(w)) {
-                        lst.add(w);
-                        prev = w;
-                    } else {
-                        break;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    void goToNextWays(Way way, Way prevWay, java.util.List<Way> wayList) {
+    public void goToNextWays(Way way, Way prevWay, java.util.List<Way> wayList) {
         java.util.List<java.util.List<Way>> lst = new ArrayList<>();
         previousWay = prevWay;
         Node node1 = null;
@@ -528,14 +651,14 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
 
         if (node1 == null) {
             lst.add(wayList);
-            displayFixVariantsWithOverlappingWays(lst);
+            displayWays.displayFixVariantsWithOverlappingWays(lst);
             return;
         }
 
         // check if the way equals the next way, if so then don't add any new ways to the list
         if (way == nextWay) {
             lst.add(wayList);
-            displayFixVariantsWithOverlappingWays(lst);
+            displayWays.displayFixVariantsWithOverlappingWays(lst);
             return;
         }
 
@@ -547,14 +670,14 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         // if the ways directly touch the next way
         if (way.isFirstLastNode(nextWay.firstNode()) || way.isFirstLastNode(nextWay.lastNode())) {
             lst.add(wayList);
-            displayFixVariantsWithOverlappingWays(lst);
+            displayWays.displayFixVariantsWithOverlappingWays(lst);
             return;
         }
 
         // if next way turns out to be a roundabout
         if (nextWay.containsNode(node) && nextWay.hasTag("junction", "roundabout")) {
             lst.add(wayList);
-            displayFixVariantsWithOverlappingWays(lst);
+            displayWays.displayFixVariantsWithOverlappingWays(lst);
             return;
         }
 
@@ -565,10 +688,10 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
             // if (already the way exists in the ways to be added
             if (wayList.contains(parents.get(0))) {
                 lst.add(wayList);
-                displayFixVariantsWithOverlappingWays(lst);
+                displayWays.displayFixVariantsWithOverlappingWays(lst);
                 return;
             }
-            downloadAreaAroundWay(parents.get(0), way, wayList);
+            downloadArea.downloadAreaAroundWay(parents.get(0), way, wayList);
             return;
         } else if (parents.size() > 1) {
             // keep the most probable option s option A
@@ -591,11 +714,11 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
                 lst.add(wl);
             }
 
-            displayFixVariantsWithOverlappingWays(lst);
+            displayWays.displayFixVariantsWithOverlappingWays(lst);
             return;
         } else {
             lst.add(wayList);
-            displayFixVariantsWithOverlappingWays(lst);
+            displayWays.displayFixVariantsWithOverlappingWays(lst);
             return;
         }
     }
@@ -856,7 +979,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         java.util.List<Node> breakNode = new ArrayList<>();
         breakNode.add(currentNode);
         splitNode = way.lastNode();
-        SplitWayCommand.Strategy strategy = new MendRelationAction.TempStrategyRoundabout();
+        SplitWayCommand.Strategy strategy = new TempStrategyRoundabout();
         java.util.List<java.util.List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(way, breakNode);
         SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
         if (result != null) {
@@ -892,7 +1015,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         @Override
         public Way determineWayToKeep(Iterable<Way> wayChunks) {
             for (Way way : wayChunks) {
-                if (!way.containsNode(prevCurrenNode)) {
+                if (!way.containsNode(prevCurrentNode)) {
                     return way;
                 }
             }
@@ -967,54 +1090,54 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         // TODO Auto-generated method stub
         boolean nexWayDelete = false;
         Node node = null;
-        super.nextIndex = false;
-        super.notice = null;
-        final NodePair commonEndNodes = WayUtils.findCommonFirstLastNodes(super.nextWay, way);
+        nextIndex = false;
+        notice = null;
+        final NodePair commonEndNodes = WayUtils.findCommonFirstLastNodes(nextWay, way);
         if (commonEndNodes.getA() != null && commonEndNodes.getB() != null) {
             nexWayDelete = true;
-            super.notice = "Multiple common nodes found between current and next way";
+            notice = "Multiple common nodes found between current and next way";
         } else if (commonEndNodes.getA() != null) {
             node = commonEndNodes.getA();
         } else if (commonEndNodes.getB() != null) {
             node = commonEndNodes.getB();
         } else {
             // the nodes can be one of the intermediate nodes
-            for (Node n : super.nextWay.getNodes()) {
+            for (Node n : nextWay.getNodes()) {
                 if (way.getNodes().contains(n)) {
                     node = n;
-                    super.currentNode = n;
+                    currentNode = n;
                 }
             }
         }
-        if (node != null && isRestricted(super.nextWay, way, node)) {
+        if (node != null && isRestricted(nextWay, way, node)) {
             nexWayDelete = true;
         }
         if (isNonSplitRoundAbout(way)) {
             nexWayDelete = false;
             for (Node n : way.getNodes()) {
-                if (super.nextWay.firstNode().equals(n) || super.nextWay.lastNode().equals(n)) {
+                if (nextWay.firstNode().equals(n) || nextWay.lastNode().equals(n)) {
                     node = n;
-                    super.currentNode = n;
+                    currentNode = n;
                 }
             }
         }
 
-        if (isNonSplitRoundAbout(super.nextWay)) {
+        if (isNonSplitRoundAbout(nextWay)) {
             nexWayDelete = false;
         }
 
-        if (node != null && !checkOneWaySatisfiability(super.nextWay, node)) {
+        if (node != null && !checkOneWaySatisfiability(nextWay, node)) {
             nexWayDelete = true;
-            super.notice = "vehicle travels against oneway restriction";
+            notice = "vehicle travels against oneway restriction";
         }
         if (nexWayDelete) {
-            super.currentWay = way;
-            super.nextIndex = true;
+            currentWay = way;
+            nextIndex = true;
             removeWay(nexidx);
             return null;
         }
 
-        super.nextIndex = false;
+        nextIndex = false;
         return node;
 
     }
@@ -1025,15 +1148,15 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         if (lastForWay != null && lastBackWay != null) {
             NodePair pair = WayUtils.findCommonFirstLastNodes(lastForWay, lastBackWay);
             if (pair.getA() == null && pair.getB() != null) {
-                if (pair.getB().equals(super.currentNode)) {
+                if (pair.getB().equals(currentNode)) {
                     flag = 1;
                 }
             } else if (pair.getB() == null && pair.getA() != null) {
-                if (pair.getA().equals(super.currentNode)) {
+                if (pair.getA().equals(currentNode)) {
                     flag = 1;
                 }
             } else if (pair.getB() != null && pair.getA() != null) {
-                if (pair.getA().equals(super.currentNode) || pair.getB().equals(super.currentNode)) {
+                if (pair.getA().equals(currentNode) || pair.getB().equals(currentNode)) {
                     flag = 1;
                 }
             }
@@ -1042,13 +1165,13 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
 
         if (flag == 1) {
             s = "";
-        } else if (prelink.isOnewayLoopBackwardPart && super.currentNode.equals(w.firstNode())) {
+        } else if (prelink.isOnewayLoopBackwardPart && currentNode.equals(w.firstNode())) {
             s = "backward";
-        } else if (prelink.isOnewayLoopBackwardPart && super.currentNode.equals(w.lastNode())) {
+        } else if (prelink.isOnewayLoopBackwardPart && currentNode.equals(w.lastNode())) {
             s = "forward";
-        } else if (prelink.isOnewayLoopForwardPart && super.currentNode.equals(w.firstNode())) {
+        } else if (prelink.isOnewayLoopForwardPart && currentNode.equals(w.firstNode())) {
             s = "forward";
-        } else if (prelink.isOnewayLoopForwardPart && super.currentNode.equals(w.lastNode())) {
+        } else if (prelink.isOnewayLoopForwardPart && currentNode.equals(w.lastNode())) {
             s = "backward";
         } else {
             s = "";
@@ -1057,10 +1180,10 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     }
 
     void assignRolesafterloop(Node jointNode) {
-        int idx = super.currentIndex;
+        int idx = currentIndex;
         int[] idxlst = new int[1];
         Node node1;
-        Way w = super.members.get(idx).getWay();
+        Way w = members.get(idx).getWay();
         Node node = null;
         String s = "";
         if (w.firstNode().equals(jointNode)) {
@@ -1072,10 +1195,10 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         }
         idxlst[0] = idx;
         idx--;
-        double minLength = findDistance(w, super.nextWay, jointNode);
-        super.memberTableModel.updateRole(idxlst, s);
+        double minLength = findDistance(w, nextWay, jointNode);
+        memberTableModel.updateRole(idxlst, s);
         while (true) {
-            w = super.members.get(idx).getWay();
+            w = members.get(idx).getWay();
             if (w.firstNode().equals(node)) {
                 node = w.lastNode();
                 node1 = w.firstNode();
@@ -1088,28 +1211,28 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
                 // roles[idx]=s;
             }
             idxlst[0] = idx;
-            double length = findDistance(w, super.nextWay, node1);
+            double length = findDistance(w, nextWay, node1);
             if (minLength > length) {
                 minLength = length;
             }
-            super.memberTableModel.updateRole(idxlst, s);
+            memberTableModel.updateRole(idxlst, s);
             if (w.firstNode().equals(jointNode) || w.lastNode().equals(jointNode)) {
                 break;
             }
             idx--;
         }
-        super.currentNode = jointNode;
+        currentNode = jointNode;
         brokenidx = idx;
-        sortBelow(super.relation.getMembers(), 0);
+        sortBelow(relation.getMembers(), 0);
     }
 
     void fixgapAfterlooping(int idx) {
-        Way w = super.members.get(idx).getWay();
-        super.currentWay = w;
+        Way w = members.get(idx).getWay();
+        currentWay = w;
         Way minWay = w;
-        double minLength = findDistance(w, super.nextWay, super.currentNode);
-        while (idx <= super.currentIndex) {
-            w = super.members.get(idx).getWay();
+        double minLength = findDistance(w, nextWay, currentNode);
+        while (idx <= currentIndex) {
+            w = members.get(idx).getWay();
             List<Way> parentWays = findNextWay(w, w.lastNode());
             if (w.firstNode() != null) {
                 parentWays.addAll(findNextWay(w, w.firstNode()));
@@ -1117,7 +1240,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
             for (int i = 0; i < parentWays.size(); i++) {
                 if (IsWaythere.get(parentWays.get(i)) == null) {
                     Node node = getOtherNode(parentWays.get(i), null);
-                    double dist = findDistance(parentWays.get(i), super.nextWay, node);
+                    double dist = findDistance(parentWays.get(i), nextWay, node);
                     if (dist < minLength) {
                         minLength = dist;
                         minWay = w;
@@ -1127,14 +1250,14 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
             idx++;
         }
         w = minWay;
-        downloadAreaAroundWay(w, w.lastNode(), w.firstNode());
+        downloadArea.downloadAreaAroundWay(w, w.lastNode(), w.firstNode());
     }
 
     /////////make panel////////////
 
     void makeNodesZeros() {
-        for (int i = 0; i < super.members.size(); i++) {
-            Way n = super.members.get(i).getWay();
+        for (int i = 0; i < members.size(); i++) {
+            Way n = members.get(i).getWay();
             Node f = n.firstNode();
             Node l = n.lastNode();
             Isthere.put(f, 0);

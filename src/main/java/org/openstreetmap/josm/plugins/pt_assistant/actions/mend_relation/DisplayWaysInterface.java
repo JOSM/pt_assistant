@@ -65,7 +65,7 @@ public interface DisplayWaysInterface {
     /**
      *
      */
-    void setWayColoring(HashMap<Way, Character> wayColoring);
+    void setOptionColors(HashMap<Way, Character> wayColoring);
 
     /**
      *

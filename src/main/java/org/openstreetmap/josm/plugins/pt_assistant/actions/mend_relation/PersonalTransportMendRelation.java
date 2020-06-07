@@ -33,15 +33,8 @@ import static org.openstreetmap.josm.tools.I18n.tr;
  * @author Ashish Singh and sudhanshu2
  */
 public class PersonalTransportMendRelation extends AbstractMendRelationAction {
-
-    Way lastForWay;
-    Way lastBackWay;
-    int brokenidx = 0;
-    HashMap<Node, Integer> Isthere = new HashMap<>();
-    static HashMap<Way, Integer> IsWaythere = new HashMap<>();
     static List<WayConnectionType> links;
     static WayConnectionType link;
-    static WayConnectionType prelink;
     List<List<Way>> directroutes;
     NodePositionComparator dist = new NodePositionComparator();
     WayConnectionTypeCalculator connectionTypeCalculator = new WayConnectionTypeCalculator();
@@ -59,7 +52,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
     /**
      * Initializes the Public Transport Mend Relation
      */
-    public void initialize() {
+    public void initialise() {
         save();
         sortBelow(relation.getMembers(), 0);
         members = editor.getRelation().getMembers();
@@ -73,6 +66,15 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
             halt = false;
             callNextWay(currentIndex);
         }
+    }
+
+    /**
+     *
+     * @param way
+     * @return
+     */
+    protected boolean isOneWayOrRoundabout(Way way) {
+        return RouteUtils.isOnewayForBicycles(way) == 0 && isSplitRoundAbout(way);
     }
 
 
@@ -154,7 +156,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
                     super.previousWay = way;
                     super.currentNode = getOtherNode(super.nextWay, node);
                     super.nextIndex = false;
-                    downloadAreaAroundWay(way);
+                    downloadArea.downloadAreaAroundWay(way);
                 }
             } else {
                 if (node == null) {
@@ -182,7 +184,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
                         } else {
                             node = way.lastNode();
                         }
-                        downloadAreaAroundWay(way);
+                        downloadArea.downloadAreaAroundWay(way);
                     } else {
                         super.currentNode = getOtherNode(way, node);
                         super.currentWay = way;
@@ -193,12 +195,12 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
                     super.previousWay = way;
                     super.currentNode = getOtherNode(super.nextWay, node);
                     super.nextIndex = false;
-                    downloadAreaAroundWay(way);
+                    downloadArea.downloadAreaAroundWay(way);
                 }
             }
 
         }
-        if (super.abort)
+        if (abort)
             return;
 
         if (idx >= super.members.size() - 1) {
@@ -256,14 +258,14 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
         }
         if (directroutes != null && directroutes.size() > 0 && !super.shorterRoutes && parentWays.size() > 0
             && super.notice == null) {
-            displayFixVariantsWithOverlappingWays(directroutes);
+            displayWays.displayFixVariantsWithOverlappingWays(directroutes);
             return null;
         }
         if (parentWays.size() == 1) {
             goToNextWays(parentWays.get(0), way, new ArrayList<>());
         } else if (parentWays.size() > 1) {
             super.nextIndex = false;
-            displayFixVariants(parentWays);
+            displayWays.displayFixVariants(parentWays);
         } else {
             super.nextIndex = true;
             if (super.currentIndex >= super.members.size() - 1) {

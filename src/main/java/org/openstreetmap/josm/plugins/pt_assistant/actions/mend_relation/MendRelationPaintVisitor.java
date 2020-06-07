@@ -55,7 +55,6 @@ public class MendRelationPaintVisitor extends PaintVisitor {
     private final String BACKTRACK_WHITE_EDGE = I18n.marktr("Split white edge");
 
     private final MendRelationPaintVisitorInterface paint;
-    private HashMap<Way, List<Character>> waysColoring;
 
     private final Graphics g;
     private final MapView mv;
@@ -367,7 +366,7 @@ public class MendRelationPaintVisitor extends PaintVisitor {
             Character currentFixVariantLetter = entry.getKey();
             List<Way> fixVariant = entry.getValue();
             for (Way way : fixVariant) {
-                if (waysColoring.containsKey(way)) {
+                if (paint.getWayColoring().containsKey(way)) {
                     if (!waysColoring.get(way).contains(currentFixVariantLetter)) {
                         waysColoring.get(way).add(currentFixVariantLetter);
                     }

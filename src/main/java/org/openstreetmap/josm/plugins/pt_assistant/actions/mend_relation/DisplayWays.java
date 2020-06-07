@@ -30,14 +30,16 @@ import java.util.stream.Collectors;
 public class DisplayWays {
     private AbstractMapViewPaintable temporaryLayer;
     private final DisplayWaysInterface display;
+    private final MendRelationPaintVisitorInterface paint;
     private  HashMap<Character, List<Way>> wayListColoring;
 
     /**
      *
      * @param display
      */
-    public DisplayWays(DisplayWaysInterface display) {
+    public DisplayWays(DisplayWaysInterface display, MendRelationPaintVisitorInterface paint) {
         this.display = display;
+        this.paint = paint;
     }
 
     /**
@@ -86,7 +88,7 @@ public class DisplayWays {
      */
     void displayFixVariants(List<Way> fixVariants) {
         List<Character> allowedCharacters = getAllowedCharacters();
-        HashMap<Way, Character> wayColoring = new HashMap<>();
+        HashMap<Way, Character> optionColors = new HashMap<>();
         char alphabet;
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
         if (numeric) {
@@ -97,11 +99,11 @@ public class DisplayWays {
 
         for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
             allowedCharacters.add(alphabet);
-            wayColoring.put(fixVariants.get(i), alphabet);
+            optionColors.put(fixVariants.get(i), alphabet);
             alphabet++;
         }
 
-        display.setWayColoring(wayColoring);
+        display.setOptionColors(optionColors);
 
         // remove any existing temporary layer
         display.removeTemporaryLayers();
@@ -199,7 +201,7 @@ public class DisplayWays {
             alphabet++;
         }
 
-        display.setWayColoring(wayColoring);
+        display.setOptionColors(wayColoring);
 
         // remove any existing temporary layer
         display.removeTemporaryLayers();
@@ -374,7 +376,7 @@ public class DisplayWays {
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
         if (numeric)
             alphabet = '1';
-        HashMap<Way, Character> wayColoring = new HashMap<>();
+        HashMap<Way, Character> optionColors = new HashMap<>();
         final List<Character> allowedCharacters = new ArrayList<>();
 
         if (numeric) {
@@ -388,10 +390,10 @@ public class DisplayWays {
         }
 
         for (int i = 0; i < 5 && i < wayIndices.size(); i++) {
-            wayColoring.put(display.getMembers().get(wayIndices.get(i)).getWay(), alphabet);
+            optionColors.put(display.getMembers().get(wayIndices.get(i)).getWay(), alphabet);
         }
 
-        display.setWayColoring(wayColoring);
+        display.setOptionColors(optionColors);
 
         if (display.getNotice().equals("vehicle travels against oneway restriction")) {
             if (numeric) {
@@ -486,7 +488,7 @@ public class DisplayWays {
 
         @Override
         public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv);
+            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv, paint);
             paintVisitor.drawVariants();
         }
     }
@@ -498,7 +500,7 @@ public class DisplayWays {
 
         @Override
         public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv);
+            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv, paint);
             paintVisitor.drawOptionsToRemoveWays();
         }
     }
@@ -510,7 +512,7 @@ public class DisplayWays {
 
         @Override
         public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv);
+            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv, paint);
             paintVisitor.drawMultipleVariants(wayListColoring);
         }
     }
