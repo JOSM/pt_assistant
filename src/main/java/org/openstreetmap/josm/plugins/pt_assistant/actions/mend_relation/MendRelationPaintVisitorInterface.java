@@ -36,24 +36,6 @@ public interface MendRelationPaintVisitorInterface {
      *
      * @return
      */
-    HashMap<Character, List<Way>> getWayListColoring();
-
-    /**
-     *
-     * @return
-     */
-    HashMap<Way, List<Character>> getWayColoring();
-
-    /**
-     *
-     * @param wayColoring
-     */
-    void setWayColoring(HashMap<Way, Character> wayColoring);
-
-    /**
-     *
-     * @return
-     */
     Way getCurrentWay();
 
     /**

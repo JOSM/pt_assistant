@@ -55,6 +55,7 @@ public class MendRelationPaintVisitor extends PaintVisitor {
     private final String BACKTRACK_WHITE_EDGE = I18n.marktr("Split white edge");
 
     private final MendRelationPaintVisitorInterface paint;
+    private Map<Way, List<Character>> wayChoiceColoring;
 
     private final Graphics g;
     private final MapView mv;
@@ -87,6 +88,7 @@ public class MendRelationPaintVisitor extends PaintVisitor {
         this.mv = mv;
         this.paint = paint;
         ADD_ONEWAY_VEHICLE_NO_TWO_WAY = paint.getOneWayString();
+        wayChoiceColoring = new HashMap<>();
     }
 
     /**
@@ -128,7 +130,7 @@ public class MendRelationPaintVisitor extends PaintVisitor {
         }
 
         for (int i = 0; i < 5; i++) {
-            if (paint.getWayColoring().containsValue(chr)) {
+            if (wayChoiceColoring.containsValue(chr)) {
                 drawFixVariantLetter(chr.toString(), colors[i], letterX, letterY, 35);
                 letterY = letterY + 60;
             }
@@ -253,7 +255,7 @@ public class MendRelationPaintVisitor extends PaintVisitor {
     }
 
     protected void drawFixVariantsWithParallelLines(boolean drawNextWay) {
-        paint.getWayColoring().entrySet().stream()
+        wayChoiceColoring.entrySet().stream()
             // Create pairs of a color and an associated pair of nodes
             .flatMap(entry -> entry.getKey().getNodePairs(false).stream()
                 .map(it -> Pair.create(CHARACTER_COLOR_MAP.get(entry.getValue()), it)))
@@ -366,14 +368,14 @@ public class MendRelationPaintVisitor extends PaintVisitor {
             Character currentFixVariantLetter = entry.getKey();
             List<Way> fixVariant = entry.getValue();
             for (Way way : fixVariant) {
-                if (paint.getWayColoring().containsKey(way)) {
-                    if (!waysColoring.get(way).contains(currentFixVariantLetter)) {
-                        waysColoring.get(way).add(currentFixVariantLetter);
+                if (wayChoiceColoring.containsKey(way)) {
+                    if (!wayChoiceColoring.get(way).contains(currentFixVariantLetter)) {
+                        wayChoiceColoring.get(way).add(currentFixVariantLetter);
                     }
                 } else {
                     List<Character> letterList = new ArrayList<>();
                     letterList.add(currentFixVariantLetter);
-                    waysColoring.put(way, letterList);
+                    wayChoiceColoring.put(way, letterList);
                 }
             }
         }

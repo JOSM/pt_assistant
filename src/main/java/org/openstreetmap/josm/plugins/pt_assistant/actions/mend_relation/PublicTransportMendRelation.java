@@ -14,7 +14,6 @@ import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
-import org.openstreetmap.josm.plugins.pt_assistant.actions.MendRelationAction;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.I18n;
@@ -38,7 +37,6 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
 
     int nodeIdx = 0;
     AbstractMapViewPaintable temporaryLayer = null;
-    java.util.List<Node> backnodes = new ArrayList<>();
 
     public PublicTransportMendRelation(IRelationEditorActionAccess editorAccess) {
         super(editorAccess,
@@ -54,6 +52,7 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
     /**
      * Initializes the Public Transport Mend Relation
      */
+    @Override
     public void initialise() {
         save();
         sortBelow(relation.getMembers(), 0);
@@ -73,6 +72,7 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
      * @param way
      * @return
      */
+    @Override
     protected boolean isOneWayOrRoundabout(Way way) {
         return currentWay.isOneway() == 0
             && RouteUtils.isOnewayForPublicTransport(currentWay) == 0
@@ -103,13 +103,8 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
 
     /* Overriden in PersonalTransport */
 
-
     @Override
-    public List<Way> getListOfAllWays() {
-        return null;
-    }
-
-    void callNextWay(int i) {
+    public void callNextWay(int i) {
         Logging.debug("Index + " + i);
         downloadCounter++;
         if (i < members.size() && members.get(i).isWay()) {
@@ -180,7 +175,8 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
         }
     }
 
-    boolean checkOneWaySatisfiability(Way way, Node node) {
+    @Override
+    public boolean checkOneWaySatisfiability(Way way, Node node) {
         String[] acceptedTags = new String[] { "yes", "designated" };
 
         if ((way.hasTag("oneway:bus", acceptedTags) || way.hasTag("oneway:psv", acceptedTags))
@@ -202,7 +198,8 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
         return true;
     }
 
-    Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
+    @Override
+    public Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
         currentWay = way;
         if (abort)
             return null;
@@ -219,7 +216,7 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
 
         if (directRoute != null && directRoute.size() > 0 && !shorterRoutes && parentWays.size() > 0
             && notice == null) {
-            displayFixVariantsWithOverlappingWays(directRoute);
+            displayWays.displayFixVariantsWithOverlappingWays(directRoute);
             return null;
         }
 
@@ -227,7 +224,7 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
             goToNextWays(parentWays.get(0), way, new ArrayList<>());
         } else if (parentWays.size() > 1) {
             nextIndex = false;
-            displayFixVariants(parentWays);
+            displayWays.displayFixVariants(parentWays);
         } else {
             nextIndex = true;
 
@@ -239,16 +236,6 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
             }
         }
         return null;
-    }
-
-    @Override
-    public int getMemberSize() {
-        return 0;
-    }
-
-    @Override
-    public void callDisplayWaysToRemove(List<Integer> wayIndices) {
-
     }
 
     List<java.util.List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
@@ -298,20 +285,21 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
         return list;
     }
 
-    List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way way) {
+    @Override
+    public List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way way) {
         parentWays.remove(way);
         if (abort)
             return null;
-        java.util.List<Way> waysToBeRemoved = new ArrayList<>();
+        List<Way> waysToBeRemoved = new ArrayList<>();
         // check if any of the way is joining with its intermediate nodes
-        java.util.List<Way> waysToBeAdded = new ArrayList<>();
+        List<Way> waysToBeAdded = new ArrayList<>();
         for (Way w : parentWays) {
             if (node != null && !w.isFirstLastNode(node)) {
                 Way w1 = new Way();
                 Way w2 = new Way();
 
-                java.util.List<Node> lst1 = new ArrayList<>();
-                java.util.List<Node> lst2 = new ArrayList<>();
+                List<Node> lst1 = new ArrayList<>();
+                List<Node> lst2 = new ArrayList<>();
                 boolean firsthalf = true;
 
                 for (Pair<Node, Node> nodePair : w.getNodePairs(false)) {
@@ -426,9 +414,10 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
         return parentWays;
     }
 
+    @Override
     public void backTrack(Way way, int idx) {
         if (idx >= backnodes.size() - 1) {
-            currentNode = prevCurrenNode;
+            currentNode = prevCurrentNode;
             callNextWay(currentIndex);
             return;
         }
@@ -477,7 +466,7 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
             }
             currentNode = nod;
             if (fixVariants.size() > 0) {
-                displayBacktrackFixVariant(fixVariants, idx);
+                displayWays.displayBacktrackFixVariant(fixVariants, idx);
             } else {
                 backTrack(way, idx + 1);
             }
@@ -485,21 +474,12 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
     }
 
     @Override
-    public Way getCurrentWay() {
-        return null;
-    }
-
-    @Override
-    public Way getNextWay() {
-        return null;
-    }
-
     public Way findWayAfterChunk(Way way) {
         Way w1 = null;
         Way wayToKeep = null;
         java.util.List<Node> breakNode = new ArrayList<>();
         breakNode.add(currentNode);
-        SplitWayCommand.Strategy strategy = new MendRelationAction.TempStrategy();
+        SplitWayCommand.Strategy strategy = new TempStrategy();
         java.util.List<java.util.List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(currentWay, breakNode);
         SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
         if (result != null) {
@@ -510,7 +490,8 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
         return wayToKeep;
     }
 
-    void backtrackCurrentEdge() {
+    @Override
+    public void backtrackCurrentEdge() {
         Way backTrackWay = currentWay;
         Way way = backTrackWay;
         backnodes = way.getNodes();
@@ -521,11 +502,12 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
             Collections.reverse(backnodes);
         }
         int idx = 1;
-        prevCurrenNode = currentNode;
+        prevCurrentNode = currentNode;
         backTrack(currentWay, idx);
     }
 
-    void getNextWayAfterBackTrackSelection(Way way) {
+    @Override
+    public void getNextWayAfterBackTrackSelection(Way way) {
         save();
         java.util.List<Integer> lst = new ArrayList<>();
         lst.add(currentIndex + 1);
@@ -554,21 +536,7 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
     }
 
     @Override
-    public List<RelationMember> getMembers() {
-        return null;
-    }
-
-    @Override
-    public String getNotice() {
-        return null;
-    }
-
-    @Override
-    public void removeWayAfterSelection(List<Integer> wayIndices, char ch) {
-
-    }
-
-    void getNextWayAfterSelection(java.util.List<Way> ways) {
+    public void getNextWayAfterSelection(java.util.List<Way> ways) {
         if (ways != null) {
             /*
              * check if the selected way is not a complete way but rather a part of a parent
@@ -697,11 +665,6 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
             deleteExtraWays();
     }
 
-    @Override
-    public void removeTemporaryLayers() {
-
-    }
-
     void addNewWays(java.util.List<Way> ways, int i) {
         try {
             java.util.List<RelationMember> c = new ArrayList<>();
@@ -749,9 +712,8 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
         }
     }
 
-
-
-    void removeCurrentEdge() {
+    @Override
+    public void removeCurrentEdge() {
         java.util.List<Integer> lst = new ArrayList<>();
         lst.add(currentIndex);
         int j = currentIndex;
@@ -799,7 +761,8 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
         }
     }
 
-    void RemoveWayAfterSelection(java.util.List<Integer> wayIndices, Character chr) {
+    @Override
+    public void removeWayAfterSelection(List<Integer> wayIndices, char chr) {
         if (chr == 'A' || chr == '1') {
             // remove all the ways
             int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
@@ -828,8 +791,8 @@ public class PublicTransportMendRelation extends AbstractMendRelationAction {
         } else if (chr == 'C' || chr == '4') {
             java.util.List<Command> cmdlst = new ArrayList<>();
             int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
-            for (int i = 0; i < lst.length; i++) {
-                Way w = members.get(lst[i]).getWay();
+            for (int value : lst) {
+                Way w = members.get(value).getWay();
                 TagMap newKeys = w.getKeys();
                 newKeys.put("oneway", "bus=no");
                 cmdlst.add(new ChangePropertyCommand(Collections.singleton(w), newKeys));

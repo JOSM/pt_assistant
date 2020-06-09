@@ -88,7 +88,7 @@ public class DisplayWays {
      */
     void displayFixVariants(List<Way> fixVariants) {
         List<Character> allowedCharacters = getAllowedCharacters();
-        HashMap<Way, Character> optionColors = new HashMap<>();
+        HashMap<Way, Character> wayColoring = new HashMap<>();
         char alphabet;
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
         if (numeric) {
@@ -99,11 +99,11 @@ public class DisplayWays {
 
         for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
             allowedCharacters.add(alphabet);
-            optionColors.put(fixVariants.get(i), alphabet);
+            wayColoring.put(fixVariants.get(i), alphabet);
             alphabet++;
         }
 
-        display.setOptionColors(optionColors);
+        display.setWayColoring(wayColoring);
 
         // remove any existing temporary layer
         display.removeTemporaryLayers();
@@ -201,7 +201,7 @@ public class DisplayWays {
             alphabet++;
         }
 
-        display.setOptionColors(wayColoring);
+        display.setWayColoring(wayColoring);
 
         // remove any existing temporary layer
         display.removeTemporaryLayers();
@@ -376,7 +376,7 @@ public class DisplayWays {
         boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
         if (numeric)
             alphabet = '1';
-        HashMap<Way, Character> optionColors = new HashMap<>();
+        HashMap<Way, Character> wayColoring = new HashMap<>();
         final List<Character> allowedCharacters = new ArrayList<>();
 
         if (numeric) {
@@ -390,10 +390,10 @@ public class DisplayWays {
         }
 
         for (int i = 0; i < 5 && i < wayIndices.size(); i++) {
-            optionColors.put(display.getMembers().get(wayIndices.get(i)).getWay(), alphabet);
+            wayColoring.put(display.getMembers().get(wayIndices.get(i)).getWay(), alphabet);
         }
 
-        display.setOptionColors(optionColors);
+        display.setWayColoring(wayColoring);
 
         if (display.getNotice().equals("vehicle travels against oneway restriction")) {
             if (numeric) {

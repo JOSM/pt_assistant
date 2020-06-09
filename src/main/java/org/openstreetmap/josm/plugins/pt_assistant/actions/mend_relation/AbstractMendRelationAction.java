@@ -76,8 +76,9 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     protected int brokenidx;
     protected HashMap<Node, Integer> Isthere = new HashMap<>();
     protected static HashMap<Way, Integer> IsWaythere = new HashMap<>();
-    protected HashMap<Character, java.util.List<Way>> wayListColoring;
-    protected HashMap<Way, List<Character>> wayColoring;
+    protected HashMap<Character, List<Way>> wayListColoring;
+    protected HashMap<Way, Character> wayColoring;
+    protected List<Node> backnodes;
 
     protected DownloadArea downloadArea;
     protected DisplayWays displayWays;
@@ -124,6 +125,8 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         halt = false;
         abort = false;
         brokenidx = 0;
+
+        backnodes = new ArrayList<>();
 
         this.addOneWay = addOneWay;
         this.downloadAreaString = downloadAreaString;
@@ -196,6 +199,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
      * Generate string query for downloading area
      * @return string query to download area
      */
+    @Override
     public String getQuery() {
         StringBuilder str = new StringBuilder("[timeout:100];\n(\n");
         String wayFormatterString = "   way(%.6f,%.6f,%.6f,%.6f)\n";
@@ -375,6 +379,16 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     }
 
     @Override
+    public List<RelationMember> getMembers() {
+        return members;
+    }
+
+    @Override
+    public String getNotice() {
+        return notice;
+    }
+
+    @Override
     public boolean getShowOption0() {
         return showOption0;
     }
@@ -420,13 +434,28 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     }
 
     @Override
-    public HashMap<Character, List<Way>> getWayListColoring() {
-        return wayListColoring;
+    public void setWayColoring(HashMap<Way, Character> wayColoring) {
+        this.wayColoring = wayColoring;
     }
 
     @Override
     public int getCurrentIndex() {
         return currentIndex;
+    }
+
+    @Override
+    public Way getCurrentWay() {
+        return currentWay;
+    }
+
+    @Override
+    public int getMemberSize() {
+        return members.size();
+    }
+
+    @Override
+    public Way getNextWay() {
+        return nextWay;
     }
 
     @Override
@@ -462,6 +491,11 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     @Override
     public int getDownloadCounter() {
         return downloadCounter;
+    }
+
+    @Override
+    public void callDisplayWaysToRemove(List<Integer> wayIndices) {
+        displayWays.displayWaysToRemove(wayIndices);
     }
 
 
@@ -545,6 +579,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         return node;
     }
 
+    @Override
     public void deleteExtraWays() {
         int[] ints = extraWaysToBeDeleted.stream().mapToInt(Integer::intValue).toArray();
         memberTableModel.remove(ints);
@@ -592,6 +627,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         return j;
     }
 
+    @Override
     public int getPreviousWayIndex(int idx) {
         int j;
 
@@ -638,6 +674,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         return null;
     }
 
+    @Override
     public void goToNextWays(Way way, Way prevWay, java.util.List<Way> wayList) {
         java.util.List<java.util.List<Way>> lst = new ArrayList<>();
         previousWay = prevWay;
@@ -975,7 +1012,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
             return way.firstNode();
     }
 
-    private void findWayafterchunkRoundabout(Way way) {
+    protected void findWayafterchunkRoundabout(Way way) {
         java.util.List<Node> breakNode = new ArrayList<>();
         breakNode.add(currentNode);
         splitNode = way.lastNode();
@@ -987,7 +1024,8 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         }
     }
 
-    void removeTemporarylayers() {
+    @Override
+    public void removeTemporaryLayers() {
         java.util.List<MapViewPaintable> tempLayers = MainApplication.getMap().mapView.getTemporaryLayers();
         for (int i = 0; i < tempLayers.size(); i++) {
             MainApplication.getMap().mapView.removeTemporaryLayer(tempLayers.get(i));
@@ -1008,7 +1046,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         defaultStates();
         nextIndex = false;
         abort = true;
-        removeTemporarylayers();
+        removeTemporaryLayers();
     }
 
     public class TempStrategy implements SplitWayCommand.Strategy {
@@ -1086,7 +1124,7 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         return null;
     }
 
-    private Node checkVaildityOfWays(Way way, int nexidx) {
+    protected Node checkVaildityOfWays(Way way, int nexidx) {
         // TODO Auto-generated method stub
         boolean nexWayDelete = false;
         Node node = null;
@@ -1140,6 +1178,18 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
         nextIndex = false;
         return node;
 
+    }
+
+    @Override
+    public List<Way> getListOfAllWays() {
+        List<Way> ways = new ArrayList<>();
+        for (int i = 0; i < members.size(); i++) {
+            if (members.get(i).isWay()) {
+                waysAlreadyPresent.put(members.get(i).getWay(), 1);
+                ways.add(members.get(i).getWay());
+            }
+        }
+        return ways;
     }
 
     String assignRoles(Way w) {

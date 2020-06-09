@@ -11,21 +11,14 @@ import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionType;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionTypeCalculator;
-import org.openstreetmap.josm.plugins.pt_assistant.actions.MendRelationAction;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.*;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
  *
@@ -52,6 +45,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
     /**
      * Initializes the Public Transport Mend Relation
      */
+    @Override
     public void initialise() {
         save();
         sortBelow(relation.getMembers(), 0);
@@ -73,6 +67,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
      * @param way
      * @return
      */
+    @Override
     protected boolean isOneWayOrRoundabout(Way way) {
         return RouteUtils.isOnewayForBicycles(way) == 0 && isSplitRoundAbout(way);
     }
@@ -212,7 +207,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
     }
 
     @Override
-    boolean checkOneWaySatisfiability(Way way, Node node) {
+    public boolean checkOneWaySatisfiability(Way way, Node node) {
         String[] acceptedTags = new String[] { "yes", "designated" };
 
         if ((link.isOnewayLoopBackwardPart && super.relation.hasTag("route", "bicycle"))
@@ -240,7 +235,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
     }
 
     @Override
-    Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
+    public Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
         // TODO Auto-generated method stub
         super.currentWay = way;
         if (super.abort)
@@ -279,7 +274,6 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
         return null;
     }
 
-    @Override
     List<List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
         //trying to find the other route relations which can connect these ways
         List<List<Way>> list = new ArrayList<>();
@@ -330,7 +324,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
     }
 
     @Override
-    List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way way) {
+    public List<Way> removeInvalidWaysFromParentWays(List<Way> parentWays, Node node, Way way) {
         parentWays.remove(way);
         if (super.abort)
             return null;
@@ -463,7 +457,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
     @Override
     public void backTrack(Way way, int idx) {
         if (idx >= super.backnodes.size() - 1) {
-            super.currentNode = prevCurrenNode;
+            super.currentNode = prevCurrentNode;
             callNextWay(super.currentIndex);
             return;
         }
@@ -512,7 +506,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
             }
             super.currentNode = nod;
             if (fixVariants.size() > 0) {
-                displayBacktrackFixVariant(fixVariants, idx);
+                displayWays.displayBacktrackFixVariant(fixVariants, idx);
             } else {
                 backTrack(way, idx + 1);
             }
@@ -525,7 +519,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
         Way wayToKeep = null;
         List<Node> breakNode = new ArrayList<>();
         breakNode.add(super.currentNode);
-        SplitWayCommand.Strategy strategy = new MendRelationAction.TempStrategy();
+        SplitWayCommand.Strategy strategy = new TempStrategy();
         List<List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(super.currentWay, breakNode);
         SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
         if (result != null) {
@@ -537,23 +531,23 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
     }
 
     @Override
-    void backtrackCurrentEdge() {
+    public void backtrackCurrentEdge() {
         Way backTrackWay = super.currentWay;
         Way way = backTrackWay;
-        super.backnodes = way.getNodes();
-        if (super.currentNode == null) {
-            super.currentNode = super.currentWay.lastNode();
+        backnodes = way.getNodes();
+        if (currentNode == null) {
+            currentNode = currentWay.lastNode();
         }
-        if (super.currentNode.equals(way.lastNode())) {
-            Collections.reverse(super.backnodes);
+        if (currentNode.equals(way.lastNode())) {
+            Collections.reverse(backnodes);
         }
         int idx = 1;
-        prevCurrenNode = super.currentNode;
+        prevCurrentNode = currentNode;
         backTrack(super.currentWay, idx);
     }
 
     @Override
-    void getNextWayAfterBackTrackSelection(Way way) {
+    public void getNextWayAfterBackTrackSelection(Way way) {
         save();
         List<Integer> lst = new ArrayList<>();
         lst.add(super.currentIndex + 1);
@@ -584,7 +578,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
     }
 
     @Override
-    void getNextWayAfterSelection(List<Way> ways) {
+    public void getNextWayAfterSelection(List<Way> ways) {
         int flag = 0;
         if (ways != null) {
             /*
@@ -736,7 +730,6 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
         }
     }
 
-    @Override
     void addNewWays(List<Way> ways, int i) {
         try {
             List<RelationMember> c = new ArrayList<>();
@@ -772,7 +765,6 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
         }
     }
 
-    @Override
     void deleteWayAfterIndex(Way way, int index) {
         for (int i = index + 1; i < super.members.size(); i++) {
             if (super.members.get(i).isWay() && super.members.get(i).getWay().equals(way)) {
@@ -803,7 +795,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
     }
 
     @Override
-    void removeCurrentEdge() {
+    public void removeCurrentEdge() {
         List<Integer> lst = new ArrayList<>();
         lst.add(super.currentIndex);
         int j = super.currentIndex;
@@ -852,7 +844,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
     }
 
     @Override
-    void RemoveWayAfterSelection(List<Integer> wayIndices, Character chr) {
+    public void removeWayAfterSelection(List<Integer> wayIndices, char chr) {
         if (chr == 'A' || chr == '1') {
             // remove all the ways
             int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
