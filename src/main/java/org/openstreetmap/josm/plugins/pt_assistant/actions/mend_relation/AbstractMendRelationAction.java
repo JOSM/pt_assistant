@@ -82,7 +82,6 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
 
     protected DownloadArea downloadArea;
     protected DisplayWays displayWays;
-    //protected MendRelationPaintVisitor paintVisitor;
 
     protected int downloadCounter;
     protected int currentIndex;
@@ -135,7 +134,6 @@ public abstract class AbstractMendRelationAction extends AbstractRelationEditorA
     protected void setHelperClasses(AbstractMendRelationAction abstractMendRelation) {
         downloadArea = new DownloadArea(abstractMendRelation);
         displayWays = new DisplayWays(abstractMendRelation, abstractMendRelation);
-        //paintVisitor = new MendRelationPaintVisitor(g, mv, abstractMendRelation);
     }
 
     /**

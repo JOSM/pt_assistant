@@ -48,6 +48,7 @@ public class PersonalTransportMendRelation extends AbstractMendRelationAction {
     @Override
     public void initialise() {
         save();
+        setHelperClasses(this);
         sortBelow(relation.getMembers(), 0);
         members = editor.getRelation().getMembers();
         if (!halt) {
