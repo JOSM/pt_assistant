@@ -152,7 +152,7 @@ public class DistanceBetweenStops extends JosmAction {
 
         new ExtendedDialog(MainApplication.getMainFrame(), getValue(NAME).toString(), tr("Close")) {
             {
-                setButtonIcons("ok.png");
+                setButtonIcons("ok");
                 final JosmTextArea jte = new JosmTextArea();
                 jte.setFont(GuiHelper.getMonospacedFont(jte));
                 jte.setEditable(false);
