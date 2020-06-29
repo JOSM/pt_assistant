@@ -1,4 +1,3 @@
-// License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.actions.mendrelation;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
@@ -21,11 +20,9 @@ import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.command.SplitWayCommand;
-import org.openstreetmap.josm.command.SplitWayCommand.Strategy;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.NodePair;
-import org.openstreetmap.josm.data.osm.NodePositionComparator;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.TagMap;
@@ -43,10 +40,10 @@ import org.openstreetmap.josm.tools.Pair;
 import org.openstreetmap.josm.tools.Utils;
 
 /**
- * Mend the relations by going through each way, sorting them and proposing
- * fixes for the gaps that are found
+ * Mend the relations for buses, walking and horses by going through each way,
+ * sorting them and proposing fixes for the gaps that are found
  *
- * @author Ashish Singh
+ * @author Ashish Singh and sudhanshu2
  */
 public class PersonalTransportMendRelationAction extends PublicTransportMendRelationAction {
 
@@ -54,17 +51,13 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
 
     Way lastForWay;
     Way lastBackWay;
-    Node pseudocurrentNode = null;
-    int cnt = 0;
     int brokenidx = 0;
     HashMap<Node, Integer> Isthere = new HashMap<>();
     static HashMap<Way, Integer> IsWaythere = new HashMap<>();
     static List<WayConnectionType> links;
     static WayConnectionType link;
     static WayConnectionType prelink;
-    Node brokenNode;
     List<List<Way>> directroutes;
-    NodePositionComparator dist = new NodePositionComparator();
     WayConnectionTypeCalculator connectionTypeCalculator = new WayConnectionTypeCalculator();
 
     /////////////Editor Access To Bicycle Routing Helper//////////////
@@ -75,7 +68,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
         super.memberTableModel = editorAccess.getMemberTableModel();
         super.relation = editor.getRelation();
         super.I18N_ADD_ONEWAY_VEHICLE_NO_TO_WAY = I18n.marktr("Add oneway:bicycle=no to way");
-        super.editor.addWindowListener(new WindowEventHandler());
+        super.editor.addWindowListener(new PersonalTransportMendRelationAction.WindowEventHandler());
     }
 
     /////////////on action call initialise()/////////////
@@ -261,8 +254,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
         return true;
     }
 
-    private Node checkVaildityOfWays(Way way, int nexidx) {
-        // TODO Auto-generated method stub
+    private Node checkVaildityOfWays(Way way, int nexidx) { // TODO: Fix typo: vaildity → validity
         boolean nexWayDelete = false;
         Node node = null;
         super.nextIndex = false;
@@ -650,7 +642,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
         Way wayToKeep = null;
         List<Node> breakNode = new ArrayList<>();
         breakNode.add(super.currentNode);
-        Strategy strategy = new TempStrategy();
+        SplitWayCommand.Strategy strategy = new PublicTransportMendRelationAction.TempStrategy();
         List<List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(super.currentWay, breakNode);
         SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
         if (result != null) {
@@ -895,43 +887,6 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
         } catch (Exception e) {
             Logging.error(e);
         }
-    }
-
-    String assignRoles(Way w) {
-        int flag = 0;
-        String s = "";
-        if (lastForWay != null && lastBackWay != null) {
-            NodePair pair = WayUtils.findCommonFirstLastNodes(lastForWay, lastBackWay);
-            if (pair.getA() == null && pair.getB() != null) {
-                if (pair.getB().equals(super.currentNode)) {
-                    flag = 1;
-                }
-            } else if (pair.getB() == null && pair.getA() != null) {
-                if (pair.getA().equals(super.currentNode)) {
-                    flag = 1;
-                }
-            } else if (pair.getB() != null && pair.getA() != null) {
-                if (pair.getA().equals(super.currentNode) || pair.getB().equals(super.currentNode)) {
-                    flag = 1;
-                }
-            }
-        }
-        // else if(lastForWay==null)
-
-        if (flag == 1) {
-            s = "";
-        } else if (prelink.isOnewayLoopBackwardPart && super.currentNode.equals(w.firstNode())) {
-            s = "backward";
-        } else if (prelink.isOnewayLoopBackwardPart && super.currentNode.equals(w.lastNode())) {
-            s = "forward";
-        } else if (prelink.isOnewayLoopForwardPart && super.currentNode.equals(w.firstNode())) {
-            s = "forward";
-        } else if (prelink.isOnewayLoopForwardPart && super.currentNode.equals(w.lastNode())) {
-            s = "backward";
-        } else {
-            s = "";
-        }
-        return s;
     }
 
     void assignRolesafterloop(Node jointNode) {

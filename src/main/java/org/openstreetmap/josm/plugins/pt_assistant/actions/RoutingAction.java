@@ -34,7 +34,6 @@ import org.openstreetmap.josm.tools.Utils;
 public class RoutingAction extends AbstractRelationEditorAction{
 	Relation relation = null;
 	GenericRelationEditor editor = null;
-	boolean setEnable = true;
 
   public RoutingAction(IRelationEditorActionAccess editorAccess){
     super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
@@ -45,6 +44,7 @@ public class RoutingAction extends AbstractRelationEditorAction{
     this.relation = editor.getRelation();
     editor.addWindowListener(new WindowEventHandler());
   }
+
   @Override
   protected void updateEnabledState() {
       final Relation curRel = relation;
@@ -56,27 +56,28 @@ public class RoutingAction extends AbstractRelationEditorAction{
           )
       );
   }
-  private void callAction(Relation relation){
-		if(relation.hasTag("route","bicycle")) {
-       PersonalTransportMendRelationAction bike = new PersonalTransportMendRelationAction(editorAccess);
-		    // MendRelationAction bike = new MendRelationAction(editorAccess);
-        bike.initialise();
-       }
-    else {
-        PublicTransportMendRelationAction pt_transport = new PublicTransportMendRelationAction(editorAccess);
-        pt_transport.initialise();
+
+    private void callAction(Relation relation){
+        if (relation.hasTag("route", "bicycle")) {
+            PersonalTransportMendRelationAction bike = new PersonalTransportMendRelationAction(editorAccess);
+            bike.initialise();
+        } else {
+            PublicTransportMendRelationAction pt_transport = new PublicTransportMendRelationAction(editorAccess);
+            pt_transport.initialise();
+        }
     }
-	}
-  @Override
-  public void actionPerformed(ActionEvent e) {
-       if (relation.hasIncompleteMembers()) {
-           downloadIncompleteRelations();
-           new Notification(tr("Downloading incomplete relation members. Kindly wait till download gets over."))
-                   .setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(3600).show();
-       } else {
-				 callAction(relation);
-  }
-  }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (relation.hasIncompleteMembers()) {
+            downloadIncompleteRelations();
+            new Notification(tr("Downloading incomplete relation members. Kindly wait till download gets over."))
+                .setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(3600).show();
+        } else {
+            callAction(relation);
+        }
+    }
+
   private void downloadIncompleteRelations() {
 
       List<Relation> parents = Collections.singletonList(relation);
