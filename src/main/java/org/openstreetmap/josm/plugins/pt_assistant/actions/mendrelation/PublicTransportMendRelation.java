@@ -1,38 +1,4 @@
-// License: GPL. For details, see LICENSE file.
-package org.openstreetmap.josm.plugins.pt_assistant.actions;
-
-import static org.openstreetmap.josm.tools.I18n.tr;
-
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagLayout;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+package org.openstreetmap.josm.plugins.pt_assistant.actions.mendrelation;
 
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
@@ -42,17 +8,9 @@ import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.command.SplitWayCommand;
-import org.openstreetmap.josm.command.SplitWayCommand.Strategy;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.UndoRedoHandler;
-import org.openstreetmap.josm.data.osm.DataSet;
-import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.NodePair;
-import org.openstreetmap.josm.data.osm.OsmPrimitive;
-import org.openstreetmap.josm.data.osm.Relation;
-import org.openstreetmap.josm.data.osm.RelationMember;
-import org.openstreetmap.josm.data.osm.TagMap;
-import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.data.osm.*;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.Notification;
@@ -72,23 +30,31 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.BoundsUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.NotificationUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
-import org.openstreetmap.josm.tools.GBC;
-import org.openstreetmap.josm.tools.I18n;
-import org.openstreetmap.josm.tools.Logging;
-import org.openstreetmap.josm.tools.Pair;
-import org.openstreetmap.josm.tools.Utils;
+import org.openstreetmap.josm.tools.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static org.openstreetmap.josm.tools.I18n.tr;
 
 /**
- * Mend the relations by going through each way, sorting them and proposing
- * fixes for the gaps that are found
+ * Mend the bus, tram and other public transport relations by going through each way,
+ * sorting them and proposing fixes for the gaps that are found
  *
- * @author Biswesh
+ * @author Biswesh and sudhanshu2
  */
-public class MendRelationAction extends AbstractRelationEditorAction {
+public class PublicTransportMendRelation extends AbstractRelationEditorAction {
     private static final DownloadParams DEFAULT_DOWNLOAD_PARAMS = new DownloadParams();
 
     private static final Color[] FIVE_COLOR_PALETTE = { new Color(0, 255, 0, 150), new Color(255, 0, 0, 150),
-            new Color(0, 0, 255, 150), new Color(255, 255, 0, 150), new Color(0, 255, 255, 150) };
+        new Color(0, 0, 255, 150), new Color(255, 255, 0, 150), new Color(0, 255, 255, 150) };
 
     private static final Map<Character, Color> CHARACTER_COLOR_MAP = new HashMap<>();
     static {
@@ -115,7 +81,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     private static final String I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY = I18n.marktr("Remove ways along with previous way");
     private static final String I18N_SKIP = I18n.marktr("Skip");
     private static final String I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS = I18n
-            .marktr("solutions based on other route relations");
+        .marktr("solutions based on other route relations");
     private static final String I18N_TURN_BY_TURN_NEXT_INTERSECTION = I18n.marktr("turn-by-turn at next intersection");
     private static final String I18N_BACKTRACK_WHITE_EDGE = I18n.marktr("Split white edge");
     Relation relation = null;
@@ -145,17 +111,16 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     Node splitNode = null;
     HashMap<Way, Character> wayColoring;
     HashMap<Character, List<Way>> wayListColoring;
-    int nodeIdx = 0;
     AbstractMapViewPaintable temporaryLayer = null;
     String notice = null;
     List<Node> backnodes = new ArrayList<>();
 
-    public MendRelationAction(IRelationEditorActionAccess editorAccess) {
+    public PublicTransportMendRelation(IRelationEditorActionAccess editorAccess) {
         super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
         editor = (GenericRelationEditor) editorAccess.getEditor();
         memberTableModel = editorAccess.getMemberTableModel();
         relation = editor.getRelation();
-        editor.addWindowListener(new WindowEventHandler());
+        editor.addWindowListener(new PublicTransportMendRelation.WindowEventHandler());
     }
 
     String getQuery() {
@@ -166,7 +131,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         final List<Node> nodeList = aroundGaps ? getBrokenNodes() : new ArrayList<>();
         if (aroundStops) {
             nodeList.addAll(members.stream().filter(RelationMember::isNode).map(RelationMember::getNode)
-                    .collect(Collectors.toList()));
+                .collect(Collectors.toList()));
         }
 
         for (final Node n : nodeList) {
@@ -204,8 +169,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         final Relation curRel = relation;
 
         setEnabled(curRel != null && setEnable
-                && ((curRel.hasTag("route", "bus") && curRel.hasTag("public_transport:version", "2"))
-                        || (RouteUtils.isPTRoute(curRel) && !curRel.hasTag("route", "bus"))));
+            && ((curRel.hasTag("route", "bus") && curRel.hasTag("public_transport:version", "2"))
+            || (RouteUtils.isPTRoute(curRel) && !curRel.hasTag("route", "bus"))));
     }
 
     @Override
@@ -213,13 +178,13 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         if (relation.hasIncompleteMembers()) {
             downloadIncompleteRelations();
             new Notification(tr("Downloading incomplete relation members. Kindly wait till download gets over."))
-                    .setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(3600).show();
+                .setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(3600).show();
         } else {
             initialise();
         }
     }
 
-    void initialise() {
+    public void initialise() {
         save();
         sortBelow(relation.getMembers(), 0);
         members = editor.getRelation().getMembers();
@@ -288,8 +253,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         if (aroundStops || aroundGaps) {
             BoundsUtils.createBoundsWithPadding(wayList, .1).ifPresent(area -> {
                 final Future<?> future = task.download(
-                        new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query),
-                        DEFAULT_DOWNLOAD_PARAMS, area, null);
+                    new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query),
+                    DEFAULT_DOWNLOAD_PARAMS, area, null);
 
                 MainApplication.worker.submit(() -> {
                     try {
@@ -526,10 +491,10 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         List<Relation> parents = Collections.singletonList(relation);
 
         Future<?> future = MainApplication.worker
-                .submit(new DownloadRelationMemberTask(parents,
-                        Utils.filteredCollection(DownloadSelectedIncompleteMembersAction
-                                .buildSetOfIncompleteMembers(new ArrayList<>(parents)), OsmPrimitive.class),
-                        MainApplication.getLayerManager().getEditLayer()));
+            .submit(new DownloadRelationMemberTask(parents,
+                Utils.filteredCollection(DownloadSelectedIncompleteMembersAction
+                    .buildSetOfIncompleteMembers(new ArrayList<>(parents)), OsmPrimitive.class),
+                MainApplication.getLayerManager().getEditLayer()));
 
         MainApplication.worker.submit(() -> {
             try {
@@ -585,7 +550,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 // and next way then don't delete it in that index
                 if (prev != null && next != null) {
                     if (WayUtils.findNumberOfCommonFirstLastNodes(prev, way) != 0
-                            && WayUtils.findNumberOfCommonFirstLastNodes(way, nextWay) != 0) {
+                        && WayUtils.findNumberOfCommonFirstLastNodes(way, nextWay) != 0) {
                         del = false;
                     }
                 }
@@ -631,7 +596,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             showOption0 = true;
 
         if (directRoute != null && directRoute.size() > 0 && !shorterRoutes && parentWays.size() > 0
-                && notice == null) {
+            && notice == null) {
             displayFixVariantsWithOverlappingWays(directRoute);
             return null;
         }
@@ -748,7 +713,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 } else if (canAdd) {
                     // not valid in reverse if it is oneway or part of roundabout
                     if (findNumberOfCommonNode(w, prev) != 0 && w.isOneway() == 0
-                            && RouteUtils.isOnewayForPublicTransport(w) == 0 && !isSplitRoundAbout(w)) {
+                        && RouteUtils.isOnewayForPublicTransport(w) == 0 && !isSplitRoundAbout(w)) {
                         lst.add(w);
                         prev = w;
                     } else {
@@ -859,7 +824,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         // put the most possible answer in front
         Way frontWay = parentWays.stream().filter(it -> checkIfWayConnectsToNextWay(it, 0, node)).findFirst()
-                .orElse(null);
+            .orElse(null);
 
         if (frontWay == null && parentWays.size() > 0) {
             Way minWay = parentWays.get(0);
@@ -996,7 +961,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         parentWays.addAll(waysToBeAdded);
         // one way direction doesn't match
         parentWays.stream().filter(it -> WayUtils.isOneWay(it) && !checkOneWaySatisfiability(it, node))
-                .forEach(waysToBeRemoved::add);
+            .forEach(waysToBeRemoved::add);
 
         parentWays.removeAll(waysToBeRemoved);
         waysToBeRemoved.clear();
@@ -1010,9 +975,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         // check if any of them belong to roundabout, if yes then show ways accordingly
         parentWays.stream()
-                .filter(it -> it.hasTag("junction", "roundabout")
-                        && WayUtils.findNumberOfCommonFirstLastNodes(way, it) == 1 && it.lastNode().equals(node))
-                .forEach(waysToBeRemoved::add);
+            .filter(it -> it.hasTag("junction", "roundabout")
+                && WayUtils.findNumberOfCommonFirstLastNodes(way, it) == 1 && it.lastNode().equals(node))
+            .forEach(waysToBeRemoved::add);
 
         // check mode of transport, also check if there is no loop
         if (relation.hasTag("route", "bus")) {
@@ -1202,8 +1167,8 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         List<Relation> parentRelation = new ArrayList<>(parentSet);
 
         String[] restrictions = new String[] { "restriction", "restriction:bus", "restriction:trolleybus",
-                "restriction:tram", "restriction:subway", "restriction:light_rail", "restriction:rail",
-                "restriction:train", "restriction:trolleybus" };
+            "restriction:tram", "restriction:subway", "restriction:light_rail", "restriction:rail",
+            "restriction:train", "restriction:trolleybus" };
 
         parentRelation.removeIf(rel -> {
             if (rel.hasKey("except")) {
@@ -1244,7 +1209,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
             if (prevRole.equals("from")) {
                 String[] acceptedTags = { "only_right_turn", "only_left_turn", "only_u_turn", "only_straight_on",
-                        "only_entry", "only_exit" };
+                    "only_entry", "only_exit" };
                 for (String s : restrictions) {
                     // if we have any "only" type restrictions then the current way should be in the
                     // relation else it is restricted
@@ -1273,7 +1238,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
             if ("to".equals(curRole) && "from".equals(prevRole)) {
                 final String[] acceptedTags = { "no_right_turn", "no_left_turn", "no_u_turn", "no_straight_on",
-                        "no_entry", "no_exit" };
+                    "no_entry", "no_exit" };
                 for (String s : restrictions) {
                     if (r.hasTag(s, acceptedTags)) {
                         for (String str : acceptedTags) {
@@ -1312,29 +1277,11 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         return false;
     }
 
-    void addAlreadyExistingWay(Way w) {
-        // delete the way if only if we haven't crossed it yet
-        if (waysAlreadyPresent.get(w) == 1) {
-            deleteWay(w);
-        }
-    }
-
-    void deleteWay(Way w) {
-        for (int i = 0; i < members.size(); i++) {
-            if (members.get(i).isWay() && members.get(i).getWay().equals(w)) {
-                int[] x = { i };
-                memberTableModel.remove(x);
-                members.remove(i);
-                break;
-            }
-        }
-    }
-
     boolean checkOneWaySatisfiability(Way way, Node node) {
         String[] acceptedTags = new String[] { "yes", "designated" };
 
         if ((way.hasTag("oneway:bus", acceptedTags) || way.hasTag("oneway:psv", acceptedTags))
-                && way.lastNode().equals(node) && relation.hasTag("route", "bus"))
+            && way.lastNode().equals(node) && relation.hasTag("route", "bus"))
             return false;
 
         if (!isNonSplitRoundAbout(way) && way.hasTag("junction", "roundabout")) {
@@ -1396,7 +1343,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         AutoScaleAction.zoomTo(fixVariants);
 
         // display the fix variants:
-        temporaryLayer = new MendRelationAddLayer();
+        temporaryLayer = new PublicTransportMendRelation.MendRelationAddLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
@@ -1491,7 +1438,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         AutoScaleAction.zoomTo(fixVariants);
 
         // display the fix variants:
-        temporaryLayer = new MendRelationAddLayer();
+        temporaryLayer = new PublicTransportMendRelation.MendRelationAddLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
@@ -1629,7 +1576,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         Way wayToKeep = null;
         List<Node> breakNode = new ArrayList<>();
         breakNode.add(currentNode);
-        Strategy strategy = new TempStrategy();
+        SplitWayCommand.Strategy strategy = new PublicTransportMendRelation.TempStrategy();
         List<List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(currentWay, breakNode);
         SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
         if (result != null) {
@@ -1644,7 +1591,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         List<Node> breakNode = new ArrayList<>();
         breakNode.add(currentNode);
         splitNode = way.lastNode();
-        Strategy strategy = new TempStrategyRoundabout();
+        SplitWayCommand.Strategy strategy = new PublicTransportMendRelation.TempStrategyRoundabout();
         List<List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(way, breakNode);
         SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
         if (result != null) {
@@ -1695,7 +1642,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         AutoScaleAction.zoomTo(fixVariants.stream().flatMap(Collection::stream).collect(Collectors.toList()));
 
         // display the fix variants:
-        temporaryLayer = new MendRelationAddMultipleLayer();
+        temporaryLayer = new PublicTransportMendRelation.MendRelationAddMultipleLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
@@ -1802,7 +1749,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         AutoScaleAction.zoomTo(waysToZoom);
 
         // display the fix variants:
-        temporaryLayer = new MendRelationRemoveLayer();
+        temporaryLayer = new PublicTransportMendRelation.MendRelationRemoveLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
@@ -2040,7 +1987,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                         if (result != null) {
                             UndoRedoHandler.getInstance().add(result);
                             if (result.getOriginalWay().getNodes().contains(w.firstNode())
-                                    && result.getOriginalWay().getNodes().contains(w.lastNode()))
+                                && result.getOriginalWay().getNodes().contains(w.lastNode()))
                                 w = result.getOriginalWay();
                             else
                                 w = result.getNewWays().get(0);
@@ -2098,7 +2045,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 break;
 
             if (!WayUtils.findCommonFirstLastNode(curr, prevWay).filter(node -> node.getParentWays().size() <= 2)
-                    .isPresent()) {
+                .isPresent()) {
                 break;
             }
 
@@ -2127,7 +2074,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 break;
 
             if (!WayUtils.findCommonFirstLastNode(curr, prevWay).filter(node -> node.getParentWays().size() <= 2)
-                    .isPresent()) {
+                .isPresent()) {
                 break;
             }
 
@@ -2185,7 +2132,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         editor.apply();
     }
 
-    public class TempStrategy implements Strategy {
+    public class TempStrategy implements SplitWayCommand.Strategy {
         @Override
         public Way determineWayToKeep(Iterable<Way> wayChunks) {
             for (Way way : wayChunks) {
@@ -2197,7 +2144,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
     }
 
-    public class TempStrategyRoundabout implements Strategy {
+    public class TempStrategyRoundabout implements SplitWayCommand.Strategy {
         @Override
         public Way determineWayToKeep(Iterable<Way> wayChunks) {
             for (Way way : wayChunks) {
@@ -2213,7 +2160,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         @Override
         public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv);
+            PublicTransportMendRelation.MendRelationPaintVisitor paintVisitor = new PublicTransportMendRelation.MendRelationPaintVisitor(g, mv);
             paintVisitor.drawVariants();
         }
     }
@@ -2222,7 +2169,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         @Override
         public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv);
+            PublicTransportMendRelation.MendRelationPaintVisitor paintVisitor = new PublicTransportMendRelation.MendRelationPaintVisitor(g, mv);
             paintVisitor.drawOptionsToRemoveWays();
         }
     }
@@ -2231,7 +2178,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         @Override
         public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv);
+            PublicTransportMendRelation.MendRelationPaintVisitor paintVisitor = new PublicTransportMendRelation.MendRelationPaintVisitor(g, mv);
             paintVisitor.drawMultipleVariants(wayListColoring);
         }
     }
@@ -2258,7 +2205,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             drawFixVariantsWithParallelLines(true);
 
             Color[] colors = { new Color(0, 255, 150), new Color(255, 0, 0, 150), new Color(0, 0, 255, 150),
-                    new Color(255, 255, 0, 150), new Color(0, 255, 255, 150) };
+                new Color(255, 255, 0, 150), new Color(0, 255, 255, 150) };
 
             double letterX = MainApplication.getMap().mapView.getBounds().getMinX() + 20;
             double letterY = MainApplication.getMap().mapView.getBounds().getMinY() + 100;
@@ -2271,18 +2218,18 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             if (showOption0 && numeric) {
                 if (!shorterRoutes)
                     drawFixVariantLetter("0 : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
-                            letterY, 25);
+                        letterY, 25);
                 else
                     drawFixVariantLetter("0 : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
-                            letterY, 25);
+                        letterY, 25);
                 letterY = letterY + 60;
             } else if (showOption0) {
                 if (!shorterRoutes)
                     drawFixVariantLetter("W : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
-                            letterY, 25);
+                        letterY, 25);
                 else
                     drawFixVariantLetter("W : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
-                            letterY, 25);
+                        letterY, 25);
                 letterY = letterY + 60;
             }
 
@@ -2329,11 +2276,11 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 drawFixVariantLetter("2 : " + tr(I18N_NOT_REMOVE_WAYS), FIVE_COLOR_PALETTE[1], letterX, letterY, 25);
                 letterY = letterY + 60;
                 drawFixVariantLetter("3 : " + tr(I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY), FIVE_COLOR_PALETTE[4], letterX,
-                        letterY, 25);
+                    letterY, 25);
                 letterY = letterY + 60;
                 if (notice.equals("vehicle travels against oneway restriction")) {
                     drawFixVariantLetter("4 : " + tr(I18N_ADD_ONEWAY_VEHICLE_NO_TO_WAY), FIVE_COLOR_PALETTE[3], letterX,
-                            letterY, 25);
+                        letterY, 25);
                 }
             } else {
                 drawFixVariantLetter("A : " + tr(I18N_REMOVE_WAYS), FIVE_COLOR_PALETTE[0], letterX, letterY, 25);
@@ -2342,11 +2289,11 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 letterY = letterY + 60;
                 if (notice.equals("vehicle travels against oneway restriction")) {
                     drawFixVariantLetter("C : " + tr(I18N_ADD_ONEWAY_VEHICLE_NO_TO_WAY), FIVE_COLOR_PALETTE[3], letterX,
-                            letterY, 25);
+                        letterY, 25);
                     letterY = letterY + 60;
                 }
                 drawFixVariantLetter("R : " + tr(I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY), FIVE_COLOR_PALETTE[4], letterX,
-                        letterY, 25);
+                    letterY, 25);
             }
 
             letterY = letterY + 60;
@@ -2368,22 +2315,22 @@ public class MendRelationAction extends AbstractRelationEditorAction {
             if (showOption0 && numeric) {
                 if (!shorterRoutes)
                     drawFixVariantLetter("0 : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
-                            letterY, 25);
+                        letterY, 25);
                 else
                     drawFixVariantLetter("0 : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
-                            letterY, 25);
+                        letterY, 25);
                 letterY = letterY + 60;
             } else if (showOption0) {
                 if (!shorterRoutes)
                     drawFixVariantLetter("W : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
-                            letterY, 25);
+                        letterY, 25);
                 else
                     drawFixVariantLetter("W : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
-                            letterY, 25);
+                        letterY, 25);
                 letterY = letterY + 60;
             }
 
-            for (Entry<Character, List<Way>> entry : fixVariants.entrySet()) {
+            for (Map.Entry<Character, List<Way>> entry : fixVariants.entrySet()) {
                 Character c = entry.getKey();
                 if (fixVariants.get(c) != null) {
                     drawFixVariantLetter(c.toString(), FIVE_COLOR_PALETTE[colorIndex % 5], letterX, letterY, 35);
@@ -2413,12 +2360,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         protected void drawFixVariantsWithParallelLines(final boolean drawNextWay) {
             wayColoring.entrySet().stream()
-                    // Create pairs of a color and an associated pair of nodes
-                    .flatMap(entry -> entry.getKey().getNodePairs(false).stream()
-                            .map(it -> Pair.create(CHARACTER_COLOR_MAP.get(entry.getValue()), it)))
-                    // Grouping by color: groups stream into a map, each map entry has a color and all associated pairs of nodes
-                    .collect(Collectors.groupingBy(it -> it.a, Collectors.mapping(it -> it.b, Collectors.toList())))
-                    .forEach((color, nodePairs) -> drawSegmentsWithParallelLines(nodePairs, color));
+                // Create pairs of a color and an associated pair of nodes
+                .flatMap(entry -> entry.getKey().getNodePairs(false).stream()
+                    .map(it -> Pair.create(CHARACTER_COLOR_MAP.get(entry.getValue()), it)))
+                // Grouping by color: groups stream into a map, each map entry has a color and all associated pairs of nodes
+                .collect(Collectors.groupingBy(it -> it.a, Collectors.mapping(it -> it.b, Collectors.toList())))
+                .forEach((color, nodePairs) -> drawSegmentsWithParallelLines(nodePairs, color));
             drawSegmentsWithParallelLines(currentWay.getNodePairs(false), CURRENT_WAY_COLOR);
             if (drawNextWay) {
                 drawSegmentsWithParallelLines(nextWay.getNodePairs(false), NEXT_WAY_COLOR);
@@ -2426,16 +2373,16 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
 
         protected void drawFixVariantsWithParallelLines(Map<Way, List<Character>> waysColoring) {
-            for (final Entry<Way, List<Character>> entry : waysColoring.entrySet()) {
+            for (final Map.Entry<Way, List<Character>> entry : waysColoring.entrySet()) {
                 final List<Color> wayColors = entry.getValue().stream().map(CHARACTER_COLOR_MAP::get)
-                        .collect(Collectors.toList());
+                    .collect(Collectors.toList());
                 for (final Pair<Node, Node> nodePair : entry.getKey().getNodePairs(false)) {
                     drawSegmentWithParallelLines(nodePair.a, nodePair.b, wayColors);
                 }
             }
 
             drawSegmentsWithParallelLines(findCurrentEdge().stream().flatMap(it -> it.getNodePairs(false).stream())
-                    .collect(Collectors.toList()), CURRENT_WAY_COLOR);
+                .collect(Collectors.toList()), CURRENT_WAY_COLOR);
 
             drawSegmentsWithParallelLines(nextWay.getNodePairs(false), NEXT_WAY_COLOR);
 
@@ -2483,9 +2430,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                     currentColor = colors.get(i % colors.size());
 
                     int[] xPoints = { (int) (prevPointX + cosT), (int) (nextPointX + cosT), (int) (nextPointX - cosT),
-                            (int) (prevPointX - cosT) };
+                        (int) (prevPointX - cosT) };
                     int[] yPoints = { (int) (prevPointY - sinT), (int) (nextPointY - sinT), (int) (nextPointY + sinT),
-                            (int) (prevPointY + sinT) };
+                        (int) (prevPointY + sinT) };
                     g.setColor(currentColor);
                     g.fillPolygon(xPoints, yPoints, 4);
 
@@ -2500,9 +2447,9 @@ public class MendRelationAction extends AbstractRelationEditorAction {
                 }
 
                 int[] lastXPoints = { (int) (prevPointX + cosT), (int) (p2.x + cosT), (int) (p2.x - cosT),
-                        (int) (prevPointX - cosT) };
+                    (int) (prevPointX - cosT) };
                 int[] lastYPoints = { (int) (prevPointY - sinT), (int) (p2.y - sinT), (int) (p2.y + sinT),
-                        (int) (prevPointY + sinT) };
+                    (int) (prevPointY + sinT) };
                 g.setColor(currentColor);
                 g.fillPolygon(lastXPoints, lastYPoints, 4);
             }
@@ -2512,7 +2459,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
 
         void addFixVariants(HashMap<Character, List<Way>> fixVariants) {
-            for (Entry<Character, List<Way>> entry : fixVariants.entrySet()) {
+            for (Map.Entry<Character, List<Way>> entry : fixVariants.entrySet()) {
                 Character currentFixVariantLetter = entry.getKey();
                 List<Way> fixVariant = entry.getValue();
                 for (Way way : fixVariant) {
