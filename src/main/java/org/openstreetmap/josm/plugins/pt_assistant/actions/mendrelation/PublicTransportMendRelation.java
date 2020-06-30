@@ -2185,15 +2185,13 @@ public class PublicTransportMendRelation extends AbstractRelationEditorAction {
 
     class MendRelationPaintVisitor extends PaintVisitor {
         /** The graphics */
-        private final Graphics g;
+        //private final Graphics g;
         /** The MapView */
-        private final MapView mv;
-        private HashMap<Way, List<Character>> waysColoring;
+        //private final MapView mv;
+        //private HashMap<Way, List<Character>> waysColoring;
 
         MendRelationPaintVisitor(Graphics2D g, MapView mv) {
             super(g, mv);
-            this.g = g;
-            this.mv = mv;
         }
 
         /*
@@ -2300,8 +2298,8 @@ public class PublicTransportMendRelation extends AbstractRelationEditorAction {
             drawFixVariantLetter("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 30);
         }
 
-        void drawMultipleVariants(HashMap<Character, List<Way>> fixVariants) {
-            waysColoring = new HashMap<>();
+        HashMap<Way, List<Character>> drawMultipleVariants(HashMap<Character, List<Way>> fixVariants) {
+            HashMap<Way, List<Character>> waysColoring = new HashMap<>();
             addFixVariants(fixVariants);
             drawFixVariantsWithParallelLines(waysColoring);
 
@@ -2355,7 +2353,7 @@ public class PublicTransportMendRelation extends AbstractRelationEditorAction {
                 letterY = letterY + 60;
                 drawFixVariantLetter("Q : " + tr(I18N_REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
             }
-
+            return waysColoring;
         }
 
         protected void drawFixVariantsWithParallelLines(final boolean drawNextWay) {
@@ -2396,7 +2394,7 @@ public class PublicTransportMendRelation extends AbstractRelationEditorAction {
             nodePairs.forEach(it -> drawSegmentWithParallelLines(it.a, it.b, colorList));
         }
 
-        void drawSegmentWithParallelLines(Node n1, Node n2, List<Color> colors) {
+        void drawSegmentWithParallelLines(Node n1, Node n2, List<Color> colors, HashMap<Way, List<Character>> waysColoring) {
             if (!n1.isDrawable() || !n2.isDrawable() || !isSegmentVisible(n1, n2)) {
                 return;
             }
