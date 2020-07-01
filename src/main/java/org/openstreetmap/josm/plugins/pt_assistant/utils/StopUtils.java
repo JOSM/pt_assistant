@@ -10,7 +10,6 @@ import org.openstreetmap.josm.tools.Utils;
  * Utils class for stop areas
  */
 public final class StopUtils {
-
     private StopUtils() {
         // private constructor for util classes
     }

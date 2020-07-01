@@ -1,7 +1,6 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.data;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,22 +32,15 @@ public class PTRouteDataManager {
     public List<PTStop> ptStops = new ArrayList<>();
 
     /* Stores all relation members that are PTWays */
-    private List<PTWay> ptWays = new ArrayList<>();
+    private final List<PTWay> ptWays = new ArrayList<>();
 
     /*
      * Stores relation members that could not be created because they are not
      * expected in the model for public_transport version 2
      */
-    private Set<RelationMember> failedMembers = new HashSet<>();
+    private final Set<RelationMember> failedMembers = new HashSet<>();
 
-    private HashMap<String, String> tags = new HashMap<>(30);
-
-    public HashMap<PTStop, Way> ptStopWays = new HashMap<>();
-    public HashMap<PTStop, Color> ptstopColors = new HashMap<>();
-    public HashMap<Way, PTStop> ptWayStops = new HashMap<>();
-    public HashMap<Way, Color> ptwayColors = new HashMap<>();
-    public HashMap<Way, ArrayList<PTStop>> RightSideStops = new HashMap<>();
-    public HashMap<Way, ArrayList<PTStop>> LeftSideStops = new HashMap<>();
+    private final HashMap<String, String> tags = new HashMap<>(30);
 
     public PTRouteDataManager(Relation relation) {
 
@@ -101,9 +93,7 @@ public class PTRouteDataManager {
                     } catch (IllegalArgumentException ex) {
                         if (ex.getMessage().equals(
                                 "The RelationMember type does not match its role " + member.getMember().getName())) {
-                            if (!failedMembers.contains(member)) {
-                                failedMembers.add(member);
-                            }
+                            failedMembers.add(member);
                         } else {
                             throw ex;
                         }
@@ -118,42 +108,6 @@ public class PTRouteDataManager {
                 failedMembers.add(member);
             }
         }
-    }
-
-    public boolean CrossProduct(Node node1, Node node2, PTStop stop) {
-        LatLon coord3;
-        if (stop.getPlatform() != null) {
-            coord3 = stop.getPlatform().getBBox().getCenter();
-        } else {
-            Node node3 = stop.getNode();
-            coord3 = new LatLon(node3.lat(), node3.lon());
-        }
-        LatLon coord1 = new LatLon(node1.lat(), node1.lon());
-        LatLon coord2 = new LatLon(node2.lat(), node2.lon());
-        //       LatLon coord3 = new LatLon(node3.lat(),node3.lon());
-        double x1 = coord1.getX();
-        double y1 = coord1.getY();
-
-        double x2 = coord2.getX();
-        double y2 = coord2.getY();
-
-        double x3 = coord3.getX();
-        double y3 = coord3.getY();
-
-        x1 -= x3;
-        y1 -= y3;
-
-        x2 -= x3;
-        y2 -= y3;
-
-        double crossprod = x1 * y2 - y1 * x2;
-
-        //Right Direction
-        if (crossprod <= 0) {
-            return true;
-        }
-        //left Direction
-        return false;
     }
 
     public double crossProductValue(Node node1, Node node2, PTStop stop) {
@@ -182,19 +136,8 @@ public class PTRouteDataManager {
         x2 -= x3;
         y2 -= y3;
 
-        double crossprod = x1 * y2 - y1 * x2;
-
         //Right Direction
-        return crossprod;
-        // if (crossprod <= 0) {
-        //     return true;
-        // }
-        //left Direction
-        // return false;
-    }
-
-    public double calculateDistanceSq(LatLon coord1, LatLon coord2) {
-        return coord1.distanceSq(coord2);
+        return x1 * y2 - y1 * x2;
     }
 
     private static double calculateDistanceSq(RelationMember member1, RelationMember member2) {
@@ -229,7 +172,7 @@ public class PTRouteDataManager {
         String v;
         for (String k : this.tags.keySet()) {
             v = this.tags.get(k);
-            if (v != null && v != "" && !v.isEmpty()) {
+            if (v != null && !v.equals("") && !v.isEmpty()) {
                 tempRel.put(k, v);
             }
         }
@@ -279,13 +222,6 @@ public class PTRouteDataManager {
         return ptStops.get(0);
     }
 
-    public Node getOtherNode(Way way, Node currentNode) {
-        if (way.firstNode().equals(currentNode))
-            return way.lastNode();
-        else
-            return way.firstNode();
-    }
-
     public PTStop getLastStop() {
         if (ptStops.isEmpty()) {
             return null;
@@ -327,71 +263,6 @@ public class PTRouteDataManager {
     }
 
     /**
-     * Returns all PTWays of this route that contain the given way.
-     *
-     * @param way way
-     * @return all PTWays of this route that contain the given way
-     */
-    public List<PTWay> findPTWaysThatContain(Way way) {
-
-        List<PTWay> ptwaysThatContain = new ArrayList<>();
-        for (PTWay ptway : ptWays) {
-            if (ptway.getWays().contains(way)) {
-                ptwaysThatContain.add(ptway);
-            }
-        }
-        return ptwaysThatContain;
-    }
-
-    /**
-     * Returns all PTWays of this route that contain the given node as their
-     * first or last node.
-     * @param node end node
-     *
-     * @return all PTWays of this route that contain the given node as their
-     * first or last node
-     */
-    public List<PTWay> findPTWaysThatContainAsEndNode(Node node) {
-
-        List<PTWay> ptwaysThatContain = new ArrayList<>();
-        for (PTWay ptway : ptWays) {
-            List<Way> ways = ptway.getWays();
-            if (ways.get(0).firstNode() == node || ways.get(0).lastNode() == node
-                    || ways.get(ways.size() - 1).firstNode() == node || ways.get(ways.size() - 1).lastNode() == node) {
-                ptwaysThatContain.add(ptway);
-            }
-        }
-        return ptwaysThatContain;
-
-    }
-
-    public List<Way> findWaysThatContainAsEndNode(Node node) {
-
-        List<Way> ptwaysThatContain = new ArrayList<>();
-        for (PTWay ptway : ptWays) {
-            List<Way> ways = ptway.getWays();
-            if (ways.get(0).firstNode() == node || ways.get(0).lastNode() == node
-                    || ways.get(ways.size() - 1).firstNode() == node || ways.get(ways.size() - 1).lastNode() == node) {
-                ptwaysThatContain.addAll(ptway.getWays());
-            }
-        }
-        return ptwaysThatContain;
-
-    }
-
-    /**
-     * Checks if at most one PTWay of this route refers to the given node
-     *
-     * @param node node
-     * @return {@code true} if at most one PTWay of this route refers to the given node
-     */
-    public boolean isDeadendNode(Node node) {
-
-        List<PTWay> referringPtways = findPTWaysThatContainAsEndNode(node);
-        return referringPtways.size() <= 1;
-    }
-
-    /**
      * Returns the PTWay which comes directly after the given ptway according to
      * the existing route member sorting
      *
@@ -408,24 +279,6 @@ public class PTRouteDataManager {
         }
         return null;
 
-    }
-
-    /**
-     * Returns the PTWay which comes directly before the given ptway according
-     * to the existing route member sorting
-     *
-     * @param ptway way
-     * @return the PTWay which comes directly before the given ptway according
-     * to the existing route member sorting
-     */
-    public PTWay getPreviousPTWay(PTWay ptway) {
-
-        for (int i = 1; i < ptWays.size(); i++) {
-            if (ptWays.get(i) == ptway) {
-                return ptWays.get(i - 1);
-            }
-        }
-        return null;
     }
 
     /**
@@ -454,14 +307,14 @@ public class PTRouteDataManager {
         for (Integer potentialStartIndex : potentialStartIndices) {
             for (Integer potentialEndIndex : potentialEndIndices) {
                 if (potentialStartIndex <= potentialEndIndex) {
-                    int[] pair = { potentialStartIndex, potentialEndIndex };
+                    int[] pair = {potentialStartIndex, potentialEndIndex};
                     pairList.add(pair);
                 }
             }
         }
 
         int minDifference = Integer.MAX_VALUE;
-        int[] mostSuitablePair = { 0, 0 };
+        int[] mostSuitablePair = {0, 0};
         for (int[] pair : pairList) {
             int diff = pair[1] - pair[0];
             if (diff < minDifference) {

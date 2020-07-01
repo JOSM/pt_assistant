@@ -1,3 +1,4 @@
+// License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
 import javax.swing.JOptionPane;
@@ -12,8 +13,8 @@ public class DialogUtils {
     /**
      * Shows a warning dialog with only an "OK" option
      */
-    public static int showOkWarning(final String title, final String message) {
-        return JOptionPane.showConfirmDialog(
+    public static void showOkWarning(final String title, final String message) {
+        JOptionPane.showConfirmDialog(
             MainApplication.getMainFrame(),
             message,
             title,

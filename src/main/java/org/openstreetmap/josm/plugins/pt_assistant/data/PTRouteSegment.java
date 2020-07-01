@@ -19,18 +19,18 @@ import org.openstreetmap.josm.data.osm.Way;
 public class PTRouteSegment {
 
     /* first stop of the route segment */
-    private PTStop firstStop;
+    private final PTStop firstStop;
 
     /* last stop of the route segment */
-    private PTStop lastStop;
+    private final PTStop lastStop;
 
     /* ptways that belong to this route segment */
     private List<PTWay> ptways;
 
     /* fix variants available for this route segment */
-    private List<List<PTWay>> fixVariants;
+    private final List<List<PTWay>> fixVariants;
 
-    private Relation relation;
+    private final Relation relation;
 
     /**
      * Constructor
