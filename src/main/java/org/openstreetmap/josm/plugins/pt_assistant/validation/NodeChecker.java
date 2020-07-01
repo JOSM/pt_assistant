@@ -138,12 +138,7 @@ public class NodeChecker extends Checker {
         } else {
 
             try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        userSelection[0] = showFixNodeTagDialog(errorParameter);
-                    }
-                });
+                SwingUtilities.invokeAndWait(() -> userSelection[0] = showFixNodeTagDialog(errorParameter));
             } catch (InvocationTargetException | InterruptedException e) {
                 e.printStackTrace();
                 return null;
@@ -155,12 +150,10 @@ public class NodeChecker extends Checker {
             Node modifiedNode = new Node(problematicNode);
             if (testError.getCode() == PTAssistantValidatorTest.ERROR_CODE_SOLITARY_STOP_POSITION) {
                 modifiedNode.put("public_transport", "platform");
-                ChangeCommand command = new ChangeCommand(problematicNode, modifiedNode);
-                return command;
+                return new ChangeCommand(problematicNode, modifiedNode);
             } else {
                 modifiedNode.put("public_transport", "stop_position");
-                ChangeCommand command = new ChangeCommand(problematicNode, modifiedNode);
-                return command;
+                return new ChangeCommand(problematicNode, modifiedNode);
             }
         }
 
@@ -191,7 +184,7 @@ public class NodeChecker extends Checker {
             }
         }
 
-        Collections.sort(parentsLabelList, new PTAssistantPaintVisitor.RefTagComparator());
+        parentsLabelList.sort(new PTAssistantPaintVisitor.RefTagComparator());
         String route_ref = null;
         if (primitive.hasTag("route_ref")) route_ref = primitive.get("route_ref");
         else if (primitive.hasTag("route_ref:De_Lijn")) route_ref = primitive.get("route_ref:De_Lijn");

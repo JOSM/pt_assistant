@@ -162,12 +162,7 @@ public abstract class Checker {
 
                 } else {
 
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            showRelationEditorAndZoom(layerParameter, relationParameter, zoomParameter);
-                        }
-                    });
+                    SwingUtilities.invokeLater(() -> showRelationEditorAndZoom(layerParameter, relationParameter, zoomParameter));
                 }
                 return command;
             }
