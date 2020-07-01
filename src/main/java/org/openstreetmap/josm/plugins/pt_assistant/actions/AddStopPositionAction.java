@@ -51,15 +51,13 @@ public class AddStopPositionAction extends MapMode {
     private static final Cursor CURSOR_JOIN_WAY = ImageProvider.getCursor(CROSSHAIR_IMAGE_FILENAME, "joinway");
     private static final Cursor CURSOR_BUS = ImageProvider.getCursor(CROSSHAIR_IMAGE_FILENAME, "bus");
 
-    private transient Set<OsmPrimitive> newHighlights = new HashSet<>();
-    private transient Set<OsmPrimitive> oldHighlights = new HashSet<>();
-
+    private final transient Set<OsmPrimitive> newHighlights = new HashSet<>();
+    private final transient Set<OsmPrimitive> oldHighlights = new HashSet<>();
 
     /**
      * Creates a new AddStopPositionAction
      */
     public AddStopPositionAction() {
-        // CHECKSTYLE.OFF: LineLength
         super(
             tr("Add stop position"),
             "bus",
@@ -118,8 +116,7 @@ public class AddStopPositionAction extends MapMode {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
-        Boolean newNode = false;
+        boolean newNode = false;
         Node newStopPos;
 
         //check if the user as selected an existing node, or a new one
@@ -219,8 +216,8 @@ public class AddStopPositionAction extends MapMode {
     }
 
     private Map<Relation, Boolean> getAffectedRelation(Way affected, boolean bool) {
-        if (bool == false) {
-            Map<Relation, Boolean> ret = new HashMap<>();
+        Map<Relation, Boolean> ret = new HashMap<>();
+        if (!bool) {
             for (Relation route : WayUtils.findPTRouteParents(affected)) {
                 if (isFirstMember(affected, route)) {
                     ret.put(route, true);
@@ -228,14 +225,12 @@ public class AddStopPositionAction extends MapMode {
                     ret.put(route, false);
                 }
             }
-            return ret;
         } else {
-            Map<Relation, Boolean> ret = new HashMap<>();
             for (Relation route : WayUtils.findPTRouteParents(affected)) {
                 ret.put(route, null);
             }
-            return ret;
         }
+        return ret;
     }
 
     private boolean isFirstMember(Way affected, Relation route) {

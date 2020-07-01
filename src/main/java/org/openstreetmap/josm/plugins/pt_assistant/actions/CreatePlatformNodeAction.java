@@ -66,7 +66,8 @@ public class CreatePlatformNodeAction extends JosmAction {
      * Creates a new PlatformAction
      */
     public CreatePlatformNodeAction() {
-        super(tr("Transfer details of stop to platform node"), "icons/transfertags", tr("Transfer details of stop to platform node"), null, true);
+        super(tr("Transfer details of stop to platform node"), "icons/transfertags",
+            tr("Transfer details of stop to platform node"), null, true);
     }
 
     @Override
@@ -84,12 +85,9 @@ public class CreatePlatformNodeAction extends JosmAction {
             action();
         } else {
             ExtendedDialog dialog = transferDialog.showDialog();
-            switch (dialog.getValue()) {
-                case 1:
-                    addToPreferences();
-                    break;
-                default:
-                    return; // Do nothing
+
+            if (dialog.getValue() == 1) {
+                addToPreferences();
             }
         }
     }
