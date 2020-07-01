@@ -70,7 +70,7 @@ public final class StopUtils {
      */
     public static boolean verifyIfMemberOfStopArea(final OsmPrimitive member) {
         return Utils.filteredCollection(member.getReferrers(), Relation.class).stream()
-        		.anyMatch(StopUtils::isStopArea);
+            .anyMatch(StopUtils::isStopArea);
     }
 
 }
