@@ -1,3 +1,4 @@
+// License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
@@ -23,7 +24,8 @@ public final class NotificationUtils {
      * @throws ExecutionException whenever {@link Future#get()} throws an exception, it is rethrown
      * @throws InterruptedException whenever {@link Future#get()} throws an exception, it is rethrown
      */
-    public static void downloadWithNotifications(final Future<?> downloadFuture, final String translatedLabel) throws ExecutionException, InterruptedException {
+    public static void downloadWithNotifications(final Future<?> downloadFuture, final String translatedLabel)
+        throws ExecutionException, InterruptedException {
         new Notification(tr("Download started: {0}", translatedLabel))
             .setIcon(JOptionPane.INFORMATION_MESSAGE)
             .setDuration(Notification.TIME_SHORT)

@@ -43,24 +43,14 @@ public final class PTAssistantLayer extends Layer implements LayerChangeListener
 
     private List<OsmPrimitive> primitives = new ArrayList<>();
     private PTAssistantPaintVisitor paintVisitor;
-    private HashMap<Character, List<PTWay>> fixVariants = new HashMap<>();
-    private HashMap<Way, List<Character>> wayColoring = new HashMap<>();
+    private final HashMap<Character, List<PTWay>> fixVariants = new HashMap<>();
+    private final HashMap<Way, List<Character>> wayColoring = new HashMap<>();
     public String modeOfTravel = null;
 
     public PTAssistantLayer() {
         super(I18n.tr("pt_assistant layer"));
         MainApplication.getLayerManager().addLayerChangeListener(this);
         MainApplication.getLayerManager().addLayer(this);
-    }
-
-    /**
-     * Adds a primitive (route) to be displayed in this layer
-     *
-     * @param primitive
-     *            primitive (route)
-     */
-    public void addPrimitive(OsmPrimitive primitive) {
-        this.primitives.add(primitive);
     }
 
     /**
@@ -132,12 +122,7 @@ public final class PTAssistantLayer extends Layer implements LayerChangeListener
         paintVisitor = new PTAssistantPaintVisitor(g, mv);
 
         for (OsmPrimitive primitive : primitives) {
-            // if(primitive.isRelation()){
-            //   paintVisitor.generatecolors(primitive);
-            // }
-            // else{
-              paintVisitor.visit(primitive);
-            // }
+            paintVisitor.visit(primitive);
         }
 
         paintVisitor.visitFixVariants(fixVariants, wayColoring);

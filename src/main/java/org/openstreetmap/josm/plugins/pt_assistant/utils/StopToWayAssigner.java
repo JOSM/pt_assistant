@@ -234,10 +234,10 @@ public class StopToWayAssigner {
         }
 
         LatLon platformCenter = platform.getBBox().getCenter();
-        Double ax = platformCenter.getX() - searchRadius;
-        Double bx = platformCenter.getX() + searchRadius;
-        Double ay = platformCenter.getY() - searchRadius;
-        Double by = platformCenter.getY() + searchRadius;
+        double ax = platformCenter.getX() - searchRadius;
+        double bx = platformCenter.getX() + searchRadius;
+        double ay = platformCenter.getY() - searchRadius;
+        double by = platformCenter.getY() + searchRadius;
         BBox platformBBox = new BBox(ax, ay, bx, by);
 
         Set<Way> potentialWays = new HashSet<>();
@@ -258,14 +258,14 @@ public class StopToWayAssigner {
             }
         }
 
-        Node platformNode = null;
+        Node platformNode;
         if (platform.getType().equals(OsmPrimitiveType.NODE)) {
             platformNode = (Node) platform;
         } else {
             platformNode = new Node(platform.getBBox().getCenter());
         }
         Way nearestWay = null;
-        Double minDistance = Double.MAX_VALUE;
+        double minDistance = Double.MAX_VALUE;
         for (Way potentialWay : potentialWays) {
             double distance = this.calculateMinDistanceToSegment(platformNode, potentialWay);
             if (distance < minDistance) {
@@ -402,11 +402,7 @@ public class StopToWayAssigner {
          * if c^2 > a^2 + b^2, it is an obtuse triangle
          */
 
-        if (lengthC * lengthC > lengthA * lengthA + lengthB * lengthB) {
-            return true;
-        }
-
-        return false;
+        return lengthC * lengthC > lengthA * lengthA + lengthB * lengthB;
     }
 
     /**
@@ -426,13 +422,4 @@ public class StopToWayAssigner {
             stopToWay.put(stop, assignedWays);
         }
     }
-
-    /**
-     * May be needed if the correspondence between stops and ways has changed
-     * significantly
-     */
-    public static void reinitiate() {
-        stopToWay = new HashMap<>();
-    }
-
 }
