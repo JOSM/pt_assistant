@@ -45,7 +45,7 @@ public class EdgeSelectionAction extends MapMode {
     private static final Cursor SELECTION_CURSOR = ImageProvider.getCursor("normal", "selection");
     private static final Cursor WAY_SELECT_CURSOR = ImageProvider.getCursor("normal", "select_way");
 
-    private transient Set<Way> highlighted;
+    private final transient Set<Way> highlighted;
 
     private List<Way> edgeList = new ArrayList<>();
     private String modeOfTravel = null;
@@ -212,7 +212,7 @@ public class EdgeSelectionAction extends MapMode {
                 ds.setSelected(edgeList);
             }
 
-        } else if (!shift && ctrl && initial != null) {
+        } else if (!shift && initial != null) {
             /*
              * toggle mode where we can individually select and deselect the edges
              */
@@ -234,9 +234,7 @@ public class EdgeSelectionAction extends MapMode {
                     }
                 }
                 final List<Way> waysToBeRemoved = waysToBeRemoved(newEdges);
-                if (waysToBeRemoved != null) {
-                    newEdges.removeAll(waysToBeRemoved);
-                }
+                newEdges.removeAll(waysToBeRemoved);
                 edgeList.addAll(newEdges);
             }
             ds.clearSelection();
@@ -266,9 +264,7 @@ public class EdgeSelectionAction extends MapMode {
             }
 
             List<Way> waysToBeRemoved = waysToBeRemoved(newEdges);
-            if (waysToBeRemoved != null) {
-                newEdges.removeAll(waysToBeRemoved);
-            }
+            newEdges.removeAll(waysToBeRemoved);
             edgeList.addAll(newEdges);
 
             Set<Way> edgeSet = new HashSet<>(edgeList);

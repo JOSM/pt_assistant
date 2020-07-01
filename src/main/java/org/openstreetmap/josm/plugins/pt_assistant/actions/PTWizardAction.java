@@ -111,9 +111,10 @@ public final class PTWizardAction extends JosmAction {
                         lastCheck = closeCheck;
                     }
                     ExtendedDialog dialog = wizardDialog.showDialog();
-                    switch (dialog.getValue()) {
-                        case 1: nextAct(i, panel); break;
-                        default: return; // Do nothing
+                    if (dialog.getValue() == 1) {
+                        nextAct(i, panel);
+                    } else {
+                        return;
                     }
                 }
             } catch (Exception ex) {
@@ -160,33 +161,19 @@ public final class PTWizardAction extends JosmAction {
                 it -> "Default".equals(it.get(1))).map(it -> it.get(0)).collect(Collectors.toList()));
     }
 
-    private void addLabel(JPanel panel, int questionNumber, boolean withTitle, boolean withQuestion, boolean withSuggestion) {
-
-        if (withTitle) {
-            String title = Config.getPref().get("pt_assistant.wizard."+ questionNumber +".title");
-            JTextArea j = new JTextArea(tr(title));
-            j.setLineWrap(true);
-            j.setWrapStyleWord(true);
-            j.setEditable(false);
-            j.setOpaque(false);
-            j.setFont(new java.awt.Font("Serif", Font.BOLD, 18));
-            panel.add(j, GBC.eol().fill(GBC.HORIZONTAL));
-        }
+    private void addLabel(JPanel panel, int questionNumber, boolean withQuestion) {
+        String title = Config.getPref().get("pt_assistant.wizard."+ questionNumber +".title");
+        JTextArea j = new JTextArea(tr(title));
+        j.setLineWrap(true);
+        j.setWrapStyleWord(true);
+        j.setEditable(false);
+        j.setOpaque(false);
+        j.setFont(new Font("Serif", Font.BOLD, 18));
+        panel.add(j, GBC.eol().fill(GBC.HORIZONTAL));
 
         if (withQuestion) {
             String question = Config.getPref().get("pt_assistant.wizard."+ questionNumber +".question");
-            JTextArea j = new JTextArea(tr(question));
-            j.setLineWrap(true);
-            j.setWrapStyleWord(true);
-            j.setEditable(false);
-            j.setOpaque(false);
-            panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
-            panel.add(j, GBC.eol().fill(GBC.HORIZONTAL));
-        }
-
-        if (withSuggestion) {
-            String suggestion = Config.getPref().get("pt_assistant.wizard."+ questionNumber +".suggestion");
-            JTextArea j = new JTextArea(tr("suggested value : "+ suggestion));
+            j = new JTextArea(tr(question));
             j.setLineWrap(true);
             j.setWrapStyleWord(true);
             j.setEditable(false);
@@ -197,7 +184,7 @@ public final class PTWizardAction extends JosmAction {
     }
 
     private void introduction(JPanel panel) {
-        addLabel(panel, 0, true, false, false);
+        addLabel(panel, 0, false);
 
         String information = PTProperties.WIZARD_INFORMATION.get();
         JTextArea j = new JTextArea(tr(information));
@@ -210,7 +197,7 @@ public final class PTWizardAction extends JosmAction {
     }
 
     private void question1(JPanel panel) {
-        addLabel(panel, 1, true, true, false);
+        addLabel(panel, 1, true);
         QUESTION_1_SPINNER_MODEL.setValue(TagEditHelper.PROPERTY_RECENT_TAGS_NUMBER.get());
         final JSpinner spinner = new JSpinner(QUESTION_1_SPINNER_MODEL);
         panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
@@ -219,7 +206,7 @@ public final class PTWizardAction extends JosmAction {
 
     private void question2(JPanel panel) {
 
-        addLabel(panel, 2, true, true, false);
+        addLabel(panel, 2, true);
 
         Box checkBoxPanel = Box.createVerticalBox();
         checkBoxPanel.setOpaque(true);
@@ -250,7 +237,7 @@ public final class PTWizardAction extends JosmAction {
 
     private void question3(JPanel panel) {
 
-        addLabel(panel, 3, true, true, false);
+        addLabel(panel, 3, true);
 
         Box checkBoxPanel = Box.createVerticalBox();
         checkBoxPanel.setOpaque(true);
@@ -281,7 +268,7 @@ public final class PTWizardAction extends JosmAction {
     }
 
     private void question4(JPanel panel) {
-        addLabel(panel, 4, true, true, false);
+        addLabel(panel, 4, true);
 
         Box checkBoxPanel = Box.createVerticalBox();
         checkBoxPanel.setOpaque(true);
@@ -398,9 +385,8 @@ public final class PTWizardAction extends JosmAction {
                     styleList.stream()
                         .filter(style -> style.title.equals(paintStyle))
                         .findFirst()
-                        .ifPresent(style -> {
-                            MapPaintStyles.removeStyle(new SourceEntry(SourceType.MAP_PAINT_STYLE, url, null, paintStyle, true));
-                        });
+                        .ifPresent(style -> MapPaintStyles.removeStyle(
+                            new SourceEntry(SourceType.MAP_PAINT_STYLE, url, null, paintStyle, true)));
                 }
             }
         } catch (Exception e) {
@@ -426,12 +412,12 @@ public final class PTWizardAction extends JosmAction {
             if (!items.containsKey(fv)) {
                 for (List<String> suggestions : suggestionLists) {
                     String key = suggestions.get(0);
-                    if (key == fv) {
-                        String Value = "";
+                    if (key.equals(fv)) {
+                        StringBuilder Value = new StringBuilder();
                         for (int i = 2; i < suggestions.size(); i++) {
-                            Value = Value + suggestions.get(i);
+                            Value.append(suggestions.get(i));
                         }
-                        SelectorItem item = new SelectorItem(key, Value);
+                        SelectorItem item = new SelectorItem(key, Value.toString());
                         itemList.add(item);
                         break;
                     }
@@ -441,9 +427,7 @@ public final class PTWizardAction extends JosmAction {
         }
 
         for (String unmarkedKey : unmarkedKeyList) {
-            if (items.containsKey(unmarkedKey)) {
-                items.remove(unmarkedKey);
-            }
+            items.remove(unmarkedKey);
         }
 
         for (SelectorItem item : itemList) {
@@ -503,7 +487,7 @@ public final class PTWizardAction extends JosmAction {
     }
 
     private String[] defaultToolBar() {
-        String[] deftoolbar = {"open", "save", "download", "upload", "|",
+        return new String[]{"open", "save", "download", "upload", "|",
             "undo", "redo", "|", "dialogs/search", "preference", "|", "splitway", "combineway",
             "wayflip", "|", "imagery-offset", "|", "tagginggroup_Highways/Streets",
             "tagginggroup_Highways/Ways", "tagginggroup_Highways/Waypoints",
@@ -511,7 +495,6 @@ public final class PTWizardAction extends JosmAction {
             "tagginggroup_Transport/Public Transport", "|", "tagginggroup_Facilities/Tourism",
             "tagginggroup_Facilities/Food+Drinks", "|", "tagginggroup_Man Made/Historic Places", "|",
             "tagginggroup_Man Made/Man Made"};
-        return deftoolbar;
     }
 
     private void nextAct(int pageNumber, JPanel panel) {
