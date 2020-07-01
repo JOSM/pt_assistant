@@ -23,8 +23,6 @@ import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
-import org.openstreetmap.josm.plugins.pt_assistant.actions.mendrelation.PersonalTransportMendRelation;
-import org.openstreetmap.josm.plugins.pt_assistant.actions.mendrelation.PublicTransportMendRelation;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.NotificationUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.ImageProvider;
@@ -34,6 +32,7 @@ import org.openstreetmap.josm.tools.Utils;
 public class RoutingAction extends AbstractRelationEditorAction{
 	Relation relation = null;
 	GenericRelationEditor editor = null;
+	boolean setEnable = true;
 
   public RoutingAction(IRelationEditorActionAccess editorAccess){
     super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
@@ -44,7 +43,6 @@ public class RoutingAction extends AbstractRelationEditorAction{
     this.relation = editor.getRelation();
     editor.addWindowListener(new WindowEventHandler());
   }
-
   @Override
   protected void updateEnabledState() {
       final Relation curRel = relation;
@@ -57,11 +55,13 @@ public class RoutingAction extends AbstractRelationEditorAction{
       );
   }
   private void callAction(Relation relation){
-		if (relation.hasTag("route","bicycle")) {
-       PersonalTransportMendRelation bike = new PersonalTransportMendRelation(editorAccess);
+		if(relation.hasTag("route","bicycle")) {
+       BicycleMendRelation bike = new BicycleMendRelation(editorAccess);
+		    // MendRelationAction bike = new MendRelationAction(editorAccess);
         bike.initialise();
-       } else {
-        PublicTransportMendRelation pt_transport = new PublicTransportMendRelation(editorAccess);
+       }
+    else {
+        MendRelationAction pt_transport = new MendRelationAction(editorAccess);
         pt_transport.initialise();
     }
 	}
