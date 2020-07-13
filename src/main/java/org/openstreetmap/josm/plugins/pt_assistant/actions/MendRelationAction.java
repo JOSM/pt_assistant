@@ -949,7 +949,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
 
         // check if one of the way's intermediate node equals the first or last node of next way,
-        // if so then break it(finally split in method getNextWayAfterSelection if the way is chosen)
+        // if so then break it (finally split in method getNextWayAfterSelection if the way is chosen)
         for (Way w : parentWays) {
             Node nextWayNode = null;
             if (w.getNodes().contains(nextWay.firstNode()) && !w.isFirstLastNode(nextWay.firstNode())) {

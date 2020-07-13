@@ -400,7 +400,7 @@ public class PTStop extends RelationMember {
      * Finds the PTWay of the given stop_position by looking at its referrer
      *
      * @param stopPosition stop position
-     * @param stop PTstop
+     * @param stop PTstopwq
      *1- find all the referrer:
      *2-filter all referrer which are ways
      *3-find all relation of each way

@@ -30,8 +30,8 @@ import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Utils;
 
 public class RoutingAction extends AbstractRelationEditorAction{
-	Relation relation = null;
-	GenericRelationEditor editor = null;
+	Relation relation;
+	GenericRelationEditor editor;
 	boolean setEnable = true;
 
   public RoutingAction(IRelationEditorActionAccess editorAccess){
@@ -50,7 +50,8 @@ public class RoutingAction extends AbstractRelationEditorAction{
           curRel != null &&
           (
               (curRel.hasTag("route", "bus") && curRel.hasTag("public_transport:version", "2")) ||
-              (RouteUtils.isPTRoute(curRel) && !curRel.hasTag("route", "bus")) || curRel.hasTag("route", "bicycle")
+              (RouteUtils.isPTRoute(curRel) && !curRel.hasTag("route", "bus")) ||
+               curRel.hasTag("route", "bicycle")
           )
       );
   }

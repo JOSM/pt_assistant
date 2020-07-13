@@ -60,6 +60,35 @@ public final class RouteUtils {
         }
     }
 
+    public static void removeOnewayAndSplitRoundaboutWays(final Relation r) {
+        if (isPTRoute(r)) {
+            for (RelationMember nestedRelationMember : r.getMembers()) {
+                if (nestedRelationMember.getType().equals(OsmPrimitiveType.WAY) &&
+                    (nestedRelationMember.getWay().hasTag("oneway", "yes") ||
+                        (nestedRelationMember.getWay().hasTag("junction", "roundabout") &&
+                            !nestedRelationMember.getWay().isClosed()
+                        )
+                    )
+                )
+                {
+                    r.removeMembersFor(nestedRelationMember.getWay());
+                }
+            }
+        }
+    }
+
+    public static void removeMembersWithRoles(final Relation r, final String... roles) {
+        if (isPTRoute(r)) {
+            for (RelationMember nestedRelationMember : r.getMembers()) {
+                for (String role : roles) {
+                    if (nestedRelationMember.getRole().contains(role)) {
+                        r.removeMembersFor(nestedRelationMember.getMember());
+                    }
+                }
+            }
+        }
+    }
+
     public static boolean isPTRoute(Relation r) {
         return r != null && r.hasTag(OSMTags.KEY_ROUTE, acceptedRouteTags);
     }

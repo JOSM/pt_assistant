@@ -76,7 +76,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
     private static final long serialVersionUID = 1L;
 
-    private GenericRelationEditor editor = null;
+    private GenericRelationEditor editor;
     public static boolean zooming = true;
     public static HashMap<Long, String> stopOrderMap = new HashMap<>();
     public static LatLon locat = null;
@@ -127,7 +127,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
     private void continueAfterDownload(Relation rel) {
         Relation newRel = new Relation(rel);
-        Boolean ask_to_create_return_route_and_routeMaster = false;
+        boolean ask_to_create_return_route_and_routeMaster = false;
 
         if (!RouteUtils.isVersionTwoPTRoute(newRel)) {
             if (DialogUtils.showYesNoQuestion(tr("This is not a PT v2 relation"),
@@ -137,6 +137,12 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                             + "but PT_Assistant can help prepare the relations."))) {
                 RouteUtils.setPTRouteVersion(newRel, "2");
                 ask_to_create_return_route_and_routeMaster = true;
+                if (DialogUtils.showYesNoQuestion(tr("Remove oneway and split roundabout ways?"),
+                    tr("As a preparation for conversion to PT v2\n"
+                        + "it may help to remove oneway and split roundabout ways?\n\n"
+                        + "Would you like to do this automatically?"))) {
+                    RouteUtils.removeOnewayAndSplitRoundaboutWays(newRel);
+                }
             } else {
                 return;
             }
@@ -147,10 +153,22 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 break;
             }
         }
+        // Create a route relation for the other direction
+        // so we can already perform some actions on it
+        // The question whether the user actually wants this will be asked later on
+        Relation otherDirRel = new Relation(newRel);
+        otherDirRel.clearOsmMetadata();
+        otherDirRel.put("from", newRel.get("to"));
+        otherDirRel.put("to", newRel.get("from"));
+
+        RouteUtils.removeMembersWithRoles(newRel, "backward_stop", "backward_platform");
+        RouteUtils.removeMembersWithRoles(otherDirRel, "forward_stop", "forward_platform");
+
         rightSide = RightAndLefthandTraffic.isRightHandTraffic(locat);
 
         sortPTRouteMembers(newRel);
         UndoRedoHandler.getInstance().add(new ChangeCommand(rel, newRel));
+        sortPTRouteMembers(otherDirRel);
         editor.reloadDataFromRelation();
 
         final PTRouteDataManager route_manager = new PTRouteDataManager(rel);
@@ -189,14 +207,10 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             editor.reloadDataFromRelation();
 
             OsmDataLayer layer = MainApplication.getLayerManager().getEditLayer();
-            Relation routeMaster = null;
+            Relation routeMaster;
 
             if (ask_to_create_return_route_and_routeMaster && DialogUtils.showYesNoQuestion(tr("Opposite itinerary?"),
                     tr("Create ''route'' relation for opposite direction of travel?"))) {
-                Relation otherDirRel = new Relation(newRel);
-                otherDirRel.clearOsmMetadata();
-                lastStopName.ifPresent(name -> otherDirRel.put("from", name));
-                firstStopName.ifPresent(name -> otherDirRel.put("to", name));
 
                 // Reverse order of members in new route relation
                 final PTRouteDataManager return_route_manager = new PTRouteDataManager(otherDirRel);
@@ -301,8 +315,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         // first loop trough all the members and remove the roles
         List<RelationMember> members = new ArrayList<>();
         List<RelationMember> oldMembers = rel.getMembers();
-        for (int i = 0; i < oldMembers.size(); i++) {
-            RelationMember rm = oldMembers.get(i);
+        for (RelationMember rm : oldMembers) {
             if (!PTStop.isPTPlatform(rm) && !PTStop.isPTStopPosition(rm))
                 members.add(new RelationMember("", rm.getMember()));
             else
@@ -320,8 +333,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         List<Way> ways = new ArrayList<>();
         // HashMap<Way,ArrayList<PTStop>> RightSideStops = new RightSideStops();
         // HashMap<Way,ArrayList<PTStop>> LeftSideStops = new LeftSideStops();
-        for (int i = 0; i < members.size(); i++) {
-            RelationMember rm = members.get(i);
+        for (RelationMember rm : members) {
             if (PTStop.isPTPlatform(rm) || PTStop.isPTStopPosition(rm))
                 stops.add(rm);
             else {
@@ -373,7 +385,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 addStopToRelation(rel, stop);
             }
             if (!wayStop.containsKey(way))
-                wayStop.put(way, new ArrayList<PTStop>());
+                wayStop.put(way, new ArrayList<>());
             wayStop.get(way).add(stop);
         });
 
@@ -383,7 +395,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 addStopToRelation(rel, stop);
             }
             if (!wayStop.containsKey(way))
-                wayStop.put(way, new ArrayList<PTStop>());
+                wayStop.put(way, new ArrayList<>());
             wayStop.get(way).add(stop);
         });
         HashMap<Way, ArrayList<PTStop>> RightSideStops = new HashMap<>();
@@ -391,10 +403,10 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         HashMap<Way, Integer> wayAlreadyThere = new HashMap<>();
         HashMap<PTStop, Integer> StopHasBeenChecked = new HashMap<>();
         Way prev1 = null;
-        Node strt = null;
+        Node strt;
         Node endn = null;
-        Node tempstrt = null;
-        Node tempend = null;
+        Node tempstrt;
+        Node tempend;
         for (int in = 0; in < ways.size(); in++) {
             Way w = ways.get(in);
             wayAlreadyThere.put(w, 0);
@@ -448,14 +460,14 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                     if (rightSide) {
                         if (route.crossProductValue(tempstrt, tempend, pts) <= 0) {
                             if (!RightSideStops.containsKey(w)) {
-                                RightSideStops.put(w, new ArrayList<PTStop>());
+                                RightSideStops.put(w, new ArrayList<>());
                             }
                             if (StopHasBeenChecked.get(pts) == null) {
                                 RightSideStops.get(w).add(pts);
                             }
                         } else {
                             if (!LeftSideStops.containsKey(w)) {
-                                LeftSideStops.put(w, new ArrayList<PTStop>());
+                                LeftSideStops.put(w, new ArrayList<>());
                             }
                             if (StopHasBeenChecked.get(pts) == null) {
                                 LeftSideStops.get(w).add(pts);
@@ -464,14 +476,14 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                     } else {
                         if (route.crossProductValue(tempstrt, tempend, pts) >= 0) {
                             if (!RightSideStops.containsKey(w)) {
-                                RightSideStops.put(w, new ArrayList<PTStop>());
+                                RightSideStops.put(w, new ArrayList<>());
                             }
                             if (StopHasBeenChecked.get(pts) == null) {
                                 RightSideStops.get(w).add(pts);
                             }
                         } else {
                             if (!LeftSideStops.containsKey(w)) {
-                                LeftSideStops.put(w, new ArrayList<PTStop>());
+                                LeftSideStops.put(w, new ArrayList<>());
                             }
                             if (StopHasBeenChecked.get(pts) == null) {
                                 LeftSideStops.get(w).add(pts);
@@ -527,7 +539,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                                 stp = sortSameWayStops(stp, curr, prev, next);
                             stp.forEach(stop -> {
                                 if (stop != null) {
-                                    Node nod = null;
+                                    Node nod;
                                     if (stop.getPlatform() != null) {
                                         LatLon x = stop.getPlatform().getBBox().getCenter();
                                         nod = new Node(x);
@@ -551,7 +563,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                                                     + " can not be served in this route relation want to remove it?")),
                                             GBC.eol().fill(GBC.HORIZONTAL));
                                     panel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
-                                    int n = JOptionPane.showConfirmDialog((Component) null, panel);
+                                    int n = JOptionPane.showConfirmDialog(null, panel);
                                     if (n == JOptionPane.YES_OPTION) {
                                         tr("This stop has been removed");
                                     } else if (n == JOptionPane.NO_OPTION) {
@@ -620,8 +632,8 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
     }
 
     private static HashMap<Way, Boolean> wayCanBeTraversedAgain(List<RelationMember> wayMembers) {
-        Way prev = null;
-        Way next = null;
+        Way prev;
+        Way next;
         HashMap<Way, Boolean> setWay = new HashMap<>();
         HashMap<Way, Pair<Node, Node>> checkWay = new HashMap<>();
         for (int i = 0; i < wayMembers.size(); i++) {
@@ -700,10 +712,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         double x2 = c.getX() - b.getX();
         double y2 = c.getY() - b.getY();
 
-        if (x1 * x2 + y1 * y2 >= 0) {
-            return true;
-        }
-        return false;
+        return x1 * x2 + y1 * y2 >= 0;
     }
 
     private static List<PTStop> getSortedStops(List<Node> nodes, Map<Node, List<PTStop>> closeNodes) {
@@ -721,7 +730,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                         return d1.compareTo(d2);
                     });
                 }
-                stops.forEach(ret::add);
+                ret.addAll(stops);
             }
         }
 
