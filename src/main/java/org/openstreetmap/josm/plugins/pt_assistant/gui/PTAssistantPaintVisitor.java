@@ -630,11 +630,11 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
     protected void drawFixVariantsWithParallelLines(Map<Way, List<Character>> wayColoring) {
 
         HashMap<Character, Color> colors = new HashMap<>();
-        colors.put('A', new Color(255, 0, 0, 200));
-        colors.put('B', new Color(0, 255, 0, 200));
-        colors.put('C', new Color(0, 0, 255, 200));
-        colors.put('D', new Color(255, 255, 0, 200));
-        colors.put('E', new Color(0, 255, 255, 200));
+        colors.put('1', new Color(255, 0, 0, 200));
+        colors.put('2', new Color(0, 255, 0, 200));
+        colors.put('3', new Color(0, 0, 255, 200));
+        colors.put('4', new Color(255, 255, 0, 200));
+        colors.put('5', new Color(0, 255, 255, 200));
 
         for (Entry<Way, List<Character>> entry : wayColoring.entrySet()) {
             Way way = entry.getKey();
