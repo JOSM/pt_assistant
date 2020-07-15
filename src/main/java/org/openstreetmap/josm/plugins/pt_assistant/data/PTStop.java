@@ -197,10 +197,10 @@ public class PTStop extends RelationMember {
         // Look for a stop position within 0.001 degrees (around 50 m) of this
         // platform:
         LatLon platformCenter = platform.getBBox().getCenter();
-        Double ax = platformCenter.getX() - 0.001;
-        Double bx = platformCenter.getX() + 0.001;
-        Double ay = platformCenter.getY() - 0.001;
-        Double by = platformCenter.getY() + 0.001;
+        double ax = platformCenter.getX() - 0.001;
+        double bx = platformCenter.getX() + 0.001;
+        double ay = platformCenter.getY() - 0.001;
+        double by = platformCenter.getY() + 0.001;
         BBox platformBBox = new BBox(ax, ay, bx, by);
 
         Collection<Node> allNodes = platform.getDataSet().getNodes();
@@ -218,7 +218,7 @@ public class PTStop extends RelationMember {
      * @return most probable way which will be served by a stop
      */
     public Way findServingWays(PTStop stop) {
-        if (stop.flag == true) {
+        if (stop.flag) {
             return this.serveWay;
         }
         Way wayOfStopPosition = findWayForNode(stop.getStopPosition(), stop);
