@@ -83,7 +83,7 @@ public class BicycleMendRelation extends MendRelationAction {
     @Override
     public void initialise() {
         save();
-        sortBelow(super.relation.getMembers(), 0);
+        sortBelow(super.relation.getMembers());
         super.members = super.editor.getRelation().getMembers();
         super.members.removeIf(m -> !m.isWay());
         links = connectionTypeCalculator.updateLinks(super.members);
@@ -976,7 +976,7 @@ public class BicycleMendRelation extends MendRelationAction {
         }
         super.currentNode = jointNode;
         brokenidx = idx;
-        sortBelow(super.relation.getMembers(), 0);
+        sortBelow(super.relation.getMembers());
     }
 
     void fixgapAfterlooping(int idx) {
