@@ -98,7 +98,7 @@ public class BicycleMendRelation extends MendRelationAction {
     }
 
     @Override
-    String getQuery() {
+    String getOverpassAPIQuery() {
         final StringBuilder str = new StringBuilder("[timeout:100];\n(\n");
         final String wayFormatterString = "   way(%.6f,%.6f,%.6f,%.6f)\n";
         final String str3 = "[\"highway\"][\"highway\"!=\"motorway\"];\n";
@@ -160,7 +160,7 @@ public class BicycleMendRelation extends MendRelationAction {
                 }
                 IsWaythere.put(way, 1);
             }
-            super.nextWay = super.members.get(nexidx).getWay();
+            super.wayToReachAfterGap = super.members.get(nexidx).getWay();
             Node node = checkVaildityOfWays(way, nexidx);
             if (super.abort || super.nextIndex) {
                 super.nextIndex = false;
@@ -176,7 +176,7 @@ public class BicycleMendRelation extends MendRelationAction {
                 } else {
                     super.noLinkToPreviousWay = false;
                     super.previousWay = way;
-                    super.currentNode = getOtherNode(super.nextWay, node);
+                    super.currentNode = getOtherNode(super.wayToReachAfterGap, node);
                     super.nextIndex = false;
                     downloadAreaAroundWay(way);
                 }
@@ -215,7 +215,7 @@ public class BicycleMendRelation extends MendRelationAction {
                     }
                 } else {
                     super.previousWay = way;
-                    super.currentNode = getOtherNode(super.nextWay, node);
+                    super.currentNode = getOtherNode(super.wayToReachAfterGap, node);
                     super.nextIndex = false;
                     downloadAreaAroundWay(way);
                 }
@@ -246,7 +246,7 @@ public class BicycleMendRelation extends MendRelationAction {
                 && relation.hasTag("route", "bicycle"))
             return false;
 
-        if (!isNonSplitRoundAbout(way) && way.hasTag("junction", "roundabout")) {
+        if (!WayUtils.isNonSplitRoundAbout(way) && way.hasTag("junction", "roundabout")) {
             if (way.lastNode().equals(node))
                 return false;
         }
@@ -267,7 +267,7 @@ public class BicycleMendRelation extends MendRelationAction {
         Node node = null;
         super.nextIndex = false;
         super.notice = null;
-        final NodePair commonEndNodes = WayUtils.findCommonFirstLastNodes(super.nextWay, way);
+        final NodePair commonEndNodes = WayUtils.findCommonFirstLastNodes(super.wayToReachAfterGap, way);
         if (commonEndNodes.getA() != null && commonEndNodes.getB() != null) {
             nexWayDelete = true;
             super.notice = "Multiple common nodes found between current and next way";
@@ -277,31 +277,31 @@ public class BicycleMendRelation extends MendRelationAction {
             node = commonEndNodes.getB();
         } else {
             // the nodes can be one of the intermediate nodes
-            for (Node n : super.nextWay.getNodes()) {
+            for (Node n : super.wayToReachAfterGap.getNodes()) {
                 if (way.getNodes().contains(n)) {
                     node = n;
                     super.currentNode = n;
                 }
             }
         }
-        if (node != null && isRestricted(super.nextWay, way, node)) {
+        if (node != null && isRestricted(super.wayToReachAfterGap, way, node)) {
             nexWayDelete = true;
         }
-        if (isNonSplitRoundAbout(way)) {
+        if (WayUtils.isNonSplitRoundAbout(way)) {
             nexWayDelete = false;
             for (Node n : way.getNodes()) {
-                if (super.nextWay.firstNode().equals(n) || super.nextWay.lastNode().equals(n)) {
+                if (super.wayToReachAfterGap.firstNode().equals(n) || super.wayToReachAfterGap.lastNode().equals(n)) {
                     node = n;
                     super.currentNode = n;
                 }
             }
         }
 
-        if (isNonSplitRoundAbout(super.nextWay)) {
+        if (WayUtils.isNonSplitRoundAbout(super.wayToReachAfterGap)) {
             nexWayDelete = false;
         }
 
-        if (node != null && !checkOneWaySatisfiability(super.nextWay, node)) {
+        if (node != null && !checkOneWaySatisfiability(super.wayToReachAfterGap, node)) {
             nexWayDelete = true;
             super.notice = "vehicle travels against oneway restriction";
         }
@@ -318,17 +318,17 @@ public class BicycleMendRelation extends MendRelationAction {
     }
 
     @Override
-    Way findNextWayAfterDownload(Way way, Node node1, Node node2) {
+    void findNextWayAfterDownload(Way way, Node node1, Node node2) {
         // TODO Auto-generated method stub
         super.currentWay = way;
         if (super.abort)
-            return null;
+            return;
         List<Way> parentWays = findNextWay(way, node1);
 
         if (node2 != null) {
             parentWays.addAll(findNextWay(way, node2));
         }
-        directroutes = getDirectRouteBetweenWays(super.currentWay, super.nextWay);
+        directroutes = getDirectRouteBetweenWaysByLookingAtOtherRouteRelations(super.currentWay, super.wayToReachAfterGap);
         if (directroutes == null || directroutes.size() == 0) {
             super.showOption0 = false;
         } else {
@@ -337,7 +337,7 @@ public class BicycleMendRelation extends MendRelationAction {
         if (directroutes != null && directroutes.size() > 0 && !super.shorterRoutes && parentWays.size() > 0
                 && super.notice == null) {
             displayFixVariantsWithOverlappingWays(directroutes);
-            return null;
+            return;
         }
         if (parentWays.size() == 1) {
             goToNextWays(parentWays.get(0), way, new ArrayList<>());
@@ -351,14 +351,12 @@ public class BicycleMendRelation extends MendRelationAction {
                 makeNodesZeros();
             } else {
                 callNextWay(++super.currentIndex);
-                return null;
             }
         }
-        return null;
     }
 
     @Override
-    List<List<Way>> getDirectRouteBetweenWays(Way current, Way next) {
+    List<List<Way>> getDirectRouteBetweenWaysByLookingAtOtherRouteRelations(Way current, Way next) {
         //trying to find the other route relations which can connect these ways
         List<List<Way>> list = new ArrayList<>();
         List<Relation> r1;
@@ -423,7 +421,7 @@ public class BicycleMendRelation extends MendRelationAction {
                     } else if (w.equals(next) && lst.size() > 0) {
                         return lst;
                     } else if (canAdd) {
-                        if (findNumberOfCommonNode(w, prev) != 0) {
+                        if (findNumberOfCommonNodes(w, prev) != 0) {
                             lst.add(w);
                             prev = w;
                         } else {
@@ -440,8 +438,8 @@ public class BicycleMendRelation extends MendRelationAction {
                         return lst;
                     } else if (canAdd) {
                         // not valid in reverse if it is oneway or part of roundabout
-                        if (findNumberOfCommonNode(w, prev) != 0 && RouteUtils.isOnewayForBicycles(w) == 0
-                                && !isSplitRoundAbout(w)) {
+                        if (findNumberOfCommonNodes(w, prev) != 0 && RouteUtils.isOnewayForBicycles(w) == 0
+                                && !WayUtils.isPartOfSplitRoundAbout(w)) {
                             lst.add(w);
                             prev = w;
                         } else {
@@ -502,11 +500,11 @@ public class BicycleMendRelation extends MendRelationAction {
         // if so then break it(finally split in method getNextWayAfterSelection if the way is chosen)
         for (Way w : parentWays) {
             Node nextWayNode = null;
-            if (w.getNodes().contains(super.nextWay.firstNode()) && !w.isFirstLastNode(super.nextWay.firstNode())) {
-                nextWayNode = super.nextWay.firstNode();
-            } else if (w.getNodes().contains(super.nextWay.lastNode())
-                    && !w.isFirstLastNode(super.nextWay.lastNode())) {
-                nextWayNode = super.nextWay.lastNode();
+            if (w.getNodes().contains(super.wayToReachAfterGap.firstNode()) && !w.isFirstLastNode(super.wayToReachAfterGap.firstNode())) {
+                nextWayNode = super.wayToReachAfterGap.firstNode();
+            } else if (w.getNodes().contains(super.wayToReachAfterGap.lastNode())
+                    && !w.isFirstLastNode(super.wayToReachAfterGap.lastNode())) {
+                nextWayNode = super.wayToReachAfterGap.lastNode();
             }
 
             if (nextWayNode != null) {
@@ -587,12 +585,12 @@ public class BicycleMendRelation extends MendRelationAction {
 
     @Override
     public void backTrack(Way way, int idx) {
-        if (idx >= super.backnodes.size() - 1) {
-            super.currentNode = prevCurrenNode;
+        if (idx >= super.backNodes.size() - 1) {
+            super.currentNode = previousCurrentNode;
             callNextWay(super.currentIndex);
             return;
         }
-        Node nod = super.backnodes.get(idx);
+        Node nod = super.backNodes.get(idx);
         if (way.isInnerNode(nod)) {
             List<Way> fixVariants = new ArrayList<>();
             List<Way> allWays = nod.getParentWays();
@@ -665,15 +663,15 @@ public class BicycleMendRelation extends MendRelationAction {
     void backtrackCurrentEdge() {
         Way backTrackWay = super.currentWay;
         Way way = backTrackWay;
-        super.backnodes = way.getNodes();
+        super.backNodes = way.getNodes();
         if (super.currentNode == null) {
             super.currentNode = super.currentWay.lastNode();
         }
         if (super.currentNode.equals(way.lastNode())) {
-            Collections.reverse(super.backnodes);
+            Collections.reverse(super.backNodes);
         }
         int idx = 1;
-        prevCurrenNode = super.currentNode;
+        previousCurrentNode = super.currentNode;
         backTrack(super.currentWay, idx);
     }
 
@@ -758,11 +756,11 @@ public class BicycleMendRelation extends MendRelationAction {
 
                     // check if the new way is part of one of the parentWay of the super.nextWay's first
                     // node
-                    for (Way v : super.nextWay.firstNode().getParentWays()) {
+                    for (Way v : super.wayToReachAfterGap.firstNode().getParentWays()) {
                         if (v.getNodes().containsAll(w.getNodes()) && w1 == null) {
-                            if (!w.equals(v) && !v.isFirstLastNode(super.nextWay.firstNode())) {
+                            if (!w.equals(v) && !v.isFirstLastNode(super.wayToReachAfterGap.firstNode())) {
                                 w1 = v;
-                                breakNode = Collections.singletonList(super.nextWay.firstNode());
+                                breakNode = Collections.singletonList(super.wayToReachAfterGap.firstNode());
                                 break;
                             } else if (w.equals(v)) {
                                 addNewWays(Collections.singletonList(v), ind);
@@ -775,11 +773,11 @@ public class BicycleMendRelation extends MendRelationAction {
                     }
 
                     // check if the new way is part of one of the parentWay of the super.nextWay's first
-                    for (Way v : super.nextWay.lastNode().getParentWays()) {
+                    for (Way v : super.wayToReachAfterGap.lastNode().getParentWays()) {
                         if (v.getNodes().containsAll(w.getNodes()) && w1 == null) {
-                            if (!w.equals(v) && !v.isFirstLastNode(super.nextWay.lastNode())) {
+                            if (!w.equals(v) && !v.isFirstLastNode(super.wayToReachAfterGap.lastNode())) {
                                 w1 = v;
-                                breakNode = Collections.singletonList(super.nextWay.lastNode());
+                                breakNode = Collections.singletonList(super.wayToReachAfterGap.lastNode());
                                 break;
                             } else if (w.equals(v)) {
                                 addNewWays(Collections.singletonList(v), ind);
@@ -950,7 +948,7 @@ public class BicycleMendRelation extends MendRelationAction {
         }
         idxlst[0] = idx;
         idx--;
-        double minLength = findDistance(w, super.nextWay, jointNode);
+        double minLength = findDistance(w, super.wayToReachAfterGap, jointNode);
         super.memberTableModel.updateRole(idxlst, s);
         while (true) {
             w = super.members.get(idx).getWay();
@@ -966,7 +964,7 @@ public class BicycleMendRelation extends MendRelationAction {
                 // roles[idx]=s;
             }
             idxlst[0] = idx;
-            double length = findDistance(w, super.nextWay, node1);
+            double length = findDistance(w, super.wayToReachAfterGap, node1);
             if (minLength > length) {
                 minLength = length;
             }
@@ -985,7 +983,7 @@ public class BicycleMendRelation extends MendRelationAction {
         Way w = super.members.get(idx).getWay();
         super.currentWay = w;
         Way minWay = w;
-        double minLength = findDistance(w, super.nextWay, super.currentNode);
+        double minLength = findDistance(w, super.wayToReachAfterGap, super.currentNode);
         while (idx <= super.currentIndex) {
             w = super.members.get(idx).getWay();
             List<Way> parentWays = findNextWay(w, w.lastNode());
@@ -995,7 +993,7 @@ public class BicycleMendRelation extends MendRelationAction {
             for (int i = 0; i < parentWays.size(); i++) {
                 if (IsWaythere.get(parentWays.get(i)) == null) {
                     Node node = getOtherNode(parentWays.get(i), null);
-                    double dist = findDistance(parentWays.get(i), super.nextWay, node);
+                    double dist = findDistance(parentWays.get(i), super.wayToReachAfterGap, node);
                     if (dist < minLength) {
                         minLength = dist;
                         minWay = w;
@@ -1023,7 +1021,7 @@ public class BicycleMendRelation extends MendRelationAction {
                 // and next way then don't delete it in that index
                 if (prev != null && next != null) {
                     if (WayUtils.findNumberOfCommonFirstLastNodes(prev, way) != 0
-                            && WayUtils.findNumberOfCommonFirstLastNodes(way, super.nextWay) != 0) {
+                            && WayUtils.findNumberOfCommonFirstLastNodes(way, super.wayToReachAfterGap) != 0) {
                         del = false;
                     }
                 }
@@ -1179,7 +1177,7 @@ public class BicycleMendRelation extends MendRelationAction {
         setEnable = false;
         super.previousWay = null;
         super.currentWay = null;
-        super.nextWay = null;
+        super.wayToReachAfterGap = null;
         super.noLinkToPreviousWay = true;
         super.nextIndex = true;
         super.shorterRoutes = false;
