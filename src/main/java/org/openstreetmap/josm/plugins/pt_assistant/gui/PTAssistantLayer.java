@@ -84,7 +84,7 @@ public final class PTAssistantLayer extends Layer implements LayerChangeListener
      */
     public void addFixVariants(List<List<PTWay>> fixVariants) {
 
-        char alphabet = 'A';
+        char alphabet = '1';
         for (int i = 0; i < 5 && i < fixVariants.size(); i++) {
             List<PTWay> fixVariant = fixVariants.get(i);
             this.fixVariants.put(alphabet, fixVariant);
