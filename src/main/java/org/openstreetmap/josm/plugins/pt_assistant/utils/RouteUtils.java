@@ -1,15 +1,28 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
+import java.awt.event.ActionEvent;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
 
+import org.openstreetmap.josm.data.gpx.GpxTrack;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.OsmUtils;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.gui.layer.GpxLayer;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
+import org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction;
+import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
+
+import static org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction.Mode.FROM_FIRST_MEMBER;
+import static org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction.Mode.TO_LAYER;
+import static org.openstreetmap.josm.plugins.pt_assistant.data.PTStop.*;
+
 
 /**
  * Utils class for routes
@@ -62,16 +75,19 @@ public final class RouteUtils {
 
     public static void removeOnewayAndSplitRoundaboutWays(final Relation r) {
         if (isPTRoute(r)) {
+            ExportRelationToGpxAction ea = new ExportRelationToGpxAction(EnumSet.of(FROM_FIRST_MEMBER, TO_LAYER));
+            ea.setPrimitives(Collections.singleton(r));
+            ea.actionPerformed(null);
             for (RelationMember nestedRelationMember : r.getMembers()) {
-                if (nestedRelationMember.getType().equals(OsmPrimitiveType.WAY) &&
-                    (nestedRelationMember.getWay().hasTag("oneway", "yes") ||
+                if (nestedRelationMember.getType().equals(OsmPrimitiveType.WAY)) {
+                    if (nestedRelationMember.getWay().hasTag("oneway", "yes") ||
                         (nestedRelationMember.getWay().hasTag("junction", "roundabout") &&
                             !nestedRelationMember.getWay().isClosed()
                         )
                     )
-                )
                 {
                     r.removeMembersFor(nestedRelationMember.getWay());
+                }
                 }
             }
         }
@@ -79,10 +95,37 @@ public final class RouteUtils {
 
     public static void removeMembersWithRoles(final Relation r, final String... roles) {
         if (isPTRoute(r)) {
-            for (RelationMember nestedRelationMember : r.getMembers()) {
+            List<RelationMember> members = r.getMembers();
+            for (int i = members.size()-1; i > 0; i--) {
+                RelationMember relationMember = members.get(i);
                 for (String role : roles) {
-                    if (nestedRelationMember.getRole().contains(role)) {
-                        r.removeMembersFor(nestedRelationMember.getMember());
+                    if (relationMember.getRole().contains(role)) {
+                        r.removeMember(i);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void addWayMembersAdjacentToPlatforms(final Relation r) {
+        // todo this adds the stops multiple times and the ways too.
+        if (isPTRoute(r)) {
+            List<RelationMember> members = r.getMembers();
+            for (RelationMember relationMember : r.getMembers()) {
+                if (isPTPlatform(relationMember)){
+                    PTStop ptStop = new PTStop(relationMember);
+                    Way served_way = ptStop.findServingWays(ptStop);
+                    if (served_way != null) {
+                        boolean found = false;
+                        for (RelationMember rm : r.getMembers()) {
+                            if (rm.getMember().equals(served_way)) {
+                                found = true;
+                                break;
+                            }
+                        if (!found) {
+                            r.addMember(new RelationMember("", served_way));
+                        }
+                    }
                     }
                 }
             }
