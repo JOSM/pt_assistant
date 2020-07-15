@@ -114,4 +114,15 @@ public final class WayUtils {
               way.hasTag("highway", "cycleway");
       }
 
+    public static boolean isRoundabout(Way w) {
+        return w.hasTag("junction", "roundabout");
+    }
+
+    public static boolean isNonSplitRoundAbout(final Way way) {
+        return isRoundabout(way) && way.firstNode().equals(way.lastNode());
+    }
+
+    public static boolean isPartOfSplitRoundAbout(final Way way) {
+        return isRoundabout(way) && !way.firstNode().equals(way.lastNode());
+    }
 }
