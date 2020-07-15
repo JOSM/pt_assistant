@@ -131,17 +131,23 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
         if (!RouteUtils.isVersionTwoPTRoute(newRel)) {
             if (DialogUtils.showYesNoQuestion(tr("This is not a PT v2 relation"),
-                    tr("This relation is not PT version 2. Sorting its stops wouldn't make sense.\n"
+                    tr("This relation is not PT version 2. Sorting its stops wouldn't make sense.\n\n"
                             + "Would you like to set ''public_transport:version=2''?\n\n"
-                            + "There will be some extra work needed after c,\n\n"
-                            + "but PT_Assistant can help prepare the relations."))) {
+                            + "There will still be some extra work needed,\n\n"
+                            + "but PT_Assistant can help prepare the \n" +
+                              "''route'' and ''route_master'' relations."))) {
                 RouteUtils.setPTRouteVersion(newRel, "2");
                 ask_to_create_return_route_and_routeMaster = true;
                 if (DialogUtils.showYesNoQuestion(tr("Remove oneway and split roundabout ways?"),
-                    tr("As a preparation for conversion to PT v2\n"
-                        + "it may help to remove oneway and split roundabout ways?\n\n"
-                        + "Would you like to do this automatically?"))) {
+                    tr("To prepare for conversion to PT v2\n\n" +
+                        "it may help to remove oneway and split roundabout ways?\n\n" +
+                        "Would you like to do this automatically?\n\n" +
+                        "When asked to remove stops that cannot be served,\n" +
+                        "answer ''no'' and use the button to sort the stops\n" +
+                        "once more after adding the ways once again\n" +
+                        "by using the routing helper"))) {
                     RouteUtils.removeOnewayAndSplitRoundaboutWays(newRel);
+                    RouteUtils.addWayMembersAdjacentToPlatforms(newRel);
                 }
             } else {
                 return;
@@ -155,11 +161,13 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         }
         // Create a route relation for the other direction
         // so we can already perform some actions on it
-        // The question whether the user actually wants this will be asked later on
+        // The question whether the user actually wants this, will be asked further along
         Relation otherDirRel = new Relation(newRel);
         otherDirRel.clearOsmMetadata();
         otherDirRel.put("from", newRel.get("to"));
         otherDirRel.put("to", newRel.get("from"));
+//        RouteUtils.addWayMembersAdjacentToPlatforms(otherDirRel);
+        // RouteUtils.createGPXLayerForWayMembers(newRel);
 
         RouteUtils.removeMembersWithRoles(newRel, "backward_stop", "backward_platform");
         RouteUtils.removeMembersWithRoles(otherDirRel, "forward_stop", "forward_platform");
@@ -168,7 +176,6 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
         sortPTRouteMembers(newRel);
         UndoRedoHandler.getInstance().add(new ChangeCommand(rel, newRel));
-        sortPTRouteMembers(otherDirRel);
         editor.reloadDataFromRelation();
 
         final PTRouteDataManager route_manager = new PTRouteDataManager(rel);
@@ -197,11 +204,11 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                     return name;
                 });
 
-        String proposedRelname = route_manager.getComposedName();
-        if (!Objects.equals(proposedRelname, route_manager.get("name"))) {
+        String proposedRelationName = route_manager.getComposedName();
+        if (!Objects.equals(proposedRelationName, route_manager.get("name"))) {
             if (DialogUtils.showYesNoQuestion(tr("Change name tag?"),
-                    tr("Change name to\n''{0}''\n?", proposedRelname))) {
-                route_manager.set("name", proposedRelname);
+                    tr("Change name to\n''{0}''\n?", proposedRelationName))) {
+                route_manager.set("name", proposedRelationName);
             }
             route_manager.writeTagsToRelation();
             editor.reloadDataFromRelation();
@@ -231,6 +238,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
                 UndoRedoHandler.getInstance()
                         .add(new AddCommand(MainApplication.getLayerManager().getActiveDataSet(), otherDirRel));
+                sortPTRouteMembers(otherDirRel);
 
                 RelationEditor editor = RelationDialogManager.getRelationDialogManager().getEditorForRelation(layer,
                         otherDirRel);
@@ -249,7 +257,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 if (rmr.isPresent()) {
                     routeMaster = rmr.get();
                 } else if (DialogUtils.showYesNoQuestion(tr("Create a route_master?"),
-                        tr("Create ''route_master'' relation and add route relations to it?"))) {
+                        tr("Create ''route_master'' relation and add these route relations to it?"))) {
                     routeMaster = new Relation();
                     routeMaster.put(OSMTags.KEY_RELATION_TYPE, OSMTags.VALUE_TYPE_ROUTE_MASTER);
                     if (rel.hasKey(OSMTags.KEY_ROUTE)) {
@@ -276,7 +284,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 UndoRedoHandler.getInstance().add(new ChangeCommand(routeMaster, newRouteMaster));
                 editor.reloadDataFromRelation();
 
-                SearchAction.search("(oneway OR junction=roundabout -closed) child new", SearchMode.fromCode('R'));
+                // SearchAction.search("(oneway OR junction=roundabout -closed) child new", SearchMode.fromCode('R'));
 
                 RelationEditor editorRM = RelationDialogManager.getRelationDialogManager().getEditorForRelation(layer,
                         routeMaster);
@@ -324,7 +332,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         }
 
         // sort the members with the built in sorting function in order to get
-        // the continuity of the ways
+        // increased continuity of the ways
         members = new RelationSorter().sortMembers(members);
 
         // divide stops and ways
@@ -550,11 +558,10 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                                     if (pt.size() > 0) {
                                         BoundingXYVisitor bboxCalculator = new BoundingXYVisitor();
                                         bboxCalculator.computeBoundingBox(pt);
-                                        for (int idx = 0; idx < 4; idx++) {
+                                        for (int idx = 0; idx < 7; idx++) {
                                             bboxCalculator.enlargeBoundingBox();
                                         }
                                         MainApplication.getMap().mapView.zoomTo(bboxCalculator);
-                                        // AutoScaleAction.zoomTo(pt);
                                     }
                                     final JPanel panel = new JPanel(new GridBagLayout());
                                     panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
