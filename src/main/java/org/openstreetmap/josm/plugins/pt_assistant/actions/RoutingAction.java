@@ -23,6 +23,8 @@ import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.mendrelation.PersonalTransportMendRelationAction;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.mendrelation.PublicTransportMendRelationAction;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.NotificationUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.ImageProvider;
@@ -32,7 +34,6 @@ import org.openstreetmap.josm.tools.Utils;
 public class RoutingAction extends AbstractRelationEditorAction{
 	Relation relation;
 	GenericRelationEditor editor;
-	boolean setEnable = true;
 
   public RoutingAction(IRelationEditorActionAccess editorAccess){
     super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
@@ -43,6 +44,7 @@ public class RoutingAction extends AbstractRelationEditorAction{
     this.relation = editor.getRelation();
     editor.addWindowListener(new WindowEventHandler());
   }
+
   @Override
   protected void updateEnabledState() {
       final Relation curRel = relation;
@@ -50,32 +52,32 @@ public class RoutingAction extends AbstractRelationEditorAction{
           curRel != null &&
           (
               (curRel.hasTag("route", "bus") && curRel.hasTag("public_transport:version", "2")) ||
-              (RouteUtils.isPTRoute(curRel) && !curRel.hasTag("route", "bus")) ||
-               curRel.hasTag("route", "bicycle")
+              (RouteUtils.isPTRoute(curRel) && !curRel.hasTag("route", "bus")) || curRel.hasTag("route", "bicycle")
           )
       );
   }
-  private void callAction(Relation relation){
-		if(relation.hasTag("route","bicycle")) {
-       BicycleMendRelation bike = new BicycleMendRelation(editorAccess);
-		    // MendRelationAction bike = new MendRelationAction(editorAccess);
-        bike.initialise();
-       }
-    else {
-        MendRelationAction pt_transport = new MendRelationAction(editorAccess);
-        pt_transport.initialise();
+
+    private void callAction(Relation relation){
+        if (relation.hasTag("route", "bicycle")) {
+            PersonalTransportMendRelationAction bike = new PersonalTransportMendRelationAction(editorAccess);
+            bike.initialise();
+        } else {
+            PublicTransportMendRelationAction pt_transport = new PublicTransportMendRelationAction(editorAccess);
+            pt_transport.initialise();
+        }
     }
-	}
-  @Override
-  public void actionPerformed(ActionEvent e) {
-       if (relation.hasIncompleteMembers()) {
-           downloadIncompleteRelations();
-           new Notification(tr("Downloading incomplete relation members. Kindly wait till download gets over."))
-                   .setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(3600).show();
-       } else {
-				 callAction(relation);
-  }
-  }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (relation.hasIncompleteMembers()) {
+            downloadIncompleteRelations();
+            new Notification(tr("Downloading incomplete relation members. Kindly wait till download gets over."))
+                .setIcon(JOptionPane.INFORMATION_MESSAGE).setDuration(3600).show();
+        } else {
+            callAction(relation);
+        }
+    }
+
   private void downloadIncompleteRelations() {
 
       List<Relation> parents = Collections.singletonList(relation);

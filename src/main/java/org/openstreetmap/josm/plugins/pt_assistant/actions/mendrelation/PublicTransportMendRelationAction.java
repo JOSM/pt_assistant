@@ -1,5 +1,4 @@
-// License: GPL. For details, see LICENSE file.
-package org.openstreetmap.josm.plugins.pt_assistant.actions;
+package org.openstreetmap.josm.plugins.pt_assistant.actions.mendrelation;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
@@ -59,7 +58,6 @@ import org.openstreetmap.josm.gui.Notification;
 import org.openstreetmap.josm.gui.dialogs.relation.DownloadRelationMemberTask;
 import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.MemberTableModel;
-import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
@@ -79,12 +77,12 @@ import org.openstreetmap.josm.tools.Pair;
 import org.openstreetmap.josm.tools.Utils;
 
 /**
- * Mend the relations by going through each way, sorting them and proposing
- * fixes for the gaps that are found
+ * Mend the bus, tram and other public transport relations by going through each way,
+ * sorting them and proposing fixes for the gaps that are found
  *
- * @author Biswesh
+ * @author Biswesh and sudhanshu2
  */
-public class MendRelationAction extends AbstractRelationEditorAction {
+public class PublicTransportMendRelationAction extends AbstractMendRelation {
     private static final DownloadParams DEFAULT_DOWNLOAD_PARAMS = new DownloadParams();
 
     private static final Color[] FIVE_COLOR_PALETTE = { new Color(0, 255, 0, 150), new Color(255, 0, 0, 150),
@@ -149,12 +147,12 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     String notice = null;
     List<Node> backNodes = new ArrayList<>();
 
-    public MendRelationAction(IRelationEditorActionAccess editorAccess) {
+    public PublicTransportMendRelationAction(IRelationEditorActionAccess editorAccess) {
         super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
         editor = (GenericRelationEditor) editorAccess.getEditor();
         memberTableModel = editorAccess.getMemberTableModel();
         relation = editor.getRelation();
-        editor.addWindowListener(new WindowEventHandler());
+        editor.addWindowListener(new PublicTransportMendRelationAction.WindowEventHandler());
     }
 
     String getOverpassAPIQuery() {
@@ -218,7 +216,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
     }
 
-    void initialise() {
+    public void initialise() {
         save();
         sortBelow(relation.getMembers());
         members = editor.getRelation().getMembers();
@@ -1268,24 +1266,6 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         return false;
     }
 
-    void addAlreadyExistingWay(Way w) {
-        // delete the way if only if we haven't crossed it yet
-        if (waysAlreadyPresent.get(w) == 1) {
-            deleteWay(w);
-        }
-    }
-
-    void deleteWay(Way w) {
-        for (int i = 0; i < members.size(); i++) {
-            if (members.get(i).isWay() && members.get(i).getWay().equals(w)) {
-                int[] x = { i };
-                memberTableModel.remove(x);
-                members.remove(i);
-                break;
-            }
-        }
-    }
-
     boolean checkOneWaySatisfiability(Way way, Node node) {
         String[] acceptedTags = new String[] { "yes", "designated" };
 
@@ -1352,7 +1332,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         AutoScaleAction.zoomTo(fixVariants);
 
         // display the fix variants:
-        temporaryLayer = new MendRelationAddLayer();
+        temporaryLayer = new PublicTransportMendRelationAction.MendRelationAddLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
@@ -1447,7 +1427,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         AutoScaleAction.zoomTo(fixVariants);
 
         // display the fix variants:
-        temporaryLayer = new MendRelationAddLayer();
+        temporaryLayer = new PublicTransportMendRelationAction.MendRelationAddLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
@@ -1585,7 +1565,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         Way wayToKeep = null;
         List<Node> breakNode = new ArrayList<>();
         breakNode.add(currentNode);
-        Strategy strategy = new TempStrategy();
+        Strategy strategy = new PublicTransportMendRelationAction.TempStrategy();
         List<List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(currentWay, breakNode);
         SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
         if (result != null) {
@@ -1600,7 +1580,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         List<Node> breakNode = new ArrayList<>();
         breakNode.add(currentNode);
         splitNode = way.lastNode();
-        Strategy strategy = new TempStrategyRoundabout();
+        Strategy strategy = new PublicTransportMendRelationAction.TempStrategyRoundabout();
         List<List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(way, breakNode);
         SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
         if (result != null) {
@@ -1651,7 +1631,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         AutoScaleAction.zoomTo(fixVariants.stream().flatMap(Collection::stream).collect(Collectors.toList()));
 
         // display the fix variants:
-        temporaryLayer = new MendRelationAddMultipleLayer();
+        temporaryLayer = new PublicTransportMendRelationAction.MendRelationAddMultipleLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
@@ -1758,7 +1738,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         AutoScaleAction.zoomTo(waysToZoom);
 
         // display the fix variants:
-        temporaryLayer = new MendRelationRemoveLayer();
+        temporaryLayer = new PublicTransportMendRelationAction.MendRelationRemoveLayer();
         MainApplication.getMap().mapView.addTemporaryLayer(temporaryLayer);
 
         // // add the key listener:
@@ -2169,7 +2149,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         @Override
         public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv);
+            PublicTransportMendRelationAction.MendRelationPaintVisitor paintVisitor = new PublicTransportMendRelationAction.MendRelationPaintVisitor(g, mv);
             paintVisitor.drawVariants();
         }
     }
@@ -2178,7 +2158,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         @Override
         public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv);
+            PublicTransportMendRelationAction.MendRelationPaintVisitor paintVisitor = new PublicTransportMendRelationAction.MendRelationPaintVisitor(g, mv);
             paintVisitor.drawOptionsToRemoveWays();
         }
     }
@@ -2187,7 +2167,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
 
         @Override
         public void paint(Graphics2D g, MapView mv, Bounds bbox) {
-            MendRelationPaintVisitor paintVisitor = new MendRelationPaintVisitor(g, mv);
+            PublicTransportMendRelationAction.MendRelationPaintVisitor paintVisitor = new PublicTransportMendRelationAction.MendRelationPaintVisitor(g, mv);
             paintVisitor.drawMultipleVariants(wayListColoring);
         }
     }
