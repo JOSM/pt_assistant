@@ -52,11 +52,7 @@ public final class RouteUtils {
         return isPTRoute(r) && r.hasTag(PT_VERSION_TAG, "2") && !r.hasTag("bus", "on_demand");
     }
 
-    public static boolean isVersionOnePTRoute(Relation r) {
-        return isPTRoute(r) && (r.get(PT_VERSION_TAG) == null || r.hasTag(PT_VERSION_TAG, "1"));
-    }
-
-    private static final String[] acceptedRouteTags = { "bus", "trolleybus", "share_taxi", "tram", "light_rail",
+    private static final String[] acceptedRouteTags = {"bus", "trolleybus", "share_taxi", "tram", "light_rail",
             "subway", "train" };
 
     /**
@@ -286,7 +282,7 @@ public final class RouteUtils {
      */
     public static boolean isWaySuitableForBuses(Way way) {
 
-        String[] acceptedHighwayTags = new String[] { "motorway", "trunk", "primary", "secondary", "tertiary",
+        String[] acceptedHighwayTags = new String[] {"motorway", "trunk", "primary", "secondary", "tertiary",
                 "unclassified", "road", "residential", "service", "motorway_link", "trunk_link", "primary_link",
                 "secondary_link", "tertiary_link", "living_street", "bus_guideway", "road" };
 
@@ -305,7 +301,7 @@ public final class RouteUtils {
      * @return {@code true} if this way is suitable for public transport
      */
     public static boolean isWaySuitableForPublicTransport(Way way) {
-        String[] acceptedRailwayTags = new String[] { "tram", "subway", "light_rail", "rail" };
+        String[] acceptedRailwayTags = new String[] {"tram", "subway", "light_rail", "rail" };
 
         return isWaySuitableForBuses(way) || way.hasTag("railway", acceptedRailwayTags);
     }
@@ -316,17 +312,6 @@ public final class RouteUtils {
         }
 
         return r.hasTag(OSMTags.KEY_ROUTE, "bicycle", "mtb");
-    }
-
-    /**
-     * Checks if this way is suitable for bicycles
-     * @param way way
-     * @return {@code true} if this way is suitable for bicycles
-     */
-    public static boolean isWaySuitableForBicycle(Way way) {
-
-        return way.hasTag("highway", "cycleway") || !(way.hasKey("highway", "motorway") || way.hasKey("bicycle", "no")
-                || way.hasKey("bicycle", "use_sidepath"));
     }
 
     public static boolean isFootRoute(Relation r) {

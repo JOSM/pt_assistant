@@ -216,18 +216,16 @@ public class RouteChecker extends Checker {
                     PTAssistantValidatorTest.ERROR_CODE_FIRST_LAST_STOP_WAY_TAG);
             builder.message(tr("PT: The first stop of the route does not match the first way"));
             List<OsmPrimitive> wayList = new ArrayList<>();
-            boolean addWays = true;
             wayList.add(relation);
             for (int i = 0; i < relation.getMembers().size(); i++) {
                 RelationMember r = relation.getMembers().get(i);
                 if (r.isWay()) {
                     if (r.getWay().equals(assigner.get(stop))) {
-                            addWays = false;
-                            break;
-                        } else if (addWays) {
-                            wayList.add(r.getWay());
-                        }
+                        break;
+                    } else {
+                        wayList.add(r.getWay());
                     }
+                }
             }
             List<OsmPrimitive> prims = new ArrayList<>(wayList);
             builder.primitives(prims);
@@ -299,16 +297,6 @@ public class RouteChecker extends Checker {
     }
 
     /**
-     * Checks whether there is at least one gap in the given list of ways.
-     *
-     * @param waysToCheck ways to check
-     * @return true if has gaps , false otherwise
-     */
-    public boolean hasGaps(List<RelationMember> waysToCheck) {
-        return countGaps(waysToCheck) > 0;
-    }
-
-    /**
      * Counts how many gaps there are for a given list of ways.
      *
      * @param waysToCheck ways to check
@@ -344,16 +332,8 @@ public class RouteChecker extends Checker {
         return gaps;
     }
 
-    public List<RelationMember> getSortedMembers() {
-
-        return sortedMembers;
-
-    }
-
     public boolean getHasGap() {
-
         return this.hasGap;
-
     }
 
     protected static Command fixSortingError(TestError testError) {
@@ -384,7 +364,7 @@ public class RouteChecker extends Checker {
         Way before = (Way) primitives.get(1);
         Way fix = (Way) primitives.get(2);
 
-        int index = 0;
+        int index;
         List<RelationMember> members = originalRelation.getMembers();
         for (index = 0; index < members.size(); index++) {
             if (members.get(index).getMember().equals(before)) {
@@ -434,16 +414,8 @@ public class RouteChecker extends Checker {
             editor.setVisible(true);
     }
 
-    public PTRouteDataManager getManager() {
-        return manager;
-    }
-
     public void setManager(PTRouteDataManager manager) {
         this.manager = manager;
-    }
-
-    public StopToWayAssigner getAssigner() {
-        return assigner;
     }
 
     public void setAssigner(StopToWayAssigner assigner) {

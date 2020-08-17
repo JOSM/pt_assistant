@@ -3,7 +3,6 @@ package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-import java.awt.Component;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -76,7 +75,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
     private static final long serialVersionUID = 1L;
 
-    private GenericRelationEditor editor;
+    private final GenericRelationEditor editor;
     public static boolean zooming = true;
     public static HashMap<Long, String> stopOrderMap = new HashMap<>();
     public static LatLon locat = null;
@@ -284,7 +283,6 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 UndoRedoHandler.getInstance().add(new ChangeCommand(routeMaster, newRouteMaster));
                 editor.reloadDataFromRelation();
 
-                // SearchAction.search("(oneway OR junction=roundabout -closed) child new", SearchMode.fromCode('R'));
 
                 RelationEditor editorRM = RelationDialogManager.getRelationDialogManager().getEditorForRelation(layer,
                         routeMaster);
@@ -320,6 +318,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             rel.remove("fixme:relation");
         }
         computeRefs(rel);
+
         // first loop trough all the members and remove the roles
         List<RelationMember> members = new ArrayList<>();
         List<RelationMember> oldMembers = rel.getMembers();
@@ -339,8 +338,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         List<RelationMember> stops = new ArrayList<>();
         List<RelationMember> wayMembers = new ArrayList<>();
         List<Way> ways = new ArrayList<>();
-        // HashMap<Way,ArrayList<PTStop>> RightSideStops = new RightSideStops();
-        // HashMap<Way,ArrayList<PTStop>> LeftSideStops = new LeftSideStops();
+
         for (RelationMember rm : members) {
             if (PTStop.isPTPlatform(rm) || PTStop.isPTStopPosition(rm))
                 stops.add(rm);
@@ -353,8 +351,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         }
         // couple together stop positions and platforms that are part of the same
         // stop. the only way used to determine whether they are part of the same
-        // stop or not is the name. this should be improved by using also the
-        // distance
+        // stop or not is the name. this should be improved by using also the distance
         Map<String, List<PTStop>> stopsByName = new HashMap<>();
         List<PTStop> unnamed = new ArrayList<>();
         stops.forEach(rm -> {
@@ -421,12 +418,10 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             if (prev1 == null) {
                 Way nex = ways.get(in + 1);
                 if (w.firstNode().equals(nex.firstNode()) || w.firstNode().equals(nex.lastNode())) {
-                    strt = w.lastNode();
                     endn = w.firstNode();
                     tempstrt = w.lastNode();
                     tempend = w.firstNode();
                 } else {
-                    strt = w.firstNode();
                     endn = w.lastNode();
                     tempstrt = w.firstNode();
                     tempend = w.lastNode();
@@ -443,7 +438,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                     Pair<Node, Node> segment = assigner.calculateNearestSegment(node3, w);
                     Node node1 = segment.a;
                     Node node2 = segment.b;
-                    //if the endn(it is not a link at this point) is the starting point of the way nodes
+                    //if the end (it is not a link at this point) is the starting point of the way nodes
                     if (w.getNodes().get(0).equals(endn)) {
                         for (int i = 0; i < w.getNodes().size() - 1; i++) {
                             if (w.getNodes().get(i) == node1 && w.getNodes().get(i + 1) == node2) {
@@ -712,18 +707,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         return ret;
     }
 
-    static boolean checkAcuteAngles(LatLon a, LatLon b, LatLon c) {
-        double x1 = a.getX() - b.getX();
-        double y1 = a.getY() - b.getY();
-
-        double x2 = c.getX() - b.getX();
-        double y2 = c.getY() - b.getY();
-
-        return x1 * x2 + y1 * y2 >= 0;
-    }
-
     private static List<PTStop> getSortedStops(List<Node> nodes, Map<Node, List<PTStop>> closeNodes) {
-
         List<PTStop> ret = new ArrayList<>();
         for (int i = 0; i < nodes.size(); i++) {
             Node n = nodes.get(i);
@@ -732,8 +716,8 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             if (stops != null) {
                 if (stops.size() > 1) {
                     stops.sort((s1, s2) -> {
-                        Double d1 = stopEastNorth(s1).distance(prevNode.getEastNorth());
-                        Double d2 = stopEastNorth(s2).distance(prevNode.getEastNorth());
+                        Double d1 = Objects.requireNonNull(stopEastNorth(s1)).distance(prevNode.getEastNorth());
+                        Double d2 = Objects.requireNonNull(stopEastNorth(s2)).distance(prevNode.getEastNorth());
                         return d1.compareTo(d2);
                     });
                 }

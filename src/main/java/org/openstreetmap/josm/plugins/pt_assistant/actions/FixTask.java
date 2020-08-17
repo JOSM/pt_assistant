@@ -3,7 +3,6 @@ package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,9 +16,6 @@ import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.PleaseWaitRunnable;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
-import org.openstreetmap.josm.io.OsmTransferException;
-import org.xml.sax.SAXException;
-
 /**
  * This class was copied with minor changes from ValidatorDialog.FixTask
  *
@@ -53,12 +49,9 @@ public class FixTask extends PleaseWaitRunnable {
         if (error.isFixable()) {
             final Command fixCommand = error.getFix();
             if (fixCommand != null) {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        UndoRedoHandler.getInstance().addNoRedraw(fixCommand);
-                        fixCommands.add(fixCommand);
-                    }
+                SwingUtilities.invokeAndWait(() -> {
+                    UndoRedoHandler.getInstance().addNoRedraw(fixCommand);
+                    fixCommands.add(fixCommand);
                 });
             }
             // It is wanted to ignore an error if it said fixable, even if
@@ -71,7 +64,7 @@ public class FixTask extends PleaseWaitRunnable {
     }
 
     @Override
-    protected void realRun() throws SAXException, IOException, OsmTransferException {
+    protected void realRun() {
         ProgressMonitor monitor = getProgressMonitor();
         try {
             monitor.setTicksCount(testErrors.size());

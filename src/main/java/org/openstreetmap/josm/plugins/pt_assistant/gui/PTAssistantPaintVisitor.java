@@ -39,9 +39,8 @@ import org.openstreetmap.josm.tools.Pair;
  *
  */
 public class PTAssistantPaintVisitor extends PaintVisitor {
-
-    private static final String[] PUBLIC_TRANSPORT_NODE_ROLES = { "stop", "stop_entry_only", "stop_exit_only",
-            "platform", "platform_entry_only", "platform_exit_only" };
+    private static final String[] PUBLIC_TRANSPORT_NODE_ROLES = {"stop", "stop_entry_only", "stop_exit_only",
+            "platform", "platform_entry_only", "platform_exit_only"};
     /** The graphics */
     private final Graphics g;
     /** The MapView */
@@ -131,7 +130,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
         if (MainApplication.getLayerManager().getEditLayer() != null
                 && MainApplication.getLayerManager().getEditLayer().getDataSet() != null)
             allRelations = MainApplication.getLayerManager().getEditLayer().getDataSet().getRelations();
-        Double scale = MainApplication.getMap().mapView.getScale();
+        double scale = MainApplication.getMap().mapView.getScale();
 
         if (allRelations != null && scale < 0.7) {
             for (Relation rel : allRelations) {
@@ -140,9 +139,9 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
                             && (rm.isNode() || rm.hasRole(PUBLIC_TRANSPORT_NODE_ROLES)))) {
 
                         if (PTStop.isPTStopPosition(rm)) {
-                            drawStopLabel(rm.getMember(), false);
+                            drawStopLabel(rm.getMember());
                         } else if (PTStop.isPTPlatform(rm)) {
-                            drawStopLabel(rm.getMember(), true);
+                            drawStopLabel(rm.getMember());
                         }
                     }
 
@@ -324,29 +323,29 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
         if (revisit) {
             // draw 3 separate lines
             g.setColor(new Color(0, 0, 0, 140));
-            int[] xPointsMiddle = { (int) (p1.x + 0.3 * cosT), (int) (p2.x + 0.3 * cosT), (int) (p2.x - 0.3 * cosT),
+            int[] xPointsMiddle = {(int) (p1.x + 0.3 * cosT), (int) (p2.x + 0.3 * cosT), (int) (p2.x - 0.3 * cosT),
                     (int) (p1.x - 0.3 * cosT) };
-            int[] yPointsMiddle = { (int) (p1.y - 0.3 * sinT), (int) (p2.y - 0.3 * sinT), (int) (p2.y + 0.3 * sinT),
+            int[] yPointsMiddle = {(int) (p1.y - 0.3 * sinT), (int) (p2.y - 0.3 * sinT), (int) (p2.y + 0.3 * sinT),
                     (int) (p1.y + 0.3 * sinT) };
             g.fillPolygon(xPointsMiddle, yPointsMiddle, 4);
 
             g.setColor(color);
 
-            int[] xPointsBottom = { (int) (p1.x - cosT + 0.2 * cosT), (int) (p2.x - cosT + 0.2 * cosT),
+            int[] xPointsBottom = {(int) (p1.x - cosT + 0.2 * cosT), (int) (p2.x - cosT + 0.2 * cosT),
                     (int) (p2.x - 1.3 * cosT), (int) (p1.x - 1.3 * cosT) };
-            int[] yPointsBottom = { (int) (p1.y + sinT - 0.2 * sinT), (int) (p2.y + sinT - 0.2 * sinT),
+            int[] yPointsBottom = {(int) (p1.y + sinT - 0.2 * sinT), (int) (p2.y + sinT - 0.2 * sinT),
                     (int) (p2.y + 1.3 * sinT), (int) (p1.y + 1.3 * sinT) };
             g.fillPolygon(xPointsBottom, yPointsBottom, 4);
 
-            int[] xPointsTop = { (int) (p1.x + 1.3 * cosT), (int) (p2.x + 1.3 * cosT), (int) (p2.x + cosT - 0.2 * cosT),
+            int[] xPointsTop = {(int) (p1.x + 1.3 * cosT), (int) (p2.x + 1.3 * cosT), (int) (p2.x + cosT - 0.2 * cosT),
                     (int) (p1.x + cosT - 0.2 * cosT) };
-            int[] yPointsTop = { (int) (p1.y - 1.3 * sinT), (int) (p2.y - 1.3 * sinT), (int) (p2.y - sinT + 0.2 * sinT),
+            int[] yPointsTop = {(int) (p1.y - 1.3 * sinT), (int) (p2.y - 1.3 * sinT), (int) (p2.y - sinT + 0.2 * sinT),
                     (int) (p1.y - sinT + 0.2 * sinT) };
             g.fillPolygon(xPointsTop, yPointsTop, 4);
 
         } else {
-            int[] xPoints = { (int) (p1.x + cosT), (int) (p2.x + cosT), (int) (p2.x - cosT), (int) (p1.x - cosT) };
-            int[] yPoints = { (int) (p1.y - sinT), (int) (p2.y - sinT), (int) (p2.y + sinT), (int) (p1.y + sinT) };
+            int[] xPoints = {(int) (p1.x + cosT), (int) (p2.x + cosT), (int) (p2.x - cosT), (int) (p1.x - cosT) };
+            int[] yPoints = {(int) (p1.y - sinT), (int) (p2.y - sinT), (int) (p2.y + sinT), (int) (p1.y + sinT) };
             g.setColor(color);
             g.fillPolygon(xPoints, yPoints, 4);
             g.fillOval(p1.x - 9, p1.y - 9, 18, 18);
@@ -361,32 +360,32 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
             g.setColor(Color.WHITE);
 
             if (oneway > 0) {
-                int[] xFillTriangle = { (int) (middleX + cosTriangle), (int) (middleX - cosTriangle),
+                int[] xFillTriangle = {(int) (middleX + cosTriangle), (int) (middleX - cosTriangle),
                         (int) (middleX + 2 * sinTriangle) };
-                int[] yFillTriangle = { (int) (middleY - sinTriangle), (int) (middleY + sinTriangle),
+                int[] yFillTriangle = {(int) (middleY - sinTriangle), (int) (middleY + sinTriangle),
                         (int) (middleY + 2 * cosTriangle) };
                 g.fillPolygon(xFillTriangle, yFillTriangle, 3);
 
                 if (oneway == 2) {
-                    int[] xDrawTriangle = { (int) (middleX + cosTriangle), (int) (middleX - cosTriangle),
+                    int[] xDrawTriangle = {(int) (middleX + cosTriangle), (int) (middleX - cosTriangle),
                             (int) (middleX - 2 * sinTriangle) };
-                    int[] yDrawTriangle = { (int) (middleY - sinTriangle), (int) (middleY + sinTriangle),
+                    int[] yDrawTriangle = {(int) (middleY - sinTriangle), (int) (middleY + sinTriangle),
                             (int) (middleY - 2 * cosTriangle) };
                     g.drawPolygon(xDrawTriangle, yDrawTriangle, 3);
                 }
             }
 
             if (oneway < 0) {
-                int[] xFillTriangle = { (int) (middleX + cosTriangle), (int) (middleX - cosTriangle),
+                int[] xFillTriangle = {(int) (middleX + cosTriangle), (int) (middleX - cosTriangle),
                         (int) (middleX - 2 * sinTriangle) };
-                int[] yFillTriangle = { (int) (middleY - sinTriangle), (int) (middleY + sinTriangle),
+                int[] yFillTriangle = {(int) (middleY - sinTriangle), (int) (middleY + sinTriangle),
                         (int) (middleY - 2 * cosTriangle) };
                 g.fillPolygon(xFillTriangle, yFillTriangle, 3);
 
                 if (oneway == -2) {
-                    int[] xDrawTriangle = { (int) (middleX + cosTriangle), (int) (middleX - cosTriangle),
+                    int[] xDrawTriangle = {(int) (middleX + cosTriangle), (int) (middleX - cosTriangle),
                             (int) (middleX + 2 * sinTriangle) };
-                    int[] yDrawTriangle = { (int) (middleY - sinTriangle), (int) (middleY + sinTriangle),
+                    int[] yDrawTriangle = {(int) (middleY - sinTriangle), (int) (middleY + sinTriangle),
                             (int) (middleY + 2 * cosTriangle) };
                     g.drawPolygon(xDrawTriangle, yDrawTriangle, 3);
                 }
@@ -448,11 +447,8 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
      *
      * @param primitive
      *     primitive
-     * @param platform
-     *     for a stop position ({@link PTStop#isPTStopPosition(RelationMember)}) this is false
-     *     for a platform ({@link PTStop#isPTPlatform(RelationMember)}) this is true
      */
-    protected void drawStopLabel(OsmPrimitive primitive, Boolean platform) {
+    protected void drawStopLabel(OsmPrimitive primitive) {
         // find the point to which the stop visualization will be linked:
         Node n = new Node(primitive.getBBox().getCenter());
 
@@ -552,7 +548,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
                 return -1;
             }
 
-            if (splitString1.length == 0 && splitString2.length == 0) {
+            if (splitString1.length == 0) {
                 // if both ref values do not start with a digit:
                 return s1.compareTo(s2);
             }
@@ -593,7 +589,7 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
 
         drawFixVariantsWithParallelLines(wayColoring);
 
-        Color[] colors = { new Color(255, 0, 0, 150), new Color(0, 255, 0, 150), new Color(0, 0, 255, 150),
+        Color[] colors = {new Color(255, 0, 0, 150), new Color(0, 255, 0, 150), new Color(0, 0, 255, 150),
                 new Color(255, 255, 0, 150), new Color(0, 255, 255, 150) };
 
         int colorIndex = 0;
@@ -673,8 +669,8 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
         g.fillOval(p1.x - 9, p1.y - 9, 18, 18);
 
         if (colors.size() == 1) {
-            int[] xPoints = { (int) (p1.x + cosT), (int) (p2.x + cosT), (int) (p2.x - cosT), (int) (p1.x - cosT) };
-            int[] yPoints = { (int) (p1.y - sinT), (int) (p2.y - sinT), (int) (p2.y + sinT), (int) (p1.y + sinT) };
+            int[] xPoints = {(int) (p1.x + cosT), (int) (p2.x + cosT), (int) (p2.x - cosT), (int) (p1.x - cosT) };
+            int[] yPoints = {(int) (p1.y - sinT), (int) (p2.y - sinT), (int) (p2.y + sinT), (int) (p1.y + sinT) };
             g.setColor(currentColor);
             g.fillPolygon(xPoints, yPoints, 4);
         } else {
@@ -682,9 +678,9 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
             while (iterate) {
                 currentColor = colors.get(i % colors.size());
 
-                int[] xPoints = { (int) (prevPointX + cosT), (int) (nextPointX + cosT), (int) (nextPointX - cosT),
+                int[] xPoints = {(int) (prevPointX + cosT), (int) (nextPointX + cosT), (int) (nextPointX - cosT),
                         (int) (prevPointX - cosT) };
-                int[] yPoints = { (int) (prevPointY - sinT), (int) (nextPointY - sinT), (int) (nextPointY + sinT),
+                int[] yPoints = {(int) (prevPointY - sinT), (int) (nextPointY - sinT), (int) (nextPointY + sinT),
                         (int) (prevPointY + sinT) };
                 g.setColor(currentColor);
                 g.fillPolygon(xPoints, yPoints, 4);
@@ -699,9 +695,9 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
                 }
             }
 
-            int[] lastXPoints = { (int) (prevPointX + cosT), (int) (p2.x + cosT), (int) (p2.x - cosT),
+            int[] lastXPoints = {(int) (prevPointX + cosT), (int) (p2.x + cosT), (int) (p2.x - cosT),
                     (int) (prevPointX - cosT) };
-            int[] lastYPoints = { (int) (prevPointY - sinT), (int) (p2.y - sinT), (int) (p2.y + sinT),
+            int[] lastYPoints = {(int) (prevPointY - sinT), (int) (p2.y - sinT), (int) (p2.y + sinT),
                     (int) (prevPointY + sinT) };
             g.setColor(currentColor);
             g.fillPolygon(lastXPoints, lastYPoints, 4);

@@ -188,16 +188,13 @@ public class PTAssistantValidatorTest extends Test {
 
             } else {
 
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            userSelection[0] = showIncompleteMembersDownloadDialog();
-                        } catch (InterruptedException e) {
-                            Logging.error(e);
-                        }
-
+                SwingUtilities.invokeAndWait(() -> {
+                    try {
+                        userSelection[0] = showIncompleteMembersDownloadDialog();
+                    } catch (InterruptedException e) {
+                        Logging.error(e);
                     }
+
                 });
 
             }
@@ -264,18 +261,12 @@ public class PTAssistantValidatorTest extends Test {
 
         if (SwingUtilities.isEventDispatchThread()) {
 
-            userInput[0] = showProceedDialog(idParameter, directionErrorParameter, roadTypeErrorParameter);
+            userInput[0] = showProceedDialog(directionErrorParameter, roadTypeErrorParameter);
 
         } else {
 
             try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        userInput[0] = showProceedDialog(idParameter, directionErrorParameter, roadTypeErrorParameter);
-
-                    }
-                });
+                SwingUtilities.invokeAndWait(() -> userInput[0] = showProceedDialog(directionErrorParameter, roadTypeErrorParameter));
             } catch (InvocationTargetException | InterruptedException e1) {
                 Logging.error(e1);
             }
@@ -302,7 +293,7 @@ public class PTAssistantValidatorTest extends Test {
 
     }
 
-    private static int showProceedDialog(long id, int numberOfDirectionErrors, int numberOfRoadTypeErrors) {
+    private static int showProceedDialog(int numberOfDirectionErrors, int numberOfRoadTypeErrors) {
 
         if (numberOfDirectionErrors == 0 && numberOfRoadTypeErrors == 0) {
             return 2;
@@ -451,11 +442,7 @@ public class PTAssistantValidatorTest extends Test {
             return true;
         }
 
-        if (testError.getCode() == ERROR_CODE_STOP_BY_STOP && SegmentChecker.isFixable(testError)) {
-            return true;
-        }
-
-        return false;
+        return testError.getCode() == ERROR_CODE_STOP_BY_STOP && SegmentChecker.isFixable(testError);
     }
 
     /**

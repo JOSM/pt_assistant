@@ -3,9 +3,9 @@ package org.openstreetmap.josm.plugins.pt_assistant.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.openstreetmap.josm.data.coor.LatLon;
@@ -32,31 +32,14 @@ public class PTStop extends RelationMember {
 
     /* platform element of this stop */
     private OsmPrimitive platform = null;
-
-    public Way firstWay = null;
-
-    public Way secondWay = null;
-
     private RelationMember stopPositionRM = null;
-
     private RelationMember platformRM = null;
-
-    private Node tempStopPosition = null;
 
     /* the name of this stop */
     private String name = "";
 
     /*check flag */
     public boolean flag = false;
-
-    /* indicates a stop where people can only exit the bus */
-    private boolean exitOnly;
-
-    /* indicates a stop where people can only entry the bus */
-    private boolean entryOnly;
-
-    /* indicates list of ways which can be served by stop */
-    public List<Way> listofways;
 
     /*stop will serve this particular way*/
     public Way serveWay;
@@ -74,10 +57,8 @@ public class PTStop extends RelationMember {
         super(other);
         String role = "";
         if (other.getRole().contains("_exit_only")) {
-            exitOnly = true;
             role = "_exit_only";
         } else if (other.getRole().contains("_entry_only")) {
-            entryOnly = true;
             role = "_entry_only";
         }
 
@@ -108,10 +89,8 @@ public class PTStop extends RelationMember {
 
         String role = "";
         if (member.getRole().contains("_exit_only")) {
-            exitOnly = true;
             role = "_exit_only";
         } else if (member.getRole().contains("_entry_only")) {
-            entryOnly = true;
             role = "_entry_only";
         }
 
@@ -154,11 +133,7 @@ public class PTStop extends RelationMember {
      * @param name name for this stop
      */
     public void setName(String name) {
-        if (name == null) {
-            this.name = "";
-        } else {
-            this.name = name;
-        }
+        this.name = Objects.requireNonNullElse(name, "");
     }
 
     /**
@@ -224,7 +199,6 @@ public class PTStop extends RelationMember {
         Way wayOfStopPosition = findWayForNode(stop.getStopPosition(), stop);
         if (wayOfStopPosition != null) {
             this.serveWay = wayOfStopPosition;
-            tempStopPosition = stop.getStopPosition();
             return wayOfStopPosition;
         }
         // 3) Search if the stop has a stop_area:
@@ -242,7 +216,6 @@ public class PTStop extends RelationMember {
                     if (StopUtils.isStopPosition(rm.getMember())) {
                         Way rmWay = this.findWayForNode(rm.getNode(), stop);
                         if (rmWay != null) {
-                            tempStopPosition = rm.getNode();
                             this.serveWay = rmWay;
                             return rmWay;
                         }
@@ -266,7 +239,6 @@ public class PTStop extends RelationMember {
                 Way closestWay = findWayForNode(closestStopPosition, stop);
                 if (closestWay != null) {
                     this.serveWay = closestWay;
-                    tempStopPosition = closestStopPosition;
                     return closestWay;
                 }
             }
@@ -295,42 +267,6 @@ public class PTStop extends RelationMember {
         return null;
     }
 
-    public Way findSecondServingWay(PTStop pts) {
-        firstWay = findServingWays(pts);
-        if (firstWay == null) {
-            return null;
-        }
-        if (tempStopPosition == null) {
-            Node closestStopPosition = null;
-            double minDistanceSq = Double.MAX_VALUE;
-            for (Node potentialStopPosition : firstWay.getNodes()) {
-                double distanceSq = potentialStopPosition.getCoor().distanceSq(pts.getPlatform().getBBox().getCenter());
-                if (distanceSq < minDistanceSq) {
-                    closestStopPosition = potentialStopPosition;
-                    minDistanceSq = distanceSq;
-                }
-            }
-            tempStopPosition = closestStopPosition;
-        }
-        List<OsmPrimitive> referrers = tempStopPosition.getReferrers();
-        for (OsmPrimitive referrer : referrers) {
-            if (referrer.getType().equals(OsmPrimitiveType.WAY)) {
-                Way referredWay = (Way) referrer;
-                if (!referredWay.equals(firstWay) && (tempStopPosition.equals(referredWay.firstNode())
-                        || tempStopPosition.equals(referredWay.lastNode()))) {
-                    secondWay = referredWay;
-                    return referredWay;
-                }
-            }
-        }
-        return null;
-    }
-
-    public void findAllServingWays(PTStop pts) {
-        firstWay = findServingWays(pts);
-        secondWay = findSecondServingWay(pts);
-    }
-
     /**
      * Finds the nearest Way in particular radius around the stop
      *
@@ -342,10 +278,10 @@ public class PTStop extends RelationMember {
         }
         StopToWayAssigner assigner = new StopToWayAssigner();
         LatLon platformCenter = platform.getBBox().getCenter();
-        Double ax = platformCenter.getX() - searchRadius;
-        Double bx = platformCenter.getX() + searchRadius;
-        Double ay = platformCenter.getY() - searchRadius;
-        Double by = platformCenter.getY() + searchRadius;
+        double ax = platformCenter.getX() - searchRadius;
+        double bx = platformCenter.getX() + searchRadius;
+        double ay = platformCenter.getY() - searchRadius;
+        double by = platformCenter.getY() + searchRadius;
         BBox platformBBox = new BBox(ax, ay, bx, by);
 
         Set<Way> potentialWays = new HashSet<>();
@@ -359,14 +295,14 @@ public class PTStop extends RelationMember {
                 }
             }
         }
-        Node platformNode = null;
+        Node platformNode;
         if (platform.getType().equals(OsmPrimitiveType.NODE)) {
             platformNode = (Node) platform;
         } else {
             platformNode = new Node(platform.getBBox().getCenter());
         }
         Way nearestWay = null;
-        Double minDistance = Double.MAX_VALUE;
+        double minDistance = Double.MAX_VALUE;
         for (Way potentialWay : potentialWays) {
             double distance = assigner.calculateMinDistanceToSegment(platformNode, potentialWay);
             if (distance < minDistance) {
@@ -432,16 +368,6 @@ public class PTStop extends RelationMember {
         return null;
     }
 
-    Way findFirstWayofRelation(Relation rel) {
-        PTRouteDataManager ptr = new PTRouteDataManager(rel);
-        return ptr.getFirstWay();
-    }
-
-    Way findlastWayofRelation(Relation rel) {
-        PTRouteDataManager ptr = new PTRouteDataManager(rel);
-        return ptr.getLastWay();
-    }
-
     /**
     *check if relation contains the given stop or not
     *
@@ -456,40 +382,6 @@ public class PTStop extends RelationMember {
             }
         }
         return false;
-    }
-
-    public List<Way> servedWaysInOrder(PTStop pts) {
-        List<Way> lis = new ArrayList<>();
-        firstWay = findServingWays(pts);
-        secondWay = findSecondServingWay(pts);
-        lis.add(firstWay);
-        if (secondWay != null) {
-            lis.add(secondWay);
-            List<OsmPrimitive> ways = new ArrayList<>(1);
-            ways.add(firstWay);
-            Set<Relation> rels = Way.getParentRelations(ways);
-            int flag1 = 0;
-            for (Relation rel : rels) {
-                if (findFirstWayofRelation(rel).equals(firstWay)) {
-                    flag1 = 1;
-                    break;
-                }
-            }
-            if (flag1 == 1) {
-                return lis;
-            } else {
-                ways = new ArrayList<>(1);
-                ways.add(secondWay);
-                rels = Way.getParentRelations(ways);
-                for (Relation rel : rels) {
-                    if (findFirstWayofRelation(rel).equals(secondWay)) {
-                        Collections.swap(lis, 0, 1);
-                        break;
-                    }
-                }
-            }
-        }
-        return lis;
     }
 
     /**
@@ -551,31 +443,7 @@ public class PTStop extends RelationMember {
         return platformRM;
     }
 
-    public void setPlatformRM(RelationMember platformRM) {
-        this.platformRM = platformRM;
-    }
-
     public RelationMember getStopPositionRM() {
         return stopPositionRM;
-    }
-
-    public void setStopPositionRM(RelationMember stopPositionRM) {
-        this.stopPositionRM = stopPositionRM;
-    }
-
-    public boolean getExitOnly() {
-        return exitOnly;
-    }
-
-    public void setExitOnly(boolean exitOnly) {
-        this.exitOnly = exitOnly;
-    }
-
-    public boolean getEntryOnly() {
-        return entryOnly;
-    }
-
-    public void setEntryOnly(boolean entryOnly) {
-        this.entryOnly = entryOnly;
     }
 }

@@ -90,7 +90,6 @@ public class SplitRoundaboutAction extends JosmAction {
                 downloadIncompleteRelations(roundabout);
             } catch (InterruptedException | ExecutionException e1) {
                 Logging.error(e1);
-                return;
             }
         });
     }
@@ -155,7 +154,6 @@ public class SplitRoundaboutAction extends JosmAction {
                 continueAfterDownload(roundabout);
             } catch (InterruptedException | ExecutionException e1) {
                 Logging.error(e1);
-                return;
             }
         });
     }
@@ -166,9 +164,7 @@ public class SplitRoundaboutAction extends JosmAction {
         changingRelations = updateRelations(savedPositions, splitNodes, splitWays);
 
         List<Command> commands = new ArrayList<>();
-        changingRelations.forEach((oldR, newR) -> {
-            commands.add(new ChangeCommand(oldR, newR));
-        });
+        changingRelations.forEach((oldR, newR) -> commands.add(new ChangeCommand(oldR, newR)));
 
         return new SequenceCommand("Split Roundabout", commands);
     }
@@ -252,6 +248,7 @@ public class SplitRoundaboutAction extends JosmAction {
 
             // starting from the entry node, add split ways until the
             // exit node is reached
+            assert entryNode != null;
             List<Way> parents = filterParents(entryNode.getParentWays(), entryWay, entryNode);
 
             if (parents.size() == 0) {
@@ -303,6 +300,7 @@ public class SplitRoundaboutAction extends JosmAction {
                 entryNode = getNodeInCommon(splitNodes, entryWay);
                 exitNode = getNodeInCommon(splitNodes, exitWay);
 
+                assert entryNode != null;
                 parents = filterParentsInOppositeDirection(entryNode.getParentWays(), entryWay, entryNode);
                 if (parents.size() != 0) {
                     curr = parents.get(0);
@@ -344,19 +342,17 @@ public class SplitRoundaboutAction extends JosmAction {
                 parents = filterParents(exitNode.getParentWays(), exitWay, exitNode);
                 curr = parents.get(0);
                 List<Way> lst = new ArrayList<>();
-                if (parents.size() != 0) {
-                    role = curr.firstNode().equals(exitNode) ? "forward" : "backward";
-                    while (!curr.lastNode().equals(entryNode)) {
-                        lst.add(curr);
-                        parents = curr.lastNode().getParentWays();
-                        parents.remove(curr);
-                        parents.removeIf(w -> !splitWays.contains(w));
-                        curr = parents.get(0);
-                    }
+                role = curr.firstNode().equals(exitNode) ? "forward" : "backward";
+                while (!curr.lastNode().equals(entryNode)) {
                     lst.add(curr);
-                    for (int k = lst.size() - 1; k >= 0; k--) {
-                        c.addMember(i + offset++, new RelationMember(role, lst.get(k)));
-                    }
+                    parents = curr.lastNode().getParentWays();
+                    parents.remove(curr);
+                    parents.removeIf(w -> !splitWays.contains(w));
+                    curr = parents.get(0);
+                }
+                lst.add(curr);
+                for (int k = lst.size() - 1; k >= 0; k--) {
+                    c.addMember(i + offset++, new RelationMember(role, lst.get(k)));
                 }
                 memberOffset.put(r, offset);
             }
@@ -378,10 +374,7 @@ public class SplitRoundaboutAction extends JosmAction {
         if (beforeEntryWay.isOneway() == 0 || entryWay.isOneway() == 0)
             return false;
 
-        if (afterExitWay.isOneway() == 0 || exitWay.isOneway() == 0)
-            return false;
-
-        return true;
+        return afterExitWay.isOneway() != 0 && exitWay.isOneway() != 0;
     }
 
     private List<Way> filterParents(List<Way> parentWays, Way entryWay, Node entryNode) {
@@ -455,7 +448,7 @@ public class SplitRoundaboutAction extends JosmAction {
         idx.add(middlewayInteger);
 
         for (int i = 0; i < 6; i++) {
-            if (idx.get(i).intValue() == -1)
+            if (idx.get(i) == -1)
                 return null;
         }
 
@@ -625,8 +618,7 @@ public class SplitRoundaboutAction extends JosmAction {
             c.removeMember(idx.get(2) + 1);
         }
         int maxIndex = idx.get(0) > idx.get(1) ? idx.get(0) : idx.get(1);
-        int offset = maxIndex - idx.get(2);
-        return offset;
+        return maxIndex - idx.get(2);
     }
 
     private int addPreviousMember(Relation relation, Way entryWay, Way middleWay, int position, String role,
@@ -646,7 +638,7 @@ public class SplitRoundaboutAction extends JosmAction {
             parent.remove(curr);
             for (Way w : parent) {
                 Collection<RelationMember> p = oldrelation.getMembersFor(Collections.singletonList(w));
-                if (p != null && p.size() != 0) {
+                if (p.size() != 0) {
                     curr = w;
                     break;
                 }
@@ -675,16 +667,14 @@ public class SplitRoundaboutAction extends JosmAction {
                 n = curr.firstNode();
             List<Way> parent = n.getParentWays();
             parent.remove(curr);
-            curr = null;
             List<Way> possibleways = new ArrayList<>();
             for (Way w : parent) {
                 Collection<RelationMember> p = oldrelation.getMembersFor(Collections.singletonList(w));
-                if (p != null && !p.isEmpty()) {
+                if (!p.isEmpty()) {
                     if (!w.hasTag("junction", "roundabout"))
                         possibleways.add(w);
 
                     if (w.equals(middleWay)) {
-                        curr = middleWay;
                         break;
                     }
                 }
@@ -695,8 +685,8 @@ public class SplitRoundaboutAction extends JosmAction {
             curr = parent.get(0);
         }
 
-        for (int j = 0; j < lst.size(); j++) {
-            relation.addMember(position + offset++, new RelationMember(role, lst.get(j)));
+        for (Way way : lst) {
+            relation.addMember(position + offset++, new RelationMember(role, way));
         }
 
         return offset;
@@ -729,9 +719,7 @@ public class SplitRoundaboutAction extends JosmAction {
         if (selection != null && selection.size() == 1) {
             Optional<Way> selectedWay = Optional.ofNullable(selection.iterator().next())
                     .map(it -> it instanceof Way ? (Way) it : null);
-            selectedWay.ifPresent(way -> {
-                setEnabled(way.isClosed() && (way.hasTag("junction", "roundabout") || way.hasTag("oneway", "yes")));
-            });
+            selectedWay.ifPresent(way -> setEnabled(way.isClosed() && (way.hasTag("junction", "roundabout") || way.hasTag("oneway", "yes"))));
         }
         // setEnabled(false);
     }
