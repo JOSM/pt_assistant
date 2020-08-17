@@ -23,6 +23,8 @@ import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.mendrelation.PersonalTransportMendRelationAction;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.mendrelation.PublicTransportMendRelationAction;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.NotificationUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.ImageProvider;
@@ -56,12 +58,12 @@ public class RoutingAction extends AbstractRelationEditorAction{
   }
   private void callAction(Relation relation){
 		if(relation.hasTag("route","bicycle")) {
-       BicycleMendRelation bike = new BicycleMendRelation(editorAccess);
+       PersonalTransportMendRelationAction bike = new PersonalTransportMendRelationAction(editorAccess);
 		    // MendRelationAction bike = new MendRelationAction(editorAccess);
         bike.initialise();
        }
     else {
-        MendRelationAction pt_transport = new MendRelationAction(editorAccess);
+        PublicTransportMendRelationAction pt_transport = new PublicTransportMendRelationAction(editorAccess);
         pt_transport.initialise();
     }
 	}

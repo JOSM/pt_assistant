@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package org.openstreetmap.josm.plugins.pt_assistant.actions;
+package org.openstreetmap.josm.plugins.pt_assistant.actions.mendrelation;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
@@ -48,7 +48,7 @@ import org.openstreetmap.josm.tools.Utils;
  *
  * @author Ashish Singh
  */
-public class BicycleMendRelation extends MendRelationAction {
+public class PersonalTransportMendRelationAction extends PublicTransportMendRelationAction {
 
     ////////////////////////Assigning Variables///////////////
 
@@ -69,7 +69,7 @@ public class BicycleMendRelation extends MendRelationAction {
 
     /////////////Editor Access To Bicycle Routing Helper//////////////
 
-    public BicycleMendRelation(IRelationEditorActionAccess editorAccess) {
+    public PersonalTransportMendRelationAction(IRelationEditorActionAccess editorAccess) {
         super(editorAccess);
         super.editor = (GenericRelationEditor) editorAccess.getEditor();
         super.memberTableModel = editorAccess.getMemberTableModel();

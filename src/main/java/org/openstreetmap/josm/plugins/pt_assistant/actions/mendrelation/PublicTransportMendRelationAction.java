@@ -1,5 +1,5 @@
 // License: GPL. For details, see LICENSE file.
-package org.openstreetmap.josm.plugins.pt_assistant.actions;
+package org.openstreetmap.josm.plugins.pt_assistant.actions.mendrelation;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
@@ -84,7 +84,7 @@ import org.openstreetmap.josm.tools.Utils;
  *
  * @author Biswesh
  */
-public class MendRelationAction extends AbstractRelationEditorAction {
+public class PublicTransportMendRelationAction extends AbstractRelationEditorAction {
     private static final DownloadParams DEFAULT_DOWNLOAD_PARAMS = new DownloadParams();
 
     private static final Color[] FIVE_COLOR_PALETTE = { new Color(0, 255, 0, 150), new Color(255, 0, 0, 150),
@@ -150,7 +150,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
     String notice = null;
     List<Node> backnodes = new ArrayList<>();
 
-    public MendRelationAction(IRelationEditorActionAccess editorAccess) {
+    public PublicTransportMendRelationAction(IRelationEditorActionAccess editorAccess) {
         super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION);
         editor = (GenericRelationEditor) editorAccess.getEditor();
         memberTableModel = editorAccess.getMemberTableModel();
@@ -219,7 +219,7 @@ public class MendRelationAction extends AbstractRelationEditorAction {
         }
     }
 
-    void initialise() {
+    public void initialise() {
         save();
         sortBelow(relation.getMembers(), 0);
         members = editor.getRelation().getMembers();
