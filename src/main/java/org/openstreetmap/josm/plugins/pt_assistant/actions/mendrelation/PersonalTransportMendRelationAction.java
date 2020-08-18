@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -632,23 +633,6 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
                 backTrack(way, idx + 1);
             }
         }
-    }
-
-    @Override
-    public Way findWayAfterChunk(Way way) {
-        Way w1 = null;
-        Way wayToKeep = null;
-        List<Node> breakNode = new ArrayList<>();
-        breakNode.add(super.currentNode);
-        SplitWayCommand.Strategy strategy = new PublicTransportMendRelationAction.TempStrategy();
-        List<List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(super.currentWay, breakNode);
-        SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
-        if (result != null) {
-            UndoRedoHandler.getInstance().add(result);
-            w1 = result.getNewWays().get(0);
-            wayToKeep = w1;
-        }
-        return wayToKeep;
     }
 
     @Override

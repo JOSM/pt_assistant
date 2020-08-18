@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -140,7 +141,6 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
     boolean aroundGaps = false;
     boolean aroundStops = false;
     Node previousCurrentNode = null;
-    Node splitNode = null;
     HashMap<Way, Character> wayColoring;
     HashMap<Character, List<Way>> wayListColoring;
     AbstractMapViewPaintable temporaryLayer = null;
@@ -1561,28 +1561,32 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
     }
 
     public Way findWayAfterChunk(Way way) {
-        Way w1 = null;
-        Way wayToKeep = null;
-        List<Node> breakNode = new ArrayList<>();
-        breakNode.add(currentNode);
-        Strategy strategy = new PublicTransportMendRelationAction.TempStrategy();
-        List<List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(currentWay, breakNode);
-        SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
+        SplitWayCommand result = SplitWayCommand.splitWay(
+            way,
+            SplitWayCommand.buildSplitChunks(currentWay, Collections.singletonList(currentNode)),
+            Collections.emptyList(),
+            wayChunks -> StreamSupport.stream(wayChunks.spliterator(), false)
+                .filter(w -> !w.containsNode(previousCurrentNode))
+                .findFirst()
+                .orElse(null)
+        );
         if (result != null) {
             UndoRedoHandler.getInstance().add(result);
-            w1 = result.getNewWays().get(0);
-            wayToKeep = w1;
+            return result.getNewWays().get(0);
         }
-        return wayToKeep;
+        return null;
     }
 
-    private void findWayafterchunkRoundabout(Way way) {
-        List<Node> breakNode = new ArrayList<>();
-        breakNode.add(currentNode);
-        splitNode = way.lastNode();
-        Strategy strategy = new PublicTransportMendRelationAction.TempStrategyRoundabout();
-        List<List<Node>> wayChunks = SplitWayCommand.buildSplitChunks(way, breakNode);
-        SplitWayCommand result = SplitWayCommand.splitWay(way, wayChunks, Collections.emptyList(), strategy);
+    private void findWayafterchunkRoundabout(final Way way) {
+        final SplitWayCommand result = SplitWayCommand.splitWay(
+            way,
+            SplitWayCommand.buildSplitChunks(way, Collections.singletonList(currentNode)),
+            Collections.emptyList(),
+            wayChunks -> StreamSupport.stream(wayChunks.spliterator(), false)
+                .filter(w -> w.containsNode(way.lastNode()))
+                .findFirst()
+                .orElse(null)
+        );
         if (result != null) {
             UndoRedoHandler.getInstance().add(result);
         }
@@ -2119,30 +2123,6 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
 
     public void save() {
         editor.apply();
-    }
-
-    public class TempStrategy implements Strategy {
-        @Override
-        public Way determineWayToKeep(Iterable<Way> wayChunks) {
-            for (Way way : wayChunks) {
-                if (!way.containsNode(previousCurrentNode)) {
-                    return way;
-                }
-            }
-            return null;
-        }
-    }
-
-    public class TempStrategyRoundabout implements Strategy {
-        @Override
-        public Way determineWayToKeep(Iterable<Way> wayChunks) {
-            for (Way way : wayChunks) {
-                if (way.containsNode(splitNode)) {
-                    return way;
-                }
-            }
-            return null;
-        }
     }
 
     private class MendRelationAddLayer extends AbstractMapViewPaintable {
