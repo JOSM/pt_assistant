@@ -52,6 +52,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteDataManager;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTWay;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.DialogUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.GeometryUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
@@ -382,7 +383,6 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         stopsByName.values().forEach(ptstops::addAll);
 
         Map<Way, List<PTStop>> wayStop = new HashMap<>();
-        PTRouteDataManager route = new PTRouteDataManager(rel);
 
         ptstops.forEach(stop -> {
             Way way = assigner.get(stop);
@@ -435,7 +435,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             if (wayStop.containsKey(w)) {
                 for (PTStop pts : wayStop.get(w)) {
                     Node node3 = pts.getNode();
-                    Pair<Node, Node> segment = assigner.calculateNearestSegment(node3, w);
+                    Pair<Node, Node> segment = GeometryUtils.findNearestSegment(w.getNodePairs(false), node3).map(GeometryUtils.NearestSegment::getSegment).orElse(null);
                     Node node1 = segment.a;
                     Node node2 = segment.b;
                     //if the end (it is not a link at this point) is the starting point of the way nodes
@@ -461,7 +461,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                         }
                     }
                     if (rightSide) {
-                        if (route.crossProductValue(tempstrt, tempend, pts) <= 0) {
+                        if (GeometryUtils.direction(Pair.create(tempstrt, tempend), pts) <= 0) {
                             if (!RightSideStops.containsKey(w)) {
                                 RightSideStops.put(w, new ArrayList<>());
                             }
@@ -477,7 +477,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                             }
                         }
                     } else {
-                        if (route.crossProductValue(tempstrt, tempend, pts) >= 0) {
+                        if (GeometryUtils.direction(Pair.create(tempstrt, tempend), pts) >= 0) {
                             if (!RightSideStops.containsKey(w)) {
                                 RightSideStops.put(w, new ArrayList<>());
                             }

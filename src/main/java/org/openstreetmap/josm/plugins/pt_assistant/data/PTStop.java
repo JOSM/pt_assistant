@@ -6,8 +6,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.DoubleFunction;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Stream;
 
+import org.openstreetmap.josm.data.coor.ILatLon;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.Node;
@@ -18,6 +24,7 @@ import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 
 /**
  * Model a stop with one or two elements (platform and/or stop_position)
@@ -25,7 +32,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
  * @author darya
  *
  */
-public class PTStop extends RelationMember {
+public class PTStop extends RelationMember implements ILatLon {
 
     /* stop_position element of this stop */
     private Node stopPosition = null;
@@ -301,16 +308,8 @@ public class PTStop extends RelationMember {
         } else {
             platformNode = new Node(platform.getBBox().getCenter());
         }
-        Way nearestWay = null;
-        double minDistance = Double.MAX_VALUE;
-        for (Way potentialWay : potentialWays) {
-            double distance = assigner.calculateMinDistanceToSegment(platformNode, potentialWay);
-            if (distance < minDistance) {
-                minDistance = distance;
-                nearestWay = potentialWay;
-            }
-        }
-        return nearestWay;
+
+        return potentialWays.stream().collect(WayUtils.nearestToPointCollector(platformNode)).orElse(null);
     }
 
     /**
@@ -445,5 +444,32 @@ public class PTStop extends RelationMember {
 
     public RelationMember getStopPositionRM() {
         return stopPositionRM;
+    }
+
+    @Override
+    public double lon() {
+        return getLatOrLon(ILatLon::lon);
+    }
+
+    @Override
+    public double lat() {
+        return getLatOrLon(ILatLon::lat);
+    }
+
+    /**
+     * @param fun set this to the method reference of either {@link ILatLon#lat()} or {@link ILatLon#lon()} to make this return the latitude or longitude
+     * @return the result of applying {@code fun} to the center of {@link #platform}.
+     * Or if no platform is set, the result of applying {@code fun} to the {@link #stopPosition} is returned.
+     * If that is also not set, {@link Double#NaN} is returned
+     */
+    private double getLatOrLon(final ToDoubleFunction<? super ILatLon> fun) {
+        return Stream.of(
+            Optional.ofNullable(platform).map(it -> it.getBBox().getCenter()).orElse(null),
+            stopPosition
+        )
+            .filter(Objects::nonNull)
+            .mapToDouble(fun)
+            .findFirst()
+            .orElse(Double.NaN);
     }
 }

@@ -1,14 +1,22 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import org.openstreetmap.josm.data.coor.ILatLon;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.NodePair;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.tools.Pair;
 
 public final class WayUtils {
     private WayUtils() {
@@ -126,5 +134,21 @@ public final class WayUtils {
 
     public static boolean isPartOfSplitRoundAbout(final Way way) {
         return isRoundabout(way) && !way.firstNode().equals(way.lastNode());
+    }
+
+    /**
+     * Collects from a {@link java.util.stream.Stream} of {@link Way}s the way that is nearest to the location
+     * given as argument to this method.
+     * @param point the location for which you want to find the way that is nearest
+     * @return a collector that will find the way that is nearest to the given {@code point} from a stream
+     */
+    public static Collector<Way, ?, Optional<Way>> nearestToPointCollector(final ILatLon point) {
+        return Collectors.minBy(
+            Comparator.comparingDouble(way ->
+                GeometryUtils.findNearestSegment(way.getNodePairs(false), point)
+                    .map(GeometryUtils.NearestSegment::getDistance)
+                    .orElse(Double.MAX_VALUE)
+            )
+        );
     }
 }

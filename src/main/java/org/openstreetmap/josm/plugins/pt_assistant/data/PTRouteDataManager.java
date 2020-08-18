@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.data.UndoRedoHandler;
+import org.openstreetmap.josm.data.coor.ILatLon;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Relation;
@@ -57,12 +59,14 @@ public class PTRouteDataManager {
                 // consecutive elements that belong to the same stop:
                 boolean stopExists = false;
                 if (prev != null) {
-                    if (prev.getName() == null || prev.getName().equals("") || member.getMember().get("name") == null
-                            || member.getMember().get("name").equals("")) {
+                    if (
+                        Optional.ofNullable(prev.getName()).map(String::isEmpty).orElse(true) ||
+                        Optional.ofNullable(member.getMember().get("name")).map(String::isEmpty).orElse(true)
+                    ) {
                         // if there is no name, check by proximity:
                         // Squared distance of 0.000004 corresponds to
                         // around 100 m
-                        if (calculateDistanceSq(member, prev) < 0.000001) {
+                        if (member.getMember().getBBox().getCenter().distanceSq(prev.getMember().getBBox().getCenter()) < 0.000001) {
                             stopExists = true;
                         }
                     } else {
@@ -110,42 +114,6 @@ public class PTRouteDataManager {
         }
     }
 
-    public double crossProductValue(Node node1, Node node2, PTStop stop) {
-        LatLon coord3;
-        if (stop.getPlatform() != null) {
-            coord3 = stop.getPlatform().getBBox().getCenter();
-        } else {
-            Node node3 = stop.getNode();
-            coord3 = new LatLon(node3.lat(), node3.lon());
-        }
-        LatLon coord1 = new LatLon(node1.lat(), node1.lon());
-        LatLon coord2 = new LatLon(node2.lat(), node2.lon());
-        //       LatLon coord3 = new LatLon(node3.lat(),node3.lon());
-        double x1 = coord1.getX();
-        double y1 = coord1.getY();
-
-        double x2 = coord2.getX();
-        double y2 = coord2.getY();
-
-        double x3 = coord3.getX();
-        double y3 = coord3.getY();
-
-        x1 -= x3;
-        y1 -= y3;
-
-        x2 -= x3;
-        y2 -= y3;
-
-        //Right Direction
-        return x1 * y2 - y1 * x2;
-    }
-
-    private static double calculateDistanceSq(RelationMember member1, RelationMember member2) {
-        LatLon coord1 = member1.getMember().getBBox().getCenter();
-        LatLon coord2 = member2.getMember().getBBox().getCenter();
-        return coord1.distanceSq(coord2);
-    }
-
     public void set(String key, String value) {
         if (!key.isEmpty() && !value.isEmpty()) {
             this.tags.put(key, value);
@@ -172,7 +140,7 @@ public class PTRouteDataManager {
         String v;
         for (String k : this.tags.keySet()) {
             v = this.tags.get(k);
-            if (v != null && !v.equals("") && !v.isEmpty()) {
+            if (v != null && !v.isEmpty()) {
                 tempRel.put(k, v);
             }
         }

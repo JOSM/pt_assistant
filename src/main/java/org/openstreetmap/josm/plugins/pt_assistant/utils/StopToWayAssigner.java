@@ -3,12 +3,16 @@ package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
+import org.openstreetmap.josm.data.coor.ILatLon;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.Node;
@@ -19,7 +23,6 @@ import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTWay;
-import org.openstreetmap.josm.tools.Pair;
 
 /**
  * Assigns stops to ways in following steps: (1) checks if the stop is in the
@@ -35,20 +38,17 @@ public class StopToWayAssigner {
     public static Map<PTStop, List<Way>> stopToWay = new HashMap<>();
 
     /*
-     * contains all PTWays of the route relation for which this assigner was
-     * created
+     * contains all PTWays of the route relation for which this assigner was created
      */
-    private HashSet<Way> ways;
+    private final Set<Way> ways = new HashSet<>();
 
     public StopToWayAssigner(List<PTWay> ptways) {
-        ways = new HashSet<>();
         for (PTWay ptway : ptways) {
             ways.addAll(ptway.getWays());
         }
     }
 
     public StopToWayAssigner(Collection<Way> ways) {
-        this.ways = new HashSet<>();
         this.ways.addAll(ways);
     }
 
@@ -108,32 +108,19 @@ public class StopToWayAssigner {
         // 4) Search if a stop position is in the vicinity of a platform:
         if (stop.getPlatform() != null) {
             List<Node> potentialStopPositionList = stop.findPotentialStopPositions();
-            Node closestStopPosition = null;
-            double minDistanceSq = Double.MAX_VALUE;
-            for (Node potentialStopPosition : potentialStopPositionList) {
-                double distanceSq = potentialStopPosition.getCoor()
-                        .distanceSq(stop.getPlatform().getBBox().getCenter());
-                if (distanceSq < minDistanceSq) {
-                    closestStopPosition = potentialStopPosition;
-                    minDistanceSq = distanceSq;
-                }
-            }
-            if (closestStopPosition != null) {
-                Way closestWay = null;
-                double minDistanceSqToWay = Double.MAX_VALUE;
-                for (Way way : this.ways) {
-                    if (way.containsNode(closestStopPosition)) {
-                        double distanceSq = calculateMinDistanceToSegment(
-                                new Node(stop.getPlatform().getBBox().getCenter()), way);
-                        if (distanceSq < minDistanceSqToWay) {
-                            closestWay = way;
-                            minDistanceSqToWay = distanceSq;
-                        }
-                    }
-                }
-                if (closestWay != null) {
-                    addAssignedWayToMap(stop, closestWay);
-                    return closestWay;
+            final Optional<Node> closestStopPosition = potentialStopPositionList.stream()
+                .min(
+                    Comparator.comparingDouble(stopPosition ->
+                        GeometryUtils.distanceSquared(stopPosition, stop.getPlatform().getBBox().getCenter())
+                    )
+                );
+            if (closestStopPosition.isPresent()) {
+                final Optional<Way> closestWay = this.ways.stream()
+                    .filter(way -> way.containsNode(closestStopPosition.get()))
+                    .collect(WayUtils.nearestToPointCollector(stop.getPlatform().getBBox().getCenter()));
+                if (closestWay.isPresent()) {
+                    addAssignedWayToMap(stop, closestWay.get());
+                    return closestWay.get();
                 }
             }
         }
@@ -193,29 +180,12 @@ public class StopToWayAssigner {
         if (rel == null || stop == null || closestStopPosition == null) {
             return null;
         }
-        Way closestWay = null;
-        double minDistanceSqToWay = Double.MAX_VALUE;
-        List<Way> listways = new ArrayList<>();
-        for (RelationMember rm : rel.getMembers()) {
-            if (rm.getType() == OsmPrimitiveType.WAY) {
-                listways.add(rm.getWay());
-            }
-        }
-        for (Way way : listways) {
-            if (way.containsNode(closestStopPosition)) {
-                double distanceSq;
-                if (stop.getPlatform() != null) {
-                    distanceSq = calculateMinDistanceToSegment(new Node(stop.getPlatform().getBBox().getCenter()), way);
-                } else {
-                    distanceSq = calculateMinDistanceToSegment(new Node(stop.getNode()), way);
-                }
-                if (distanceSq < minDistanceSqToWay) {
-                    closestWay = way;
-                    minDistanceSqToWay = distanceSq;
-                }
-            }
-        }
-        return closestWay;
+        return rel.getMembers().stream()
+            .filter(it -> it.getType() == OsmPrimitiveType.WAY)
+            .map(RelationMember::getWay)
+            .filter(way -> way.containsNode(closestStopPosition))
+            .collect(WayUtils.nearestToPointCollector(stop))
+            .orElse(null);
     }
 
     /**
@@ -240,169 +210,21 @@ public class StopToWayAssigner {
         double by = platformCenter.getY() + searchRadius;
         BBox platformBBox = new BBox(ax, ay, bx, by);
 
-        Set<Way> potentialWays = new HashSet<>();
-
-        Collection<Node> allNodes = platform.getDataSet().getNodes();
-        for (Node currentNode : allNodes) {
-            if (platformBBox.bounds(currentNode.getBBox())) {
-                List<OsmPrimitive> referrers = currentNode.getReferrers();
-                for (OsmPrimitive referrer : referrers) {
-                    if (referrer.getType().equals(OsmPrimitiveType.WAY)) {
-                        Way referrerWay = (Way) referrer;
-                        if (this.ways.contains(referrerWay)) {
-                            potentialWays.add(referrerWay);
-                        }
-                    }
-                }
-
-            }
-        }
-
-        Node platformNode;
-        if (platform.getType().equals(OsmPrimitiveType.NODE)) {
+        final ILatLon platformNode;
+        if (OsmPrimitiveType.NODE.equals(platform.getType())) {
             platformNode = (Node) platform;
         } else {
-            platformNode = new Node(platform.getBBox().getCenter());
-        }
-        Way nearestWay = null;
-        double minDistance = Double.MAX_VALUE;
-        for (Way potentialWay : potentialWays) {
-            double distance = this.calculateMinDistanceToSegment(platformNode, potentialWay);
-            if (distance < minDistance) {
-                minDistance = distance;
-                nearestWay = potentialWay;
-            }
+            platformNode = platform.getBBox().getCenter();
         }
 
-        return nearestWay;
-    }
-
-    /**
-     * Calculates the minimum distance between a node and a way
-     *
-     * @param node node
-     * @param way way
-     * @return the minimum distance between a node and a way
-     */
-    public double calculateMinDistanceToSegment(Node node, Way way) {
-
-        double minDistance = Double.MAX_VALUE;
-
-        List<Pair<Node, Node>> waySegments = way.getNodePairs(false);
-        for (Pair<Node, Node> waySegment : waySegments) {
-            if (waySegment.a != node && waySegment.b != node) {
-                double distanceToLine = this.calculateDistanceToSegment(node, waySegment);
-                if (distanceToLine < minDistance) {
-                    minDistance = distanceToLine;
-                }
-            }
-        }
-
-        return minDistance;
-
-    }
-
-    public Pair<Node, Node> calculateNearestSegment(Node node, Way way) {
-        double minDistance = Double.MAX_VALUE;
-
-        List<Pair<Node, Node>> waySegments = way.getNodePairs(false);
-        Pair<Node, Node> minWaySegment = null;
-        for (Pair<Node, Node> waySegment : waySegments) {
-            if (waySegment.a != node && waySegment.b != node) {
-                double distanceToLine = this.calculateDistanceToSegment(node, waySegment);
-                if (distanceToLine < minDistance) {
-                    minDistance = distanceToLine;
-                    minWaySegment = waySegment;
-                }
-            } else {
-                minWaySegment = waySegment;
-            }
-        }
-        return minWaySegment;
-    }
-
-    /**
-     * Calculates the distance from point to segment and differentiates between
-     * acute, right and obtuse triangles. If a triangle is acute or right, the
-     * distance to segment is calculated as distance from point to line. If the
-     * triangle is obtuse, the distance is calculated as the distance to the
-     * nearest vertex of the segment.
-     *
-     * @param node node
-     * @param segment segment
-     * @return the distance from point to segment
-     */
-    private double calculateDistanceToSegment(Node node, Pair<Node, Node> segment) {
-
-        if (node == segment.a || node == segment.b) {
-            return 0.0;
-        }
-
-        double lengthA = node.getCoor().distance(segment.a.getCoor());
-        double lengthB = node.getCoor().distance(segment.b.getCoor());
-        double lengthC = segment.a.getCoor().distance(segment.b.getCoor());
-
-        if (isObtuse(lengthC, lengthB, lengthA)) {
-            return lengthB;
-        }
-
-        if (isObtuse(lengthA, lengthC, lengthB)) {
-            return lengthA;
-        }
-
-        return calculateDistanceToLine(node, segment);
-    }
-
-    /**
-     * Calculates the distance from point to line using formulas for triangle
-     * area. Does not differentiate between acute, right and obtuse triangles
-     *
-     * @param node node
-     * @param segment segment
-     * @return the distance from point to line
-     */
-    private double calculateDistanceToLine(Node node, Pair<Node, Node> segment) {
-
-        /*
-         * Let a be the triangle edge between the point and the first node of
-         * the segment. Let b be the triangle edge between the point and the
-         * second node of the segment. Let c be the triangle edge which is the
-         * segment.
-         */
-
-        double lengthA = node.getCoor().distance(segment.a.getCoor());
-        double lengthB = node.getCoor().distance(segment.b.getCoor());
-        double lengthC = segment.a.getCoor().distance(segment.b.getCoor());
-
-        // calculate triangle area using Heron's formula:
-        double p = (lengthA + lengthB + lengthC) / 2.0;
-        double triangleArea = Math.sqrt(p * (p - lengthA) * (p - lengthB) * (p - lengthC));
-
-        // calculate the distance from point to segment using the 0.5*c*h
-        // formula for triangle area:
-        return triangleArea * 2.0 / lengthC;
-    }
-
-    /**
-     * Checks if the angle opposite of the edge c is obtuse. Uses the cosine
-     * theorem
-     *
-     * @param lengthA length A
-     * @param lengthB length B
-     * @param lengthC length C
-     * @return true if the angle opposite of the edge c is obtuse
-     */
-    private boolean isObtuse(double lengthA, double lengthB, double lengthC) {
-
-        /*-
-         * Law of cosines:
-         * c^2 = a^2 + b^2 - 2abcos
-         * if c^2 = a^2 + b^2, it is a right triangle
-         * if c^2 < a^2 + b^2, it is an acute triangle
-         * if c^2 > a^2 + b^2, it is an obtuse triangle
-         */
-
-        return lengthC * lengthC > lengthA * lengthA + lengthB * lengthB;
+        return platform.getDataSet().getNodes().stream()
+            .filter(node -> platformBBox.bounds(node.getBBox())) // only nodes in BBox
+            .flatMap(node -> node.getReferrers().stream()) // operate on the referrers of the nodes
+            .map(referrer -> OsmPrimitiveType.WAY.equals(referrer.getType()) ? (Way) referrer : null) // keep only the ways
+            .filter(Objects::nonNull)
+            .filter(this.ways::contains)
+            .collect(WayUtils.nearestToPointCollector(platformNode)) // find the way that is closest to the platformNode
+            .orElse(null);
     }
 
     /**
