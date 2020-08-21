@@ -85,6 +85,8 @@ public final class GeometryUtilsTest {
         assertDistancePointToLineSegment(0, Pair.create(P_M4_M2, P_3_5), P_M4_M2);
         assertDistancePointToLineSegment(0, Pair.create(P_M4_M2, P_3_5), P_3_5);
 
+        assertDistancePointToLineSegment(Math.sqrt(34), Pair.create(P_3_5, P_3_5), P_0_0);
+
         assertDistancePointToLineSegment(Math.sqrt(2), Pair.create(P_0_2, P_2_0), P_0_0);
         assertDistancePointToLineSegment(Math.sqrt(72), Pair.create(P_M4_M2, P_3_5), P_7_M3);
         assertDistancePointToLineSegment(Math.sqrt(34), Pair.create(P_0_0, P_2_0), P_7_M3);

@@ -94,26 +94,8 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
     }
 
     @Override
-    String getOverpassAPIQuery() {
-        final StringBuilder str = new StringBuilder("[timeout:100];\n(\n");
-        final String wayFormatterString = "   way(%.6f,%.6f,%.6f,%.6f)\n";
-        final String str3 = "[\"highway\"][\"highway\"!=\"motorway\"];\n";
-
-        final List<Node> nodeList = super.aroundGaps ? getBrokenNodes() : new ArrayList<>();
-        if (super.aroundStops) {
-            nodeList.addAll(super.members.stream().filter(RelationMember::isNode).map(RelationMember::getNode)
-                    .collect(Collectors.toList()));
-        }
-
-        for (final Node n : nodeList) {
-            final double maxLat = n.getBBox().getTopLeftLat() + 0.001;
-            final double minLat = n.getBBox().getBottomRightLat() - 0.001;
-            final double maxLon = n.getBBox().getBottomRightLon() + 0.001;
-            final double minLon = n.getBBox().getTopLeftLon() - 0.001;
-            str.append(String.format(wayFormatterString, minLat, minLon, maxLat, maxLon)).append(str3);
-
-        }
-        return str.append(");\n(._;<;);\n(._;>;);\nout meta;").toString();
+    protected String getOverpassApiWaySelectorString() {
+        return "[\"highway\"][\"highway\"!=\"motorway\"]";
     }
 
     ////////calling the nextway /////////

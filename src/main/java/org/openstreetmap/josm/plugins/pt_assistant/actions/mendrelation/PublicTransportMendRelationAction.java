@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
@@ -50,6 +51,7 @@ import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.command.SplitWayCommand;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.UndoRedoHandler;
+import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.NodePair;
@@ -100,8 +102,6 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
     private static final Color CURRENT_WAY_COLOR = new Color(255, 255, 255, 190);
     private static final Color NEXT_WAY_COLOR = new Color(169, 169, 169, 210);
 
-    private static final String I18N_CLOSE_OPTIONS = I18n.marktr("Close the options");
-
     Relation relation;
     MemberTableModel memberTableModel;
     GenericRelationEditor editor;
@@ -139,27 +139,25 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
         editor.addWindowListener(new PublicTransportMendRelationAction.WindowEventHandler());
     }
 
-    String getOverpassAPIQuery() {
-        final StringBuilder str = new StringBuilder("[timeout:100];\n(\n");
-        final String wayFormatterString = "   way(%.6f,%.6f,%.6f,%.6f)\n";
-        final String str3 = "   [\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"];\n";
+    protected String getOverpassApiWaySelectorString() {
+        return "[\"highway\"][\"highway\"!=\"footway\"][\"highway\"!=\"path\"][\"highway\"!=\"cycleway\"]";
+    }
 
-        final List<Node> nodeList = aroundGaps ? getBrokenNodes() : new ArrayList<>();
-        if (aroundStops) {
-            nodeList.addAll(members.stream().filter(RelationMember::isNode).map(RelationMember::getNode)
-                    .collect(Collectors.toList()));
+    public final String getOverpassAPIQuery() {
+        final String waySelectionLines = Stream.concat(
+            aroundGaps ? getBrokenNodes().stream() : Stream.empty(),
+            aroundStops ? members.stream().filter(RelationMember::isNode).map(RelationMember::getNode) : Stream.empty()
+        )
+            .filter(Objects::nonNull)
+            .map(it -> String.format(Locale.ENGLISH, "  way(around:%d,%.6f,%.6f)%s;", 50 /* meters */, it.lat(), it.lon(), getOverpassApiWaySelectorString()))
+            .collect(Collectors.joining("\n"));
+
+        if (waySelectionLines.isEmpty()) {
+            // there are no nodes around which we could download
+            return null;
         }
 
-        for (final Node n : nodeList) {
-            final double maxLat = n.getBBox().getTopLeftLat() + 0.001;
-            final double minLat = n.getBBox().getBottomRightLat() - 0.001;
-            final double maxLon = n.getBBox().getBottomRightLon() + 0.001;
-            final double minLon = n.getBBox().getTopLeftLon() - 0.001;
-            str.append(String.format(wayFormatterString, minLat, minLon, maxLat, maxLon)).append(str3);
-
-        }
-
-        return str.append(");\n(._;<;);\n(._;>;);\nout meta;").toString();
+        return "[timeout:100];\n(\n" + waySelectionLines + "\n);\n(._;<;);\n(._;>;);\nout meta;";
     }
 
     List<Node> getBrokenNodes() {
@@ -263,10 +261,10 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
             return;
         }
 
-        String query = getOverpassAPIQuery();
+        final String query = getOverpassAPIQuery();
         Logging.debug(query);
 
-        if (aroundStops || aroundGaps) {
+        if ((aroundStops || aroundGaps) && query != null) {
             BoundsUtils.createBoundsWithPadding(wayList, .1).ifPresent(area -> {
                 final Future<?> future = task.download(
                         new OverpassDownloadReader(area, OverpassDownloadReader.OVERPASS_SERVER.get(), query),
@@ -288,7 +286,7 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
     }
 
     void callNextWay(int i) {
-        Logging.debug("Index + " + i);
+        Logging.debug("callNextWay(" + i + ")");
         downloadCounter++;
         if (i < members.size() && members.get(i).isWay()) {
             if (currentNode == null)
@@ -1329,13 +1327,7 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
                     }
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    MainApplication.getMap().mapView.removeKeyListener(this);
-                    nextIndex = false;
-                    shorterRoutes = false;
-                    setEnable = true;
-                    halt = true;
-                    setEnabled(true);
-                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+                    onEscapeKeyPressed(this);
                 }
             }
         });
@@ -1425,13 +1417,7 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
                     }
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    MainApplication.getMap().mapView.removeKeyListener(this);
-                    nextIndex = false;
-                    shorterRoutes = false;
-                    setEnable = true;
-                    halt = true;
-                    setEnabled(true);
-                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+                    onEscapeKeyPressed(this);
                 }
             }
         });
@@ -1632,13 +1618,7 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
                     }
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    MainApplication.getMap().mapView.removeKeyListener(this);
-                    nextIndex = false;
-                    setEnable = true;
-                    shorterRoutes = false;
-                    halt = true;
-                    setEnabled(true);
-                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+                    onEscapeKeyPressed(this);
                 }
             }
         });
@@ -1725,13 +1705,7 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
                     RemoveWayAfterSelection(wayIndices, typedKeyUpperCase);
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    MainApplication.getMap().mapView.removeKeyListener(this);
-                    Logging.debug("ESC");
-                    nextIndex = false;
-                    setEnable = true;
-                    halt = true;
-                    setEnabled(true);
-                    MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
+                    onEscapeKeyPressed(this);
                 }
             }
 
@@ -2126,8 +2100,6 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
             double letterX = MainApplication.getMap().mapView.getBounds().getMinX() + 20;
             double letterY = MainApplication.getMap().mapView.getBounds().getMinY() + 100;
 
-            boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
-
             final char firstCharacter = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get() ? '1' : 'A';
 
             if (showOption0) {
@@ -2145,7 +2117,7 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
             }
 
             // display the "Esc", "Skip" label:
-            drawKeyboardHint("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 25);
+            drawEscapeKeyboardHint(letterX, letterY);
             for (final RouteFixVariant fixVariant : Arrays.asList(RouteFixVariant.SKIP, RouteFixVariant.BACKTRACK_WHITE_EDGE, RouteFixVariant.REMOVE_CURRENT_EDGE)) {
                 letterY += 60;
                 drawFixVariant(PublicTransportMendRelationAction.this, fixVariant, letterX, letterY);
@@ -2174,7 +2146,7 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
                 drawFixVariant(PublicTransportMendRelationAction.this, fixVariant, letterX, letterY);
                 letterY += 60;
             }
-            drawKeyboardHint("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 30);
+            drawEscapeKeyboardHint(letterX, letterY);
         }
 
         void drawMultipleVariants(HashMap<Character, List<Way>> fixVariants) {
@@ -2204,7 +2176,7 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
             }
 
             // display the "Esc", "Skip" label:
-            drawKeyboardHint("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 25);
+            drawEscapeKeyboardHint(letterX, letterY);
 
             for (final RouteFixVariant fixVariant : Arrays.asList(RouteFixVariant.SKIP, RouteFixVariant.BACKTRACK_WHITE_EDGE, RouteFixVariant.REMOVE_CURRENT_EDGE)) {
                 letterY += 60;
@@ -2337,9 +2309,12 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
                         ? fixVariant.getNumericCharacter()
                         : fixVariant.getAlphabeticCharacter()
                 ) + " : " + fixVariant.getDescription(action),
-                fixVariant.getColor(),
+                fixVariant.getColor(action),
                 x, y, 25
             );
+        }
+        private void drawEscapeKeyboardHint(final double x, final double y) {
+            drawKeyboardHint(I18n.tr("Esc") + " : " + I18n.tr("Close the options"), Color.WHITE, x, y, 25);
         }
         private void drawKeyboardHint(final String hint, final Color color, final double x, final double y, final float size) {
             g.setColor(color);
@@ -2355,5 +2330,15 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
             Logging.debug("close");
             stop();
         }
+    }
+
+    private void onEscapeKeyPressed(final KeyListener source) {
+        MainApplication.getMap().mapView.removeKeyListener(source);
+        nextIndex = false;
+        shorterRoutes = false;
+        setEnable = true;
+        halt = true;
+        setEnabled(true);
+        MainApplication.getMap().mapView.removeTemporaryLayer(temporaryLayer);
     }
 }

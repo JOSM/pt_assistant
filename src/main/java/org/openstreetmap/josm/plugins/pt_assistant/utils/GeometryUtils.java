@@ -8,6 +8,13 @@ import org.openstreetmap.josm.data.coor.ILatLon;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.tools.Pair;
 
+
+/**
+ * Several utilities that help with calculating distances between points or line segments,
+ * or have to do with relative orientation (e.g. to the right or left).
+ *
+ * At the moment the euclidean distance is used, but most of the time the great circle distance is probably best.
+ */
 public final class GeometryUtils {
     private GeometryUtils() {
         // Private constructor to avoid instantiation
