@@ -26,7 +26,7 @@ public final class WayUtils {
      * @param w2 another way
      * @return The first node of the ways {@code w1} and {@code w2} that is also part of the other
      *     of those ways. If the two ways do not have a {@link Node} in common, or if at least
-     *     one of the given ways is {@link null}, the returned {@link Optional} is empty.
+     *     one of the given ways is {@code null}, the returned {@link Optional} is empty.
      */
     public static Optional<Node> findFirstCommonNode(final Way w1, final Way w2) {
         if (w1 == null || w2 == null) {

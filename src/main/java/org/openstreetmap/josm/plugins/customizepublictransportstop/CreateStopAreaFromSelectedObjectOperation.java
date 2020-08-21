@@ -95,7 +95,7 @@ public class CreateStopAreaFromSelectedObjectOperation extends StopAreaOperation
     /**
      * Setting of stop area from selected josm object
      *
-     * @param selectedObject Selected josm object
+     * @param stopArea Selected stop area
      */
     public void fromSelectedObject(StopArea stopArea) {
         Collection<OsmPrimitive> selectedObjects = new ArrayList<OsmPrimitive>();

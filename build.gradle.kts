@@ -1,19 +1,17 @@
-import java.net.URL
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.openstreetmap.josm.gradle.plugin.i18n.I18nSourceSet
+import java.net.URL
 
 plugins {
   java
   jacoco
   id("org.openstreetmap.josm") version "0.7.0"
-  id("com.github.ben-manes.versions") version "0.28.0"
 }
 
 object Versions {
   const val awaitility = "4.0.3"
   const val jacoco = "0.8.4"
   const val junit = "5.6.2"
-  const val wiremock = "2.26.3"
+  const val wiremock = "2.27.1"
 }
 
 repositories {
@@ -32,6 +30,13 @@ tasks.withType(JavaCompile::class) {
   options.compilerArgs.addAll(
     arrayOf("-Xlint:all", "-Xlint:-serial")
   )
+}
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
+  withSourcesJar()
+  withJavadocJar()
 }
 
 josm {
@@ -73,12 +78,11 @@ jacoco {
   toolVersion = Versions.jacoco
 }
 
-val jacocoTestReport: JacocoReport by tasks
-jacocoTestReport.apply {
+tasks.jacocoTestReport {
   reports {
     xml.isEnabled = true
     html.isEnabled = true
   }
+  dependsOn(tasks.test)
+  tasks.check.get().dependsOn(this)
 }
-tasks["check"].dependsOn(jacocoTestReport)
-jacocoTestReport.dependsOn(tasks["test"])

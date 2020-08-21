@@ -140,16 +140,16 @@ public class PTStop extends RelationMember implements ILatLon {
      * @param name name for this stop
      */
     public void setName(String name) {
-        this.name = Objects.requireNonNullElse(name, "");
+        this.name = name;
     }
 
     /**
      * Returns the name of this stop
      *
-     * @return the name of this stop
+     * @return the name of this stop, never null.
      */
     public String getName() {
-        return this.name;
+        return Optional.ofNullable(this.name).orElse("");
     }
 
     /**

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -705,7 +706,7 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
             .findFirst();
 
         // check if the way equals the next way, if so then don't add any new ways to the list
-        if (entranceNode.isEmpty() || way == wayToReachAfterGap) {
+        if (!entranceNode.isPresent() || way == wayToReachAfterGap) {
             lst.add(wayList);
             displayFixVariantsWithOverlappingWays(lst);
             return;
@@ -744,7 +745,7 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
 
             final Way minWay = parents.stream()
                 .min(Comparator.comparingDouble(parent -> WayUtils.calcDistanceSqToFirstOrLastWayNode(entranceNode.get(), wayToReachAfterGap)))
-                .orElseThrow();
+                .orElseThrow(NoSuchElementException::new);
             parents.remove(minWay);
             parents.add(0, minWay);
 
@@ -781,7 +782,7 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
         if (frontWay == null && !parentWays.isEmpty()) {
             frontWay = parentWays.stream()
                 .min(Comparator.comparingDouble(parentWay -> WayUtils.calcDistanceSqToFirstOrLastWayNode(getOtherNode(parentWay, node), wayToReachAfterGap)))
-                .orElseThrow();
+                .orElseThrow(NoSuchElementException::new);
         }
 
         if (frontWay != null) {
