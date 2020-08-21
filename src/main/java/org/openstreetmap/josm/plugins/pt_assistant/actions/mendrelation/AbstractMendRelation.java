@@ -10,6 +10,8 @@ import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdate
  * @author sudhanshu2
  */
 public abstract class AbstractMendRelation extends AbstractRelationEditorAction {
+    protected boolean shorterRoutes = false;
+
     protected AbstractMendRelation(IRelationEditorActionAccess editorAccess, IRelationEditorUpdateOn... updateOn) {
         super(editorAccess, updateOn);
     }

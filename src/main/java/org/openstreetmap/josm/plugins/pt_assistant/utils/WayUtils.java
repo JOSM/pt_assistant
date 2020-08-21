@@ -1,22 +1,20 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.openstreetmap.josm.data.coor.ILatLon;
+import org.openstreetmap.josm.data.coor.LatLon;
+import org.openstreetmap.josm.data.osm.INode;
+import org.openstreetmap.josm.data.osm.IWay;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.NodePair;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.tools.Pair;
 
 public final class WayUtils {
     private WayUtils() {
@@ -150,5 +148,19 @@ public final class WayUtils {
                     .orElse(Double.MAX_VALUE)
             )
         );
+    }
+
+    /**
+     * Calculates the {@link LatLon#distanceSq(LatLon)} from {@code origin} to the {@link Way#firstNode()}  and the
+     * {@link Way#lastNode()}. Whichever value is lower is returned.
+     *
+     * @param origin the point from which the distance is measured
+     * @param way the way to whose first or last node the distance is measured
+     * @return the lower of these two values: the squared distance from the origin to the first node of the way,
+     *   or the squared distance from the origin to the last node of the way
+     */
+    public static double calcDistanceSqToFirstOrLastWayNode(final ILatLon origin, final IWay<? extends INode> way) {
+        final LatLon o = new LatLon(origin);
+        return Math.min(o.distanceSq(way.firstNode().getCoor()), o.distanceSq(way.lastNode().getCoor()));
     }
 }

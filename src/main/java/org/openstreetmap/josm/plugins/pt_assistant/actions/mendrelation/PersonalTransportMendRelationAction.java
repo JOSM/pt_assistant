@@ -4,12 +4,16 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -35,7 +39,6 @@ import org.openstreetmap.josm.gui.dialogs.relation.sort.WayConnectionTypeCalcula
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.GBC;
-import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
 import org.openstreetmap.josm.tools.Utils;
@@ -68,7 +71,6 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
         super.editor = (GenericRelationEditor) editorAccess.getEditor();
         super.memberTableModel = editorAccess.getMemberTableModel();
         super.relation = editor.getRelation();
-        super.I18N_ADD_ONEWAY_VEHICLE_NO_TO_WAY = I18n.marktr("Add oneway:bicycle=no to way");
         super.editor.addWindowListener(new PersonalTransportMendRelationAction.WindowEventHandler());
     }
 
@@ -636,22 +638,6 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
     }
 
     @Override
-    void backtrackCurrentEdge() {
-        Way backTrackWay = super.currentWay;
-        Way way = backTrackWay;
-        super.backNodes = way.getNodes();
-        if (super.currentNode == null) {
-            super.currentNode = super.currentWay.lastNode();
-        }
-        if (super.currentNode.equals(way.lastNode())) {
-            Collections.reverse(super.backNodes);
-        }
-        int idx = 1;
-        previousCurrentNode = super.currentNode;
-        backTrack(super.currentWay, idx);
-    }
-
-    @Override
     void getNextWayAfterBackTrackSelection(Way way) {
         save();
         List<Integer> lst = new ArrayList<>();
@@ -887,7 +873,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
         }
         idxlst[0] = idx;
         idx--;
-        double minLength = findDistance(w, super.wayToReachAfterGap, jointNode);
+        double minLength = WayUtils.calcDistanceSqToFirstOrLastWayNode(getOtherNode(w, jointNode), super.wayToReachAfterGap);
         super.memberTableModel.updateRole(idxlst, s);
         while (true) {
             w = super.members.get(idx).getWay();
@@ -903,7 +889,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
                 // roles[idx]=s;
             }
             idxlst[0] = idx;
-            double length = findDistance(w, super.wayToReachAfterGap, node1);
+            double length = WayUtils.calcDistanceSqToFirstOrLastWayNode(getOtherNode(w, node1), super.wayToReachAfterGap);
             if (minLength > length) {
                 minLength = length;
             }
@@ -919,30 +905,22 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
     }
 
     void fixgapAfterlooping(int idx) {
-        Way w = super.members.get(idx).getWay();
-        super.currentWay = w;
-        Way minWay = w;
-        double minLength = findDistance(w, super.wayToReachAfterGap, super.currentNode);
-        while (idx <= super.currentIndex) {
-            w = super.members.get(idx).getWay();
-            List<Way> parentWays = findNextWay(w, w.lastNode());
-            if (w.firstNode() != null) {
-                parentWays.addAll(findNextWay(w, w.firstNode()));
-            }
-            for (int i = 0; i < parentWays.size(); i++) {
-                if (IsWaythere.get(parentWays.get(i)) == null) {
-                    Node node = getOtherNode(parentWays.get(i), null);
-                    double dist = findDistance(parentWays.get(i), super.wayToReachAfterGap, node);
-                    if (dist < minLength) {
-                        minLength = dist;
-                        minWay = w;
-                    }
-                }
-            }
-            idx++;
-        }
-        w = minWay;
-        downloadAreaAroundWay(w, w.lastNode(), w.firstNode());
+        super.currentWay = super.members.get(idx).getWay();
+
+        IntStream.range(idx, super.currentIndex + 1)
+            .mapToObj(super.members::get)
+            .map(RelationMember::getWay)
+            .min(Comparator.comparingDouble(current ->
+                Stream.of(current.lastNode(), current.firstNode())
+                    .filter(Objects::nonNull)
+                    .map(it -> findNextWay(current, it))
+                    .flatMap(Collection::stream)
+                    .filter(it -> IsWaythere.get(it) == null)
+                    .mapToDouble(it -> WayUtils.calcDistanceSqToFirstOrLastWayNode(it.lastNode(), super.wayToReachAfterGap))
+                    .min()
+                    .orElse(-Double.MAX_VALUE)
+            ))
+            .ifPresent(way -> downloadAreaAroundWay(way, way.lastNode(), way.firstNode()));
     }
 
     @Override

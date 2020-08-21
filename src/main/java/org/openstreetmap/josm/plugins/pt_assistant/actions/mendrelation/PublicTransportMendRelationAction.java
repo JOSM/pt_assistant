@@ -4,7 +4,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagLayout;
 import java.awt.Point;
@@ -15,17 +14,23 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import javax.swing.BorderFactory;
@@ -42,7 +47,6 @@ import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.command.SplitWayCommand;
-import org.openstreetmap.josm.command.SplitWayCommand.Strategy;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.DataSet;
@@ -68,6 +72,7 @@ import org.openstreetmap.josm.gui.layer.validation.PaintVisitor;
 import org.openstreetmap.josm.io.OverpassDownloadReader;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.BoundsUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.ColorPalette;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.NotificationUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
@@ -86,37 +91,16 @@ import org.openstreetmap.josm.tools.Utils;
 public class PublicTransportMendRelationAction extends AbstractMendRelation {
     private static final DownloadParams DEFAULT_DOWNLOAD_PARAMS = new DownloadParams();
 
-    private static final Color[] FIVE_COLOR_PALETTE = { new Color(0, 255, 0, 150), new Color(255, 0, 0, 150),
-            new Color(0, 0, 255, 150), new Color(255, 255, 0, 150), new Color(0, 255, 255, 150) };
-
-    private static final Map<Character, Color> CHARACTER_COLOR_MAP = new HashMap<>();
-    static {
-        CHARACTER_COLOR_MAP.put('A', new Color(0, 255, 0, 200));
-        CHARACTER_COLOR_MAP.put('B', new Color(255, 0, 0, 200));
-        CHARACTER_COLOR_MAP.put('C', new Color(0, 0, 255, 200));
-        CHARACTER_COLOR_MAP.put('D', new Color(255, 255, 0, 200));
-        CHARACTER_COLOR_MAP.put('E', new Color(0, 255, 255, 200));
-        CHARACTER_COLOR_MAP.put('1', new Color(0, 255, 0, 200));
-        CHARACTER_COLOR_MAP.put('2', new Color(255, 0, 0, 200));
-        CHARACTER_COLOR_MAP.put('3', new Color(0, 0, 255, 200));
-        CHARACTER_COLOR_MAP.put('4', new Color(255, 255, 0, 200));
-        CHARACTER_COLOR_MAP.put('5', new Color(0, 255, 255, 200));
-    }
+    @Deprecated
+    private static final Map<Character, Color> CHARACTER_COLOR_MAP = IntStream.range(0, 5).boxed()
+        .flatMap(it -> Stream.of(Pair.create((char) ('A' + it), ColorPalette.FIVE_COLORS[it]), Pair.create((char) ('1' + it), ColorPalette.FIVE_COLORS[it])))
+        .collect(Collectors.toMap(it -> it.a, it -> it.b));
 
     private static final Color CURRENT_WAY_COLOR = new Color(255, 255, 255, 190);
     private static final Color NEXT_WAY_COLOR = new Color(169, 169, 169, 210);
 
-    String I18N_ADD_ONEWAY_VEHICLE_NO_TO_WAY = I18n.marktr("Add oneway:bus=no to way");
     private static final String I18N_CLOSE_OPTIONS = I18n.marktr("Close the options");
-    private static final String I18N_NOT_REMOVE_WAYS = I18n.marktr("Do not remove ways");
-    private static final String I18N_REMOVE_CURRENT_EDGE = I18n.marktr("Remove current edge (white)");
-    private static final String I18N_REMOVE_WAYS = I18n.marktr("Remove ways");
-    private static final String I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY = I18n.marktr("Remove ways along with previous way");
-    private static final String I18N_SKIP = I18n.marktr("Skip");
-    private static final String I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS = I18n
-            .marktr("solutions based on other route relations");
-    private static final String I18N_TURN_BY_TURN_NEXT_INTERSECTION = I18n.marktr("turn-by-turn at next intersection");
-    private static final String I18N_BACKTRACK_WHITE_EDGE = I18n.marktr("Split white edge");
+
     Relation relation;
     MemberTableModel memberTableModel;
     GenericRelationEditor editor;
@@ -135,7 +119,6 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
     boolean firstCall = true;
     boolean halt = false;
     boolean abort = false;
-    boolean shorterRoutes = false;
     boolean showOption0 = false;
     boolean onFly = false;
     boolean aroundGaps = false;
@@ -717,48 +700,36 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
     void goToNextWays(Way way, Way prevWay, List<Way> wayList) {
         List<List<Way>> lst = new ArrayList<>();
         previousWay = prevWay;
-        Node node1 = null;
-        for (Node n : way.getNodes()) {
-            if (prevWay.getNodes().contains(n)) {
-                node1 = n;
-                break;
-            }
-        }
-
-        if (node1 == null) {
-            lst.add(wayList);
-            displayFixVariantsWithOverlappingWays(lst);
-            return;
-        }
+        final Optional<Node> entranceNode = way.getNodes().stream()
+            .filter(prevWay::containsNode)
+            .findFirst();
 
         // check if the way equals the next way, if so then don't add any new ways to the list
-        if (way == wayToReachAfterGap) {
+        if (entranceNode.isEmpty() || way == wayToReachAfterGap) {
             lst.add(wayList);
             displayFixVariantsWithOverlappingWays(lst);
             return;
         }
 
-        Node node = getOtherNode(way, node1);
+        final Node exitNode = entranceNode.map(entrance -> entrance.equals(way.firstNode()) ? way.lastNode() : null).orElse(way.firstNode());
+
         wayList.add(way);
-        List<Way> parents = node.getParentWays();
+        List<Way> parents = exitNode.getParentWays();
         parents.remove(way);
 
-        // if the ways directly touch the next way
-        if (way.isFirstLastNode(wayToReachAfterGap.firstNode()) || way.isFirstLastNode(wayToReachAfterGap.lastNode())) {
-            lst.add(wayList);
-            displayFixVariantsWithOverlappingWays(lst);
-            return;
-        }
-
-        // if next way turns out to be a roundabout
-        if (wayToReachAfterGap.containsNode(node) && WayUtils.isRoundabout(wayToReachAfterGap)) {
+        if (
+            // if the ways directly touch the next way
+            way.isFirstLastNode(wayToReachAfterGap.firstNode()) || way.isFirstLastNode(wayToReachAfterGap.lastNode())
+            // if next way turns out to be a roundabout
+            || wayToReachAfterGap.containsNode(exitNode) && WayUtils.isRoundabout(wayToReachAfterGap)
+        ) {
             lst.add(wayList);
             displayFixVariantsWithOverlappingWays(lst);
             return;
         }
 
         // remove all the invalid ways from the parent ways
-        parents = removeInvalidWaysFromParentWays(parents, node, way);
+        parents = removeInvalidWaysFromParentWays(parents, exitNode, way);
 
         if (parents.size() == 1) {
             // if (already the way exists in the ways to be added
@@ -768,34 +739,26 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
                 return;
             }
             downloadAreaAroundWay(parents.get(0), way, wayList);
-            return;
         } else if (parents.size() > 1) {
-            // keep the most probable option s option A
-            Way minWay = parents.get(0);
-            double minLength = findDistance(minWay, wayToReachAfterGap, node);
-            for (int k = 1; k < parents.size(); k++) {
-                double length = findDistance(parents.get(k), wayToReachAfterGap, node);
-                if (minLength > length) {
-                    minLength = length;
-                    minWay = parents.get(k);
-                }
-            }
+            // keep the most probable option as option A
+
+            final Way minWay = parents.stream()
+                .min(Comparator.comparingDouble(parent -> WayUtils.calcDistanceSqToFirstOrLastWayNode(entranceNode.get(), wayToReachAfterGap)))
+                .orElseThrow();
             parents.remove(minWay);
             parents.add(0, minWay);
 
             // add all the list of ways to list of list of ways
-            for (int i = 0; i < parents.size(); i++) {
+            for (final Way parent : parents) {
                 List<Way> wl = new ArrayList<>(wayList);
-                wl.add(parents.get(i));
+                wl.add(parent);
                 lst.add(wl);
             }
 
             displayFixVariantsWithOverlappingWays(lst);
-            return;
         } else {
             lst.add(wayList);
             displayFixVariantsWithOverlappingWays(lst);
-            return;
         }
     }
 
@@ -805,7 +768,7 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
 
         // if the way is a roundabout but no suitable option for next
         // way was found yet, look at parents of all the roundabout's nodes
-        if (WayUtils.isRoundabout(way) && parentWays.size() == 0) {
+        if (WayUtils.isRoundabout(way) && parentWays.isEmpty()) {
             for (Node n : way.getNodes()) {
                 parentWays.addAll(removeInvalidWaysFromParentWaysOfRoundabouts(n.getParentWays(), n, way));
             }
@@ -815,17 +778,10 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
         Way frontWay = parentWays.stream().filter(it -> checkIfWayConnectsToNextWay(it, 0, node)).findFirst()
                 .orElse(null);
 
-        if (frontWay == null && parentWays.size() > 0) {
-            Way minWay = parentWays.get(0);
-            double minLength = findDistance(minWay, wayToReachAfterGap, node);
-            for (int i = 1; i < parentWays.size(); i++) {
-                double length = findDistance(parentWays.get(i), wayToReachAfterGap, node);
-                if (minLength > length) {
-                    minLength = length;
-                    minWay = parentWays.get(i);
-                }
-            }
-            frontWay = minWay;
+        if (frontWay == null && !parentWays.isEmpty()) {
+            frontWay = parentWays.stream()
+                .min(Comparator.comparingDouble(parentWay -> WayUtils.calcDistanceSqToFirstOrLastWayNode(getOtherNode(parentWay, node), wayToReachAfterGap)))
+                .orElseThrow();
         }
 
         if (frontWay != null) {
@@ -1028,13 +984,6 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
 
         parentWays.removeAll(waysToBeRemoved);
         return parentWays;
-    }
-
-    double findDistance(Way way, Way nextWay, Node node) {
-        Node otherNode = getOtherNode(way, node);
-        double Lat = (nextWay.firstNode().lat() + nextWay.lastNode().lat()) / 2;
-        double Lon = (nextWay.firstNode().lon() + nextWay.lastNode().lon()) / 2;
-        return (otherNode.lat() - Lat) * (otherNode.lat() - Lat) + (otherNode.lon() - Lon) * (otherNode.lon() - Lon);
     }
 
     void downloadAreaAroundWay(Way way, Node node1, Node node2) {
@@ -2099,8 +2048,8 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
 
     void removeTemporarylayers() {
         List<MapViewPaintable> tempLayers = MainApplication.getMap().mapView.getTemporaryLayers();
-        for (int i = 0; i < tempLayers.size(); i++) {
-            MainApplication.getMap().mapView.removeTemporaryLayer(tempLayers.get(i));
+        for (final MapViewPaintable tempLayer : tempLayers) {
+            MainApplication.getMap().mapView.removeTemporaryLayer(tempLayer);
         }
     }
 
@@ -2154,7 +2103,7 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
 
     class MendRelationPaintVisitor extends PaintVisitor {
         /** The graphics */
-        private final Graphics g;
+        private final Graphics2D g;
         /** The MapView */
         private final MapView mv;
         private HashMap<Way, List<Character>> waysColoring;
@@ -2173,100 +2122,58 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
         void drawVariants() {
             drawFixVariantsWithParallelLines(true);
 
-            Color[] colors = { new Color(0, 255, 150), new Color(255, 0, 0, 150), new Color(0, 0, 255, 150),
-                    new Color(255, 255, 0, 150), new Color(0, 255, 255, 150) };
-
             double letterX = MainApplication.getMap().mapView.getBounds().getMinX() + 20;
             double letterY = MainApplication.getMap().mapView.getBounds().getMinY() + 100;
 
             boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
-            Character chr = 'A';
-            if (numeric)
-                chr = '1';
 
-            if (showOption0 && numeric) {
-                if (!shorterRoutes)
-                    drawFixVariantLetter("0 : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
-                            letterY, 25);
-                else
-                    drawFixVariantLetter("0 : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
-                            letterY, 25);
-                letterY = letterY + 60;
-            } else if (showOption0) {
-                if (!shorterRoutes)
-                    drawFixVariantLetter("W : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
-                            letterY, 25);
-                else
-                    drawFixVariantLetter("W : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
-                            letterY, 25);
-                letterY = letterY + 60;
+            final char firstCharacter = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get() ? '1' : 'A';
+
+            if (showOption0) {
+                for (final RouteFixVariant fixVariant : Collections.singletonList(RouteFixVariant.TURN_BY_TURN_NEXT_INTERSECTION)) {
+                    drawFixVariant(PublicTransportMendRelationAction.this, fixVariant, letterX, letterY);
+                    letterY += 60;
+                }
             }
 
             for (int i = 0; i < 5; i++) {
-                if (wayColoring.containsValue(chr)) {
-                    drawFixVariantLetter(chr.toString(), colors[i], letterX, letterY, 35);
+                if (wayColoring.containsValue((char) (firstCharacter + i))) {
+                    drawKeyboardHint(String.valueOf((char) (firstCharacter + i)), ColorPalette.FIVE_COLORS[i], letterX, letterY, 35);
                     letterY = letterY + 60;
                 }
-                chr++;
             }
 
             // display the "Esc", "Skip" label:
-            drawFixVariantLetter("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 25);
-            letterY = letterY + 60;
-            if (numeric) {
-                drawFixVariantLetter("7 : " + tr(I18N_SKIP), Color.WHITE, letterX, letterY, 25);
-                letterY = letterY + 60;
-                drawFixVariantLetter("8 : " + tr(I18N_BACKTRACK_WHITE_EDGE), Color.WHITE, letterX, letterY, 25);
-                letterY = letterY + 60;
-                drawFixVariantLetter("9 : " + tr(I18N_REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
-            } else {
-                drawFixVariantLetter("S : " + tr(I18N_SKIP), Color.WHITE, letterX, letterY, 25);
-                letterY = letterY + 60;
-                drawFixVariantLetter("V : " + tr(I18N_BACKTRACK_WHITE_EDGE), Color.WHITE, letterX, letterY, 25);
-                letterY = letterY + 60;
-                drawFixVariantLetter("Q : " + tr(I18N_REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
+            drawKeyboardHint("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 25);
+            for (final RouteFixVariant fixVariant : Arrays.asList(RouteFixVariant.SKIP, RouteFixVariant.BACKTRACK_WHITE_EDGE, RouteFixVariant.REMOVE_CURRENT_EDGE)) {
+                letterY += 60;
+                drawFixVariant(PublicTransportMendRelationAction.this, fixVariant, letterX, letterY);
             }
         }
 
         void drawOptionsToRemoveWays() {
             drawFixVariantsWithParallelLines(false);
-            boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
 
             double letterX = MainApplication.getMap().mapView.getBounds().getMinX() + 20;
             double letterY = MainApplication.getMap().mapView.getBounds().getMinY() + 100;
 
             if (notice != null) {
-                drawFixVariantLetter("Error:  " + notice, Color.WHITE, letterX, letterY, 25);
-                letterY = letterY + 60;
-            }
-            if (numeric) {
-                drawFixVariantLetter("1 : " + tr(I18N_REMOVE_WAYS), FIVE_COLOR_PALETTE[0], letterX, letterY, 25);
-                letterY = letterY + 60;
-                drawFixVariantLetter("2 : " + tr(I18N_NOT_REMOVE_WAYS), FIVE_COLOR_PALETTE[1], letterX, letterY, 25);
-                letterY = letterY + 60;
-                drawFixVariantLetter("3 : " + tr(I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY), FIVE_COLOR_PALETTE[4], letterX,
-                        letterY, 25);
-                letterY = letterY + 60;
-                if (notice.equals("vehicle travels against oneway restriction")) {
-                    drawFixVariantLetter("4 : " + tr(I18N_ADD_ONEWAY_VEHICLE_NO_TO_WAY), FIVE_COLOR_PALETTE[3], letterX,
-                            letterY, 25);
-                }
-            } else {
-                drawFixVariantLetter("A : " + tr(I18N_REMOVE_WAYS), FIVE_COLOR_PALETTE[0], letterX, letterY, 25);
-                letterY = letterY + 60;
-                drawFixVariantLetter("B : " + tr(I18N_NOT_REMOVE_WAYS), FIVE_COLOR_PALETTE[1], letterX, letterY, 25);
-                letterY = letterY + 60;
-                if (notice.equals("vehicle travels against oneway restriction")) {
-                    drawFixVariantLetter("C : " + tr(I18N_ADD_ONEWAY_VEHICLE_NO_TO_WAY), FIVE_COLOR_PALETTE[3], letterX,
-                            letterY, 25);
-                    letterY = letterY + 60;
-                }
-                drawFixVariantLetter("R : " + tr(I18N_REMOVE_WAYS_WITH_PREVIOUS_WAY), FIVE_COLOR_PALETTE[4], letterX,
-                        letterY, 25);
+                drawKeyboardHint("Error:  " + notice, Color.WHITE, letterX, letterY, 25);
+                letterY += 60;
             }
 
-            letterY = letterY + 60;
-            drawFixVariantLetter("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 30);
+            final List<RouteFixVariant> fixVariants = Stream.of(
+              RouteFixVariant.REMOVE_WAYS,
+              RouteFixVariant.NOT_REMOVE_WAYS,
+              RouteFixVariant.REMOVE_WAYS_WITH_PREVIOUS_WAY,
+              "vehicle travels against oneway restriction".equals(notice) ? RouteFixVariant.ADD_ONEWAY_VEHICLE_NO_TO_WAY : null
+            ).filter(Objects::nonNull).collect(Collectors.toList());
+
+            for (final RouteFixVariant fixVariant : fixVariants) {
+                drawFixVariant(PublicTransportMendRelationAction.this, fixVariant, letterX, letterY);
+                letterY += 60;
+            }
+            drawKeyboardHint("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 30);
         }
 
         void drawMultipleVariants(HashMap<Character, List<Way>> fixVariants) {
@@ -2279,52 +2186,29 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
             double letterX = MainApplication.getMap().mapView.getBounds().getMinX() + 20;
             double letterY = MainApplication.getMap().mapView.getBounds().getMinY() + 100;
 
-            boolean numeric = PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get();
-
-            if (showOption0 && numeric) {
-                if (!shorterRoutes)
-                    drawFixVariantLetter("0 : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
-                            letterY, 25);
-                else
-                    drawFixVariantLetter("0 : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
-                            letterY, 25);
-                letterY = letterY + 60;
-            } else if (showOption0) {
-                if (!shorterRoutes)
-                    drawFixVariantLetter("W : " + tr(I18N_TURN_BY_TURN_NEXT_INTERSECTION), Color.ORANGE, letterX,
-                            letterY, 25);
-                else
-                    drawFixVariantLetter("W : " + tr(I18N_SOLUTIONS_BASED_ON_OTHER_RELATIONS), Color.PINK, letterX,
-                            letterY, 25);
-                letterY = letterY + 60;
+            if (showOption0) {
+                for (final RouteFixVariant fixVariant : Collections.singletonList(RouteFixVariant.TURN_BY_TURN_NEXT_INTERSECTION)) {
+                    drawFixVariant(PublicTransportMendRelationAction.this, fixVariant, letterX, letterY);
+                    letterY += 60;
+                }
             }
 
             for (Entry<Character, List<Way>> entry : fixVariants.entrySet()) {
                 Character c = entry.getKey();
                 if (fixVariants.get(c) != null) {
-                    drawFixVariantLetter(c.toString(), FIVE_COLOR_PALETTE[colorIndex % 5], letterX, letterY, 35);
+                    drawKeyboardHint(c.toString(), ColorPalette.FIVE_COLORS[colorIndex % 5], letterX, letterY, 35);
                     colorIndex++;
                     letterY = letterY + 60;
                 }
             }
 
             // display the "Esc", "Skip" label:
-            drawFixVariantLetter("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 25);
-            letterY = letterY + 60;
-            if (numeric) {
-                drawFixVariantLetter("7 : " + tr(I18N_SKIP), Color.WHITE, letterX, letterY, 25);
-                letterY = letterY + 60;
-                drawFixVariantLetter("8 : " + tr(I18N_BACKTRACK_WHITE_EDGE), Color.WHITE, letterX, letterY, 25);
-                letterY = letterY + 60;
-                drawFixVariantLetter("9 : " + tr(I18N_REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
-            } else {
-                drawFixVariantLetter("S : " + tr(I18N_SKIP), Color.WHITE, letterX, letterY, 25);
-                letterY = letterY + 60;
-                drawFixVariantLetter("V : " + tr(I18N_BACKTRACK_WHITE_EDGE), Color.WHITE, letterX, letterY, 25);
-                letterY = letterY + 60;
-                drawFixVariantLetter("Q : " + tr(I18N_REMOVE_CURRENT_EDGE), Color.WHITE, letterX, letterY, 25);
-            }
+            drawKeyboardHint("Esc : " + tr(I18N_CLOSE_OPTIONS), Color.WHITE, letterX, letterY, 25);
 
+            for (final RouteFixVariant fixVariant : Arrays.asList(RouteFixVariant.SKIP, RouteFixVariant.BACKTRACK_WHITE_EDGE, RouteFixVariant.REMOVE_CURRENT_EDGE)) {
+                letterY += 60;
+                drawFixVariant(PublicTransportMendRelationAction.this, fixVariant, letterX, letterY);
+            }
         }
 
         protected void drawFixVariantsWithParallelLines(final boolean drawNextWay) {
@@ -2445,26 +2329,21 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
             }
         }
 
-        /**
-         * Visualizes the letters for each fix variant
-         * @param letter letter to draw
-         * @param color text color
-         * @param letterX X coordinate
-         * @param letterY Y coordinate
-         * @param size font size
-         */
-        private void drawFixVariantLetter(String letter, Color color, double letterX, double letterY, int size) {
+        private void drawFixVariant(final AbstractMendRelation action, final RouteFixVariant fixVariant, final double x, final double y) {
+            drawKeyboardHint(
+                (
+                    PTAssistantPluginPreferences.NUMERICAL_OPTIONS.get()
+                        ? fixVariant.getNumericCharacter()
+                        : fixVariant.getAlphabeticCharacter()
+                ) + " : " + fixVariant.getDescription(action),
+                fixVariant.getColor(),
+                x, y, 25
+            );
+        }
+        private void drawKeyboardHint(final String hint, final Color color, final double x, final double y, final float size) {
             g.setColor(color);
-            Font stringFont = new Font("SansSerif", Font.PLAIN, size);
-            g.setFont(stringFont);
-            try {
-                g.drawString(letter, (int) letterX, (int) letterY);
-                g.drawString(letter, (int) letterX, (int) letterY);
-            } catch (NullPointerException ex) {
-                // do nothing
-                Logging.trace(ex);
-            }
-
+            g.setFont(g.getFont().deriveFont(Font.PLAIN).deriveFont(size));
+            g.drawString(hint, (float) x, (float) y);
         }
     }
 
