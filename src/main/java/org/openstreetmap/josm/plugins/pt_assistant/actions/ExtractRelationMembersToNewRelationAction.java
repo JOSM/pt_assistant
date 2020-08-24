@@ -83,12 +83,12 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
     @Override
     protected void updateEnabledState() {
         final boolean newEnabledState = !editorAccess.getSelectionTableModel().getSelection().isEmpty()
-            && Optional.ofNullable(editorAccess.getTagModel().get("type")).filter(it -> "superroute".equals(it.getValue())).isPresent();
+            && Optional.ofNullable(editorAccess.getTagModel().get("type")).filter(it -> "route".equals(it.getValue())).isPresent();
 
         putValue(SHORT_DESCRIPTION, (
             newEnabledState
                 ? I18n.tr("Extract part of the route into new relation")
-                : I18n.tr("Extract into new relation (needs type=superroute tag and at least one selected relation member)")
+                : I18n.tr("Extract into new relation (needs type=route tag and at least one selected relation member)")
         ));
         setEnabled(newEnabledState);
     }
