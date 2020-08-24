@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import javax.swing.JOptionPane;
 
+import org.openstreetmap.josm.command.ChangeCommand;
+import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
@@ -27,12 +29,28 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
     public void actionPerformed(ActionEvent actionEvent) {
         final Collection<RelationMember> selectedMembers = editorAccess.getMemberTableModel().getSelectedMembers();
         final Map<String, String> tags = editorAccess.getTagModel().getTags();
+        final Relation superroute_relation = editorAccess.getEditor().getRelation();
 
         final Relation extractedRelation = new Relation();
         extractedRelation.setKeys(tags);
-        for (final RelationMember member : selectedMembers) {
-            extractedRelation.addMember(member);
+        int i = 0; boolean flag = true;
+
+        Relation newsuperroute_relation = new Relation(superroute_relation);
+        for (final RelationMember member : newsuperroute_relation.getMembers()) {
+            if (selectedMembers.contains(member)) {
+                extractedRelation.addMember(member);
+                newsuperroute_relation.removeMembersFor(member.getMember());
+            }
+            if (flag) {
+                // superroute_relation.addMember(i, new RelationMember("", extractedRelation));
+                flag = false;
+            }
+            i++;
         }
+        extractedRelation.put("type", "route");
+
+        UndoRedoHandler.getInstance().add(new ChangeCommand(superroute_relation, newsuperroute_relation));
+        editorAccess.getEditor().reloadDataFromRelation();
 
         if (
             JOptionPane.showConfirmDialog(
@@ -61,12 +79,12 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
     @Override
     protected void updateEnabledState() {
         final boolean newEnabledState = !editorAccess.getSelectionTableModel().getSelection().isEmpty()
-            && Optional.ofNullable(editorAccess.getTagModel().get("type")).filter(it -> "route".equals(it.getValue())).isPresent();
+            && Optional.ofNullable(editorAccess.getTagModel().get("type")).filter(it -> "superroute".equals(it.getValue())).isPresent();
 
         putValue(SHORT_DESCRIPTION, (
             newEnabledState
                 ? I18n.tr("Extract part of the route into new relation")
-                : I18n.tr("Extract into new relation (needs type=route tag and at least one selected relation member)")
+                : I18n.tr("Extract into new relation (needs type=superroute tag and at least one selected relation member)")
         ));
         setEnabled(newEnabledState);
     }
