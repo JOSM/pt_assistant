@@ -1,23 +1,24 @@
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import javax.swing.JOptionPane;
 
+import org.openstreetmap.josm.command.AddCommand;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
+import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
+
+import static org.openstreetmap.josm.gui.MainApplication.*;
 
 public class ExtractRelationMembersToNewRelationAction extends AbstractRelationEditorAction {
     public ExtractRelationMembersToNewRelationAction(IRelationEditorActionAccess editorAccess) {
@@ -29,28 +30,8 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
     public void actionPerformed(ActionEvent actionEvent) {
         final Collection<RelationMember> selectedMembers = editorAccess.getMemberTableModel().getSelectedMembers();
         final Map<String, String> tags = editorAccess.getTagModel().getTags();
-        final Relation superroute_relation = editorAccess.getEditor().getRelation();
+        final Relation originalRelation = editorAccess.getEditor().getRelation();
 
-        final Relation extractedRelation = new Relation();
-        extractedRelation.setKeys(tags);
-        int i = 0; boolean flag = true;
-
-        Relation newsuperroute_relation = new Relation(superroute_relation);
-        for (final RelationMember member : newsuperroute_relation.getMembers()) {
-            if (selectedMembers.contains(member)) {
-                extractedRelation.addMember(member);
-                newsuperroute_relation.removeMembersFor(member.getMember());
-            }
-            if (flag) {
-                // superroute_relation.addMember(i, new RelationMember("", extractedRelation));
-                flag = false;
-            }
-            i++;
-        }
-        extractedRelation.put("type", "route");
-
-        UndoRedoHandler.getInstance().add(new ChangeCommand(superroute_relation, newsuperroute_relation));
-        editorAccess.getEditor().reloadDataFromRelation();
 
         if (
             JOptionPane.showConfirmDialog(
@@ -66,7 +47,30 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                 JOptionPane.QUESTION_MESSAGE
             ) == JOptionPane.OK_OPTION
         ) {
-            getEditor().getLayer().data.addPrimitive(extractedRelation);
+            final Relation extractedRelation = new Relation();
+            extractedRelation.setKeys(tags);
+            UndoRedoHandler.getInstance().add(new AddCommand(getLayerManager().getActiveDataSet(), extractedRelation));
+            final Relation newExtractedRelation = new Relation(extractedRelation);
+            boolean flag = true;
+
+            Relation newRelation = new Relation(originalRelation);
+            List<RelationMember> members = newRelation.getMembers();
+            for (int i = members.size()-1; i >= 0; i--) {
+                RelationMember member = members.get(i);
+                if (selectedMembers.contains(member)) {
+                    newExtractedRelation.addMember(0, member);
+                    newRelation.removeMember(i);
+                    if (flag) {
+                        newRelation.addMember(i, new RelationMember("", extractedRelation));
+                        flag = false;
+                    }
+                }
+            }
+            newExtractedRelation.put("type", "route");
+
+            UndoRedoHandler.getInstance().add(new ChangeCommand(originalRelation, newRelation));
+            UndoRedoHandler.getInstance().add(new ChangeCommand(extractedRelation, newExtractedRelation));
+            editorAccess.getEditor().reloadDataFromRelation();
             RelationEditor.getEditor(getEditor().getLayer(), extractedRelation, Collections.emptyList()).setVisible(true);
         }
     }
