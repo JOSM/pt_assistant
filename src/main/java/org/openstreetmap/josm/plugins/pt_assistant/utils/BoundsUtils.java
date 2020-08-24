@@ -4,6 +4,7 @@ package org.openstreetmap.josm.plugins.pt_assistant.utils;
 import java.util.Collection;
 import java.util.Optional;
 
+import com.drew.lang.annotations.NotNull;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.Way;
@@ -52,5 +53,14 @@ public final class BoundsUtils {
                 it.getBottomRightLon() + xPadding
             );
         });
+    }
+
+    /**
+     * Converts the given {@link BBox} to {@link Bounds}
+     * @param bbox the bbox to convert
+     * @return the bounds equivalent to the passed bbox
+     */
+    public static Bounds fromBBox(@NotNull final BBox bbox) {
+        return new Bounds(bbox.getBottomRightLat(), bbox.getTopLeftLon(), bbox.getTopLeftLat(), bbox.getBottomRightLon());
     }
 }
