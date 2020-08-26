@@ -65,9 +65,8 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
             }
             UndoRedoHandler.getInstance().add(new AddCommand(getLayerManager().getActiveDataSet(), extractedRelation));
 
-            if (index > 0) {
-                newRelation.addMember(index, new RelationMember("", extractedRelation));
-            }
+            newRelation.addMember(index, new RelationMember("", extractedRelation));
+
             UndoRedoHandler.getInstance().add(new ChangeCommand(originalRelation, newRelation));
             editorAccess.getEditor().reloadDataFromRelation();
             RelationEditor.getEditor(getEditor().getLayer(), extractedRelation, Collections.emptyList()).setVisible(true);
