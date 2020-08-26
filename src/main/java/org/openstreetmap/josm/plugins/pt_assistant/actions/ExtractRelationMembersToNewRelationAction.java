@@ -11,6 +11,7 @@ import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.gui.dialogs.relation.MemberTableModel;
 import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
@@ -28,7 +29,8 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        final Collection<RelationMember> selectedMembers = editorAccess.getMemberTableModel().getSelectedMembers();
+        final MemberTableModel memberTableModel = editorAccess.getMemberTableModel();
+        final Collection<RelationMember> selectedMembers = memberTableModel.getSelectedMembers();
         final Map<String, String> tags = editorAccess.getTagModel().getTags();
         final Relation originalRelation = editorAccess.getEditor().getRelation();
 
@@ -49,27 +51,24 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
         ) {
             final Relation extractedRelation = new Relation();
             extractedRelation.setKeys(tags);
-            UndoRedoHandler.getInstance().add(new AddCommand(getLayerManager().getActiveDataSet(), extractedRelation));
-            final Relation newExtractedRelation = new Relation(extractedRelation);
-            boolean flag = true;
+            extractedRelation.put("type", "route");
 
-            Relation newRelation = new Relation(originalRelation);
+            final Relation newRelation = new Relation(originalRelation);
             List<RelationMember> members = newRelation.getMembers();
-            for (int i = members.size()-1; i >= 0; i--) {
-                RelationMember member = members.get(i);
-                if (selectedMembers.contains(member)) {
-                    newExtractedRelation.addMember(0, member);
-                    newRelation.removeMember(i);
-                    if (flag) {
-                        newRelation.addMember(i, new RelationMember("", extractedRelation));
-                        flag = false;
-                    }
-                }
+            int[] selectedIndices = memberTableModel.getSelectedIndices();
+            int index = 0;
+            for (int i = selectedIndices.length-1; i >= 0; i--) {
+                index = selectedIndices[i];
+                RelationMember member = members.get(index);
+                extractedRelation.addMember(0, member);
+                newRelation.removeMember(index);
             }
-            newExtractedRelation.put("type", "route");
+            UndoRedoHandler.getInstance().add(new AddCommand(getLayerManager().getActiveDataSet(), extractedRelation));
 
+            if (index > 0) {
+                newRelation.addMember(index, new RelationMember("", extractedRelation));
+            }
             UndoRedoHandler.getInstance().add(new ChangeCommand(originalRelation, newRelation));
-            UndoRedoHandler.getInstance().add(new ChangeCommand(extractedRelation, newExtractedRelation));
             editorAccess.getEditor().reloadDataFromRelation();
             RelationEditor.getEditor(getEditor().getLayer(), extractedRelation, Collections.emptyList()).setVisible(true);
         }
@@ -83,7 +82,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
     @Override
     protected void updateEnabledState() {
         final boolean newEnabledState = !editorAccess.getSelectionTableModel().getSelection().isEmpty()
-            && Optional.ofNullable(editorAccess.getTagModel().get("type")).filter(it -> "route".equals(it.getValue())).isPresent();
+            && Optional.ofNullable(editorAccess.getTagModel().get("type")).filter(it -> it.getValue().matches("route|superroute")).isPresent();
 
         putValue(SHORT_DESCRIPTION, (
             newEnabledState
