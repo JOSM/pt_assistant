@@ -10,7 +10,6 @@ import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
-import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.dialogs.relation.MemberTableModel;
 import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
@@ -49,28 +48,37 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                 JOptionPane.QUESTION_MESSAGE
             ) == JOptionPane.OK_OPTION
         ) {
-            final Relation extractedRelation = new Relation();
-            extractedRelation.setKeys(tags);
-            extractedRelation.put("type", "route");
-
-            final Relation newRelation = new Relation(originalRelation);
-            List<RelationMember> members = newRelation.getMembers();
-            int[] selectedIndices = memberTableModel.getSelectedIndices();
-            int index = 0;
-            for (int i = selectedIndices.length-1; i >= 0; i--) {
-                index = selectedIndices[i];
-                RelationMember member = members.get(index);
-                extractedRelation.addMember(0, member);
-                newRelation.removeMember(index);
-            }
-            UndoRedoHandler.getInstance().add(new AddCommand(getLayerManager().getActiveDataSet(), extractedRelation));
-
-            newRelation.addMember(index, new RelationMember("", extractedRelation));
-
-            UndoRedoHandler.getInstance().add(new ChangeCommand(originalRelation, newRelation));
+            final Relation extractedRelation = extractMembersToRouteRelationAndSubstituteThem(originalRelation, memberTableModel, tags);
             editorAccess.getEditor().reloadDataFromRelation();
             RelationEditor.getEditor(getEditor().getLayer(), extractedRelation, Collections.emptyList()).setVisible(true);
         }
+    }
+
+    public Relation extractMembersToRouteRelationAndSubstituteThem(Relation originalRelation, MemberTableModel memberTableModel, Map<String, String> tags) {
+        int[] selectedIndices = memberTableModel.getSelectedIndices();
+        return extractMembersForIndicesAndSubstitute(originalRelation, selectedIndices, tags);
+    }
+
+    public Relation extractMembersForIndicesAndSubstitute(Relation originalRelation, int[] selectedIndices, Map<String, String> tags) {
+        final Relation extractedRelation = new Relation();
+        extractedRelation.setKeys(tags);
+        extractedRelation.put("type", "route");
+
+        final Relation newRelation = new Relation(originalRelation);
+        List<RelationMember> members = newRelation.getMembers();
+        int index = 0;
+        for (int i = selectedIndices.length-1; i >= 0; i--) {
+            index = selectedIndices[i];
+            RelationMember member = members.get(index);
+            extractedRelation.addMember(0, member);
+            newRelation.removeMember(index);
+        }
+        UndoRedoHandler.getInstance().add(new AddCommand(getLayerManager().getActiveDataSet(), extractedRelation));
+
+        newRelation.addMember(index, new RelationMember("", extractedRelation));
+
+        UndoRedoHandler.getInstance().add(new ChangeCommand(originalRelation, newRelation));
+        return extractedRelation;
     }
 
     @Override
