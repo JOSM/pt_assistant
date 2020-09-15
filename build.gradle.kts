@@ -1,5 +1,5 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.net.URL
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
   java
@@ -69,7 +69,7 @@ tasks.withType(ProcessResources::class).getByName(sourceSets["main"].processReso
   from(projectDir) {
     include("images/**")
     include("GPL-*")
-    include("README")
+    include("README.md")
     include("LICENSE")
   }
 }
