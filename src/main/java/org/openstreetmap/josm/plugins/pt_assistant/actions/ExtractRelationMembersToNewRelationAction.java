@@ -36,7 +36,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
         super(editorAccess, IRelationEditorUpdateOn.MEMBER_TABLE_SELECTION,
             IRelationEditorUpdateOn.MEMBER_TABLE_CHANGE,
             IRelationEditorUpdateOn.TAG_CHANGE);
-        new ImageProvider("bus").getResource().attachImageIcon(this);
+        new ImageProvider("dialogs/relation", "extract_relation").getResource().attachImageIcon(this);
     }
 
     @Override
