@@ -18,6 +18,7 @@ import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
+import org.openstreetmap.josm.plugins.pt_assistant.data.PTSegmentToExtract;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.*;
 
@@ -91,7 +92,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
             paramsList.add(cbFindAllSegmentsAutomatically);
         }
         paramsList.add(cbConvertToSuperroute);
-        Object[] params = paramsList.toArray(new Object[paramsList.size()]);
+        Object[] params = paramsList.toArray(new Object[0]); // paramsList.size()]);
         if (
             JOptionPane.showConfirmDialog(
                 getMemberTable(),
@@ -146,194 +147,184 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                     }
                 }
             } else {
-                final Relation clonedRelation = new Relation(originalRelation);
-                DataSet activeDataSet = getLayerManager().getActiveDataSet();
-                String previousLineIdentifiersSignature = "";
-                List<RelationMember> members = clonedRelation.getMembers();
-                List<String> streetNamesList = new ArrayList<>();
-                List<Integer> selectedIndices = new ArrayList<>();
-                Way nextWay = new Way();
-                boolean startNewSegment = false;
-                boolean firstWayWasReached = false;
-                for (int i = members.size()-1; i>=0; i--) {
-                    RelationMember rm = members.get(i);
-                    selectedIndices.add(0, i);
-                    if (RouteUtils.isPTWay(rm)) {
-                        final Way rmWay = rm.getWay();
-                        List<Relation> parentRouteRelations = new ArrayList<>(Utils.filteredCollection(rmWay.getReferrers(), Relation.class));
-                        List<String> lineIdentifiersList = new ArrayList<>();
-                        String ref = clonedRelation.get("ref");
-                        if (ref != null) {
-                            lineIdentifiersList.add(ref);
-                        }
-                        startNewSegment = false;
-                        if (i==0) {
-                            // make sure we process the last segment
-                            // since we're working backwards, it's actually the first segment
-                            startNewSegment = true;
-                        } else {
-                            // also make sure to reset startNewSegment flag
-
-                        }
-                        for (Relation pr : parentRouteRelations) {
-                            if (RouteUtils.isVersionTwoPTRoute(pr) && pr.getId() != clonedRelation.getId()) {
-                                // todo code is needed to detect way sequences that are in the route relation twice
-                                List<Pair<Way, Way>> prevAndNext = findPreviousAndNextWayInRoute(pr.getMembers(), rmWay);
-                                Way previousWayInParentRoute = null;
-                                Way nextWayInParentRoute = null;
-                                for (int j=prevAndNext.size()-1; j>0; j--) {
-//                                    if (j<prevAndNext.size()-1) {
-//                                        break;
-//                                    }
-                                    Pair<Way, Way> pan = prevAndNext.get(j);
-                                    previousWayInParentRoute = pan.a;
-                                    nextWayInParentRoute = pan.b;
-
-                                    /*
-                                     We are not interested in route relations that describe vehicles
-                                     traveling in the opposite direction
-                                    */
-                                    Way previousWay = findPreviousWay(members, i);
-                                    String currentWayName = rmWay.get("name");
-                                    String previousWayName = previousWay.get("name");
-                                    String previousWayInParentName = previousWayInParentRoute.get("name");
-                                    if (nextWayInParentRoute != null) {
-                                        String nextWayInParentName = nextWayInParentRoute.get("name");
-                                    }
-                                    String nextWayName = nextWay.get("name");
-                                    if (currentWayName == "006 Burchtstraat") {
-                                        currentWayName = rmWay.get("name");
-                                    }
-                                    final long previousWayId = previousWay.getId();
-                                    if (nextWayInParentRoute != null &&
-                                        (previousWayId == nextWayInParentRoute.getId() ||
-                                            nextWay.getId() == previousWayInParentRoute.getId())) {
-                                        // this parent relation describes an itinerary in the opposite direction
-                                        // so we don't need it
-                                    } else {
-                                        if (!startNewSegment && previousWayId != previousWayInParentRoute.getId()) {
-                                            // if one of the parent relations has a different previous way
-                                            // it's time to start a new segment
-                                            startNewSegment = true;
-                                        }
-                                        // If the next way after the previous way's in one of the parent
-                                        // routes isn't the same as the way we're looking at right now
-                                        // a split is also needed
-                                        if (!startNewSegment) {
-                                            // no need to check for this if a new segment will be created anyway already
-                                            List<Relation> parentRoutesOfPreviousWay = new ArrayList<>(Utils.filteredCollection(previousWay.getReferrers(), Relation.class));
-                                            for (Relation prOfPreviousWay : parentRoutesOfPreviousWay) {
-                                                if (RouteUtils.isVersionTwoPTRoute(prOfPreviousWay)) {
-                                                    List<Pair<Way, Way>> prevAndNextParent = findPreviousAndNextWayInRoute(prOfPreviousWay.getMembers(), previousWay);
-                                                    Way nextWayInParentRouteOfPreviousWay = null;
-                                                    for (int k = prevAndNextParent.size()-1; k>0; k--) {
-//                                                        if (k<prevAndNextParent.size()-1) {
-//                                                            break;
-//                                                        }
-                                                        Pair<Way, Way> panParent = prevAndNext.get(k);
-                                                        nextWayInParentRouteOfPreviousWay = panParent.b;
-                                                        if (nextWayInParentRouteOfPreviousWay != null
-                                                            && nextWayInParentRouteOfPreviousWay != rmWay) {
-                                                            startNewSegment = true;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        String lineIdentifier = pr.get("ref");
-                                        if (lineIdentifier != null && !lineIdentifiersList.contains(lineIdentifier)) {
-                                            lineIdentifiersList.add(lineIdentifier);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        sort(lineIdentifiersList);
-                        String lineIdentifiersSignature = String.join(";", lineIdentifiersList);
-
-                        String streetName = rmWay.get("name");
-                        if (streetName == null) {
-                            streetName = rmWay.get("ref");
-                        }
-                        addStreetName(streetNamesList, streetName);
-                        if (startNewSegment) {
-                            ArrayList<String> allButLastStreetNames = new ArrayList<>();
-                            for (int j = 0; j < streetNamesList.size()-1; j++) {
-                                String element = streetNamesList.get(j);
-                                allButLastStreetNames.add(element);
-                            }
-                            String streetNamesSignature = String.join(";", allButLastStreetNames);
-                            Relation extractedRelation = extractMembersForIndicesAndSubstitute(
-                                clonedRelation, selectedIndices, true);
-                            if (extractedRelation != null && extractedRelation.getId() <= 0) {
-                                updateTags(lineIdentifiersSignature, allButLastStreetNames, streetNamesSignature, extractedRelation);
-                                commands.add(new AddCommand(activeDataSet, extractedRelation));
-                            }
-                            String lastStreetName = "";
-                            if (streetNamesList.size()>0) {
-                                lastStreetName = streetNamesList.get(0); // streetNamesList.size() - 1);
-                            }
-                            streetNamesList = new ArrayList<>();
-                            if (!"".equals(lastStreetName)) {
-                                streetNamesList.add(lastStreetName);
-                            }
-                            selectedIndices = new ArrayList<>();
-                        }
-                        nextWay = rmWay;
-                        if (firstWayWasReached == true) {
-                            break;
-                        }
-                    } else {
-                        firstWayWasReached = true;
-                    }
-                }
-                commands.add(new ChangeCommand(originalRelation, clonedRelation));
-                UndoRedoHandler.getInstance().add(new SequenceCommand(I18n.tr("Extract ways to relation"), commands));
+                splitInSegments(originalRelation);
                 editor.reloadDataFromRelation();
             }
         }
     }
 
-    private Way findPreviousWay(List<RelationMember> members, int i) {
-        if (i < 1) {
-            return new Way();
+    public void splitInSegments(Relation originalRelation) {
+        final DataSet activeDataSet = getLayerManager().getActiveDataSet();
+        final Relation clonedRelation = new Relation(originalRelation);
+        final long clonedRelationId = clonedRelation.getId();
+        final List<RelationMember> members = clonedRelation.getMembers();
+        List<PTSegmentToExtract> segments = new ArrayList<>();
+        RelationMember previousWayMember = null;
+        RelationMember currentWayMember = null;
+        RelationMember nextWayMember = null;
+        boolean startNewSegment = false;
+        PTSegmentToExtract segment = null;
+        for (int i = members.size()-1; i>=0; i--) {
+            RelationMember rm = members.get(i);
+            if (RouteUtils.isPTWay(rm)) {
+                previousWayMember = rm;
+                if (currentWayMember == null) {
+                    currentWayMember = previousWayMember;
+                    continue;
+                } else if (nextWayMember == null) {
+                    nextWayMember = currentWayMember;
+                    currentWayMember = previousWayMember;
+                    segment = new PTSegmentToExtract(clonedRelation);
+                    continue;
+                }
+                // now previousWayMember, currentWayMember and nextWayMember all have values
+                // how to decide whether currentWayMember is in the same segment as nextWayMember?
+                // it is if for all the parent route relations of currentWayMember
+                // that go in the same direction, the nextWayMember is the same as the nextWayMember of this route
+                // to exclude route that go in the opposite direction it's necessary to compare
+                // previousWayMember with their nextWayMember and nextWayMember with their previousWayMember
+                final Way previousWay = previousWayMember.getWay();
+                final Way currentWay = currentWayMember.getWay();
+                final Way nextWay = nextWayMember.getWay();
+                List<Relation> parentRouteRelations = new ArrayList<>(Utils.filteredCollection(currentWay.getReferrers(), Relation.class));
+                if (segment != null) {
+                    segment.addPTWay(nextWayMember, i+2,
+                                     clonedRelation.get("ref"), clonedRelation.get("colour"));
+                }
+                if (startNewSegment) {
+                    segments.add(segment);
+
+                    Relation extractedRelation = extractMembersForIndicesAndSubstitute(
+                        clonedRelation, segment.getIndices(), true);
+
+                    if (extractedRelation != null && extractedRelation.getId() <= 0) {
+                        updateTags(segment.getLineIdentifiersSignature(),
+                                   segment.getFirstAndLastStreetNameOrRef(),
+                                   segment.getStreetNamesSignature(),
+                                   segment.getColoursSignature(),
+                                   extractedRelation);
+                        UndoRedoHandler.getInstance().add(new AddCommand(activeDataSet, extractedRelation));
+                    }
+                    segment = new PTSegmentToExtract(clonedRelation);
+                    startNewSegment = false;
+                }
+                String previousWayName = previousWay.get("name");
+                String currentWayName = currentWay.get("name");
+                String nextWayName = nextWay.get("name");
+                final long previousWayId = previousWay.getId();
+                for (Relation parentRoute : parentRouteRelations) {
+                    if (parentRoute.getId() != clonedRelationId && RouteUtils.isVersionTwoPTRoute(parentRoute)) {
+                        List<Pair<Way, Way>> prevAndNext = findPreviousAndNextWayInRoute(parentRoute.getMembers(), currentWay);
+                        Way previousWayInParentRoute = null;
+                        Way nextWayInParentRoute = null;
+                        for (int k = 0; k < prevAndNext.size(); k++) {
+                            Pair<Way, Way> wayPair = prevAndNext.get(k);
+                            previousWayInParentRoute = wayPair.a;
+                            nextWayInParentRoute = wayPair.b;
+                            /*
+                             We are not interested in route relations that describe vehicles
+                             traveling in the opposite direction
+                            */
+                            long previousWayInParentRouteId = 0;
+                            if (previousWayInParentRoute != null) {
+                                String previousWayInParentName = previousWayInParentRoute.get("name");
+                                previousWayInParentRouteId = previousWayInParentRoute.getId();
+                            }
+                            if (nextWayInParentRoute != null) {
+                                String nextWayInParentName = nextWayInParentRoute.get("name");
+                            }
+//                                if (currentWayName == "006 Burchtstraat") {  }
+                            if (isItineraryInSameDirection(nextWay, nextWayInParentRoute, previousWayId, previousWayInParentRouteId)) {
+                               if (!startNewSegment &&
+                                    previousWayInParentRouteId != 0 && previousWayId != previousWayInParentRouteId) {
+                                    // if one of the parent relations has a different previous way
+                                    // it's time to start a new segment
+                                    startNewSegment = true;
+                                }
+                                // If the next way after the previous way's parent
+                                // routes isn't the same as currentWay
+                                // a split is also needed
+                                if (!startNewSegment) {
+                                    startNewSegment = isNextWayOfPreviousWayDifferentFromCurrentWayInAtLeastOneOfTheParentsOfPreviousWay(previousWay, currentWay);
+                                }
+                            }
+                            if (startNewSegment == true) { break; }
+                        }
+                        segment.addLineIdentifier(parentRoute.get("ref"));
+                        segment.addColour(parentRoute.get("colour"));
+                    }
+                }
+            }
+            nextWayMember = currentWayMember;
+            currentWayMember = previousWayMember;
         }
-        final RelationMember potentialWayMember = members.get(i - 1);
-        if (potentialWayMember.isWay()) {
-            return potentialWayMember.getWay();
-        } else {
-            return new Way();
+        UndoRedoHandler.getInstance().add(new ChangeCommand(originalRelation, clonedRelation));
+    }
+
+    public boolean isNextWayOfPreviousWayDifferentFromCurrentWayInAtLeastOneOfTheParentsOfPreviousWay(Way previousWay, Way currentWay) {
+        List<Relation> parentRoutesOfPreviousWay = new ArrayList<>(Utils.filteredCollection(previousWay.getReferrers(), Relation.class));
+        for (Relation parentRouteOfPreviousWay : parentRoutesOfPreviousWay) {
+            if (RouteUtils.isVersionTwoPTRoute(parentRouteOfPreviousWay)) {
+                List<Pair<Way, Way>> prevAndNextParent = findPreviousAndNextWayInRoute(parentRouteOfPreviousWay.getMembers(), previousWay);
+                Way nextWayInParentRouteOfPreviousWay = null;
+                if (prevAndNextParent.size() > 0) {
+                    // todo what if the way occurs more than once in the parent
+                    // route of the previous way?
+                    nextWayInParentRouteOfPreviousWay = prevAndNextParent.get(0).b;
+                    if (nextWayInParentRouteOfPreviousWay != null) {
+                        String nextWayInParentRouteOfPreviousWayName = nextWayInParentRouteOfPreviousWay.get("name");
+                    }
+                }
+                if (nextWayInParentRouteOfPreviousWay != null
+                    && nextWayInParentRouteOfPreviousWay.getId() != currentWay.getId()) {
+                    return true;
+                }
+            }
         }
-//        Way previousWay;
-//        if (i < members.size() - 1 && members.get(i + 1).isWay()) {
-//            previousWay = members.get(i + 1).getWay();
-//        } else {
-//            previousWay = new Way();
+        return false;
+    }
+
+    public boolean isItineraryInSameDirection(Way nextWayMember, Way nextWayInParentRoute, long previousWayId, long previousWayInParentRouteId) {
+        return !(nextWayInParentRoute != null && previousWayId == nextWayInParentRoute.getId() ||
+            previousWayInParentRouteId != 0 && nextWayMember.getId() == previousWayInParentRouteId);
+    }
+
+//    private Way findPreviousWay(List<RelationMember> members, int i) {
+//        if (i < 1) {
+//            return new Way();
 //        }
-//        return previousWay;
-    }
+//        final RelationMember potentialWayMember = members.get(i - 1);
+//        if (potentialWayMember.isWay()) {
+//            return potentialWayMember.getWay();
+//        } else {
+//            return new Way();
+//        }
+////        Way previousWay;
+////        if (i < members.size() - 1 && members.get(i + 1).isWay()) {
+////            previousWay = members.get(i + 1).getWay();
+////        } else {
+////            previousWay = new Way();
+////        }
+////        return previousWay;
+//    }
+//
+//    private void addStreetName(List<String> streetNamesList, String streetName) {
+//        if (streetName != null && !streetNamesList.contains(streetName)) {
+//            streetNamesList.add(0, streetName);
+//        }
+//    }
 
-    private void addStreetName(List<String> streetNamesList, String streetName) {
-        if (streetName != null && !streetNamesList.contains(streetName)) {
-            streetNamesList.add(0, streetName);
-        }
-    }
-
-    private void updateTags(String previousLineIdentifiersSignature, List<String> streetNamesList, String streetNamesSignature, Relation extractedRelation) {
+    private void updateTags(String lineIdentifiersSignature, String firstAndLastStreetNameOrRef, String streetNamesSignature, String colours, Relation extractedRelation) {
         if (!streetNamesSignature.isEmpty()) {
             extractedRelation.put("street_names", streetNamesSignature);
         }
-        String fromToStreet = "";
-        if (streetNamesList.size() > 0) {
-            fromToStreet = streetNamesList.get(0).concat(" ");
-            if (streetNamesList.size() > 1) {
-                fromToStreet = String.format("%s- %s ", fromToStreet, streetNamesList.get(streetNamesList.size() - 1));
-            }
+        if (!colours.isEmpty()) {
+            extractedRelation.put("colour", colours);
         }
-        String name = String.format("%s(%s)", fromToStreet, previousLineIdentifiersSignature);
-        extractedRelation.put("name", name);
-        extractedRelation.put("route_ref", previousLineIdentifiersSignature);
+        extractedRelation.put("name", String.format("%s(%s)",
+                                                    firstAndLastStreetNameOrRef,
+                                                    lineIdentifiersSignature));
+        extractedRelation.put("route_ref", lineIdentifiersSignature);
         // todo make a list of the ones we want to keep and remove the others
         extractedRelation.remove("bus");
         extractedRelation.remove("colour");
@@ -348,29 +339,36 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
         extractedRelation.remove("wikidata");
     }
 
+    /**
+     * for all occurences of wayToLocate this method returns the way before it and the way after it
+     * @param members          The members list of the relation
+     * @param wayToLocate      The way to locate in the list
+     * @return a list of way pairs
+     */
     private List<Pair<Way,Way>> findPreviousAndNextWayInRoute(List<RelationMember> members, Way wayToLocate) {
+        final long wayToLocateId = wayToLocate.getId();
         Way previousWay;
         Way nextWay = null;
         boolean foundWay = false;
-        List<Pair<Way,Way>> pairsList = new ArrayList<>();
-        for (int j = members.size() - 1; j >= 0; j--) {
+        List<Pair<Way,Way>> wayPairs = new ArrayList<>();
+        for (int j = members.size() - 1; j>=0 ; j--) {
             RelationMember rm = members.get(j);
-            if (rm.isWay()) {
+            if (rm.isWay() && RouteUtils.isPTWay(rm)) {
                 previousWay = rm.getWay();
                 if (foundWay) {
-                    pairsList.add(new Pair(previousWay,nextWay));
+                    wayPairs.add(0, new Pair(previousWay,nextWay));
                     nextWay = null;
                     foundWay = false;
                     continue;
                 }
-                if (previousWay.getId() == wayToLocate.getId()) {
+                if (previousWay.getId() == wayToLocateId) {
                     foundWay = true;
                 } else {
                     nextWay = previousWay;
                 }
             }
         }
-        return pairsList;
+        return wayPairs;
     }
     /** This method modifies clonedRelation in place if substituteWaysWithRelation is true
      *  and if ways are extracted into a new relation
