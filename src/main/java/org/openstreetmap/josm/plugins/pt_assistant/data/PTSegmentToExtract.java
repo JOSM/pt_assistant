@@ -7,10 +7,7 @@ import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.sort;
@@ -35,8 +32,8 @@ public class PTSegmentToExtract {
 
     private ArrayList<RelationMember> ptWays;
     private final List<Integer> indices;
-    private final List<String> lineIdentifiers;
-    private final List<String> colours;
+    private final TreeSet<String> lineIdentifiers;
+    private final TreeSet<String> colours;
     private List<String> streetNames;
     private List<Long> streetIds;
 
@@ -60,8 +57,8 @@ public class PTSegmentToExtract {
 
         ptWays = new ArrayList<>();
         indices = new ArrayList<>();
-        lineIdentifiers = new ArrayList<>();
-        colours = new ArrayList<>();
+        lineIdentifiers = new TreeSet<>(new RefTagComparator());
+        colours = new TreeSet<>();
         streetNames = null;
         streetIds = null;
     }
@@ -72,8 +69,8 @@ public class PTSegmentToExtract {
 
         ptWays = new ArrayList<>();
         indices = new ArrayList<>();
-        lineIdentifiers = new ArrayList<>();
-        colours = new ArrayList<>();
+        lineIdentifiers = new TreeSet<>();
+        colours = new TreeSet<>();
         streetNames = null;
         streetIds = null;
 
@@ -152,8 +149,7 @@ public class PTSegmentToExtract {
         }
     }
 
-    public List<String> getLineIdentifiers() {
-        lineIdentifiers.sort(new RefTagComparator());
+    public TreeSet<String> getLineIdentifiers() {
         return lineIdentifiers;
     }
 
@@ -161,8 +157,7 @@ public class PTSegmentToExtract {
         return String.join(";", getLineIdentifiers());
     }
 
-    public List<String> getColours() {
-        sort(colours);
+    public TreeSet<String> getColours() {
         return colours;
     }
 
