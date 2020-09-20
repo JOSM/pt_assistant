@@ -35,7 +35,8 @@ public class PTSegmentToExtract {
     private final TreeSet<String> lineIdentifiers;
     private final TreeSet<String> colours;
     private List<String> streetNames;
-    private List<Long> streetIds;
+    private List<String> wayIds;
+    private String wayIdsSignature;
 
     static {
         ptSegments = new HashMap<>();
@@ -60,7 +61,7 @@ public class PTSegmentToExtract {
         lineIdentifiers = new TreeSet<>(new RefTagComparator());
         colours = new TreeSet<>();
         streetNames = null;
-        streetIds = null;
+        wayIds = null;
     }
 
     public PTSegmentToExtract(Relation existingRelation, Boolean updateTags) {
@@ -72,7 +73,7 @@ public class PTSegmentToExtract {
         lineIdentifiers = new TreeSet<>();
         colours = new TreeSet<>();
         streetNames = null;
-        streetIds = null;
+        wayIds = null;
 
         this.ptWays = (ArrayList<RelationMember>) existingRelation.getMembers().stream()
             .filter(RelationMember::isWay)
@@ -105,25 +106,27 @@ public class PTSegmentToExtract {
             addLineIdentifier(relation.get("ref"));
             addColour(relation.get("colour"));
             streetNames = null;
-            streetIds = null;
+            wayIds = null;
         }
     }
 
-    public List<Long> getWayIds() {
-        if (streetIds == null) {
-            streetIds = new ArrayList<>();
+    public List<String> getWayIds() {
+        if (wayIds == null) {
+            wayIds = new ArrayList<>();
             for (RelationMember rm : ptWays) {
-                streetIds.add(rm.getWay().getId());
+                wayIds.add(String.valueOf(rm.getWay().getId()));
             }
         }
-        return streetIds;
+        wayIdsSignature = String.join(";", wayIds);
+        return wayIds;
     }
 
     /**
      * @return All the Way member's ids as a ; delimited string
      */
     public String getWayIdsSignature() {
-        return String.join(";", getWayIds().toString());
+        getWayIds();
+        return wayIdsSignature;
     }
 
     /**
@@ -235,7 +238,7 @@ public class PTSegmentToExtract {
     public Relation extractToRelation(ArrayList<String> tagsToTransfer, Boolean substituteWaysWithRelation) {
         boolean extractedRelationAlreadyExists = false;
         if (ptSegments.containsKey(getWayIdsSignature())) {
-            extractedRelation = ptSegments.get(getWayIdsSignature());
+            extractedRelation = ptSegments.get(wayIdsSignature);
             extractedRelationAlreadyExists = true;
         } else {
             extractedRelation = new Relation();
@@ -257,8 +260,8 @@ public class PTSegmentToExtract {
             }
         }
 
-        if (atLeast1MemberAddedToExtractedRelation) {
-            if (extractedRelation.getId() <= 0 && !ptSegments.containsKey(getWayIdsSignature())) {
+        if (atLeast1MemberAddedToExtractedRelation || extractedRelationAlreadyExists) {
+            if (extractedRelation.getId() <= 0 && !extractedRelationAlreadyExists) {
                 updateTags();
                 UndoRedoHandler.getInstance().add(new AddCommand(getLayerManager().getActiveDataSet(),
                     extractedRelation));
@@ -286,7 +289,7 @@ public class PTSegmentToExtract {
 
     private void addPtSegment() {
         if (extractedRelation != null) {
-            ptSegments.put(getWayIdsSignature(), extractedRelation);
+            ptSegments.put(wayIdsSignature, extractedRelation);
         }
     }
 

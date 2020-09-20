@@ -187,9 +187,13 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                 if (parentRoute.getId() != clonedRelationId && RouteUtils.isVersionTwoPTRoute(parentRoute)) {
                     for (WayTriplet<Way,Way,Way> waysInParentRoute : findPreviousAndNextWayInRoute(parentRoute.getMembers(), currentWay)) {
                         long previousWayInParentRouteId = 0;
-                        if (waysInParentRoute.previousWay != null) {
-                            previousWayInParentRouteId = waysInParentRoute.previousWay.getId();
+                        if (waysInParentRoute.previousWay == null || waysInParentRoute.nextWay == null) {
+                            // If there is no way before or a way after in the parent route
+                            // this was the first or the last way in the parent route
+                            // so a split is needed
+                            startNewSegment = true;
                         }
+                        previousWayInParentRouteId = waysInParentRoute.previousWay.getId();
                         if (isItineraryInSameDirection(nextWay, waysInParentRoute.nextWay, previousWayId, previousWayInParentRouteId)) {
                             if (!startNewSegment && previousWayInParentRouteId != 0
                                 && previousWayId != previousWayInParentRouteId) {
@@ -251,7 +255,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
     }
 
     /**
-     * for all occurences of wayToLocate this method returns the way before it and the way after it
+     * for all occurrences of wayToLocate this method returns the way before it and the way after it
      * @param members          The members list of the relation
      * @param wayToLocate      The way to locate in the list
      * @return a list of way pairs
@@ -267,6 +271,9 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
             if (rm.isWay() && RouteUtils.isPTWay(rm)) {
                 previousWay = rm.getWay();
                 if (foundWay) {
+                    if (previousWay == wayToLocate) {
+                        previousWay = null;
+                    }
                     wayTriplets.add(0, new WayTriplet<>(previousWay,wayToLocate,nextWay));
                     nextWay = null;
                     foundWay = false;
