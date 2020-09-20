@@ -5,14 +5,17 @@ import org.openstreetmap.josm.command.AddCommand;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
-import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantPaintVisitor;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.sort;
 import static org.openstreetmap.josm.gui.MainApplication.getLayerManager;
-import static org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantPaintVisitor.*;
+import static org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantPaintVisitor.RefTagComparator;
 
 /**
  * Represents a piece of a route that includes all the ways
@@ -30,16 +33,18 @@ public class PTSegmentToExtract {
     private final Relation relation;
     private Relation extractedRelation;
 
-    private final ArrayList<RelationMember> ptWays;
-    private List<Integer> indices;
-    private List<String> lineIdentifiers;
-    private List<String> colours;
+    private ArrayList<RelationMember> ptWays;
+    private final List<Integer> indices;
+    private final List<String> lineIdentifiers;
+    private final List<String> colours;
     private List<String> streetNames;
     private List<Long> streetIds;
 
     static {
-        PTSegmentToExtract.ptSegments = new HashMap<>();
+        ptSegments = new HashMap<>();
     }
+
+    private Boolean updateTags;
 
     /**
      * Constructor
@@ -49,7 +54,6 @@ public class PTSegmentToExtract {
      * lineIdentifiers  The ref tag of the route parent route relations of the ways
      * colours          The colours of the public transport lines of this line bundle
      */
-
     public PTSegmentToExtract(Relation relation) {
         this.relation = relation;
         extractedRelation = null;
@@ -62,6 +66,27 @@ public class PTSegmentToExtract {
         streetIds = null;
     }
 
+    public PTSegmentToExtract(Relation existingRelation, Boolean updateTags) {
+        this.relation = null;
+        extractedRelation = existingRelation;
+
+        ptWays = new ArrayList<>();
+        indices = new ArrayList<>();
+        lineIdentifiers = new ArrayList<>();
+        colours = new ArrayList<>();
+        streetNames = null;
+        streetIds = null;
+
+        this.ptWays = (ArrayList<RelationMember>) existingRelation.getMembers().stream()
+            .filter(RelationMember::isWay)
+            .filter(RouteUtils::isPTWay)
+            .collect(Collectors.toList());
+        if (updateTags) {
+            updateTags();
+        }
+        ptSegments.put(getWayIdsSignature(), extractedRelation);
+    }
+
     /**
      * Returns the PTWays of this route segment
      * @return the PTWays of this route segment
@@ -72,18 +97,19 @@ public class PTSegmentToExtract {
 
     /**
      * Sets the PTWays of this route segment to the given list
-     * @param ptWay           the Way Member to add
-     * @param index           its index in the relation specified in the constructor
-     * @param lineIdentifier  The ref tag of the relation
-     * @param colour          The colour tag of the relation
+     * @param index its index in the relation specified in the constructor
      */
-    public void addPTWay(RelationMember ptWay, Integer index, String lineIdentifier, String colour) {
-        ptWays.add(0, ptWay);
-        indices.add(0, index);
-        addLineIdentifier(lineIdentifier);
-        addColour(colour);
-        streetNames = null;
-        streetIds = null;
+    public void addPTWay(Integer index) {
+        assert relation != null;
+        final RelationMember member = relation.getMember(index);
+        if(member.isWay()) {
+            indices.add(0, index);
+            ptWays.add(0, member);
+            addLineIdentifier(relation.get("ref"));
+            addColour(relation.get("colour"));
+            streetNames = null;
+            streetIds = null;
+        }
     }
 
     public List<Long> getWayIds() {
@@ -193,7 +219,7 @@ public class PTSegmentToExtract {
                 last = streetNames.get(streetNames.size() - 1);
             }
         }
-        if (first == last) {
+        if (first.equals(last)) {
             last = "";
         }
         String names;
@@ -221,6 +247,7 @@ public class PTSegmentToExtract {
         } else {
             extractedRelation = new Relation();
             for (String tag : tagsToTransfer) {
+                assert relation != null;
                 extractedRelation.put(tag, relation.get(tag));
             }
             extractedRelation.put("type", "route");
@@ -229,6 +256,7 @@ public class PTSegmentToExtract {
         boolean atLeast1MemberAddedToExtractedRelation = false;
         for (int i = indices.size() - 1; i >= 0; i--) {
             index = indices.get(i);
+            assert relation != null;
             RelationMember relationMember = relation.removeMember(index);
             if (!extractedRelationAlreadyExists && RouteUtils.isPTWay(relationMember)) {
                 extractedRelation.addMember(0, relationMember);
@@ -238,12 +266,7 @@ public class PTSegmentToExtract {
 
         if (atLeast1MemberAddedToExtractedRelation) {
             if (extractedRelation.getId() <= 0 && !ptSegments.containsKey(getWayIdsSignature())) {
-                final String lineIdentifiersSignature = getLineIdentifiersSignature();
-                extractedRelation.put("note",
-                    String.format("%s(%s)", getFirstAndLastStreetNameOrRef(), lineIdentifiersSignature));
-                extractedRelation.put("route_ref", lineIdentifiersSignature);
-                // extractedRelation.put("street_names", getStreetNamesSignature());
-                extractedRelation.put("colour", getColoursSignature());
+                updateTags();
                 UndoRedoHandler.getInstance().add(new AddCommand(getLayerManager().getActiveDataSet(),
                     extractedRelation));
                 addPtSegment();
@@ -259,9 +282,18 @@ public class PTSegmentToExtract {
         return extractedRelation;
     }
 
+    public void updateTags() {
+        final String lineIdentifiersSignature = getLineIdentifiersSignature();
+        extractedRelation.put("note",
+            String.format("%s(%s)", getFirstAndLastStreetNameOrRef(), lineIdentifiersSignature));
+        extractedRelation.put("route_ref", lineIdentifiersSignature);
+        // extractedRelation.put("street_names", getStreetNamesSignature());
+        extractedRelation.put("colour", getColoursSignature());
+    }
+
     private void addPtSegment() {
         if (extractedRelation != null) {
-            PTSegmentToExtract.ptSegments.put(getWayIdsSignature(), extractedRelation);
+            ptSegments.put(getWayIdsSignature(), extractedRelation);
         }
     }
 
