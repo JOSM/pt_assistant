@@ -131,7 +131,7 @@ public class PTSegmentToExtract {
      * @param lineIdentifier  The ref tag of the way's parent relation
      */
     public void addLineIdentifier(String lineIdentifier) {
-        if (lineIdentifier != null && !lineIdentifiers.contains(lineIdentifier)) {
+        if (lineIdentifier != null) {
             lineIdentifiers.add(lineIdentifier);
         }
     }
@@ -143,9 +143,7 @@ public class PTSegmentToExtract {
     public void addColour(String colour) {
         if (colour != null) {
             String colourUppercase = colour.toUpperCase();
-            if (!colours.contains(colourUppercase)) {
-                colours.add(colourUppercase);
-            }
+            colours.add(colourUppercase);
         }
     }
 
