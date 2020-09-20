@@ -103,13 +103,14 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                 JOptionPane.QUESTION_MESSAGE
             ) == JOptionPane.OK_OPTION
         ) {
-            if (!cbFindAllSegmentsAutomatically.isSelected()) {
+            if (cbFindAllSegmentsAutomatically.isSelected()) {
+                splitInSegments(originalRelation, cbConvertToSuperroute.isSelected());
+            } else {
                 final Relation clonedRelation = new Relation(originalRelation);
-                boolean substituteWaysWithRelation = !cbReplaceInSuperrouteRelations.isSelected();
                 List<Integer> selectedIndices = Arrays.stream(memberTableModel.getSelectedIndices())
                     .boxed().collect(Collectors.toList());
                 final Relation extractedRelation = extractMembersForIndicesAndSubstitute(
-                    clonedRelation, selectedIndices, substituteWaysWithRelation);
+                    clonedRelation, selectedIndices, !cbReplaceInSuperrouteRelations.isSelected());
                 if (extractedRelation != null) {
                     if (extractedRelation.getId() <= 0) {
                         if (cbConvertToSuperroute.isSelected()) {
@@ -132,29 +133,13 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                     RelationEditor extraEditor = RelationEditor.getEditor(getEditor().getLayer(), extractedRelation, emptyList());
                     extraEditor.setVisible(true);
                     extraEditor.setAlwaysOnTop(true);
-
-                    try {
-                        editor.reloadDataFromRelation();
-                        // todo this often gives index out of bounds exception
-                        // I can't figure out why.
-                        // catching it here causes the exception to occur when
-                        // the user presses the update button, so not really a solution
-                        // The update button appears if I remove 1 or 2 members before extracting
-                        // so when the relation editor is 'dirty'.
-                        // using memberTableModel.applyToRelation(originalRelation);
-                        // at the beginning doesn't seem to actually save the relation
-                    } catch (Exception e) {
-                        Logging.error(e);
-                    }
                 }
-            } else {
-                splitInSegments(originalRelation);
-                editor.reloadDataFromRelation();
             }
+            editor.reloadDataFromRelation();
         }
     }
 
-    public void splitInSegments(Relation originalRelation) {
+    public void splitInSegments(Relation originalRelation, Boolean convertToSuperroute) {
         final Relation clonedRelation = new Relation(originalRelation);
         final long clonedRelationId = clonedRelation.getId();
         boolean startNewSegment = false;
@@ -166,14 +151,14 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
             final Way currentWay = getIfWay(members, i);
             if (currentWay == null) {
                 // Going backward through all the ways, the stop members were reached
-                segment.extractToRelation(new ArrayList<String>(Arrays.asList("type", "route")),
+                segment.extractToRelation(new ArrayList<>(Arrays.asList("type", "route")),
                     true);
                 break;
             }
             final Way nextWay = getIfWay(members, i + 1);
 
             if (startNewSegment) {
-                segment.extractToRelation(new ArrayList<String>(Arrays.asList("type", "route")),
+                segment.extractToRelation(new ArrayList<>(Arrays.asList("type", "route")),
                                           true);
                 segment = new PTSegmentToExtract(clonedRelation);
                 startNewSegment = false;
@@ -186,14 +171,14 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
             for (Relation parentRoute : parentRouteRelations) {
                 if (parentRoute.getId() != clonedRelationId && RouteUtils.isVersionTwoPTRoute(parentRoute)) {
                     for (WayTriplet<Way,Way,Way> waysInParentRoute : findPreviousAndNextWayInRoute(parentRoute.getMembers(), currentWay)) {
-                        long previousWayInParentRouteId = 0;
                         if (waysInParentRoute.previousWay == null || waysInParentRoute.nextWay == null) {
                             // If there is no way before or a way after in the parent route
                             // this was the first or the last way in the parent route
                             // so a split is needed
+                            // todo this doesn't work as intended yet
                             startNewSegment = true;
                         }
-                        previousWayInParentRouteId = waysInParentRoute.previousWay.getId();
+                        long previousWayInParentRouteId = waysInParentRoute.previousWay != null ? waysInParentRoute.previousWay.getId() : 0;
                         if (isItineraryInSameDirection(nextWay, waysInParentRoute.nextWay, previousWayId, previousWayInParentRouteId)) {
                             if (!startNewSegment && previousWayInParentRouteId != 0
                                 && previousWayId != previousWayInParentRouteId) {
@@ -206,7 +191,10 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                              routes isn't the same as currentWay a split is also needed
                             */
                             if (!startNewSegment) {
-                                startNewSegment = isNextWayOfPreviousWayDifferentFromCurrentWayInAtLeastOneOfTheParentsOfPreviousWay(previousWay, currentWay);
+                                if (previousWay != null) {
+                                    startNewSegment = isNextWayOfPreviousWayDifferentFromCurrentWayInAtLeastOneOfTheParentsOfPreviousWay(
+                                        previousWay, currentWay);
+                                }
                             }
                             segment.addLineIdentifier(parentRoute.get("ref"));
                             segment.addColour(parentRoute.get("colour"));
@@ -217,6 +205,9 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                     }
                 }
             }
+        }
+        if (convertToSuperroute) {
+            clonedRelation.put("type", "superroute");
         }
         UndoRedoHandler.getInstance().add(new ChangeCommand(originalRelation, clonedRelation));
     }
@@ -258,7 +249,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
      * for all occurrences of wayToLocate this method returns the way before it and the way after it
      * @param members          The members list of the relation
      * @param wayToLocate      The way to locate in the list
-     * @return a list of way pairs
+     * @return a list of way triplets
      */
     private List<WayTriplet<Way,Way,Way>> findPreviousAndNextWayInRoute(List<RelationMember> members, Way wayToLocate) {
         final long wayToLocateId = wayToLocate.getId();

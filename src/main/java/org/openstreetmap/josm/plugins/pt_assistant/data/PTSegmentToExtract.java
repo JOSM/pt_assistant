@@ -10,7 +10,6 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.sort;
 import static org.openstreetmap.josm.gui.MainApplication.getLayerManager;
 import static org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantPaintVisitor.RefTagComparator;
 
@@ -26,7 +25,7 @@ public class PTSegmentToExtract {
     /**
      *
      */
-    private static Map<String, Relation> ptSegments;
+    private static final Map<String, Relation> ptSegments;
     private final Relation relation;
     private Relation extractedRelation;
 
@@ -41,8 +40,6 @@ public class PTSegmentToExtract {
     static {
         ptSegments = new HashMap<>();
     }
-
-    private Boolean updateTags;
 
     /**
      * Constructor
