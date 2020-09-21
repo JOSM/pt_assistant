@@ -17,7 +17,14 @@ import static org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantPaintVi
 /**
  * Represents a piece of a route that includes all the ways
  * belonging to the same bundle of itineraries of vehicles
- * traveling in the same direction
+ * traveling in the same direction in the case of public transport
+ *
+ * In case of 'personal' transport it contains all the ways for
+ * both directions of travel
+ *
+ * It is meant to help with extracting segments of ways from
+ * route relations so that these can be converted to superroute relations
+ * in a convenient way
  *
  * @author Polyglot
  *
@@ -121,7 +128,14 @@ public class PTSegmentToExtract {
     public void addPTWay(Integer index) {
         this.addPTWay(index, true);
     }
-    public void addPTWay(Integer index, boolean updateIndices) {
+
+    /**
+     * Sets the PTWays of this route segment to the given list
+     * @param index its index in the relation specified in the constructor
+     * @param updateIndices when the list of indices was set in the constructor
+     *                      don't update it anymore
+     */
+    private void addPTWay(Integer index, boolean updateIndices) {
         assert relation != null;
         final RelationMember member = relation.getMember(index);
         if(member.isWay()) {
@@ -260,6 +274,11 @@ public class PTSegmentToExtract {
         return indices;
     }
 
+    /**
+     * @param tagsToTransfer list of tags to transfer from relation this segment will be extracted from
+     * @param substituteWaysWithRelation add the extracted relation where the ways were removed?
+     * @return the relation that contains the extracted ways, or null if an empty relation would have been created
+     */
     public Relation extractToRelation(ArrayList<String> tagsToTransfer, Boolean substituteWaysWithRelation) {
         assert relation != null;
         boolean extractedRelationAlreadyExists = false;
