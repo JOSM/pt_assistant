@@ -120,7 +120,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                     true);
 //                    todo cbReplaceInSuperrouteRelations.isSelected());
                 if (extractedRelation != null) {
-                    if (extractedRelation.getId() <= 0 && cbConvertToSuperroute.isSelected()) {
+                    if (extractedRelation.isNew() && cbConvertToSuperroute.isSelected()) {
                         clonedRelation.put("type", "superroute");
                     }
                     commands.add(new ChangeCommand(originalRelation, clonedRelation));
