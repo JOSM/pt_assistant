@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.*;
 
-import org.openstreetmap.josm.command.AddCommand;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
@@ -24,7 +23,6 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.*;
 
 import static java.util.Collections.*;
-import static org.openstreetmap.josm.gui.MainApplication.*;
 
 /*
 Extracts selected members to a new route relation
@@ -107,30 +105,32 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                 splitInSegments(originalRelation, cbConvertToSuperroute.isSelected());
             } else {
                 final Relation clonedRelation = new Relation(originalRelation);
-                List<Integer> selectedIndices = Arrays.stream(memberTableModel.getSelectedIndices())
-                    .boxed().collect(Collectors.toList());
-                final Relation extractedRelation = extractMembersForIndicesAndSubstitute(
-                    clonedRelation, selectedIndices, !cbReplaceInSuperrouteRelations.isSelected());
+                PTSegmentToExtract segment = new PTSegmentToExtract(clonedRelation,
+                    Arrays.stream(memberTableModel.getSelectedIndices()).boxed().collect(Collectors.toList()));
+                segment.put("name", tfNameTag.getText());
+                if (cbProposed.isSelected()) {
+                    segment.put("state", "proposed");
+                    segment.put("name", tfNameTag.getText() + " (wenslijn)");
+                }
+                if (cbDeviation.isSelected()) {
+                    segment.put("name", tfNameTag.getText() + " (omleiding)");
+                }
+                Relation extractedRelation = segment.extractToRelation(
+                    new ArrayList<>(Arrays.asList("type", "route", "cycle_network", "network", "operator", "ref")),
+                    true);
+//                    todo cbReplaceInSuperrouteRelations.isSelected());
                 if (extractedRelation != null) {
-                    if (extractedRelation.getId() <= 0) {
-                        if (cbConvertToSuperroute.isSelected()) {
-                            clonedRelation.put("type", "superroute");
-                        }
-                        extractedRelation.put("name", tfNameTag.getText());
-                        if (cbProposed.isSelected()) {
-                            extractedRelation.put("state", "proposed");
-                            extractedRelation.put("name", tfNameTag.getText() + " (wenslijn)");
-                        }
-                        if (cbDeviation.isSelected()) {
-                            extractedRelation.put("name", tfNameTag.getText() + " (omleiding)");
-                        }
-                        DataSet activeDataSet = getLayerManager().getActiveDataSet();
-                        commands.add(new AddCommand(activeDataSet, extractedRelation));
+                    if (extractedRelation.getId() <= 0 && cbConvertToSuperroute.isSelected()) {
+                        clonedRelation.put("type", "superroute");
                     }
                     commands.add(new ChangeCommand(originalRelation, clonedRelation));
-                    addExtractedRelationToParentSuperrouteRelations(originalRelation, commands, parentRelations, selectedIndices, extractedRelation);
-                    UndoRedoHandler.getInstance().add(new SequenceCommand(I18n.tr("Extract ways to relation"), commands));
-                    RelationEditor extraEditor = RelationEditor.getEditor(getEditor().getLayer(), extractedRelation, emptyList());
+                    addExtractedRelationToParentSuperrouteRelations(originalRelation, commands,
+                        parentRelations, segment.getIndices(), extractedRelation);
+                    UndoRedoHandler.getInstance().add(
+                        new SequenceCommand(I18n.tr("Extract ways to relation"), commands));
+
+                    RelationEditor extraEditor = RelationEditor.getEditor(
+                        getEditor().getLayer(), extractedRelation, emptyList());
                     extraEditor.setVisible(true);
                     extraEditor.setAlwaysOnTop(true);
                 }
@@ -177,6 +177,10 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                             // so a split is needed
                             // todo this doesn't work as intended yet
                             startNewSegment = true;
+                            String route_ref = parentRoute.get("route_ref");
+                            if (waysInParentRoute.nextWay == null && route_ref != null) {
+                                new PTSegmentToExtract(parentRoute, false);
+                            }
                         }
                         long previousWayInParentRouteId = waysInParentRoute.previousWay != null ? waysInParentRoute.previousWay.getId() : 0;
                         if (isItineraryInSameDirection(nextWay, waysInParentRoute.nextWay, previousWayId, previousWayInParentRouteId)) {
@@ -286,34 +290,6 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
      *  it returns a pointer to that relation
      *  otherwise it returns a new relation with a negative id,
      *  which still needs to be added using addCommand()*/
-
-    public Relation extractMembersForIndicesAndSubstitute(Relation clonedRelation,
-                                                          List<Integer> selectedIndices,
-                                                          boolean substituteWaysWithRelation) {
-        Relation extractedRelation = new Relation();
-        extractedRelation.setKeys(clonedRelation.getKeys());
-        extractedRelation.put("type", "route");
-
-        int index = 0;
-        boolean atLeast1MemberAddedToExtractedRelation = false;
-        for (int i = selectedIndices.size() - 1; i >= 0; i--) {
-            atLeast1MemberAddedToExtractedRelation = true;
-            index = selectedIndices.get(i);
-            RelationMember relationMember = clonedRelation.removeMember(index);
-            extractedRelation.addMember(0, relationMember);
-        }
-
-        if (atLeast1MemberAddedToExtractedRelation) {
-            if (substituteWaysWithRelation) {
-                // replace removed members with the extracted relation
-                index = PTSegmentToExtract.limitIntegerTo(index, clonedRelation.getMembersCount());
-                clonedRelation.addMember(index, new RelationMember("", extractedRelation));
-                }
-            } else {
-                return null;
-            }
-        return extractedRelation;
-    }
 
     private void addExtractedRelationToParentSuperrouteRelations(Relation originalRelation, List<Command> commands, List<Relation> parentRelations, List<Integer> selectedIndices, Relation extractedRelation) {
         for (Relation superroute : parentRelations) {

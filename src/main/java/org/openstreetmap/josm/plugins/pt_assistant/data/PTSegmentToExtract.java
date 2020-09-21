@@ -5,6 +5,7 @@ import org.openstreetmap.josm.command.AddCommand;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
+import org.openstreetmap.josm.data.osm.TagMap;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 
 import java.util.*;
@@ -36,6 +37,7 @@ public class PTSegmentToExtract {
     private List<String> streetNames;
     private List<String> wayIds;
     private String wayIdsSignature;
+    private TagMap tags;
 
     static {
         ptSegments = new HashMap<>();
@@ -61,6 +63,11 @@ public class PTSegmentToExtract {
         wayIds = null;
     }
 
+    /**
+     * Constructor
+     * @param existingRelation to be used when a potential sub route relation is encountered
+     * @param updateTags update the tags automatically?
+     */
     public PTSegmentToExtract(Relation existingRelation, Boolean updateTags) {
         this.relation = null;
         extractedRelation = existingRelation;
@@ -82,6 +89,23 @@ public class PTSegmentToExtract {
         ptSegments.put(getWayIdsSignature(), extractedRelation);
     }
 
+    public PTSegmentToExtract(Relation relation, List<Integer> selectedIndices) {
+        this.relation = relation;
+        extractedRelation = null;
+
+        ptWays = new ArrayList<>();
+        indices = selectedIndices;
+        lineIdentifiers = new TreeSet<>(new RefTagComparator());
+        colours = new TreeSet<>();
+        tags = new TagMap();
+        streetNames = null;
+        wayIds = null;
+
+        for (Integer index : indices) {
+            addPTWay(index, false);
+        }
+    }
+
     /**
      * Returns the PTWays of this route segment
      * @return the PTWays of this route segment
@@ -95,10 +119,15 @@ public class PTSegmentToExtract {
      * @param index its index in the relation specified in the constructor
      */
     public void addPTWay(Integer index) {
+        this.addPTWay(index, true);
+    }
+    public void addPTWay(Integer index, boolean updateIndices) {
         assert relation != null;
         final RelationMember member = relation.getMember(index);
         if(member.isWay()) {
-            indices.add(0, index);
+            if (updateIndices) {
+                indices.add(0, index);
+            }
             ptWays.add(0, member);
             addLineIdentifier(relation.get("ref"));
             addColour(relation.get("colour"));
@@ -142,8 +171,7 @@ public class PTSegmentToExtract {
      */
     public void addColour(String colour) {
         if (colour != null) {
-            String colourUppercase = colour.toUpperCase();
-            colours.add(colourUppercase);
+            colours.add(colour.toUpperCase());
         }
     }
 
@@ -233,23 +261,23 @@ public class PTSegmentToExtract {
     }
 
     public Relation extractToRelation(ArrayList<String> tagsToTransfer, Boolean substituteWaysWithRelation) {
+        assert relation != null;
         boolean extractedRelationAlreadyExists = false;
         if (ptSegments.containsKey(getWayIdsSignature())) {
             extractedRelation = ptSegments.get(wayIdsSignature);
             extractedRelationAlreadyExists = true;
         } else {
             extractedRelation = new Relation();
+            extractedRelation.setKeys(tags);
             for (String tag : tagsToTransfer) {
-                assert relation != null;
                 extractedRelation.put(tag, relation.get(tag));
             }
             extractedRelation.put("type", "route");
         }
-        int index = 0;
         boolean atLeast1MemberAddedToExtractedRelation = false;
+        int index = 0;
         for (int i = indices.size() - 1; i >= 0; i--) {
             index = indices.get(i);
-            assert relation != null;
             RelationMember relationMember = relation.removeMember(index);
             if (!extractedRelationAlreadyExists && RouteUtils.isPTWay(relationMember)) {
                 extractedRelation.addMember(0, relationMember);
@@ -259,7 +287,9 @@ public class PTSegmentToExtract {
 
         if (atLeast1MemberAddedToExtractedRelation || extractedRelationAlreadyExists) {
             if (extractedRelation.getId() <= 0 && !extractedRelationAlreadyExists) {
-                updateTags();
+                if (relation.hasTag("public_transport:version", "2")) {
+                    updateTags();
+                }
                 UndoRedoHandler.getInstance().add(new AddCommand(getLayerManager().getActiveDataSet(),
                     extractedRelation));
                 addPtSegment();
@@ -286,7 +316,7 @@ public class PTSegmentToExtract {
 
     private void addPtSegment() {
         if (extractedRelation != null) {
-            ptSegments.put(wayIdsSignature, extractedRelation);
+            ptSegments.put(getWayIdsSignature(), extractedRelation);
         }
     }
 
@@ -295,5 +325,9 @@ public class PTSegmentToExtract {
             index = limit;
         }
         return index;
+    }
+
+    public void put(String key, String value) {
+        tags.put(key, value);
     }
 }
