@@ -27,17 +27,17 @@ public class PTSegmentToExtract {
      *
      */
     private static final Map<String, Relation> ptSegments;
-    private final Relation relation;
+    private Relation relation;
     private Relation extractedRelation;
 
     private ArrayList<RelationMember> ptWays;
-    private final List<Integer> indices;
+    private List<Integer> indices;
     private final TreeSet<String> lineIdentifiers;
     private final TreeSet<String> colours;
-    private List<String> streetNames;
+    private List<String> streetNames = null;
     private List<String> wayIds;
     private String wayIdsSignature;
-    private TagMap tags;
+    private final TagMap tags = new TagMap();
 
     static {
         ptSegments = new HashMap<>();
@@ -45,39 +45,56 @@ public class PTSegmentToExtract {
 
     /**
      * Constructor
-     * @param relation  The route or superroute relation for which this route segment is created
      * ptWays           The list of PTWay members to extract
      * indices          The indices corresponding to the ways
      * lineIdentifiers  The ref tag of the route parent route relations of the ways
      * colours          The colours of the public transport lines of this line bundle
      */
+    private PTSegmentToExtract() {
+        ptWays = new ArrayList<>();
+        lineIdentifiers = new TreeSet<>(new RefTagComparator());
+        colours = new TreeSet<>();
+        wayIds = null;
+    }
+    /**
+     * Constructor
+     * @param relation The route or superroute relation for which this route segment is created
+     *                 use addPTWay() to add ways one by one
+     */
     public PTSegmentToExtract(Relation relation) {
+        this();
         this.relation = relation;
         extractedRelation = null;
 
-        ptWays = new ArrayList<>();
         indices = new ArrayList<>();
-        lineIdentifiers = new TreeSet<>(new RefTagComparator());
-        colours = new TreeSet<>();
-        streetNames = null;
-        wayIds = null;
+    }
+
+    /**
+     * Constructor
+     * @param relation The route or superroute relation for which this route segment is created
+     * @param selectedIndices ways will be added for these indices
+     */
+    public PTSegmentToExtract(Relation relation, List<Integer> selectedIndices) {
+        this(relation);
+
+        indices = selectedIndices;
+
+        for (Integer index : indices) {
+            addPTWay(index, false);
+        }
     }
 
     /**
      * Constructor
      * @param existingRelation to be used when a potential sub route relation is encountered
-     * @param updateTags update the tags automatically?
+     * @param updateTags update the tags automatically or not?
      */
     public PTSegmentToExtract(Relation existingRelation, Boolean updateTags) {
+        this();
         this.relation = null;
         extractedRelation = existingRelation;
 
-        ptWays = new ArrayList<>();
         indices = new ArrayList<>();
-        lineIdentifiers = new TreeSet<>();
-        colours = new TreeSet<>();
-        streetNames = null;
-        wayIds = null;
 
         this.ptWays = (ArrayList<RelationMember>) existingRelation.getMembers().stream()
             .filter(RelationMember::isWay)
@@ -87,23 +104,6 @@ public class PTSegmentToExtract {
             updateTags();
         }
         ptSegments.put(getWayIdsSignature(), extractedRelation);
-    }
-
-    public PTSegmentToExtract(Relation relation, List<Integer> selectedIndices) {
-        this.relation = relation;
-        extractedRelation = null;
-
-        ptWays = new ArrayList<>();
-        indices = selectedIndices;
-        lineIdentifiers = new TreeSet<>(new RefTagComparator());
-        colours = new TreeSet<>();
-        tags = new TagMap();
-        streetNames = null;
-        wayIds = null;
-
-        for (Integer index : indices) {
-            addPTWay(index, false);
-        }
     }
 
     /**
