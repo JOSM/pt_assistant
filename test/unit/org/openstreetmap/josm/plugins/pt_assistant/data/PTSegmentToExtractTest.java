@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.io.IllegalDataException;
 import org.openstreetmap.josm.io.OsmReader;
@@ -34,7 +35,7 @@ class PTSegmentToExtractTest {
     void someTest() {
         Collection<Relation> allRelations = ds.getRelations();
         Relation bus601RouteRelation = allRelations.stream().filter(relation -> relation.hasTag("ref", "601")).findFirst().get();
-        RouteSegmentToExtract segment = new RouteSegmentToExtract(bus601RouteRelation);
+        PTSegmentToExtract segment = new PTSegmentToExtract(bus601RouteRelation);
         assertEquals("601", segment.getLineIdentifiersSignature());
         segment.addLineIdentifier("600");
         assertEquals("600;601", segment.getLineIdentifiersSignature());

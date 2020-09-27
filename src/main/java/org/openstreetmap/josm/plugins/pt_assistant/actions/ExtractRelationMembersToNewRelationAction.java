@@ -116,7 +116,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                     segment.put("name", tfNameTag.getText() + " (omleiding)");
                 }
                 Relation extractedRelation = segment.extractToRelation(
-                    new ArrayList<>(Arrays.asList("type", "route", "cycle_network", "network", "operator", "ref")),
+                    Arrays.asList("type", "route", "cycle_network", "network", "operator", "ref"),
                     true);
 //                    todo cbReplaceInSuperrouteRelations.isSelected());
                 if (extractedRelation != null) {
@@ -145,13 +145,13 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
         boolean startNewSegment = false;
         final List<RelationMember> members = clonedRelation.getMembers();
         RouteSegmentToExtract segment = new RouteSegmentToExtract(clonedRelation);
-        segment.addPTWay(members.size() - 1);
+        segment.addWay(members.size() - 1);
         for (int i = members.size() - 2; i >= 1; i--) {
             final Way previousWay = getIfWay(members, i - 1);
             final Way currentWay = getIfWay(members, i);
             if (currentWay == null) {
                 // Going backward through all the ways, the stop members were reached
-                segment.extractToRelation(new ArrayList<>(Arrays.asList("type", "route")),
+                segment.extractToRelation(Arrays.asList("type", "route"),
                     true);
                 break;
             }
@@ -163,7 +163,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                 segment = new RouteSegmentToExtract(clonedRelation);
                 startNewSegment = false;
             }
-            segment.addPTWay(i);
+            segment.addWay(i);
 
             long previousWayId = 0;
             if (previousWay != null) {previousWayId = previousWay.getId();}
@@ -255,7 +255,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
      * @param wayToLocate      The way to locate in the list
      * @return a list of way triplets
      */
-    private List<WayTriplet<Way,Way,Way>> findPreviousAndNextWayInRoute(List<RelationMember> members, Way wayToLocate) {
+    private static List<WayTriplet<Way,Way,Way>> findPreviousAndNextWayInRoute(List<RelationMember> members, Way wayToLocate) {
         final long wayToLocateId = wayToLocate.getId();
         Way previousWay;
         Way nextWay = null;
