@@ -251,7 +251,7 @@ public class RouteSegmentToExtract {
                      routes isn't the same as currentWay a split is also needed
                     */
                     if (isPreviousWayDifferentFromCurrentWayInAtLeastOneOfTheParentsOfNextWay(
-                        currentWay, nextWay, wayAfterNextWay)) {
+                            currentWay, nextWay, wayAfterNextWay)) {
                         startNewSegment = true;
                     } else if (addToLineIdentifier) {
                         addLineIdentifier(parentRoute.get("ref"));
@@ -287,8 +287,9 @@ public class RouteSegmentToExtract {
                     }
                 }
                 if (startNewSegment
-                    || itinerariesInSameDirection.isEmpty() && lineIdentifiers.size() > 1
-                    || currentWayIsFirstWayInOneOfTheParentWays) {
+                        || currentWayIsFirstWayInOneOfTheParentWays
+                        || itinerariesInSameDirection.isEmpty() && lineIdentifiers.size() > 1
+                    ) {
                     RouteSegmentToExtract newSegment = new RouteSegmentToExtract(relation, activeDataSet);
                     newSegment.addPTWayMember(index);
                     return newSegment;
@@ -309,11 +310,10 @@ public class RouteSegmentToExtract {
 
         for (Relation parentRouteOfNextWay : parentRoutesOfNextWay) {
             for (WayTriplet<Way, Way, Way> waysInParentRouteOfNextWay : findPreviousAndNextWayInRoute(parentRouteOfNextWay.getMembers(), nextWay)) {
-                if (isItineraryInSameDirection(currentWay, wayAfterNextWay, waysInParentRouteOfNextWay)) {
-                    if (waysInParentRouteOfNextWay.previousWay != null
-                        && !waysInParentRouteOfNextWay.previousWay.equals(currentWay)) {
-                        return true;
-                    }
+                if (waysInParentRouteOfNextWay.previousWay != null
+                        && !waysInParentRouteOfNextWay.previousWay.equals(currentWay)
+                        && isItineraryInSameDirection(currentWay, wayAfterNextWay, waysInParentRouteOfNextWay)) {
+                    return true;
                 }
             }
         }
