@@ -1,10 +1,12 @@
 package org.openstreetmap.josm.plugins.pt_assistant.data;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
+
 import org.openstreetmap.josm.io.IllegalDataException;
 import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
 
@@ -16,19 +18,60 @@ import static org.junit.Assert.*;
 import static org.openstreetmap.josm.io.OsmReader.parseDataSet;
 
 @SuppressWarnings("NonAsciiCharacters")
-public class RouteSegmentToExtractTest {
+public class RouteSegmentToExtractTest extends AbstractTest{
 
     private static DataSet ds;
+    private static Collection<Relation> allRelations;
 
     @BeforeClass
     public static void init() throws FileNotFoundException, IllegalDataException {
-        ds = parseDataSet(new FileInputStream(AbstractTest.PATH_TO_PT_BEFORE_SPLITTING_TEST), null);
+        ds = parseDataSet(new FileInputStream(PATH_TO_PT_BEFORE_SPLITTING_TEST), null);
+        allRelations = ds.getRelations();
     }
 
     @Test
-    public void bus601Test() {
-        Collection<Relation> allRelations = ds.getRelations();
+    public void isItineraryInSameDirectionTest() {
+        Relation bus601RouteRelation = allRelations.stream()
+            .filter(relation -> relation.getId() == 3612781)
+            .findFirst().orElse(null);
 
+        Relation bus370NightRouteRelation = allRelations.stream()
+            .filter(relation -> relation.getId() == 5240367)
+            .findFirst().orElse(null);
+
+        Relation bus358RouteRelation = allRelations.stream()
+            .filter(relation -> relation.getId() == 6695469)
+            .findFirst().orElse(null);
+
+        Relation bus371RouteRelation = allRelations.stream()
+            .filter(relation -> relation.getId() == 1606056)
+            .findFirst().orElse(null);
+
+        WaySequence<Way, Way, Way, Way> waysInParentRouteOf601 = new WaySequence<>(
+            bus601RouteRelation.getMembers().get(156).getWay(),
+            bus601RouteRelation.getMembers().get(157).getWay(),
+            bus601RouteRelation.getMembers().get(158).getWay());
+//        WaySequence<Way, Way, Way, Way> waysInParentRouteOf370Night = new WaySequence<>(
+//            bus370NightRouteRelation.getMembers().get(152).getWay(),
+//            bus370NightRouteRelation.getMembers().get(153).getWay(),
+//            null);
+        WaySequence<Way, Way, Way, Way> waysInParentRouteOf358 = new WaySequence<>(
+            bus358RouteRelation.getMembers().get(114).getWay(),
+            bus358RouteRelation.getMembers().get(115).getWay(),
+            bus358RouteRelation.getMembers().get(116).getWay());
+        WaySequence<Way, Way, Way, Way> waysInParentRouteOf371 = new WaySequence<>(
+            bus371RouteRelation.getMembers().get(132).getWay(),
+            bus371RouteRelation.getMembers().get(133).getWay(),
+            bus371RouteRelation.getMembers().get(134).getWay());
+        RouteSegmentToExtract segment601_1 = new RouteSegmentToExtract(bus601RouteRelation, ds);
+//        assertTrue(segment601_1.isItineraryInSameDirection(waysInParentRouteOf601, waysInParentRouteOf370Night));
+        assertTrue(segment601_1.isItineraryInSameDirection(waysInParentRouteOf601, waysInParentRouteOf358));
+        assertFalse(segment601_1.isItineraryInSameDirection(waysInParentRouteOf601, waysInParentRouteOf371));
+    }
+
+
+    @Test
+    public void bus601_600Test() {
         Relation bus601RouteRelation = allRelations.stream()
             .filter(relation -> relation.getId() == 3612781)
             .findFirst().orElse(null);
@@ -44,6 +87,27 @@ public class RouteSegmentToExtractTest {
 
         assertEquals("", segment1.getWayIdsSignature());
         assertEquals(Collections.emptyList(), segment1.getWayMembers());
+
+        // The following code serves to create list of
+        // ways in the route relation to test with
+//        Relation bus600RouteRelation = allRelations.stream()
+//            .filter(relation -> relation.getId() == 955908)
+//            .findFirst().orElse(null);
+//        List<RelationMember> members = bus600RouteRelation.getMembers();
+//        for (int i = members.size() - 1; i >= 0; i--) {
+//            RelationMember member = members.get(i);
+//            if (member.isWay() && RouteUtils.isPTWay(member)) {
+//                Way way = member.getWay();
+//                String id = String.valueOf(way.getId());
+//                String name = "";
+//                if (way.hasKey("name")) name = way.get("name");
+//                name = name.replace("-","_");
+//                name = name.replace(" ","_");
+//                name += "_";
+//                System.out.println(String.format("final int W_%s_%s%s_ = %s;",
+//                    i, name, id, id));
+//            }
+//        }
 
         final int W_158_perron1and2terminus_78579065_B = 78579065;
         final int W_157_perron1and2_377814547_A = 377814547;
@@ -85,40 +149,36 @@ public class RouteSegmentToExtractTest {
         final int W_154_Tiensevest_4_79211472_A = 79211472;
         RouteSegmentToExtract segment4 = segment3.addPTWayMember(154);
 
-        // segment4 was created, verify segment3
         extractAndAssertValues(154, segment3, segment4, cloneOfBus601RouteRelation,
             W_155_Tiensevest_5_79211473_A, W_155_Tiensevest_5_79211473_A,
             W_154_Tiensevest_4_79211472_A, "Tiensevest",
             null,
-            "1;2;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;520;524;525;537;539;586;601;658"
+            "1;2;3;7;8;9;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;520;524;525;537;539;586;601;658"
         );
 
         final int W_153_Tiensevest_3_79211472_A = 79175435;
         RouteSegmentToExtract segment5 = segment4.addPTWayMember(153);
 
-        // segment5 was created, verify segment4
         extractAndAssertValues(153, segment4, segment5, cloneOfBus601RouteRelation,
             W_154_Tiensevest_4_79211472_A, W_154_Tiensevest_4_79211472_A,
             W_153_Tiensevest_3_79211472_A, "Tiensevest",
             null,
-            "284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;524;537;601;658"
+            "1;2;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;520;524;525;537;539;586;601;658"
         );
 
         final int W_152_Tiensevest_2_80458208_A = 80458208;
         RouteSegmentToExtract segment6 = segment5.addPTWayMember(152);
 
-        // segment6 was created, verify segment5
         extractAndAssertValues(152, segment5, segment6, cloneOfBus601RouteRelation,
             W_153_Tiensevest_3_79211472_A, W_153_Tiensevest_3_79211472_A,
             W_152_Tiensevest_2_80458208_A, "Tiensevest",
             null,
-            "284;285;305;306;310;315;316;317;318;358;395;410;433;475;485;601;651;652;658"
+            "284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;524;537;601;651;652;658"
         );
 
         final int W_33_151_Tiensevest_1_19793164_A = 19793164;
         RouteSegmentToExtract segment7 = segment6.addPTWayMember(151);
 
-        // segment7 was created, verify segment6
         extractAndAssertValues(151, segment6, segment7, cloneOfBus601RouteRelation,
             W_152_Tiensevest_2_80458208_A, W_152_Tiensevest_2_80458208_A,
             W_33_151_Tiensevest_1_19793164_A, "Tiensevest",
@@ -127,8 +187,8 @@ public class RouteSegmentToExtractTest {
         );
 
         final int W_32_150_Diestsevest_4_NextToOostertunnel_6184898_D = 6184898;
-//        final int W_31_149_Diestsevest_3_81457878_C = 81457878;
-//        final int W_30_148_Diestsevest_2_4003924_B = 4003924;
+        final int W_31_149_Diestsevest_3_81457878_C = 81457878;
+        final int W_30_148_Diestsevest_2_4003924_B = 4003924;
         final int W_29_147_Diestsevest_1_8133608_A = 8133608;
 
         final int W_28_146_Artoisplein_2_254800931_A = 254800931;
@@ -138,7 +198,7 @@ public class RouteSegmentToExtractTest {
             W_33_151_Tiensevest_1_19793164_A, W_33_151_Tiensevest_1_19793164_A,
             W_32_150_Diestsevest_4_NextToOostertunnel_6184898_D, "Diestsevest",
             null,
-            "305;318;334;335;358;410;513;601;630;651;652;658"
+            "284;285;305;306;310;315;316;317;318;334;335;358;395;410;433;475;485;513;601;630;651;652;658"
         );
 
         for (int n = 149; n >= 147; n--) returnValueNull = segment8.addPTWayMember(n); assertNull(returnValueNull);
@@ -162,7 +222,7 @@ public class RouteSegmentToExtractTest {
             W_28_146_Artoisplein_2_254800931_A, W_28_146_Artoisplein_2_254800931_A,
             W_145_Artoisplein_1_23691158_E, "Joanna-Maria Artoisplein",
             null,
-            "178;305;318;358;410;601;651;652;658"
+            "178;305;318;334;335;358;410;513;601;630;651;652;658"
         );
         for (int n = 144; n >= 141; n--) returnValueNull = segment10.addPTWayMember(n); assertNull(returnValueNull);
 
@@ -352,7 +412,7 @@ public class RouteSegmentToExtractTest {
             W_108_Rotonde_Het_Teken_3752557_A, W_108_Rotonde_Het_Teken_3752557_A,
             W_107_Rotonde_Het_Teken_VWBln_249333188_A, "Rotonde Het Teken",
             null,
-            "3;410;600;601"
+            "3;317;333;334;335;370;371;373;374;380;395;410;600;601"
         );
         final int W_106_Rotonde_Het_Teken_249333187_A = 249333187;
 
@@ -374,7 +434,7 @@ public class RouteSegmentToExtractTest {
             W_106_Rotonde_Het_Teken_249333187_A, W_106_Rotonde_Het_Teken_249333187_A,
             W_105_Herestraat_7_13067134_D, "Herestraat",
             null,
-            "410;600;601"
+            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"
         );
 
         final int W_101_Herestraat_3_813970229_C = 813970229;
@@ -529,7 +589,7 @@ public class RouteSegmentToExtractTest {
             W_48_Tiensevest_185988814_A, W_48_Tiensevest_185988814_A,
             W_47_Martelarenplein_76856823_D, "Martelarenplein",
             null,
-            "7;8;9;18;178;179;306 (student);337;380;527;601;630"
+            "1;4;5;6;7;8;9;18;178;179;306 (student);337;380;527;600;601;616;630"
         );
 
         final int W_43__79264899_A = 79264899;
@@ -549,7 +609,7 @@ public class RouteSegmentToExtractTest {
             W_43__79264899_A, W_43__79264899_A,
             W_42__377918635_A, null,
             null,
-            "18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;601"
+            "18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;601;630"
         );
         final int W_41__79264888_A = 79264888;
 
@@ -585,7 +645,7 @@ public class RouteSegmentToExtractTest {
             W_39__71754927_A, W_39__71754927_A,
             W_38__377918638_A_TEC18, null,
             null,
-            "18;601" // TODO: this is odd, needs verification
+            "2;3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;475;485;512;513;520;524;525;601"
         );
         final int W_37__79264891_A = 79264891;
 
@@ -594,7 +654,7 @@ public class RouteSegmentToExtractTest {
             W_38__377918638_A_TEC18, W_38__377918638_A_TEC18,
             W_37__79264891_A, null,
             null,
-            "18;601"
+            "601" // TODO, here line 18 has its first way in common with 601
         );
         final int W_36_Tiensevest_78568409_A = 78568409;
 
@@ -612,7 +672,7 @@ public class RouteSegmentToExtractTest {
             W_36_Tiensevest_78568409_A, W_36_Tiensevest_78568409_A,
             W_35_Tiensevest_79193579_A, "Tiensevest",
             null,
-            "4;5;6;7;8;9;18;179;306 (student);334;335;337;380;601;616;658"
+            "4;5;6;7;8;9;18;179;284;285;306 (student);315;316;317;334;335;337;380;601;616;658"
         );
         final int W_34_Bend_19793394_A = 19793394;
         // ways 28 to 33 are the same as 146 - 151
@@ -624,7 +684,7 @@ public class RouteSegmentToExtractTest {
             W_35_Tiensevest_79193579_A, W_35_Tiensevest_79193579_A,
             W_34_Bend_19793394_A, null,
             null,
-            "334;335;513;601"
+            "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;380;513;600;601;616;630;658"
         );
         final int W_26_Havenkant_510790349_M = 510790349;
         final int W_25_Havenkant_510790348_L = 510790348;
@@ -653,7 +713,7 @@ public class RouteSegmentToExtractTest {
             W_33_151_Tiensevest_1_19793164_A, W_33_151_Tiensevest_1_19793164_A,
             W_32_150_Diestsevest_4_NextToOostertunnel_6184898_D, "Diestsevest",
             null,
-            "305;318;334;335;358;410;513;601;630;651;652;658"
+            "284;285;305;306;310;315;316;317;318;334;335;358;395;410;433;475;485;513;601;630;651;652;658"
         );
         assertEquals(rel8.getId(), rel50.getId());
 
@@ -672,7 +732,7 @@ public class RouteSegmentToExtractTest {
             W_28_146_Artoisplein_2_254800931_A, W_28_146_Artoisplein_2_254800931_A,
             W_27_Zoutstraat_3992548_A, "Zoutstraat",
             null,
-            "334;335;513;601;630"
+            "178;305;318;334;335;358;410;513;601;630;651;652;658"
         );
         assertEquals(rel10.getId(), rel52.getId());
 
@@ -681,7 +741,7 @@ public class RouteSegmentToExtractTest {
             W_27_Zoutstraat_3992548_A, W_27_Zoutstraat_3992548_A,
             W_26_Havenkant_510790349_M, "Havenkant",
             null,
-            "601"
+            "334;335;513;601;630"
         );
 
         for (int n = 25; n >= 14; n--) returnValueNull = segment53.addPTWayMember(n); assertNull(returnValueNull);
@@ -692,6 +752,80 @@ public class RouteSegmentToExtractTest {
             null,
             "601"
         );
+
+
+        // ***********************************************************
+        // ***********************************************************
+        // ***********************************************************
+
+
+        Relation bus600RouteRelation = allRelations.stream()
+            .filter(relation -> relation.getId() == 955908)
+            .findFirst().orElse(null);
+
+        assertNotNull(bus600RouteRelation);
+        Relation cloneOfBus600RouteRelation = new Relation(bus600RouteRelation);
+        assertNotNull(cloneOfBus600RouteRelation);
+        RouteSegmentToExtract segment101 = new RouteSegmentToExtract(cloneOfBus600RouteRelation, ds);
+        assertEquals(cloneOfBus600RouteRelation.get("ref"), segment101.getLineIdentifiersSignature());
+        assertEquals(cloneOfBus600RouteRelation.get("colour"), segment101.getColoursSignature());
+
+        assertNull(segment101.extractToRelation(Collections.emptyList(), false));
+
+        assertEquals("", segment101.getWayIdsSignature());
+        assertEquals(Collections.emptyList(), segment101.getWayMembers());
+
+        final int W_169_Engels_Plein_608715622_O = 608715622;
+        final int W_168_Engels_Plein_338057819_N = 338057819;
+        final int W_167_Engels_Plein_305316104_M = 305316104;
+        final int W_166_Engels_Plein_3869812_L = 3869812;
+        final int W_165_Wolvengang_25928482_K = 25928482;
+        final int W_164_Wolvengang_659297690_J = 659297690;
+        final int W_163_Achter_de_latten_330300723_I = 330300723;
+        final int W_162_Burchtstraat_3869822_H = 3869822;
+        final int W_161_Havenkant_330300725_G = 330300725;
+        final int W_160_Havenkant_270181176_F = 270181176;
+        final int W_159_Havenkant_406205781_E = 406205781;
+        final int W_158_Havenkant_843534478_D = 843534478;
+        final int W_157_Havenkant_314635787_C = 314635787;
+        final int W_156_Havenkant_510790348_B = 510790348;
+        final int W_155_Havenkant_29283599_A = 29283599;
+
+        final int W_154_Havenkant_304241968_B = 304241968;
+        final int W_153_Aarschotsesteenweg_304241967_A = 304241967;
+
+        for (int n = 169; n >= 155; n--) returnValueNull = segment101.addPTWayMember(n); assertNull(returnValueNull);
+        RouteSegmentToExtract segment102 = segment101.addPTWayMember(154);
+        extractAndAssertValues(154, segment101, segment102, cloneOfBus600RouteRelation,
+            W_155_Havenkant_29283599_A, W_169_Engels_Plein_608715622_O,
+            W_154_Havenkant_304241968_B, "Havenkant",
+            null,
+            "600"
+        );
+
+        final int W_152_Redersstraat_340265961_B = 340265961;
+        final int W_151_Redersstraat_318825613_A = 318825613;
+
+        returnValueNull = segment102.addPTWayMember(153); assertNull(returnValueNull);
+        RouteSegmentToExtract segment103 = segment102.addPTWayMember(152);
+        extractAndAssertValues(152, segment102, segment103, cloneOfBus600RouteRelation,
+            W_153_Aarschotsesteenweg_304241967_A, W_154_Havenkant_304241968_B,
+            W_152_Redersstraat_340265961_B, "Redersstraat",
+            null,
+            "334;335;513;600;630"
+        );
+
+        final int W_150_Redersstraat_340265962_A = 340265962;
+
+        returnValueNull = segment103.addPTWayMember(151); assertNull(returnValueNull);
+        RouteSegmentToExtract segment104 = segment103.addPTWayMember(150);
+        extractAndAssertValues(150, segment103, segment104, cloneOfBus600RouteRelation,
+            W_151_Redersstraat_318825613_A, W_152_Redersstraat_340265961_B,
+            W_150_Redersstraat_340265962_A, "Redersstraat",
+            null,
+            "600"
+        );
+
     }
 
     public Relation extractAndAssertValues(int index, RouteSegmentToExtract createdSegment, RouteSegmentToExtract newSegment,
@@ -699,7 +833,7 @@ public class RouteSegmentToExtractTest {
                                        String nameOfNewWay,
                                        String expectedColours, String expectedRouteRef) {
         Relation extractedRelation = createdSegment.extractToRelation(Arrays.asList("type", "route"), true);
-        System.out.println(extractedRelation.get("note"));
+        System.out.println(index + " " + extractedRelation.get("note"));
         assertEquals("first way not correct", firstWayId, extractedRelation.firstMember().getWay().getId());
         assertEquals("last way not correct", lastWayId, extractedRelation.lastMember().getWay().getId());
         if (expectedColours != null) assertEquals(expectedColours, createdSegment.getColoursSignature());
