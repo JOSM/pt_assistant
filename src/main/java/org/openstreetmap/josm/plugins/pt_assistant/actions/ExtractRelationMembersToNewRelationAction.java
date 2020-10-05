@@ -18,7 +18,6 @@ import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEdito
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
 import org.openstreetmap.josm.plugins.pt_assistant.data.RouteSegmentToExtract;
-import org.openstreetmap.josm.plugins.pt_assistant.data.WayTriplet;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.*;
 
