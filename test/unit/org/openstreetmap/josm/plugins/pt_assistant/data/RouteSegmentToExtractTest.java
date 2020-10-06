@@ -925,6 +925,59 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             "333;334;335;513;600;630;651;652;658"
         );
 
+        final int W_140_Diestsepoort_198559166_E = 198559166;
+        // W_139_Diestsepoort_584356751_D = 584356751;
+        // W_138_Diestsepoort_451873773_C = 451873773;
+        // W_137_Diestsepoort_584356742_B = 584356742;
+        final int W_136_Diestsepoort_451873774_A = 451873774;
+
+        for (int n = 143; n >= 141; n--) {returnValueNull =segment107.addPTWayMember(n); assertNull(returnValueNull);}
+        RouteSegmentToExtract segment108 = segment107.addPTWayMember(140);
+        extractAndAssertValues(140, segment107, segment108, cloneOfBus600RouteRelation,
+            W_141_Diestsepoort_584356745_A, W_144_Diestsepoort_61556877_D,
+            W_140_Diestsepoort_198559166_E, "Diestsepoort",
+            null,
+            "2;3;179;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658"
+        );
+
+        final int W_135__76867049_C = 76867049;
+        // W_134__79264890_B = 79264890;
+        final int W_133__79596965_A = 79596965;
+
+        for (int n = 139; n >= 136; n--) {returnValueNull =segment108.addPTWayMember(n); assertNull(returnValueNull);}
+        RouteSegmentToExtract segment109 = segment108.addPTWayMember(135);
+        extractAndAssertValues(135, segment108, segment109, cloneOfBus600RouteRelation,
+            W_136_Diestsepoort_451873774_A, W_140_Diestsepoort_198559166_E,
+            W_135__76867049_C, null,
+            null,
+            "2;3;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658"
+        );
+
+        final int W_132__79596974_B = 79596974;
+        final int W_131__79596982_A = 79596982;
+        final int W_130__79596987_A = 79596987;
+
+        for (int n = 134; n >= 133; n--) {returnValueNull =segment109.addPTWayMember(n); assertNull(returnValueNull);}
+        RouteSegmentToExtract segment110 = segment109.addPTWayMember(132);
+        extractAndAssertValues(132, segment109, segment110, cloneOfBus600RouteRelation,
+            W_133__79596965_A, W_135__76867049_C,
+            W_132__79596974_B, null,
+            null,
+            "2;3;310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630"
+        );
+
+        final int W_129__377918658_A = 377918658;
+        final int W_128__79596980_A = 79596980;
+
+        returnValueNull =segment110.addPTWayMember(131); assertNull(returnValueNull);
+        RouteSegmentToExtract segment111 = segment110.addPTWayMember(130);
+        extractAndAssertValues(130, segment110, segment111, cloneOfBus600RouteRelation,
+            W_131__79596982_A, W_132__79596974_B,
+            W_130__79596987_A, null,
+            null,
+            "3;333;334;335;433;600;630"
+        );
+
     }
 
     public Relation extractAndAssertValues(int index, RouteSegmentToExtract createdSegment, RouteSegmentToExtract newSegment,

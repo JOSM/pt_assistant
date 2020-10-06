@@ -273,7 +273,9 @@ public class RouteSegmentToExtract {
                 long occurrences = getMembershipCount(waysInCurrentRoute.currentWay, parentRoute);
                 if (!itinerariesInSameDirection.contains(parentRoute)) {
                     final Way firstHighwayInParentRoute = getHighways(parentRoute).get(0);
-                    if (firstHighwayInParentRoute == waysInCurrentRoute.currentWay) {
+                    final Way secondHighwayInParentRoute = getHighways(parentRoute).get(1);
+                    if (firstHighwayInParentRoute == waysInCurrentRoute.currentWay
+                            && !waysInCurrentRoute.previousWay.getNodes().contains(secondHighwayInParentRoute.getNode(0))) {
                         itinerariesInSameDirection.add(parentRoute);
                     }
                     for (WaySequence<Way, Way, Way, Way> waysInParentRoute : findPreviousAndNextWayInRoute(
