@@ -22,6 +22,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
     private static DataSet ds;
     private static Collection<Relation> allRelations;
     private static Collection<Way> allWays;
+    private final static String rc = " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way";
 
     @BeforeClass
     public static void init() throws FileNotFoundException, IllegalDataException {
@@ -48,22 +49,22 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             .filter(relation -> relation.getId() == 1606056)
             .findFirst().orElse(null);
 
-        WaySequence<Way, Way, Way, Way> waysInParentRouteOf601 = new WaySequence<>(
+        WaySequence waysInParentRouteOf601 = new WaySequence(
             bus601RouteRelation.getMembers().get(156).getWay(),
             bus601RouteRelation.getMembers().get(157).getWay(),
             bus601RouteRelation.getMembers().get(158).getWay());
 
-        WaySequence<Way, Way, Way, Way> waysInParentRouteOf358 = new WaySequence<>(
+        WaySequence waysInParentRouteOf358 = new WaySequence(
             bus358RouteRelation.getMembers().get(114).getWay(),
             bus358RouteRelation.getMembers().get(115).getWay(),
             bus358RouteRelation.getMembers().get(116).getWay());
-        WaySequence<Way, Way, Way, Way> waysInParentRouteOf371 = new WaySequence<>(
+        WaySequence waysInParentRouteOf371 = new WaySequence(
             bus371RouteRelation.getMembers().get(132).getWay(),
             bus371RouteRelation.getMembers().get(133).getWay(),
             bus371RouteRelation.getMembers().get(134).getWay());
         RouteSegmentToExtract segment601_1 = new RouteSegmentToExtract(bus601RouteRelation, ds);
-        assertTrue(segment601_1.isItineraryInSameDirection(waysInParentRouteOf601, waysInParentRouteOf358, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(waysInParentRouteOf601, waysInParentRouteOf371, 1));
+        assertTrue(segment601_1.isItineraryInSameDirection(waysInParentRouteOf601, waysInParentRouteOf358));
+        assertFalse(segment601_1.isItineraryInSameDirection(waysInParentRouteOf601, waysInParentRouteOf371));
 
         Way commonWay = allWays.stream()
             .filter(way -> way.getId() == 75113358)
@@ -85,59 +86,59 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             .filter(way -> way.getId() == 809485597)
             .findFirst().orElse(null);
 
-        WaySequence<Way, Way, Way, Way> leuvenToHaasrode = new WaySequence<>(toLeuven,commonWay,toHaasrode);
-        WaySequence<Way, Way, Way, Way> leuvenToBlanden = new WaySequence<>(toLeuven,commonWay,toBlanden);
-        WaySequence<Way, Way, Way, Way> neervelpToHaasrode = new WaySequence<>(toNeervelp,commonWay,toHaasrode);
-        WaySequence<Way, Way, Way, Way> neervelpToBlanden = new WaySequence<>(toNeervelp,commonWay,toBlanden);
-        WaySequence<Way, Way, Way, Way> haasrodeToLeuven = new WaySequence<>(toHaasrode,commonWay,toLeuven);
-        WaySequence<Way, Way, Way, Way> blandenToLeuven = new WaySequence<>(toBlanden,commonWay,toLeuven);
-        WaySequence<Way, Way, Way, Way> haasrodeToNeervelp = new WaySequence<>(toHaasrode,commonWay,toNeervelp);
-        WaySequence<Way, Way, Way, Way> blandenToNeervelp = new WaySequence<>(toBlanden,commonWay,toNeervelp);
+        WaySequence leuvenToHaasrode = new WaySequence(toLeuven,commonWay,toHaasrode);
+        WaySequence leuvenToBlanden = new WaySequence(toLeuven,commonWay,toBlanden);
+        WaySequence neervelpToHaasrode = new WaySequence(toNeervelp,commonWay,toHaasrode);
+        WaySequence neervelpToBlanden = new WaySequence(toNeervelp,commonWay,toBlanden);
+        WaySequence haasrodeToLeuven = new WaySequence(toHaasrode,commonWay,toLeuven);
+        WaySequence blandenToLeuven = new WaySequence(toBlanden,commonWay,toLeuven);
+        WaySequence haasrodeToNeervelp = new WaySequence(toHaasrode,commonWay,toNeervelp);
+        WaySequence blandenToNeervelp = new WaySequence(toBlanden,commonWay,toNeervelp);
 
-        assertTrue(segment601_1.isItineraryInSameDirection(leuvenToHaasrode, leuvenToBlanden, 1));
-        assertTrue(segment601_1.isItineraryInSameDirection(leuvenToBlanden, leuvenToHaasrode, 1));
-        assertTrue(segment601_1.isItineraryInSameDirection(haasrodeToLeuven, blandenToLeuven, 1));
-        assertTrue(segment601_1.isItineraryInSameDirection(blandenToLeuven, haasrodeToLeuven, 1));
-        assertTrue(segment601_1.isItineraryInSameDirection(neervelpToBlanden, neervelpToHaasrode, 1));
-        assertTrue(segment601_1.isItineraryInSameDirection(neervelpToHaasrode, neervelpToBlanden, 1));
-        assertTrue(segment601_1.isItineraryInSameDirection(blandenToNeervelp, blandenToLeuven, 1));
-        assertTrue(segment601_1.isItineraryInSameDirection(blandenToLeuven, blandenToNeervelp, 1));
+        assertTrue(segment601_1.isItineraryInSameDirection(leuvenToHaasrode, leuvenToBlanden));
+        assertTrue(segment601_1.isItineraryInSameDirection(leuvenToBlanden, leuvenToHaasrode));
+        assertTrue(segment601_1.isItineraryInSameDirection(haasrodeToLeuven, blandenToLeuven));
+        assertTrue(segment601_1.isItineraryInSameDirection(blandenToLeuven, haasrodeToLeuven));
+        assertTrue(segment601_1.isItineraryInSameDirection(neervelpToBlanden, neervelpToHaasrode));
+        assertTrue(segment601_1.isItineraryInSameDirection(neervelpToHaasrode, neervelpToBlanden));
+        assertTrue(segment601_1.isItineraryInSameDirection(blandenToNeervelp, blandenToLeuven));
+        assertTrue(segment601_1.isItineraryInSameDirection(blandenToLeuven, blandenToNeervelp));
 
-        assertFalse(segment601_1.isItineraryInSameDirection(leuvenToBlanden, blandenToLeuven, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(blandenToLeuven, leuvenToBlanden, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(leuvenToHaasrode, haasrodeToLeuven, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(haasrodeToLeuven, leuvenToHaasrode, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(neervelpToBlanden, blandenToNeervelp, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(blandenToNeervelp, neervelpToBlanden, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(neervelpToHaasrode, haasrodeToNeervelp, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(haasrodeToNeervelp, neervelpToHaasrode, 1));
+        assertFalse(segment601_1.isItineraryInSameDirection(leuvenToBlanden, blandenToLeuven));
+        assertFalse(segment601_1.isItineraryInSameDirection(blandenToLeuven, leuvenToBlanden));
+        assertFalse(segment601_1.isItineraryInSameDirection(leuvenToHaasrode, haasrodeToLeuven));
+        assertFalse(segment601_1.isItineraryInSameDirection(haasrodeToLeuven, leuvenToHaasrode));
+        assertFalse(segment601_1.isItineraryInSameDirection(neervelpToBlanden, blandenToNeervelp));
+        assertFalse(segment601_1.isItineraryInSameDirection(blandenToNeervelp, neervelpToBlanden));
+        assertFalse(segment601_1.isItineraryInSameDirection(neervelpToHaasrode, haasrodeToNeervelp));
+        assertFalse(segment601_1.isItineraryInSameDirection(haasrodeToNeervelp, neervelpToHaasrode));
 
-        WaySequence<Way, Way, Way, Way> missingToBlanden = new WaySequence<>(null,commonWay,toBlanden);
-        WaySequence<Way, Way, Way, Way> missingToHaasrode = new WaySequence<>(null,commonWay,toHaasrode);
-        WaySequence<Way, Way, Way, Way> missingToLeuven = new WaySequence<>(null,commonWay,toLeuven);
-        WaySequence<Way, Way, Way, Way> missingToNeervelp = new WaySequence<>(null,commonWay,toNeervelp);
-        WaySequence<Way, Way, Way, Way> blandenToMissing = new WaySequence<>(toBlanden,commonWay,null);
-        WaySequence<Way, Way, Way, Way> haasrodeToMissing = new WaySequence<>(toHaasrode,commonWay,null);
-        WaySequence<Way, Way, Way, Way> leuvenToMissing = new WaySequence<>(toNeervelp,commonWay,null);
-        WaySequence<Way, Way, Way, Way> neervelpToMissing = new WaySequence<>(toNeervelp,commonWay,null);
+        WaySequence missingToBlanden = new WaySequence(null,commonWay,toBlanden);
+        WaySequence missingToHaasrode = new WaySequence(null,commonWay,toHaasrode);
+        WaySequence missingToLeuven = new WaySequence(null,commonWay,toLeuven);
+        WaySequence missingToNeervelp = new WaySequence(null,commonWay,toNeervelp);
+        WaySequence blandenToMissing = new WaySequence(toBlanden,commonWay,null);
+        WaySequence haasrodeToMissing = new WaySequence(toHaasrode,commonWay,null);
+        WaySequence leuvenToMissing = new WaySequence(toNeervelp,commonWay,null);
+        WaySequence neervelpToMissing = new WaySequence(toNeervelp,commonWay,null);
 
-        assertTrue(segment601_1.isItineraryInSameDirection(missingToBlanden, leuvenToBlanden, 1));
-        assertTrue(segment601_1.isItineraryInSameDirection(leuvenToBlanden, missingToBlanden, 1));
-        assertTrue(segment601_1.isItineraryInSameDirection(missingToLeuven, blandenToLeuven, 1));
-        assertTrue(segment601_1.isItineraryInSameDirection(blandenToLeuven, missingToLeuven, 1));
-        assertTrue(segment601_1.isItineraryInSameDirection(missingToBlanden, neervelpToHaasrode, 1));
-        assertTrue(segment601_1.isItineraryInSameDirection(neervelpToHaasrode, missingToBlanden, 1));
-        assertTrue(segment601_1.isItineraryInSameDirection(missingToNeervelp, blandenToLeuven, 1));
-        assertTrue(segment601_1.isItineraryInSameDirection(blandenToLeuven, missingToNeervelp, 1));
+        assertTrue(segment601_1.isItineraryInSameDirection(missingToBlanden, leuvenToBlanden));
+        assertTrue(segment601_1.isItineraryInSameDirection(leuvenToBlanden, missingToBlanden));
+        assertTrue(segment601_1.isItineraryInSameDirection(missingToLeuven, blandenToLeuven));
+        assertTrue(segment601_1.isItineraryInSameDirection(blandenToLeuven, missingToLeuven));
+        assertTrue(segment601_1.isItineraryInSameDirection(missingToBlanden, neervelpToHaasrode));
+        assertTrue(segment601_1.isItineraryInSameDirection(neervelpToHaasrode, missingToBlanden));
+        assertTrue(segment601_1.isItineraryInSameDirection(missingToNeervelp, blandenToLeuven));
+        assertTrue(segment601_1.isItineraryInSameDirection(blandenToLeuven, missingToNeervelp));
 
-        assertFalse(segment601_1.isItineraryInSameDirection(leuvenToBlanden, blandenToLeuven, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(blandenToLeuven, leuvenToBlanden, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(leuvenToHaasrode, haasrodeToLeuven, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(haasrodeToLeuven, leuvenToHaasrode, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(neervelpToBlanden, blandenToNeervelp, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(blandenToNeervelp, neervelpToBlanden, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(neervelpToHaasrode, haasrodeToNeervelp, 1));
-        assertFalse(segment601_1.isItineraryInSameDirection(haasrodeToNeervelp, neervelpToHaasrode, 1));
+        assertFalse(segment601_1.isItineraryInSameDirection(leuvenToBlanden, blandenToLeuven));
+        assertFalse(segment601_1.isItineraryInSameDirection(blandenToLeuven, leuvenToBlanden));
+        assertFalse(segment601_1.isItineraryInSameDirection(leuvenToHaasrode, haasrodeToLeuven));
+        assertFalse(segment601_1.isItineraryInSameDirection(haasrodeToLeuven, leuvenToHaasrode));
+        assertFalse(segment601_1.isItineraryInSameDirection(neervelpToBlanden, blandenToNeervelp));
+        assertFalse(segment601_1.isItineraryInSameDirection(blandenToNeervelp, neervelpToBlanden));
+        assertFalse(segment601_1.isItineraryInSameDirection(neervelpToHaasrode, haasrodeToNeervelp));
+        assertFalse(segment601_1.isItineraryInSameDirection(haasrodeToNeervelp, neervelpToHaasrode));
     }
 
 
@@ -186,7 +187,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         final int W_156_TiensevestToPerron1_79596986_A = 79596986;
 
         RouteSegmentToExtract returnValueNull =null;
-        for (int n = 158; n >= 157; n--) {returnValueNull =segment1.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 158; n >= 157; n--) {returnValueNull =segment1.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment2 = segment1.addPTWayMember(156);
 
         final Way veryLastWay = segment1.getWayMembers().get(1).getWay();
@@ -275,7 +276,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // W_142_Lüdenscheidsingel_3_3993388_B = 3993388;
         final int W_141_Lüdenscheidsingel_2_109267417_A = 109267417;
 
-        for (int n = 149; n >= 147; n--) {returnValueNull =segment8.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 149; n >= 147; n--) {returnValueNull =segment8.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment9 = segment8.addPTWayMember(146);
         Relation rel9 = extractAndAssertValues(146, segment8, segment9, cloneOfBus601RouteRelation,
             W_29_147_Diestsevest_1_8133608_A, W_32_150_Diestsevest_4_NextToOostertunnel_6184898_D,
@@ -298,7 +299,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // W_137_Den_Boschsingel_1_146171871_B = 146171871;
         final int W_136_Den_Boschsingel_2_23837544_A = 23837544;
 
-        for (int n = 144; n >= 141; n--) {returnValueNull =segment10.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 144; n >= 141; n--) {returnValueNull =segment10.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment11 = segment10.addPTWayMember(140);
         extractAndAssertValues(140, segment10, segment11, cloneOfBus601RouteRelation,
             W_141_Lüdenscheidsingel_2_109267417_A, W_145_Artoisplein_1_23691158_E,
@@ -313,7 +314,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // W_132_Rennes_Singel_2_3994257_B = 3994257;
         final int W_131_Rennes_Singel_1_249333185_A = 249333185;
 
-        for (int n = 139; n >= 136; n--) {returnValueNull =segment11.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 139; n >= 136; n--) {returnValueNull =segment11.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment12 = segment11.addPTWayMember(135);
         extractAndAssertValues(135, segment11, segment12, cloneOfBus601RouteRelation,
             W_136_Den_Boschsingel_2_23837544_A, W_140_Lüdenscheidsingel_1_3993387_E,
@@ -325,7 +326,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // W_100_129_Herestraat_2_813970231_BB = 813970231;
         final int W_128_Herestraat_11_681081951_A = 681081951;
 
-        for (int n = 134; n >= 131; n--) {returnValueNull =segment12.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 134; n >= 131; n--) {returnValueNull =segment12.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment13 = segment12.addPTWayMember(130);
         extractAndAssertValues(130, segment12, segment13, cloneOfBus601RouteRelation,
             W_131_Rennes_Singel_1_249333185_A, W_135_Den_Boschsingel_3_225605630_E,
@@ -338,7 +339,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // W_126_Herestraat_9_41403544_B = 41403544;
         final int W_125_Herestraat_8_8079995_A = 8079995;
 
-        for (int n = 129; n >= 128; n--) {returnValueNull =segment13.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 129; n >= 128; n--) {returnValueNull =segment13.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment14 = segment13.addPTWayMember(127);
         extractAndAssertValues(127, segment13, segment14, cloneOfBus601RouteRelation,
             W_128_Herestraat_11_681081951_A, W_99_130_Herestraat_1_249333184_AC,
@@ -350,7 +351,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         final int W_124_Rotonde_Het_Teken_41403538_B = 41403538;
         final int W_123_Ring_Zuid_79340950_A = 79340950;
 
-        for (int n = 126; n >= 125; n--) {returnValueNull =segment14.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 126; n >= 125; n--) {returnValueNull =segment14.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment15 = segment14.addPTWayMember(124);
         extractAndAssertValues(124, segment14, segment15, cloneOfBus601RouteRelation,
             W_125_Herestraat_8_8079995_A, W_127_Herestraat_10_813970227_C,
@@ -448,7 +449,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
 
         final int W_109_Rotonde_Het_Teken_Ring_Noord_bus3_78873921_A = 78873921;
 
-        for (int n = 112; n >= 110; n--) {returnValueNull =segment23.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 112; n >= 110; n--) {returnValueNull =segment23.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
 
         RouteSegmentToExtract segment24 = segment23.addPTWayMember(109);
         extractAndAssertValues(109, segment23, segment24, cloneOfBus601RouteRelation,
@@ -504,7 +505,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         final int W_101_Herestraat_3_813970229_C = 813970229;
         // 99 and 100 are defined as 129 and 130
 
-        for (int n = 104; n >= 102; n--) {returnValueNull =segment28.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 104; n >= 102; n--) {returnValueNull =segment28.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment29 = segment28.addPTWayMember(101);
         extractAndAssertValues(101, segment28, segment29, cloneOfBus601RouteRelation,
             W_102_Herestraat_4_813970228_A, W_105_Herestraat_7_13067134_D,
@@ -522,7 +523,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // W_92_Rennes_Singel_8131120_B = 8131120;
         final int W_91_Rennes_Singel_429706864_A = 429706864;
 
-        for (int n = 100; n >= 99; n--) {returnValueNull =segment29.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 100; n >= 99; n--) {returnValueNull =segment29.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment30 = segment29.addPTWayMember(98);
         extractAndAssertValues(98, segment29, segment30, cloneOfBus601RouteRelation,
             W_99_130_Herestraat_1_249333184_AC, W_101_Herestraat_3_813970229_C,
@@ -543,7 +544,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // W_81_Tervuursevest_429706866_B = 429706866;
         final int W_80_Tervuursevest_88361317_A = 88361317;
 
-        for (int n = 97; n >= 91; n--) {returnValueNull =segment30.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 97; n >= 91; n--) {returnValueNull =segment30.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment31 = segment30.addPTWayMember(90);
         extractAndAssertValues(90, segment30, segment31, cloneOfBus601RouteRelation,
             W_91_Rennes_Singel_429706864_A, W_98_Rennes_Singel_249333186_H,
@@ -554,7 +555,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
 
         final int W_79_Tervuursevest_Kapucijnenvoer_461159345_A = 461159345;
 
-        for (int n = 89; n >= 80; n--) {returnValueNull =segment31.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 89; n >= 80; n--) {returnValueNull =segment31.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment32 = segment31.addPTWayMember(79);
         extractAndAssertValues(79, segment31, segment32, cloneOfBus601RouteRelation,
             W_80_Tervuursevest_88361317_A, W_90_Tervuursevest_99583853_K,
@@ -600,7 +601,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // W_54_Geldenaaksevest_586268893_B = 586268893;
         final int W_53_Geldenaaksevest_8130906_A = 8130906;
 
-        for (int n = 77; n >= 68; n--) {returnValueNull =segment33.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 77; n >= 68; n--) {returnValueNull =segment33.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment34 = segment33.addPTWayMember(67);
         extractAndAssertValues(67, segment33, segment34, cloneOfBus601RouteRelation,
             W_68_Tervuursevest_3677330_A, W_78_Tervuursevest_461159362_K,
@@ -614,7 +615,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // W_50_Tiensevest_12712557_B = 12712557;
         final int W_49_Tiensevest_Oostertunnel_8590231_A = 8590231;
 
-        for (int n = 66; n >= 61; n--) {returnValueNull =segment34.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 66; n >= 61; n--) {returnValueNull =segment34.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment35 = segment34.addPTWayMember(60);
         extractAndAssertValues(60, segment34, segment35, cloneOfBus601RouteRelation,
             W_61_Geldenaaksevest_24905257_A, W_67_Naamsevest_86164005_G,
@@ -623,7 +624,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             "18;178;179;306 (student);337;601;616"
         );
 
-        for (int n = 60; n >= 53; n--) {returnValueNull =segment35.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 60; n >= 53; n--) {returnValueNull =segment35.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment36 = segment35.addPTWayMember(52);
         extractAndAssertValues(52, segment35, segment36, cloneOfBus601RouteRelation,
             W_53_Geldenaaksevest_8130906_A, W_60_Geldenaaksevest_608715605_H,
@@ -634,7 +635,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
 
         final int W_48_Tiensevest_185988814_A = 185988814;
 
-        for (int n = 51; n >= 49; n--) {returnValueNull =segment36.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 51; n >= 49; n--) {returnValueNull =segment36.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment37 = segment36.addPTWayMember(48);
         extractAndAssertValues(48, segment36, segment37, cloneOfBus601RouteRelation,
             W_49_Tiensevest_Oostertunnel_8590231_A, W_52_Tiensepoort_16775171_D,
@@ -658,7 +659,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
 
         final int W_43__79264899_A = 79264899;
 
-        for (int n = 46; n >= 44; n--) {returnValueNull =segment38.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 46; n >= 44; n--) {returnValueNull =segment38.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment39 = segment38.addPTWayMember(43);
         extractAndAssertValues(43, segment38, segment39, cloneOfBus601RouteRelation,
             W_44__78815533_A, W_47_Martelarenplein_76856823_D,
@@ -778,7 +779,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         );
         assertEquals(rel8.getId(), rel50.getId());
 
-        for (int n = 31; n >= 29; n--) {returnValueNull =segment50.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 31; n >= 29; n--) {returnValueNull =segment50.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment51 = segment50.addPTWayMember(28);
         Relation rel51 = extractAndAssertValues(28, segment50, segment51, cloneOfBus601RouteRelation,
             W_29_147_Diestsevest_1_8133608_A, W_32_150_Diestsevest_4_NextToOostertunnel_6184898_D,
@@ -805,7 +806,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             "334;335;513;601;630"
         );
 
-        for (int n = 25; n >= 14; n--) {returnValueNull =segment53.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 25; n >= 14; n--) {returnValueNull =segment53.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment54 = segment53.addPTWayMember(13);
         extractAndAssertValues(13, segment53, segment54, cloneOfBus601RouteRelation,
             W_14_Engels_Plein_338057820_A, W_26_Havenkant_510790349_M,
@@ -855,7 +856,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         final int W_154_Havenkant_304241968_B = 304241968;
         final int W_153_Aarschotsesteenweg_304241967_A = 304241967;
 
-        for (int n = 169; n >= 155; n--) {returnValueNull =segment101.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 169; n >= 155; n--) {returnValueNull =segment101.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment102 = segment101.addPTWayMember(154);
         extractAndAssertValues(154, segment101, segment102, cloneOfBus600RouteRelation,
             W_155_Havenkant_29283599_A, W_169_Engels_Plein_608715622_O,
@@ -916,7 +917,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // W_142_Diestsepoort_584356749_B = 584356749;
         final int W_141_Diestsepoort_584356745_A = 584356745;
 
-        for (int n = 146; n >= 145; n--) {returnValueNull =segment106.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 146; n >= 145; n--) {returnValueNull =segment106.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment107 = segment106.addPTWayMember(144);
         extractAndAssertValues(144, segment106, segment107, cloneOfBus600RouteRelation,
             W_145_Diestsepoort_8109264_A, W_147_Vuurkruisenlaan_23691160_C,
@@ -931,7 +932,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // W_137_Diestsepoort_584356742_B = 584356742;
         final int W_136_Diestsepoort_451873774_A = 451873774;
 
-        for (int n = 143; n >= 141; n--) {returnValueNull =segment107.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 143; n >= 141; n--) {returnValueNull =segment107.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment108 = segment107.addPTWayMember(140);
         extractAndAssertValues(140, segment107, segment108, cloneOfBus600RouteRelation,
             W_141_Diestsepoort_584356745_A, W_144_Diestsepoort_61556877_D,
@@ -944,7 +945,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // W_134__79264890_B = 79264890;
         final int W_133__79596965_A = 79596965;
 
-        for (int n = 139; n >= 136; n--) {returnValueNull =segment108.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 139; n >= 136; n--) {returnValueNull =segment108.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment109 = segment108.addPTWayMember(135);
         extractAndAssertValues(135, segment108, segment109, cloneOfBus600RouteRelation,
             W_136_Diestsepoort_451873774_A, W_140_Diestsepoort_198559166_E,
@@ -957,7 +958,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         final int W_131__79596982_A = 79596982;
         final int W_130__79596987_A = 79596987;
 
-        for (int n = 134; n >= 133; n--) {returnValueNull =segment109.addPTWayMember(n); assertNull(returnValueNull);}
+        for (int n = 134; n >= 133; n--) {returnValueNull =segment109.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment110 = segment109.addPTWayMember(132);
         extractAndAssertValues(132, segment109, segment110, cloneOfBus600RouteRelation,
             W_133__79596965_A, W_135__76867049_C,
@@ -977,7 +978,6 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             null,
             "3;333;334;335;433;600;630"
         );
-
     }
 
     public Relation extractAndAssertValues(int index, RouteSegmentToExtract createdSegment, RouteSegmentToExtract newSegment,
@@ -986,16 +986,17 @@ public class RouteSegmentToExtractTest extends AbstractTest{
                                        String expectedColours, String expectedRouteRef) {
         Relation extractedRelation = createdSegment.extractToRelation(Arrays.asList("type", "route"), true);
         System.out.println(index + " " + extractedRelation.get("note"));
-        assertEquals("first way not correct", firstWayId, extractedRelation.firstMember().getWay().getId());
-        assertEquals("last way not correct", lastWayId, extractedRelation.lastMember().getWay().getId());
+        assertEquals(String.format("%d first way not correct %s%s\n", index, rc, firstWayId), firstWayId, extractedRelation.firstMember().getWay().getId());
+        assertEquals(String.format("%d last way not correct %s%s\n", index, rc, lastWayId), lastWayId, extractedRelation.lastMember().getWay().getId());
         if (expectedColours != null) assertEquals(expectedColours, createdSegment.getColoursSignature());
         assertEquals(expectedRouteRef, createdSegment.getLineIdentifiersSignature());
 
-        assertEquals("relation id not correct", extractedRelation.getId(), superRouteRelation.getMember(index+1).getMember().getId());
+        assertEquals(String.format("%d relation id not correct\n", index), extractedRelation.getId(), superRouteRelation.getMember(index+1).getMember().getId());
         // newSegment should have the last way we tried to add to this segment
         if (firstWayIdForNewSegment != 0) {
-            assertEquals("name of last added way not correct", nameOfNewWay, newSegment.getWayMembers().get(0).getWay().get("name"));
-            assertEquals("id of first way not correct", firstWayIdForNewSegment, newSegment.getWayMembers().get(0).getWay().getId());
+            final long wayId = newSegment.getWayMembers().get(0).getWay().getId();
+            assertEquals(String.format("%d name of last added way not correct %s%s\n ", index, rc, wayId), nameOfNewWay, newSegment.getWayMembers().get(0).getWay().get("name"));
+            assertEquals(String.format("%d id of first way not correct  %s%s\n", index, rc, wayId), firstWayIdForNewSegment, wayId);
         }
         return extractedRelation;
     }
