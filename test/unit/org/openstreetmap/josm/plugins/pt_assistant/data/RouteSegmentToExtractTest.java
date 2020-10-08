@@ -956,7 +956,6 @@ public class RouteSegmentToExtractTest extends AbstractTest{
 
         final int W_132__79596974_B = 79596974;
         final int W_131__79596982_A = 79596982;
-        final int W_130__79596987_A = 79596987;
 
         for (int n = 134; n >= 133; n--) {returnValueNull =segment109.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
         RouteSegmentToExtract segment110 = segment109.addPTWayMember(132);
@@ -967,16 +966,597 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             "2;3;310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630"
         );
 
-        final int W_129__377918658_A = 377918658;
+        final int W_130__79596987_C = 79596987;
+        // W_129__377918658_B = 377918658;
         final int W_128__79596980_A = 79596980;
 
         returnValueNull =segment110.addPTWayMember(131); assertNull(returnValueNull);
         RouteSegmentToExtract segment111 = segment110.addPTWayMember(130);
         extractAndAssertValues(130, segment110, segment111, cloneOfBus600RouteRelation,
             W_131__79596982_A, W_132__79596974_B,
-            W_130__79596987_A, null,
+            W_130__79596987_C, null,
             null,
             "3;333;334;335;433;600;630"
+        );
+        final int W_127_Tiensevest_79193579_A = 79193579;
+
+        for (int n = 129; n >= 128; n--) {returnValueNull =segment111.addPTWayMember(n); assertNull(returnValueNull);}
+        RouteSegmentToExtract segment112 = segment111.addPTWayMember(127);
+        extractAndAssertValues(127, segment111, segment112, cloneOfBus600RouteRelation,
+            W_128__79596980_A, W_130__79596987_C,
+            W_127_Tiensevest_79193579_A, "Tiensevest",
+            null,
+            "3;333;334;335;513;600;630"
+        );
+
+        final int W_126_Tiensevest_258936980_A = 258936980;
+
+        RouteSegmentToExtract segment113 = segment112.addPTWayMember(126);
+        extractAndAssertValues(126, segment112, segment113, cloneOfBus600RouteRelation,
+            W_127_Tiensevest_79193579_A, W_127_Tiensevest_79193579_A,
+            W_126_Tiensevest_258936980_A, "Tiensevest",
+            null,
+            "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;380;513;600;601;616;630;658"
+        );
+
+        final int W_125_Tiensevest_79193580_A = 79193580;
+
+        RouteSegmentToExtract segment114 = segment113.addPTWayMember(125);
+        extractAndAssertValues(125, segment113, segment114, cloneOfBus600RouteRelation,
+            W_126_Tiensevest_258936980_A, W_126_Tiensevest_258936980_A,
+            W_125_Tiensevest_79193580_A, "Tiensevest",
+            null,
+            "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630;658"
+        );
+
+        final int W_124_Tiensevest_79193581_A = 79193581;
+
+        RouteSegmentToExtract segment115 = segment114.addPTWayMember(124);
+        extractAndAssertValues(124, segment114, segment115, cloneOfBus600RouteRelation,
+            W_125_Tiensevest_79193580_A, W_125_Tiensevest_79193580_A,
+            W_124_Tiensevest_79193581_A, "Tiensevest",
+            null,
+            "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630"
+        );
+
+        final int W_123_Tiensevest_78815505_A = 78815505;
+
+        RouteSegmentToExtract segment116 = segment115.addPTWayMember(123);
+        extractAndAssertValues(123, segment115, segment116, cloneOfBus600RouteRelation,
+            W_124_Tiensevest_79193581_A, W_124_Tiensevest_79193581_A,
+            W_123_Tiensevest_78815505_A, "Tiensevest",
+            null,
+            "2;3;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630"
+        );
+
+        final int W_122_Tiensevest_84696751_A = 84696751;
+        final int W_121_Tiensevest_79265237_A = 79265237;
+
+        RouteSegmentToExtract segment117 = segment116.addPTWayMember(122);
+        extractAndAssertValues(122, segment116, segment117, cloneOfBus600RouteRelation,
+            W_123_Tiensevest_78815505_A, W_123_Tiensevest_78815505_A,
+            W_122_Tiensevest_84696751_A, "Tiensevest",
+            null,
+            "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630"
+        );
+
+        final int W_120_Tiensevest_89574079_B = 89574079;
+        final int W_119_Tiensevest_81522744_A = 81522744;
+        final int W_118_Tiensevest_19793223_B = 19793223;
+        final int W_117_Tiensevest_185988814_A = 185988814;
+
+        RouteSegmentToExtract segment118 = segment117.addPTWayMember(121);
+        extractAndAssertValues(121, segment117, segment118, cloneOfBus600RouteRelation,
+            W_122_Tiensevest_84696751_A, W_122_Tiensevest_84696751_A,
+            W_121_Tiensevest_79265237_A, "Tiensevest",
+            null,
+            "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;527;600;616;630"
+        );
+
+        RouteSegmentToExtract segment119 = segment118.addPTWayMember(120);
+        extractAndAssertValues(120, segment118, segment119, cloneOfBus600RouteRelation,
+            W_121_Tiensevest_79265237_A, W_121_Tiensevest_79265237_A,
+            W_120_Tiensevest_89574079_B, "Tiensevest",
+            null,
+            "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;527;600;616;630"
+        );
+
+        final int W_116_Tiensevest_185988816_B = 185988816;
+        final int W_115_Tiensevest_15083398_A = 15083398;
+
+        for (int n = 119; n >= 119; n--) {returnValueNull =segment119.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
+        RouteSegmentToExtract segment119a = segment119.addPTWayMember(118);
+        extractAndAssertValues(118, segment119, segment119a, cloneOfBus600RouteRelation,
+            W_119_Tiensevest_81522744_A, W_120_Tiensevest_89574079_B,
+            W_118_Tiensevest_19793223_B, "Tiensevest",
+            null,
+            "1;2;3;7;8;9;18;179;284;285;306 (student);315;316;317;333;334;335;337;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539;600;616;630"
+        );
+
+        for (int n = 117; n >= 117; n--) {returnValueNull =segment119a.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
+        RouteSegmentToExtract segment119b = segment119a.addPTWayMember(116);
+        extractAndAssertValues(116, segment119a, segment119b, cloneOfBus600RouteRelation,
+            W_117_Tiensevest_185988814_A, W_118_Tiensevest_19793223_B,
+            W_116_Tiensevest_185988816_B, "Tiensevest",
+            null,
+            "1;7;8;9;18;179;306 (student);337;380;600;616;630"
+        );
+
+        final int W_114_Tiensevest_8154434_E = 8154434;
+        // W_113_Tiensevest_4003927_D = 4003927;
+        // W_112_Tiensevest_521193609_C = 521193609;
+        // W_111_Tiensevest_586268892_B = 586268892;
+        final int W_110_Tiensevest_521193611_A = 521193611;
+
+        returnValueNull =segment119b.addPTWayMember(115); assertNull(returnValueNull);
+        RouteSegmentToExtract segment120 = segment119b.addPTWayMember(114);
+        extractAndAssertValues(114, segment119b, segment120, cloneOfBus600RouteRelation,
+            W_115_Tiensevest_15083398_A, W_116_Tiensevest_185988816_B,
+            W_114_Tiensevest_8154434_E, "Tiensevest",
+            null,
+            "7;8;9;18;179;306 (student);337;380;600;616;630"
+        );
+
+        final int W_109_Tiensepoort_4003928_G = 4003928;
+        // W_108_Geldenaaksevest_8130905_F = 8130905;
+        // W_107_Geldenaaksevest_24905256_E = 24905256;
+        // W_106_Geldenaaksevest_24905255_D = 24905255;
+        // W_105_Geldenaaksevest_491728135_C = 491728135;
+        // W_104_Geldenaaksevest_24905254_B = 24905254;
+        final int W_103_Geldenaaksevest_199381120_A = 199381120;
+
+        for (int n = 113; n >= 110; n--) {returnValueNull =segment120.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
+        RouteSegmentToExtract segment121 = segment120.addPTWayMember(109);
+        extractAndAssertValues(109, segment120, segment121, cloneOfBus600RouteRelation,
+            W_110_Tiensevest_521193611_A, W_114_Tiensevest_8154434_E,
+            W_109_Tiensepoort_4003928_G, "Tiensepoort",
+            null,
+            "7;8;9;18;178;179;306 (student);337;380;600;616;630"
+        );
+
+        final int W_102_Geldenaaksevest_3991775_E = 3991775;
+        // W_101_Erasme_Ruelensvest_120086001_D = 120086001;
+        // W_100_Erasme_Ruelensvest_608715575_C = 608715575;
+        final int W_99_Erasme_Ruelensvest_608715579_A = 608715579;
+
+        for (int n = 108; n >= 103; n--) {returnValueNull =segment121.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
+        RouteSegmentToExtract segment122 = segment121.addPTWayMember(102);
+        extractAndAssertValues(102, segment121, segment122, cloneOfBus600RouteRelation,
+            W_103_Geldenaaksevest_199381120_A, W_109_Tiensepoort_4003928_G,
+            W_102_Geldenaaksevest_3991775_E, "Geldenaaksevest",
+            null,
+            "18;178;179;306 (student);337;600;616;630"
+        );
+
+        final int W_98_Erasme_Ruelensvest_3677822_B = 3677822;
+        final int W_97_Tervuursevest_120086003_A = 120086003;
+
+        for (int n = 100; n >= 99; n--) {returnValueNull =segment122.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
+        RouteSegmentToExtract segment123 = segment122.addPTWayMember(98);
+        extractAndAssertValues(98, segment122, segment123, cloneOfBus600RouteRelation,
+            W_99_Erasme_Ruelensvest_608715579_A, W_102_Geldenaaksevest_3991775_E,
+            W_98_Erasme_Ruelensvest_3677822_B, "Erasme Ruelensvest",
+            null,
+            "18;178;179;306 (student);337;600;616"
+        );
+
+        final int W_96_Tervuursevest_90168774_F = 90168774;
+        // W_95_Tervuursevest_3677329_E = 3677329;
+        // W_94_Tervuursevest_608715614_D = 608715614;
+        // W_93_Tervuursevest_608715615_C = 608715615;
+        final int W_92_Tervuursevest_85044922_A = 85044922;
+
+        final int W_91_Tervuursevest_16771611_A = 16771611;
+
+        returnValueNull =segment123.addPTWayMember(97); assertNull(String.format("%d %s%s\n", 97, rc, cloneOfBus600RouteRelation.getMember(97).getMember().getId()), returnValueNull);
+        RouteSegmentToExtract segment125 = segment123.addPTWayMember(96);
+        extractAndAssertValues(96, segment123, segment125, cloneOfBus600RouteRelation,
+            W_97_Tervuursevest_120086003_A, W_98_Erasme_Ruelensvest_3677822_B,
+            W_96_Tervuursevest_90168774_F, "Tervuursevest",
+            null,
+            "178;179;306 (student);600"
+        );
+
+        for (int n = 95; n >= 92; n--) {returnValueNull =segment125.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
+        RouteSegmentToExtract segment127 = segment125.addPTWayMember(91);
+        extractAndAssertValues(91, segment125, segment127, cloneOfBus600RouteRelation,
+            W_92_Tervuursevest_85044922_A, W_96_Tervuursevest_90168774_F,
+            W_91_Tervuursevest_16771611_A, "Tervuursevest",
+            null,
+            "178;179;306 (student);520;524;525;537;586;600"
+        );
+
+        final int W_90_Tervuursevest_13246158_A = 13246158;
+
+        final int W_89_Tervuursevest_260405216_B = 260405216;
+        final int W_88_Tervuursevest_16771609_A = 16771609;
+
+        RouteSegmentToExtract segment128 = segment127.addPTWayMember(90);
+        extractAndAssertValues(90, segment127, segment128, cloneOfBus600RouteRelation,
+            W_91_Tervuursevest_16771611_A, W_91_Tervuursevest_16771611_A,
+            W_90_Tervuursevest_13246158_A, "Tervuursevest",
+            null,
+            "178;520;524;525;537;586;600"
+        );
+
+        final int W_87_Tervuursevest_608715518_J = 608715518;
+        // W_86_Tervuursevest_608715519_I = 608715519;
+        // W_85_Tervuursevest_3677336_H = 3677336;
+        // W_84_Tervuursevest_15051052_G = 15051052;
+        // W_83_Tervuursevest_814322832_F = 814322832;
+        // W_82_Tervuursevest_80194318_E = 80194318;
+        // W_81_Tervuursevest_813979466_D = 813979466;
+        // W_80_Tervuursevest_521193382_C = 521193382;
+        // W_79_Tervuursevest_521193383_B = 521193383;
+        final int W_78_Tervuursevest_3677945_A = 3677945;
+
+        RouteSegmentToExtract segment129 = segment128.addPTWayMember(89);
+        extractAndAssertValues(89, segment128, segment129, cloneOfBus600RouteRelation,
+            W_90_Tervuursevest_13246158_A, W_90_Tervuursevest_13246158_A,
+            W_89_Tervuursevest_260405216_B, "Tervuursevest",
+            null,
+            "7;8;9;178;520;524;525;527;537;586;600"
+        );
+
+        for (int n = 88; n >= 88; n--) {returnValueNull =segment129.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
+        RouteSegmentToExtract segment130 = segment129.addPTWayMember(87);
+        extractAndAssertValues(87, segment129, segment130, cloneOfBus600RouteRelation,
+            W_88_Tervuursevest_16771609_A, W_89_Tervuursevest_260405216_B,
+            W_87_Tervuursevest_608715518_J, "Tervuursevest",
+            null,
+            "7;8;9;178;527;600"
+        );
+
+        final int W_77_Rennes_Singel_192559627_E = 192559627;
+        // W_76_Rennes_Singel_813979469_D = 813979469;
+        // W_75_Rennes_Singel_192559626_C = 192559626;
+        // W_74_Rennes_Singel_813979473_B = 813979473;
+        final int W_73_Rennes_Singel_28982660_A = 28982660;
+
+        final int W_72_Herestraat_78568455_A = 78568455;
+
+        for (int n = 86; n >= 78; n--) {returnValueNull =segment130.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
+        RouteSegmentToExtract segment131 = segment130.addPTWayMember(77);
+        extractAndAssertValues(77, segment130, segment131, cloneOfBus600RouteRelation,
+            W_78_Tervuursevest_3677945_A, W_87_Tervuursevest_608715518_J,
+            W_77_Rennes_Singel_192559627_E, "Rennes-Singel",
+            null,
+            "178;600"
+        );
+
+        final int W_71_Herestraat_813970227_C = 813970227;
+        // W_70_Herestraat_41403544_B = 41403544;
+        final int W_69_Herestraat_8079995_A = 8079995;
+
+        for (int n = 76; n >= 73; n--) {returnValueNull =segment131.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
+        RouteSegmentToExtract segment132 = segment131.addPTWayMember(72);
+        extractAndAssertValues(72, segment131, segment132, cloneOfBus600RouteRelation,
+            W_73_Rennes_Singel_28982660_A, W_77_Rennes_Singel_192559627_E,
+            W_72_Herestraat_78568455_A, "Herestraat",
+            null,
+            "178;318;600"
+        );
+
+        final int W_68_Rotonde_Het_Teken_41403538_B = 41403538;
+        final int W_67_Ring_Zuid_79340950_A = 79340950;
+
+        RouteSegmentToExtract segment133 = segment132.addPTWayMember(71);
+        extractAndAssertValues(71, segment132, segment133, cloneOfBus600RouteRelation,
+            W_72_Herestraat_78568455_A, W_72_Herestraat_78568455_A,
+            W_71_Herestraat_813970227_C, "Herestraat",
+            null,
+            "600"
+        );
+
+        for (int n = 70; n >= 69; n--) {returnValueNull =segment133.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
+        RouteSegmentToExtract segment134 = segment133.addPTWayMember(68);
+        extractAndAssertValues(68, segment133, segment134, cloneOfBus600RouteRelation,
+            W_69_Herestraat_8079995_A, W_71_Herestraat_813970227_C,
+            W_68_Rotonde_Het_Teken_41403538_B, "Rotonde Het Teken",
+            null,
+            "410;600;601"
+        );
+
+        final int W_66_Ring_Zuid_11369123_A = 11369123;
+
+        for (int n = 67; n >= 67; n--) {returnValueNull =segment134.addPTWayMember(n); assertNull(Integer.toString(n) + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
+        RouteSegmentToExtract segment135 = segment134.addPTWayMember(66);
+        extractAndAssertValues(66, segment134, segment135, cloneOfBus600RouteRelation,
+            W_67_Ring_Zuid_79340950_A, W_68_Rotonde_Het_Teken_41403538_B,
+            W_66_Ring_Zuid_11369123_A, "Ring Zuid",
+            null,
+            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"
+        );
+
+        final int W_65__159949154_A = 159949154;
+
+        final int W_64__332258104_B = 332258104;
+        final int W_63__78852604_A = 78852604;
+
+        RouteSegmentToExtract segment136 = segment135.addPTWayMember(65);
+        extractAndAssertValues(65, segment135, segment136, cloneOfBus600RouteRelation,
+            W_66_Ring_Zuid_11369123_A, W_66_Ring_Zuid_11369123_A,
+            W_65__159949154_A, null,
+            null,
+            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"
+        );
+
+        RouteSegmentToExtract segment137 = segment136.addPTWayMember(64);
+        extractAndAssertValues(64, segment136, segment137, cloneOfBus600RouteRelation,
+            W_65__159949154_A, W_65__159949154_A,
+            W_64__332258104_B, null,
+            null,
+            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"
+        );
+
+        final int W_62__14508735_A = 14508735;
+
+        for (int n = 63; n >= 63; n--) {returnValueNull =segment137.addPTWayMember(n); assertNull(Integer.toString(n) + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
+        RouteSegmentToExtract segment138 = segment137.addPTWayMember(62);
+        extractAndAssertValues(62, segment137, segment138, cloneOfBus600RouteRelation,
+            W_63__78852604_A, W_64__332258104_B,
+            W_62__14508735_A, null,
+            null,
+            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"
+        );
+
+        final int W_61__318878531_B = 318878531;
+        final int W_60__14506241_A = 14506241;
+
+        RouteSegmentToExtract segment139 = segment138.addPTWayMember(61);
+        extractAndAssertValues(61, segment138, segment139, cloneOfBus600RouteRelation,
+            W_62__14508735_A, W_62__14508735_A,
+            W_61__318878531_B, null,
+            null,
+            "3;317;333;334;335;370;371;373;374;380;395;410;513;600"
+        );
+
+        final int W_59_Ring_Zuid_109267436_A = 109267436;
+
+        for (int n = 60; n >= 60; n--) {returnValueNull =segment139.addPTWayMember(n); assertNull(Integer.toString(n) + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
+        RouteSegmentToExtract segment142 = segment139.addPTWayMember(59);
+        extractAndAssertValues(59, segment139, segment142, cloneOfBus600RouteRelation,
+            W_60__14506241_A, W_61__318878531_B,
+            W_59_Ring_Zuid_109267436_A, "Ring Zuid",
+            null,
+            "3;317;395;410;600"
+        );
+
+        final int W_58_Ring_Zuid_14508739_A = 14508739;
+
+        RouteSegmentToExtract segment143 = segment142.addPTWayMember(58);
+        extractAndAssertValues(58, segment142, segment143, cloneOfBus600RouteRelation,
+            W_59_Ring_Zuid_109267436_A, W_59_Ring_Zuid_109267436_A,
+            W_58_Ring_Zuid_14508739_A, "Ring Zuid",
+            null,
+            "3;317;395;410;600;601"
+        );
+
+        final int W_57_Ring_Zuid_14508740_A = 14508740;
+
+        RouteSegmentToExtract segment144 = segment143.addPTWayMember(57);
+        extractAndAssertValues(57, segment143, segment144, cloneOfBus600RouteRelation,
+            W_58_Ring_Zuid_14508739_A, W_58_Ring_Zuid_14508739_A,
+            W_57_Ring_Zuid_14508740_A, "Ring Zuid",
+            null,
+            "3;317;334;335;395;410;600;601"
+        );
+
+        final int W_56_Ring_Zuid_502328838_D = 502328838;
+        final int W_55_Ring_Zuid_502328837_C = 502328837;
+        final int W_54_Ring_Zuid_8080023_B = 8080023;
+        final int W_53_Rotonde_Het_Teken_78568660_A = 78568660;
+
+        RouteSegmentToExtract segment145 = segment144.addPTWayMember(56);
+        extractAndAssertValues(56, segment144, segment145, cloneOfBus600RouteRelation,
+            W_57_Ring_Zuid_14508740_A, W_57_Ring_Zuid_14508740_A,
+            W_56_Ring_Zuid_502328838_D, "Ring Zuid",
+            null,
+            "3;317;334;335;380;395;410;600;601"
+        );
+
+        final int W_52_Rotonde_Het_Teken_78873921_A = 78873921;
+
+        for (int n = 55; n >= 53; n--) {returnValueNull =segment145.addPTWayMember(n); assertNull(Integer.toString(n) + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
+        RouteSegmentToExtract segment146 = segment145.addPTWayMember(52);
+        extractAndAssertValues(52, segment145, segment146, cloneOfBus600RouteRelation,
+            W_53_Rotonde_Het_Teken_78568660_A, W_56_Ring_Zuid_502328838_D,
+            W_52_Rotonde_Het_Teken_78873921_A, "Rotonde Het Teken",
+            null,
+            "3;317;333;334;335;370;371;373;374;380;395;410;600;601"
+        );
+
+        final int W_51_Rotonde_Het_Teken_3752557_A = 3752557;
+
+        RouteSegmentToExtract segment148 = segment146.addPTWayMember(51);
+        extractAndAssertValues(51, segment146, segment148, cloneOfBus600RouteRelation,
+            W_52_Rotonde_Het_Teken_78873921_A, W_52_Rotonde_Het_Teken_78873921_A,
+            W_51_Rotonde_Het_Teken_3752557_A, "Rotonde Het Teken",
+            null,
+            "3;317;333;334;335;370;371;373;374;380;395;410;600;601"
+        );
+
+        final int W_50_Rotonde_Het_Teken_249333188_A = 249333188;
+
+        RouteSegmentToExtract segment149 = segment148.addPTWayMember(50);
+        extractAndAssertValues(50, segment148, segment149, cloneOfBus600RouteRelation,
+            W_51_Rotonde_Het_Teken_3752557_A, W_51_Rotonde_Het_Teken_3752557_A,
+            W_50_Rotonde_Het_Teken_249333188_A, "Rotonde Het Teken",
+            null,
+            "3;317;333;334;335;370;371;373;374;380;395;410;600;601"
+        );
+
+        final int W_49_Rotonde_Het_Teken_249333187_A = 249333187;
+
+        RouteSegmentToExtract segment150 = segment149.addPTWayMember(49);
+        extractAndAssertValues(49, segment149, segment150, cloneOfBus600RouteRelation,
+            W_50_Rotonde_Het_Teken_249333188_A, W_50_Rotonde_Het_Teken_249333188_A,
+            W_49_Rotonde_Het_Teken_249333187_A, "Rotonde Het Teken",
+            null,
+            "3;410;600;601"
+        );
+
+        final int W_48_Herestraat_13067134_D = 13067134;
+        final int W_47_Herestraat_813970232_C = 813970232;
+        final int W_46_Herestraat_813970226_B = 813970226;
+        final int W_45_Herestraat_813970228_A = 813970228;
+
+        RouteSegmentToExtract segment151 = segment150.addPTWayMember(48);
+        extractAndAssertValues(48, segment150, segment151, cloneOfBus600RouteRelation,
+            W_49_Rotonde_Het_Teken_249333187_A, W_49_Rotonde_Het_Teken_249333187_A,
+            W_48_Herestraat_13067134_D, "Herestraat",
+            null,
+            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"
+        );
+
+        final int W_44_Herestraat_270181177_A = 270181177;
+
+        for (int n = 47; n >= 45; n--) {returnValueNull =segment151.addPTWayMember(n); assertNull(Integer.toString(n) + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
+        RouteSegmentToExtract segment152 = segment151.addPTWayMember(44);
+        extractAndAssertValues(44, segment151, segment152, cloneOfBus600RouteRelation,
+            W_45_Herestraat_813970228_A, W_48_Herestraat_13067134_D,
+            W_44_Herestraat_270181177_A, "Herestraat",
+            null,
+            "410;600;601"
+        );
+
+        final int W_43_Rennes_Singel_78568454_B = 78568454;
+        final int W_42_Rennes_Singel_225605633_A = 225605633;
+
+        RouteSegmentToExtract segment153 = segment152.addPTWayMember(43);
+        extractAndAssertValues(43, segment152, segment153, cloneOfBus600RouteRelation,
+            W_44_Herestraat_270181177_A, W_44_Herestraat_270181177_A,
+            W_43_Rennes_Singel_78568454_B, "Rennes-Singel",
+            null,
+            "410;600"
+        );
+
+        final int W_41_Rennes_Singel_8131123_D = 8131123;
+        final int W_40_Rennes_Singel_3680457_C = 3680457;
+        final int W_39_Den_Boschsingel_192559625_B = 192559625;
+        final int W_38_Den_Boschsingel_23837543_A = 23837543;
+
+        for (int n = 42; n >= 42; n--) {returnValueNull =segment153.addPTWayMember(n); assertNull(Integer.toString(n) + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
+        RouteSegmentToExtract segment154 = segment153.addPTWayMember(41);
+        extractAndAssertValues(41, segment153, segment154, cloneOfBus600RouteRelation,
+            W_42_Rennes_Singel_225605633_A, W_43_Rennes_Singel_78568454_B,
+            W_41_Rennes_Singel_8131123_D, "Rennes-Singel",
+            null,
+            "178;318;410;600"
+        );
+
+        final int W_37_Den_Boschsingel_146171867_D = 146171867;
+        final int W_36_Den_Boschsingel_125835586_C = 125835586;
+        final int W_35__3877104_B = 3877104;
+        final int W_34_Lüdenscheidsingel_85048201_A = 85048201;
+
+        for (int n = 40; n >= 38; n--) {returnValueNull =segment154.addPTWayMember(n); assertNull(Integer.toString(n) + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
+        RouteSegmentToExtract segment155 = segment154.addPTWayMember(37);
+        extractAndAssertValues(37, segment154, segment155, cloneOfBus600RouteRelation,
+            W_38_Den_Boschsingel_23837543_A, W_41_Rennes_Singel_8131123_D,
+            W_37_Den_Boschsingel_146171867_D, "Den Boschsingel",
+            null,
+            "318;410;600"
+        );
+
+        final int W_33_Lüdenscheidsingel_12891213_D = 12891213;
+        final int W_32_Lüdenscheidsingel_44932919_C = 44932919;
+        final int W_31_Lüdenscheidsingel_8131040_B = 8131040;
+        final int W_30_Joanna_Maria_Artoisplein_61540098_A = 61540098;
+
+        for (int n = 36; n >= 34; n--) {returnValueNull =segment155.addPTWayMember(n); assertNull(Integer.toString(n) + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
+        RouteSegmentToExtract segment156 = segment155.addPTWayMember(33);
+        extractAndAssertValues(33, segment155, segment156, cloneOfBus600RouteRelation,
+            W_34_Lüdenscheidsingel_85048201_A, W_37_Den_Boschsingel_146171867_D,
+            W_33_Lüdenscheidsingel_12891213_D, "Lüdenscheidsingel",
+            null,
+            "318;410;600;651;658"
+        );
+
+        final int W_29_Joanna_Maria_Artoisplein_254801390_B = 254801390;
+        final int W_28_Joanna_Maria_Artoisplein_61540068_A = 61540068;
+
+        for (int n = 32; n >= 30; n--) {returnValueNull =segment156.addPTWayMember(n); assertNull(Integer.toString(n) + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
+        RouteSegmentToExtract segment157 = segment156.addPTWayMember(29);
+        extractAndAssertValues(29, segment156, segment157, cloneOfBus600RouteRelation,
+            W_30_Joanna_Maria_Artoisplein_61540098_A, W_33_Lüdenscheidsingel_12891213_D,
+            W_29_Joanna_Maria_Artoisplein_254801390_B, "Joanna-Maria Artoisplein",
+            null,
+            "178;318;410;600;651;652;658"
+        );
+
+        final int W_27_Vuurkruisenlaan_23691160_C = 23691160;
+        final int W_26_Vuurkruisenlaan_4061640_B = 4061640;
+        final int W_25_Diestsepoort_8109264_A = 8109264;
+
+        for (int n = 28; n >= 28; n--) {returnValueNull =segment157.addPTWayMember(n); assertNull(Integer.toString(n) + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
+        RouteSegmentToExtract segment158 = segment157.addPTWayMember(27);
+        extractAndAssertValues(27, segment157, segment158, cloneOfBus600RouteRelation,
+            W_28_Joanna_Maria_Artoisplein_61540068_A, W_29_Joanna_Maria_Artoisplein_254801390_B,
+            W_27_Vuurkruisenlaan_23691160_C, "Vuurkruisenlaan",
+            null,
+            "178;318;333;334;335;410;513;600;630;651;652;658"
+        );
+
+        final int W_24_Diestsepoort_61556877_D = 61556877;
+        final int W_23_Diestsepoort_663770966_C = 663770966;
+        final int W_22_Diestsepoort_584356749_B = 584356749;
+        final int W_21_Diestsepoort_584356745_A = 584356745;
+
+        for (int n = 26; n >= 25; n--) {returnValueNull =segment158.addPTWayMember(n); assertNull(Integer.toString(n) + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
+        RouteSegmentToExtract segment159 = segment158.addPTWayMember(24);
+        extractAndAssertValues(24, segment158, segment159, cloneOfBus600RouteRelation,
+            W_25_Diestsepoort_8109264_A, W_27_Vuurkruisenlaan_23691160_C,
+            W_24_Diestsepoort_61556877_D, "Diestsepoort",
+            null,
+            "333;334;335;513;600;630;651;652;658"
+        );
+
+        final int W_20_Diestsepoort_198559166_E = 198559166;
+        final int W_19_Diestsepoort_584356751_D = 584356751;
+        final int W_18_Diestsepoort_451873773_C = 451873773;
+        final int W_17_Diestsepoort_584356742_B = 584356742;
+        final int W_16_Diestsepoort_451873774_A = 451873774;
+
+        for (int n = 23; n >= 21; n--) {returnValueNull =segment159.addPTWayMember(n); assertNull(Integer.toString(n) + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
+        RouteSegmentToExtract segment160 = segment159.addPTWayMember(20);
+        extractAndAssertValues(20, segment159, segment160, cloneOfBus600RouteRelation,
+            W_21_Diestsepoort_584356745_A, W_24_Diestsepoort_61556877_D,
+            W_20_Diestsepoort_198559166_E, "Diestsepoort",
+            null,
+            "2;3;179;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658"
+        );
+
+        final int W_15_Diestsepoort_116797180_B = 116797180;
+        final int W_14_Diestsepoort_23691157_A = 23691157;
+
+        for (int n = 19; n >= 16; n--) {returnValueNull =segment160.addPTWayMember(n); assertNull(Integer.toString(n) + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
+        RouteSegmentToExtract segment161 = segment160.addPTWayMember(15);
+        extractAndAssertValues(15, segment160, segment161, cloneOfBus600RouteRelation,
+            W_16_Diestsepoort_451873774_A, W_20_Diestsepoort_198559166_E,
+            W_15_Diestsepoort_116797180_B, "Diestsepoort",
+            null,
+            "2;3;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658"
+        );
+
+        final int W_13_p12_to_Diestsepoort_78815527_B = 78815527;
+        final int W_12_perron_12_377918658_A = 377918658;
+
+        for (int n = 15; n >= 14; n--) {returnValueNull =segment161.addPTWayMember(n); assertNull(Integer.toString(n) + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
+        RouteSegmentToExtract segment162 = segment161.addPTWayMember(13);
+        extractAndAssertValues(13, segment161, segment162, cloneOfBus600RouteRelation,
+            W_14_Diestsepoort_23691157_A, W_15_Diestsepoort_116797180_B,
+            W_13_p12_to_Diestsepoort_78815527_B, null,
+            null,
+            "4;5;6;7;8;9;179;306 (student);334;335;337;380;600;616;651;652;658"
+        );
+
+        RouteSegmentToExtract segment163 = segment162.addPTWayMember(12);
+        extractAndAssertValues(12, segment162, segment163, cloneOfBus600RouteRelation,
+            W_12_perron_12_377918658_A, W_13_p12_to_Diestsepoort_78815527_B,
+            0, null,
+            null,
+            "395;600;651;652"
         );
     }
 

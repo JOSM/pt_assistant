@@ -218,10 +218,11 @@ public class RouteSegmentToExtract {
                 this.itinerariesInSameDirection = itinerariesInSameDirection;
                 for (Relation parentRoute : itinerariesInSameDirection) {
                     if (waysInCurrentRoute.currentWay == getLastWay(parentRoute)
-                            || getMembershipCount(waysInCurrentRoute.currentWay, parentRoute) > 1
-                                && !parentRoute.equals(relation)) {
+                            || getMembershipCountOfWayInSameDirection(waysInCurrentRoute.currentWay, parentRoute) > 1
+                                && !parentRoute.equals(relation))
+                    {
                         startNewSegment = true;
-                        if (getMembershipCount(waysInCurrentRoute.currentWay, parentRoute) > 1) {
+                        if (getMembershipCountOfWayInSameDirection(waysInCurrentRoute.currentWay, parentRoute) > 1) {
                             startNewSegmentInNewSegment = true;
                         }
                     }
@@ -318,10 +319,57 @@ public class RouteSegmentToExtract {
         }
     }
 
+    /**
+     * @param way
+     * @param routeRelation
+     * @return number of times this way appears in the route relation, regardless of the sense it's traversed
+     */
     public long getMembershipCount(Way way, Relation routeRelation) {
-        return routeRelation.getMembers().stream()
-            .filter(member -> member.getMember().equals(way))
-            .count();
+        return this.getItineraryWays(routeRelation).stream()
+            .filter(w -> w.equals(way)).count();
+    }
+    /**
+     * @param way
+     * @param routeRelation
+     * @return number of times this way appears in the route relation, being traversed in the same sense
+     */
+    public long getMembershipCountOfWayInSameDirection(Way way, Relation routeRelation) {
+        List<Integer> indices = new ArrayList<>();
+        List<RelationMember> members = routeRelation.getMembers();
+        for (int i = 0; i < members.size(); i++) {
+            RelationMember member = members.get(i);
+            if (member.getMember().equals(way)) {
+                indices.add(i);
+            }
+        }
+        int counter = indices.size();
+        assert !(counter > 2); // if this happens the method will have to be rewritten to accomodate 3 or more occurrences
+                                      // of the same with in a single route relation
+        if (counter == 2) {
+            Way previousWay1 = null;
+            Way previousWay2 = null;
+            Way nextWay1 = null;
+            Way nextWay2 = null;
+            if (routeRelation.getMember(indices.get(0) - 1).isWay())
+                previousWay1 = routeRelation.getMember(indices.get(0) - 1).getWay();
+            if (routeRelation.getMember(indices.get(1) - 1).isWay())
+                previousWay2 = routeRelation.getMember(indices.get(1) - 1).getWay();
+            if (routeRelation.getMember(indices.get(0) + 1).isWay())
+                nextWay1 = routeRelation.getMember(indices.get(0) + 1).getWay();
+            if (routeRelation.getMember(indices.get(1) + 1).isWay())
+                nextWay2 = routeRelation.getMember(indices.get(1) + 1).getWay();
+            if (!isItineraryInSameDirection(new WaySequence(
+                                                previousWay1,
+                                                way,
+                                                nextWay1),
+                                            new WaySequence(
+                                                previousWay2,
+                                                way,
+                                                nextWay2))) {
+                counter--;
+            }
+        }
+        return counter;
     }
 
     public boolean isItineraryInSameDirection(WaySequence waysInCurrentRoute,
