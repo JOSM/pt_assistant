@@ -222,7 +222,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             W_155_Tiensevest_5_79211473_A, W_155_Tiensevest_5_79211473_A,
             W_154_Tiensevest_4_79211472_A, "Tiensevest",
             null,
-            "1;2;3;7;8;9;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;520;524;525;537;539;586;601;658"
+            "1;2;3;4;5;6;7;8;9;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;520;524;525;537;539;586;601;616;658"
         );
 
         final int W_153_Tiensevest_3_79175435_A = 79175435;
@@ -599,7 +599,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             W_48_Tiensevest_185988814_A, W_48_Tiensevest_185988814_A,
             W_47_Martelarenplein_76856823_D, "Martelarenplein",
             null,
-            "1;4;5;6;7;8;9;18;178;179;306 (student);337;380;527;601;630"
+            "1;7;8;9;18;178;179;306 (student);337;380;527;601;616;630"
         );
 
         final int W_43__79264899_A = 79264899;
@@ -940,7 +940,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             W_124_Tiensevest_79193581_A, W_124_Tiensevest_79193581_A,
             W_123_Tiensevest_78815505_A, "Tiensevest",
             null,
-            "2;3;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630"
+            "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630"
         );
 
         final int W_122_Tiensevest_84696751_A = 84696751;
@@ -956,6 +956,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
 
         final int W_120_Tiensevest_89574079_B = 89574079;
         final int W_119_Tiensevest_81522744_A = 81522744;
+
         final int W_118_Tiensevest_19793223_B = 19793223;
         final int W_117_Tiensevest_185988814_A = 185988814;
 
@@ -984,7 +985,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             W_119_Tiensevest_81522744_A, W_120_Tiensevest_89574079_B,
             W_118_Tiensevest_19793223_B, "Tiensevest",
             null,
-            "1;2;3;7;8;9;18;179;284;285;306 (student);315;316;317;333;334;335;337;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539;600;616;630"
+            "1;2;3;4;5;6;7;8;9;18;179;284;285;306 (student);315;316;317;333;334;335;337;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539;600;616;630"
         );
 
         for (int n = 117; n >= 117; n--) {returnValueNull =segment119a.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
@@ -993,7 +994,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             W_117_Tiensevest_185988814_A, W_118_Tiensevest_19793223_B,
             W_116_Tiensevest_185988816_B, "Tiensevest",
             null,
-            "1;7;8;9;18;179;306 (student);337;380;600;616;630"
+            "1;4;5;6;7;8;9;18;179;306 (student);337;380;600;616;630"
         );
 
         final int W_114_Tiensevest_8154434_E = 8154434;

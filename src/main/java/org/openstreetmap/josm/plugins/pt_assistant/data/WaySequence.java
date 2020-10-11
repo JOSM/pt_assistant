@@ -3,21 +3,30 @@ package org.openstreetmap.josm.plugins.pt_assistant.data;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 
 import java.util.List;
 
 import static org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils.isPTWay;
 
+/**
+ * This class keeps track of up to 4 consecutive ways
+ * that are most likely members in a route relation
+ */
 public final class WaySequence {
+    public boolean hasGap = false;
     public Way previousWay;
     public Way currentWay;
     public Way nextWay;
     public Way wayAfterNextWay;
 
-    public WaySequence() {
-        this(null, null, null, null);
-    }
-
+    /**
+     * Constructor to fetch the ways from a route relation
+     * The caller needs to verify that hasGap remains false
+     *
+     * @param relation the route relation
+     * @param index the position of currentWay in the route relation
+     */
     public WaySequence(Relation relation, int index) {
         final RelationMember currentMember = relation.getMember(index);
         if (isPTWay(currentMember)) {
@@ -39,7 +48,7 @@ public final class WaySequence {
                 currentWay = currentMember.getWay();
             }
         } else {
-            // the member was probably a stop or platform
+            // the member was probably a stop or a platform
             currentWay = null;
             return;
         }
@@ -52,49 +61,124 @@ public final class WaySequence {
         }
     }
 
+    /**
+     * Constructor if only 3 ways are needed/known
+     * @param previousWay the way before currentWay
+     * @param currentWay the current way
+     * @param nextWay the way after currentWay
+     */
     public WaySequence(Way previousWay, Way currentWay, Way nextWay)
     {
         this(previousWay, currentWay, nextWay, null);
     }
 
+    /**
+     * Constructor if all 4 ways are known
+     * @param previousWay the way before currentWay
+     * @param currentWay the way this way sequence was created for
+     * @param nextWay the way after currentWay
+     * @param wayAfterNextWay the way after nextWay
+     */
     public WaySequence(Way previousWay, Way currentWay, Way nextWay, Way wayAfterNextWay) {
-        this.previousWay = previousWay;
         this.currentWay = currentWay;
-        this.nextWay = nextWay;
-        this.wayAfterNextWay =  wayAfterNextWay;
+        setPreviousWay(previousWay);
+        setNextWay(nextWay);
+        setAfterNextWay(wayAfterNextWay);
     }
 
+    /**
+     * @param way the way that comes before currentWay
+     *            a check is performed to make sure they actually connect
+     */
+    public void setPreviousWay(Way way) {
+        if (way == null || RouteUtils.waysTouch(way, currentWay)) {
+            previousWay = way;
+        } else {
+            previousWay = null;
+            hasGap = true;
+        }
+    }
+
+    /**
+     * @param way the way that comes after currentWay
+     *            a check is performed to make sure they actually connect
+     */
+    public void setNextWay(Way way) {
+        if (way == null || RouteUtils.waysTouch(currentWay, way)) {
+            nextWay = way;
+        } else {
+            nextWay = null;
+            hasGap = true;
+        }
+    }
+
+    /**
+     * @param way the way that comes after nextWay
+     *            a check is performed to make sure they actually connect
+     */
+    public void setAfterNextWay(Way way) {
+        if (way == null || RouteUtils.waysTouch(nextWay, way)) {
+            wayAfterNextWay = way;
+        } else {
+            wayAfterNextWay = null;
+            hasGap = true;
+        }
+    }
+
+    /**
+     * @param previousMember the relation member that comes before currentWay in the route relation
+     *                       in case this member is also a relation, the last way in that relation
+     *                       is used
+     */
     public void setPreviousPtWay(RelationMember previousMember) {
         if (isPTWay(previousMember)) {
             if (previousMember.isWay()) {
-                previousWay = previousMember.getWay();
+                setPreviousWay(previousMember.getWay());
             } else if (previousMember.isRelation()) {
                List<RelationMember> subRelationMembers = previousMember.getRelation().getMembers();
-               previousWay = subRelationMembers.get(subRelationMembers.size() - 1).getWay();
+                setPreviousWay(subRelationMembers.get(subRelationMembers.size() - 1).getWay());
             }
         } else {
             previousWay = null;
         }
     }
 
+    /**
+     * @param nextMember the relation member that comes after currentWay in the route relation
+     *                   in case this member is also a relation, the first way in that relation
+     *                   is used.
+     *                   If that relation has more than 1 member, afterNextWay is also set already
+     */
     public void setNextPtWay(RelationMember nextMember) {
         if (isPTWay(nextMember)) {
             if (nextMember.isWay()) {
-            nextWay = nextMember.getWay();
-        } else if (nextMember.isRelation()) {
-                nextWay = nextMember.getRelation().getMember(0).getWay();
+                setNextWay(nextMember.getWay());
+            } else if (nextMember.isRelation()) {
+                final Relation subRelation = nextMember.getRelation();
+                setNextWay(subRelation.getMember(0).getWay());
+                if (subRelation.getMembersCount() > 1) {
+                    setAfterNextWay(subRelation.getMember(1).getWay());
+                }
             }
         } else {
             nextWay = null;
+            hasGap = true;
         }
     }
 
+    /**
+     * @param afterNextMember the relation member that comes after nextWay in the route relation
+     *                        in case this member is also a relation, the last way in that relation
+     *                        is used.
+     *                        If wayAfterNextWay already contains a way, this is not performed anymore
+     *                        Also if there was no nextWay, hasGap will be true
+     */
     public void setAfterNextPtWay(RelationMember afterNextMember) {
-        if (isPTWay(afterNextMember)) {
+        if (!hasGap && wayAfterNextWay == null && isPTWay(afterNextMember)) {
             if (afterNextMember.isWay()) {
-                wayAfterNextWay = afterNextMember.getWay();
+                setAfterNextWay(afterNextMember.getWay());
             } else if (afterNextMember.isRelation()) {
-                wayAfterNextWay = afterNextMember.getRelation().getMember(0).getWay();
+                setAfterNextWay(afterNextMember.getRelation().getMember(0).getWay());
             }
         } else {
             wayAfterNextWay = null;

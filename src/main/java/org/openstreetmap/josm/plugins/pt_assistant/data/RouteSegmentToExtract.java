@@ -180,14 +180,13 @@ public class RouteSegmentToExtract {
 
     public RouteSegmentToExtract addPTWayMember(Integer index) {
         assert relation != null;
-        WaySequence waysInCurrentRoute = new WaySequence(relation, index);
-        if (waysInCurrentRoute.currentWay == null) {
+        WaySequence thisRoute = new WaySequence(relation, index);
+        if (thisRoute.currentWay == null || thisRoute.hasGap) {
             return null;
         }
-        WaySequence nextWaysInCurrentRoute = new WaySequence(waysInCurrentRoute.currentWay, waysInCurrentRoute.nextWay, waysInCurrentRoute.wayAfterNextWay);
 
-        if (this.itinerariesInSameDirection == null && nextWaysInCurrentRoute.currentWay != null) {
-            TreeSet<Relation> itinerariesInSameDirection = getItinerariesInSameDirection(waysInCurrentRoute);
+        if (this.itinerariesInSameDirection == null) {
+            TreeSet<Relation> itinerariesInSameDirection = getItinerariesInSameDirection(thisRoute);
             if (itinerariesInSameDirection != null) {
                 this.itinerariesInSameDirection = itinerariesInSameDirection;
                 for (Relation relation : itinerariesInSameDirection) {
@@ -201,24 +200,24 @@ public class RouteSegmentToExtract {
             addWay(index, true);
         } else {
             List<Relation> parentRouteRelations =
-                Utils.filteredCollection(waysInCurrentRoute.currentWay.getReferrers(), Relation.class).stream()
+                Utils.filteredCollection(thisRoute.currentWay.getReferrers(), Relation.class).stream()
                     .filter(RouteUtils::isVersionTwoPTRoute)
                     .collect(Collectors.toList());
-            TreeSet<Relation> itinerariesInSameDirection = getItinerariesInSameDirection(waysInCurrentRoute, parentRouteRelations);
+            TreeSet<Relation> itinerariesInSameDirection = getItinerariesInSameDirection(thisRoute, parentRouteRelations);
             boolean startNewSegmentInNewSegment = false;
             if (this.itinerariesInSameDirection != null
                     && itinerariesInSameDirection.size() != 0
                     && !itinerariesInSameDirection.equals(this.itinerariesInSameDirection)
-                    && !(getMembershipCount(waysInCurrentRoute.currentWay, relation) > 1
-                            && waysInCurrentRoute.currentWay.equals(getFirstWay(relation)))
+                    && !(getMembershipCount(thisRoute.currentWay, relation) > 1
+                            && thisRoute.currentWay.equals(getFirstWay(relation)))
             ) {
                 startNewSegment = true;
             } else {
                 this.itinerariesInSameDirection = itinerariesInSameDirection;
                 for (Relation parentRoute : itinerariesInSameDirection) {
                     final long membershipCountOfWayInSameDirectionInParentRoute =
-                        getMembershipCountOfWayInSameDirection(waysInCurrentRoute.currentWay, parentRoute);
-                    if (waysInCurrentRoute.currentWay == getLastWay(parentRoute)
+                        getMembershipCountOfWayInSameDirection(thisRoute.currentWay, parentRoute);
+                    if (thisRoute.currentWay == getLastWay(parentRoute)
                             || membershipCountOfWayInSameDirectionInParentRoute > 1
                                 && !parentRoute.equals(relation)) {
                         startNewSegment = true;
@@ -234,7 +233,7 @@ public class RouteSegmentToExtract {
 
                     if (!startNewSegment && !relation.equals(parentRoute)
                             && Objects.equals(relation.get("ref"), parentRoute.get("ref"))) {
-                        final Node commonNode = WayUtils.findFirstCommonNode(waysInCurrentRoute.currentWay, waysInCurrentRoute.nextWay).orElseGet(null);
+                        final Node commonNode = WayUtils.findFirstCommonNode(thisRoute.currentWay, thisRoute.nextWay).orElseGet(null);
                         if (commonNode.getParentWays().stream()
                                     .filter(w -> (getItineraryWays(parentRoute).contains(w)))
                                     .count() > 2) {
@@ -291,19 +290,17 @@ public class RouteSegmentToExtract {
         return highways.get(highways.size() - 1);
     }
 
-    public TreeSet<Relation> getItinerariesInSameDirection(
-        WaySequence waysInCurrentRoute) {
-        final String wayInRelation = relation.getId() + "," + waysInCurrentRoute.currentWay.getId();
+    public TreeSet<Relation> getItinerariesInSameDirection(WaySequence thisRoute) {
+        final String wayInRelation = relation.getId() + "," + thisRoute.currentWay.getId();
         if (parentRelationsForSameDirectionOfTravel.containsKey(wayInRelation)) {
             return parentRelationsForSameDirectionOfTravel.get(wayInRelation);
         }
         return null;
     }
 
-    public TreeSet<Relation> getItinerariesInSameDirection(
-        WaySequence waysInCurrentRoute,
-        List<Relation> parentRouteRelations) {
-        TreeSet<Relation> r = getItinerariesInSameDirection(waysInCurrentRoute);
+    public TreeSet<Relation> getItinerariesInSameDirection(WaySequence thisRoute,
+                                                           List<Relation> parentRouteRelations) {
+        TreeSet<Relation> r = getItinerariesInSameDirection(thisRoute);
         if (r != null) {
             return r;
         } else {
@@ -311,20 +308,20 @@ public class RouteSegmentToExtract {
             for (Relation parentRoute : parentRouteRelations) {
                 final List<Way> parentRouteHighways = getItineraryWays(parentRoute);
                 if (!itinerariesInSameDirection.contains(parentRoute)) {
-                    if (getFirstWay(parentRoute) == waysInCurrentRoute.currentWay
-                            && waysInCurrentRoute.previousWay != null
-                            && !waysInCurrentRoute.previousWay.getNodes().contains(getSecondWay(parentRoute).getNode(0))) {
+                    if (getFirstWay(parentRoute) == thisRoute.currentWay
+                            && thisRoute.previousWay != null
+                            && !thisRoute.previousWay.getNodes().contains(getSecondWay(parentRoute).getNode(0))) {
                         itinerariesInSameDirection.add(parentRoute);
                     }
-                    findPreviousAndNextWayInRoute(parentRouteHighways, waysInCurrentRoute.currentWay).stream()
-                        .filter(waysInParentRoute -> isItineraryInSameDirection(waysInCurrentRoute, waysInParentRoute))
+                    findPreviousAndNextWayInRoute(parentRouteHighways, thisRoute.currentWay).stream()
+                        .filter(waysInParentRoute -> isItineraryInSameDirection(thisRoute, waysInParentRoute))
                         .map(waysInParentRoute -> parentRoute)
                         .forEachOrdered(itinerariesInSameDirection::add);
                 }
             }
-            if (getMembershipCount(waysInCurrentRoute.currentWay, relation) < 2) {
+            if (getMembershipCount(thisRoute.currentWay, relation) < 2) {
                 parentRelationsForSameDirectionOfTravel.put(
-                    relation.getId() + "," + waysInCurrentRoute.currentWay.getId(),
+                    relation.getId() + "," + thisRoute.currentWay.getId(),
                     itinerariesInSameDirection);
             }
             return itinerariesInSameDirection;
@@ -370,43 +367,43 @@ public class RouteSegmentToExtract {
         return indices;
     }
 
-    public boolean isItineraryInSameDirection(WaySequence waysInCurrentRoute,
-                                              WaySequence waysInParentRoute) {
-        assert waysInCurrentRoute.currentWay == waysInParentRoute.currentWay :
+    public boolean isItineraryInSameDirection(WaySequence thisRoute,
+                                              WaySequence parentRoute) {
+        assert thisRoute.currentWay == parentRoute.currentWay :
             "this only works when comparing two equivalent way sequences" ;
 
         // if all ways are present, try the simple solution first
-        if (waysInCurrentRoute.previousWay != null
-                && waysInCurrentRoute.nextWay != null
-                && waysInParentRoute.previousWay != null
-                && waysInParentRoute.nextWay != null
-                && (waysInCurrentRoute.previousWay == waysInParentRoute.previousWay
-                    ||  waysInCurrentRoute.nextWay == waysInParentRoute.nextWay)
+        if (thisRoute.previousWay != null
+                && thisRoute.nextWay != null
+                && parentRoute.previousWay != null
+                && parentRoute.nextWay != null
+                && (thisRoute.previousWay == parentRoute.previousWay
+                    ||  thisRoute.nextWay == parentRoute.nextWay)
         ) {
-            return (!waysInCurrentRoute.previousWay.equals(waysInParentRoute.nextWay) &&
-                    !waysInCurrentRoute.nextWay.    equals(waysInParentRoute.previousWay));
+            return (!thisRoute.previousWay.equals(parentRoute.nextWay) &&
+                    !thisRoute.nextWay.    equals(parentRoute.previousWay));
         }
 
         // if not, compare on the nodes
         Node firstNodeCurrentWay = null;
-        if (waysInCurrentRoute.previousWay != null) {
+        if (thisRoute.previousWay != null) {
             firstNodeCurrentWay = WayUtils.findCommonFirstLastNode(
-                waysInCurrentRoute.previousWay, waysInCurrentRoute.currentWay).orElse(null);
+                thisRoute.previousWay, thisRoute.currentWay).orElse(null);
         }
         Node lastNodeCurrentWay = null;
-        if (waysInCurrentRoute.nextWay != null) {
+        if (thisRoute.nextWay != null) {
             lastNodeCurrentWay = WayUtils.findCommonFirstLastNode(
-                waysInCurrentRoute.currentWay, waysInCurrentRoute.nextWay).orElse(null);
+                thisRoute.currentWay, thisRoute.nextWay).orElse(null);
         }
         Node firstNodeWayOfParent = null;
-        if (waysInParentRoute.previousWay != null) {
+        if (parentRoute.previousWay != null) {
             firstNodeWayOfParent = WayUtils.findCommonFirstLastNode(
-                waysInParentRoute.previousWay, waysInParentRoute.currentWay).orElse(null);
+                parentRoute.previousWay, parentRoute.currentWay).orElse(null);
         }
         Node lastNodeWayOfParent = null;
-        if (waysInParentRoute.nextWay != null) {
+        if (parentRoute.nextWay != null) {
             lastNodeWayOfParent = WayUtils.findCommonFirstLastNode(
-                waysInParentRoute.currentWay, waysInParentRoute.nextWay).orElse(null);
+                parentRoute.currentWay, parentRoute.nextWay).orElse(null);
         }
 
         return (firstNodeCurrentWay != null && firstNodeCurrentWay.equals(firstNodeWayOfParent)
@@ -429,8 +426,11 @@ public class RouteSegmentToExtract {
         for (int j = highwayMembers.size() - 1; j>=0 ; j--) {
             wayAtIndexPosition = highwayMembers.get(j);
             if (foundWay) {
-                waySequences.add(0, new WaySequence(
-                    wayAtIndexPosition, wayToLocate, nextWay, wayAfterNextWay));
+                final WaySequence waySequence = new WaySequence(
+                    wayAtIndexPosition, wayToLocate, nextWay, wayAfterNextWay);
+                if (!waySequence.hasGap) {
+                    waySequences.add(0, waySequence);
+                }
                 wayAfterNextWay = null;
                 nextWay = null;
                 foundWay = false;
