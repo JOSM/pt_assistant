@@ -65,14 +65,14 @@ public class CreatePlatformNodeThroughReplaceAction extends JosmAction {
             null,
             tr("Shortcut action to Transfer details of stop to platform node"),
             Shortcut.registerShortcut("tools:createplatformthruoghreplace",
-                tr("Shortcut action to Transfer details of stop to platform node"), KeyEvent.VK_G, Shortcut.SHIFT),
+                tr("Public Transport: {0}", tr("Shortcut action to Transfer details of stop to platform node")), KeyEvent.VK_G, Shortcut.SHIFT),
             false
         );
         transferHandler = new OsmTransferHandler();
         MainApplication.registerActionShortcut(
             this,
             Shortcut.registerShortcut("tools:createplatformthruoghreplace",
-                tr("Shortcut action to Transfer details of stop to platform node"), KeyEvent.VK_G, Shortcut.SHIFT));
+                tr("Public Transport: {0}", tr("Shortcut action to Transfer details of stop to platform node")), KeyEvent.VK_G, Shortcut.SHIFT));
         // CHECKSTYLE.ON: LineLength
     }
 
