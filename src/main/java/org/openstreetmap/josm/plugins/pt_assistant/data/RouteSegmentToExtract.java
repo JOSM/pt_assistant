@@ -36,6 +36,11 @@ public class RouteSegmentToExtract {
     private static final Map<String, Relation> ptSegments;
     private static final Map<String, TreeSet<Relation>> parentRelationsForSameDirectionOfTravel;
     private static final Map<Relation, List<Way>> itineraryWays;
+
+    public void setActiveDataSet(DataSet activeDataSet) {
+        this.activeDataSet = activeDataSet;
+    }
+
     private DataSet activeDataSet;
     private Relation relation;
     private Relation extractedRelation;
@@ -87,19 +92,6 @@ public class RouteSegmentToExtract {
         indices = new ArrayList<>();
         addLineIdentifier(relation.get("ref"));
         addColour(relation.get("colour"));
-    }
-
-    /**
-     * Constructor
-     *
-     * @param relation The route or superroute relation for which this route segment is created
-     *                 use addPTWay() to add ways one by one
-     * @param ds       for the unit tests the dataset is the one of the file loaded
-     *                 if it's determined automatically it weirdly uses another DataSet
-     */
-    public RouteSegmentToExtract(Relation relation, DataSet ds) {
-        this(relation);
-        activeDataSet = ds;
     }
 
     /**
@@ -270,7 +262,8 @@ public class RouteSegmentToExtract {
                 }
             }
             if (startNewSegment) {
-                RouteSegmentToExtract newSegment = new RouteSegmentToExtract(relation, activeDataSet);
+                RouteSegmentToExtract newSegment = new RouteSegmentToExtract(relation);
+                newSegment.setActiveDataSet(activeDataSet);
                 newSegment.addPTWayMember(index);
                 newSegment.itinerariesInSameDirection = itinerariesInSameDirection;
                 newSegment.populateLineIdentifierAndColourLists();
