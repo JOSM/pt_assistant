@@ -43,11 +43,11 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
         final MemberTableModel memberTableModel = editorAccess.getMemberTableModel();
         IRelationEditor editor = editorAccess.getEditor();
         final Relation originalRelation = editor.getRelation();
-        Relation editedRelation = new Relation(originalRelation);
-        // save the current state, otherwise accidents happen
-        memberTableModel.applyToRelation(editedRelation);
-        editorAccess.getTagModel().applyToPrimitive(editedRelation);
-        UndoRedoHandler.getInstance().add(new ChangeCommand(originalRelation, editedRelation));
+//        Relation editedRelation = new Relation(originalRelation);
+//        // save the current state, otherwise accidents happen
+//        memberTableModel.applyToRelation(editedRelation);
+//        editorAccess.getTagModel().applyToPrimitive(editedRelation);
+//        UndoRedoHandler.getInstance().add(new ChangeCommand(originalRelation, editedRelation));
 
         final Collection<RelationMember> selectedMembers = memberTableModel.getSelectedMembers();
 
@@ -103,7 +103,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
             if (cbFindAllSegmentsAutomatically.isSelected()) {
                 splitInSegments(originalRelation, cbConvertToSuperroute.isSelected());
             } else {
-                final Relation clonedRelation = new Relation(originalRelation);
+                Relation clonedRelation = new Relation(originalRelation);
                 RouteSegmentToExtract segment = new RouteSegmentToExtract(clonedRelation,
                     Arrays.stream(memberTableModel.getSelectedIndices()).boxed().collect(Collectors.toList()));
                 segment.put("name", tfNameTag.getText());
@@ -136,7 +136,23 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                     extraEditor.setAlwaysOnTop(true);
                 }
             }
-            editor.reloadDataFromRelation();
+            /*
+             Doing this suppresses the exception to be shown to the user,
+             something fishy is still happening though.
+             And the stack trace comes anyway when the user presses
+             the reload button in the relation editor.
+             This is annoying, I have no idea how to solve this.
+             The problem has been there since the beginning.
+             Oddly there are relations for which it doesn't happen.
+             It must have something to do with the fact that the member
+             count is always lower after converting ways to relations
+             that contain those ways.
+            */
+            try {
+                editor.reloadDataFromRelation();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
