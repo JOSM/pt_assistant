@@ -19,6 +19,39 @@ import java.util.List;
 import static org.junit.Assert.*;
 import static org.openstreetmap.josm.io.OsmReader.parseDataSet;
 
+/**
+ * An ExpectedValue for each index
+ */
+@SuppressWarnings("unused")
+class Val {
+    int index;
+    int iDOfNextWay;
+    String nameOfNextWay;
+    int iDOfFirstWay;
+    int iDOfLastWay;
+    String note = null;
+    String expectedRouteRef = null;
+
+    public Val(int index, int iDOfFirstWay, int iDOfLastWay, int iDOfNextWay,
+               String nameOfNextWay, String note, String expectedRouteRef) {
+        this.index = index;
+        this.nameOfNextWay = nameOfNextWay;
+        this.iDOfFirstWay = iDOfFirstWay;
+        this.iDOfLastWay = iDOfLastWay;
+        this.iDOfNextWay = iDOfNextWay;
+        this.note = note;
+        this.expectedRouteRef = expectedRouteRef;
+    }
+
+    public Val(int index, int iDOfFirstWay, int iDOfLastWay, int iDOfNextWay, String nameOfNextWay) {
+        this.index = index;
+        this.nameOfNextWay = nameOfNextWay;
+        this.iDOfFirstWay = iDOfFirstWay;
+        this.iDOfLastWay = iDOfLastWay;
+        this.iDOfNextWay = iDOfNextWay;
+    }
+}
+
 @SuppressWarnings("NonAsciiCharacters")
 public class RouteSegmentToExtractTest extends AbstractTest{
 
@@ -190,522 +223,375 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         assertEquals("", segment1.getWayIdsSignature());
         assertEquals(Collections.emptyList(), segment1.getWayMembers());
 
-        final int W_158_perron1and2terminus_78579065_B = 78579065;
-        final int W_157_perron1and2_377814547_A = 377814547;
-
-        final int W_156_TiensevestToPerron1_79596986_A = 79596986;
 
         RouteSegmentToExtract returnValueNull;
-        for (int n = 158; n >= 157; n--) {returnValueNull =segment1.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment2 = segment1.addPTWayMember(156);
-
-        final Way veryLastWay = segment1.getWayMembers().get(1).getWay();
-        assertEquals("perron 1 & 2", veryLastWay.get("ref"));
-        assertEquals(W_158_perron1and2terminus_78579065_B, veryLastWay.getId());
-        final Way beforeLastWay = segment1.getWayMembers().get(0).getWay();
-        assertEquals("perron 1 & 2", beforeLastWay.get("ref"));
-        assertEquals(W_157_perron1and2_377814547_A, beforeLastWay.getId());
-
-        // segment2 was created, extract segment1 to its own relation
-        extractAndAssertValues(156, segment1, segment2, cloneOfBus601RouteRelation,
-            W_157_perron1and2_377814547_A, W_158_perron1and2terminus_78579065_B,
-            W_156_TiensevestToPerron1_79596986_A, null,
-            "#1199DD;#229922;#771133;#77CCAA;#8899AA;#991199;#995511;#BB0022;#BBDD00;#C5AA77;#DD0077;#DD5555;#FF88AA;#FFCC11",
-            "1;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;537;539;601;658");
-
-        final int W_155_Tiensevest_5_79211473_A = 79211473;
-
-        RouteSegmentToExtract segment3 = segment2.addPTWayMember(155);
-        extractAndAssertValues(155, segment2, segment3, cloneOfBus601RouteRelation,
-            W_156_TiensevestToPerron1_79596986_A, W_156_TiensevestToPerron1_79596986_A,
-            W_155_Tiensevest_5_79211473_A, "Tiensevest",
-            null,
-            "305;306;310;318;358;410;433;475;485;601;658");
-
-        final int W_154_Tiensevest_4_79211472_A = 79211472;
-
-        RouteSegmentToExtract segment4 = segment3.addPTWayMember(154);
-        extractAndAssertValues(154, segment3, segment4, cloneOfBus601RouteRelation,
-            W_155_Tiensevest_5_79211473_A, W_155_Tiensevest_5_79211473_A,
-            W_154_Tiensevest_4_79211472_A, "Tiensevest",
-            null,
-            "1;2;3;4;5;6;7;8;9;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;520;524;525;537;539;586;601;616;658");
-
-        final int W_153_Tiensevest_3_79175435_A = 79175435;
-
-        RouteSegmentToExtract segment5 = segment4.addPTWayMember(153);
-        extractAndAssertValues(153, segment4, segment5, cloneOfBus601RouteRelation,
-            W_154_Tiensevest_4_79211472_A, W_154_Tiensevest_4_79211472_A,
-            W_153_Tiensevest_3_79175435_A, "Tiensevest",
-            null,
-            "2;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;520;524;525;537;539;586;601;616;658");
-
-        final int W_152_Tiensevest_2_80458208_A = 80458208;
-
-        RouteSegmentToExtract segment6 = segment5.addPTWayMember(152);
-        extractAndAssertValues(152, segment5, segment6, cloneOfBus601RouteRelation,
-            W_153_Tiensevest_3_79175435_A, W_153_Tiensevest_3_79175435_A,
-            W_152_Tiensevest_2_80458208_A, "Tiensevest",
-            null,
-            "284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;524;537;601;651;652;658");
-
-        final int W_33_151_Tiensevest_1_19793164_A = 19793164;
-
-        RouteSegmentToExtract segment7 = segment6.addPTWayMember(151);
-        extractAndAssertValues(151, segment6, segment7, cloneOfBus601RouteRelation,
-            W_152_Tiensevest_2_80458208_A, W_152_Tiensevest_2_80458208_A,
-            W_33_151_Tiensevest_1_19793164_A, "Tiensevest",
-            null,
-            "284;285;305;306;310;315;316;317;318;358;395;410;433;475;485;601;630;651;652;658");
-
-        final int W_32_150_Diestsevest_4_NextToOostertunnel_6184898_D = 6184898;
-        final int W_29_147_Diestsevest_1_8133608_A = 8133608;
-
-        RouteSegmentToExtract segment8 = segment7.addPTWayMember(150);
-        Relation rel8 = extractAndAssertValues(150, segment7, segment8, cloneOfBus601RouteRelation,
-            W_33_151_Tiensevest_1_19793164_A, W_33_151_Tiensevest_1_19793164_A,
-            W_32_150_Diestsevest_4_NextToOostertunnel_6184898_D, "Diestsevest",
-            null,
-            "284;285;305;306;310;315;316;317;318;334;335;358;395;410;433;475;485;513;601;630;651;652;658");
-
-        final int W_28_146_Artoisplein_2_254800931_A = 254800931;
-
-        final int W_145_Artoisplein_1_23691158_E = 23691158;
-        final int W_141_Lüdenscheidsingel_2_109267417_A = 109267417;
-
-        for (int n = 149; n >= 147; n--) {returnValueNull =segment8.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment9 = segment8.addPTWayMember(146);
-        Relation rel9 = extractAndAssertValues(146, segment8, segment9, cloneOfBus601RouteRelation,
-            W_29_147_Diestsevest_1_8133608_A, W_32_150_Diestsevest_4_NextToOostertunnel_6184898_D,
-            W_28_146_Artoisplein_2_254800931_A, "Joanna-Maria Artoisplein",
-            null,
-            "305;318;334;335;358;410;513;601;630;651;652;658");
-
-        RouteSegmentToExtract segment10 = segment9.addPTWayMember(145);
-        Relation rel10 = extractAndAssertValues(145, segment9, segment10, cloneOfBus601RouteRelation,
-            W_28_146_Artoisplein_2_254800931_A, W_28_146_Artoisplein_2_254800931_A,
-            W_145_Artoisplein_1_23691158_E, "Joanna-Maria Artoisplein",
-            null,
-            "178;305;318;334;335;358;410;513;601;630;651;652;658");
-
-        final int W_140_Lüdenscheidsingel_1_3993387_E = 3993387;
-        final int W_136_Den_Boschsingel_2_23837544_A = 23837544;
-
-        for (int n = 144; n >= 141; n--) {returnValueNull =segment10.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment11 = segment10.addPTWayMember(140);
-        extractAndAssertValues(140, segment10, segment11, cloneOfBus601RouteRelation,
-            W_141_Lüdenscheidsingel_2_109267417_A, W_145_Artoisplein_1_23691158_E,
-            W_140_Lüdenscheidsingel_1_3993387_E, "Lüdenscheidsingel",
-            null,
-            "178;305;318;358;410;601;651;652;658");
-
-        final int W_135_Den_Boschsingel_3_225605630_E = 225605630;
-        final int W_131_Rennes_Singel_1_249333185_A = 249333185;
-
-        for (int n = 139; n >= 136; n--) {returnValueNull =segment11.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment12 = segment11.addPTWayMember(135);
-        extractAndAssertValues(135, segment11, segment12, cloneOfBus601RouteRelation,
-            W_136_Den_Boschsingel_2_23837544_A, W_140_Lüdenscheidsingel_1_3993387_E,
-            W_135_Den_Boschsingel_3_225605630_E, "Den Boschsingel",
-            null,
-            "318;358;410;601;651;658");
-        final int W_99_130_Herestraat_1_249333184_AC = 249333184;
-        // W_100_129_Herestraat_2_813970231_BB = 813970231;
-        final int W_128_Herestraat_11_681081951_A = 681081951;
-
-        for (int n = 134; n >= 131; n--) {returnValueNull =segment12.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment13 = segment12.addPTWayMember(130);
-        extractAndAssertValues(130, segment12, segment13, cloneOfBus601RouteRelation,
-            W_131_Rennes_Singel_1_249333185_A, W_135_Den_Boschsingel_3_225605630_E,
-            W_99_130_Herestraat_1_249333184_AC, "Herestraat",
-            null,
-            "318;410;601");
-
-        final int W_127_Herestraat_10_813970227_C = 813970227;
-        final int W_125_Herestraat_8_8079995_A = 8079995;
-
-        for (int n = 129; n >= 128; n--) {returnValueNull =segment13.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment14 = segment13.addPTWayMember(127);
-        extractAndAssertValues(127, segment13, segment14, cloneOfBus601RouteRelation,
-            W_128_Herestraat_11_681081951_A, W_99_130_Herestraat_1_249333184_AC,
-            W_127_Herestraat_10_813970227_C, "Herestraat",
-            null,
-            "410;601");
-
-        final int W_124_Rotonde_Het_Teken_41403538_B = 41403538;
-        final int W_123_Ring_Zuid_79340950_A = 79340950;
-
-        for (int n = 126; n >= 125; n--) {returnValueNull =segment14.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment15 = segment14.addPTWayMember(124);
-        extractAndAssertValues(124, segment14, segment15, cloneOfBus601RouteRelation,
-            W_125_Herestraat_8_8079995_A, W_127_Herestraat_10_813970227_C,
-            W_124_Rotonde_Het_Teken_41403538_B, "Rotonde Het Teken",
-            null,
-            "410;600;601");
-
-        final int W_122_Ring_Zuid_11369123_A = 11369123;
-
-        returnValueNull =segment15.addPTWayMember(123); assertNull(returnValueNull);
-        RouteSegmentToExtract segment16 = segment15.addPTWayMember(122);
-        extractAndAssertValues(122, segment15, segment16, cloneOfBus601RouteRelation,
-            W_123_Ring_Zuid_79340950_A, W_124_Rotonde_Het_Teken_41403538_B,
-            W_122_Ring_Zuid_11369123_A, "Ring Zuid",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        final int W_121__159949154_A = 159949154;
-        final int W_120__332258104_B = 332258104;
-
-        final int W_119_GHB_ingang_78852604_A = 78852604;
-
-        RouteSegmentToExtract segment17 = segment16.addPTWayMember(121);
-        extractAndAssertValues(121, segment16, segment17, cloneOfBus601RouteRelation,
-            W_122_Ring_Zuid_11369123_A, W_122_Ring_Zuid_11369123_A,
-            W_121__159949154_A, null,
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        final int W_118_GHB_p5_377918641_B = 377918641;
-        final int W_117_GHB_p5_14508736_A = 14508736;
-
-        RouteSegmentToExtract segment18 = segment17.addPTWayMember(120);
-        extractAndAssertValues(120, segment17, segment18, cloneOfBus601RouteRelation,
-            W_121__159949154_A, W_121__159949154_A,
-            W_120__332258104_B, null,
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        final int W_116_Ring_Zuid_p45_109267436_A = 109267436;
-
-        returnValueNull =segment18.addPTWayMember(119); assertNull(returnValueNull);
-        RouteSegmentToExtract segment19 = segment18.addPTWayMember(118);
-        extractAndAssertValues(118, segment18, segment19, cloneOfBus601RouteRelation,
-            W_119_GHB_ingang_78852604_A, W_120__332258104_B,
-            W_118_GHB_p5_377918641_B, null,
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        final int W_115_Ring_Zuid_p3_14508739_A = 14508739;
-
-        returnValueNull =segment19.addPTWayMember(117); assertNull(returnValueNull);
-        RouteSegmentToExtract segment20 = segment19.addPTWayMember(116);
-        extractAndAssertValues(116, segment19, segment20, cloneOfBus601RouteRelation,
-            W_117_GHB_p5_14508736_A, W_118_GHB_p5_377918641_B,
-            W_116_Ring_Zuid_p45_109267436_A, "Ring Zuid",
-            null,
-            "3;317;395;410;601");
-
-        final int W_114_Ring_Zuid_p2_14508740_A = 14508740;
-
-        RouteSegmentToExtract segment21 = segment20.addPTWayMember(115);
-        extractAndAssertValues(115, segment20, segment21, cloneOfBus601RouteRelation,
-            W_116_Ring_Zuid_p45_109267436_A, W_116_Ring_Zuid_p45_109267436_A,
-            W_115_Ring_Zuid_p3_14508739_A, "Ring Zuid",
-            null,
-            "3;317;395;410;600;601");
-
-        final int W_113_Ring_Zuid_p1_502328838_D = 502328838;
-        final int W_110_Rotonde_Het_Teken_78568660_A = 78568660;
-
-        RouteSegmentToExtract segment22 = segment21.addPTWayMember(114);
-        extractAndAssertValues(114, segment21, segment22, cloneOfBus601RouteRelation,
-            W_115_Ring_Zuid_p3_14508739_A, W_115_Ring_Zuid_p3_14508739_A,
-            W_114_Ring_Zuid_p2_14508740_A, "Ring Zuid",
-            null,
-            "3;317;334;335;395;410;600;601");
-
-        RouteSegmentToExtract segment23 = segment22.addPTWayMember(113);
-        extractAndAssertValues(113, segment22, segment23, cloneOfBus601RouteRelation,
-            W_114_Ring_Zuid_p2_14508740_A, W_114_Ring_Zuid_p2_14508740_A,
-            W_113_Ring_Zuid_p1_502328838_D, "Ring Zuid",
-            null,
-            "3;317;334;335;380;395;410;600;601");
-
-        final int W_109_Rotonde_Het_Teken_Ring_Noord_bus3_78873921_A = 78873921;
-
-        for (int n = 112; n >= 110; n--) {returnValueNull =segment23.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment24 = segment23.addPTWayMember(109);
-        extractAndAssertValues(109, segment23, segment24, cloneOfBus601RouteRelation,
-            W_110_Rotonde_Het_Teken_78568660_A, W_113_Ring_Zuid_p1_502328838_D,
-            W_109_Rotonde_Het_Teken_Ring_Noord_bus3_78873921_A, "Rotonde Het Teken",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;600;601");
-
-        final int W_108_Rotonde_Het_Teken_3752557_A = 3752557;
-
-        RouteSegmentToExtract segment25 = segment24.addPTWayMember(108);
-        extractAndAssertValues(108, segment24, segment25, cloneOfBus601RouteRelation,
-            W_109_Rotonde_Het_Teken_Ring_Noord_bus3_78873921_A, W_109_Rotonde_Het_Teken_Ring_Noord_bus3_78873921_A,
-            W_108_Rotonde_Het_Teken_3752557_A, "Rotonde Het Teken",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;600;601");
-
-        final int W_107_Rotonde_Het_Teken_VWBln_249333188_A = 249333188;
-
-        RouteSegmentToExtract segment26 = segment25.addPTWayMember(107);
-        extractAndAssertValues(107, segment25, segment26, cloneOfBus601RouteRelation,
-            W_108_Rotonde_Het_Teken_3752557_A, W_108_Rotonde_Het_Teken_3752557_A,
-            W_107_Rotonde_Het_Teken_VWBln_249333188_A, "Rotonde Het Teken",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;600;601");
-
-        final int W_106_Rotonde_Het_Teken_249333187_A = 249333187;
-
-        RouteSegmentToExtract segment27 = segment26.addPTWayMember(106);
-        extractAndAssertValues(106, segment26, segment27, cloneOfBus601RouteRelation,
-            W_107_Rotonde_Het_Teken_VWBln_249333188_A, W_107_Rotonde_Het_Teken_VWBln_249333188_A,
-            W_106_Rotonde_Het_Teken_249333187_A, "Rotonde Het Teken",
-            null,
-            "3;410;600;601");
-
-        final int W_105_Herestraat_7_13067134_D = 13067134;
-        final int W_102_Herestraat_4_813970228_A = 813970228;
-
-        RouteSegmentToExtract segment28 = segment27.addPTWayMember(105);
-        extractAndAssertValues(105, segment27, segment28, cloneOfBus601RouteRelation,
-            W_106_Rotonde_Het_Teken_249333187_A, W_106_Rotonde_Het_Teken_249333187_A,
-            W_105_Herestraat_7_13067134_D, "Herestraat",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        final int W_101_Herestraat_3_813970229_C = 813970229;
-        // 99 and 100 are defined as 129 and 130
-
-        for (int n = 104; n >= 102; n--) {returnValueNull =segment28.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment29 = segment28.addPTWayMember(101);
-        extractAndAssertValues(101, segment28, segment29, cloneOfBus601RouteRelation,
-            W_102_Herestraat_4_813970228_A, W_105_Herestraat_7_13067134_D,
-            W_101_Herestraat_3_813970229_C, "Herestraat",
-            null,
-            "410;600;601");
-
-        final int W_98_Rennes_Singel_249333186_H = 249333186;
-        final int W_91_Rennes_Singel_429706864_A = 429706864;
-
-        for (int n = 100; n >= 99; n--) {returnValueNull =segment29.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment30 = segment29.addPTWayMember(98);
-        extractAndAssertValues(98, segment29, segment30, cloneOfBus601RouteRelation,
-            W_99_130_Herestraat_1_249333184_AC, W_101_Herestraat_3_813970229_C,
-            W_98_Rennes_Singel_249333186_H, "Rennes-Singel",
-            null,
-            "601");
-
-        final int W_90_Tervuursevest_99583853_K = 99583853;
-        final int W_80_Tervuursevest_88361317_A = 88361317;
-
-        for (int n = 97; n >= 91; n--) {returnValueNull =segment30.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment31 = segment30.addPTWayMember(90);
-        extractAndAssertValues(90, segment30, segment31, cloneOfBus601RouteRelation,
-            W_91_Rennes_Singel_429706864_A, W_98_Rennes_Singel_249333186_H,
-            W_90_Tervuursevest_99583853_K, "Tervuursevest",
-            null,
-            "318;601");
-
-        final int W_79_Tervuursevest_Kapucijnenvoer_461159345_A = 461159345;
-
-        for (int n = 89; n >= 80; n--) {returnValueNull =segment31.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment32 = segment31.addPTWayMember(79);
-        extractAndAssertValues(79, segment31, segment32, cloneOfBus601RouteRelation,
-            W_80_Tervuursevest_88361317_A, W_90_Tervuursevest_99583853_K,
-            W_79_Tervuursevest_Kapucijnenvoer_461159345_A, "Tervuursevest",
-            null,
-            "601");
-
-        final int W_78_Tervuursevest_461159362_K = 461159362;
-        final int W_68_Tervuursevest_3677330_A = 3677330;
-
-        RouteSegmentToExtract segment33 = segment32.addPTWayMember(78);
-        extractAndAssertValues(78, segment32, segment33, cloneOfBus601RouteRelation,
-            W_79_Tervuursevest_Kapucijnenvoer_461159345_A, W_79_Tervuursevest_Kapucijnenvoer_461159345_A,
-            W_78_Tervuursevest_461159362_K, "Tervuursevest",
-            null,
-            "178;179;306 (student);601");
-
-        final int W_67_Naamsevest_86164005_G = 86164005;
-        final int W_61_Geldenaaksevest_24905257_A = 24905257;
-
-        final int W_60_Geldenaaksevest_608715605_H = 608715605;
-        final int W_53_Geldenaaksevest_8130906_A = 8130906;
-
-        for (int n = 77; n >= 68; n--) {returnValueNull =segment33.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment34 = segment33.addPTWayMember(67);
-        extractAndAssertValues(67, segment33, segment34, cloneOfBus601RouteRelation,
-            W_68_Tervuursevest_3677330_A, W_78_Tervuursevest_461159362_K,
-            W_67_Naamsevest_86164005_G, "Naamsevest",
-            null,
-            "178;179;306 (student);520;524;525;537;601");
-
-        final int W_52_Tiensepoort_16775171_D = 16775171;
-        final int W_49_Tiensevest_Oostertunnel_8590231_A = 8590231;
-
-        for (int n = 66; n >= 61; n--) {returnValueNull =segment34.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment35 = segment34.addPTWayMember(60);
-        extractAndAssertValues(60, segment34, segment35, cloneOfBus601RouteRelation,
-            W_61_Geldenaaksevest_24905257_A, W_67_Naamsevest_86164005_G,
-            W_60_Geldenaaksevest_608715605_H, "Geldenaaksevest",
-            null,
-            "18;178;179;306 (student);337;601;616");
-
-        for (int n = 60; n >= 53; n--) {returnValueNull =segment35.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment36 = segment35.addPTWayMember(52);
-        extractAndAssertValues(52, segment35, segment36, cloneOfBus601RouteRelation,
-            W_53_Geldenaaksevest_8130906_A, W_60_Geldenaaksevest_608715605_H,
-            W_52_Tiensepoort_16775171_D, "Tiensepoort",
-            null,
-            "18;178;179;306 (student);337;601;616;630");
-
-        final int W_48_Tiensevest_185988814_A = 185988814;
-
-        for (int n = 51; n >= 49; n--) {returnValueNull =segment36.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment37 = segment36.addPTWayMember(48);
-        extractAndAssertValues(48, segment36, segment37, cloneOfBus601RouteRelation,
-            W_49_Tiensevest_Oostertunnel_8590231_A, W_52_Tiensepoort_16775171_D,
-            W_48_Tiensevest_185988814_A, "Tiensevest",
-            null,
-            "7;8;9;18;178;179;306 (student);337;380;527;601;616;630");
-
-        final int W_47_Martelarenplein_76856823_D = 76856823;
-        final int W_44__78815533_A = 78815533;
-
-        RouteSegmentToExtract segment38 = segment37.addPTWayMember(47);
-        extractAndAssertValues(47, segment37, segment38, cloneOfBus601RouteRelation,
-            W_48_Tiensevest_185988814_A, W_48_Tiensevest_185988814_A,
-            W_47_Martelarenplein_76856823_D, "Martelarenplein",
-            null,
-            "1;4;5;6;7;8;9;18;178;179;306 (student);337;380;527;601;616;630");
-
-        final int W_43__79264899_A = 79264899;
-
-        for (int n = 46; n >= 44; n--) {returnValueNull =segment38.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment39 = segment38.addPTWayMember(43);
-        extractAndAssertValues(43, segment38, segment39, cloneOfBus601RouteRelation,
-            W_44__78815533_A, W_47_Martelarenplein_76856823_D,
-            W_43__79264899_A, null,
-            null,
-            "4;5;6;7;8;9;18;178;179;306 (student);337;380;527;601;630");
-
-        final int W_42__377918635_A = 377918635;
-
-        RouteSegmentToExtract segment40 = segment39.addPTWayMember(42);
-        extractAndAssertValues(42, segment39, segment40, cloneOfBus601RouteRelation,
-            W_43__79264899_A, W_43__79264899_A,
-            W_42__377918635_A, null,
-            null,
-            "4;5;6;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;601;630");
-        final int W_41__79264888_A = 79264888;
-
-        RouteSegmentToExtract segment41 = segment40.addPTWayMember(41);
-        extractAndAssertValues(41, segment40, segment41, cloneOfBus601RouteRelation,
-            W_42__377918635_A, W_42__377918635_A,
-            W_41__79264888_A, null,
-            null,
-            "3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;601");
-
-        final int W_40__79264897_B = 79264897;
-        final int W_39__71754927_A = 71754927;
-
-        RouteSegmentToExtract segment42 = segment41.addPTWayMember(40);
-        extractAndAssertValues(40, segment41, segment42, cloneOfBus601RouteRelation,
-            W_41__79264888_A, W_41__79264888_A,
-            W_40__79264897_B, null,
-            null,
-            "2;3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;525;601");
-
-        final int W_38__377918638_A_TEC18 = 377918638;
-
-        returnValueNull =segment42.addPTWayMember(39); assertNull(returnValueNull);
-        RouteSegmentToExtract segment44 = segment42.addPTWayMember(38);
-        extractAndAssertValues(38, segment42, segment44, cloneOfBus601RouteRelation,
-            W_39__71754927_A, W_40__79264897_B,
-            W_38__377918638_A_TEC18, null,
-            null,
-            "2;3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;524;525;601");
-
-        final int W_37__79264891_A = 79264891;
-
-        RouteSegmentToExtract segment45 = segment44.addPTWayMember(37);
-        extractAndAssertValues(37, segment44, segment45, cloneOfBus601RouteRelation,
-            W_38__377918638_A_TEC18, W_38__377918638_A_TEC18,
-            W_37__79264891_A, null,
-            null,
-            "18;601");
-        final int W_36_Tiensevest_78568409_A = 78568409;
-
-        RouteSegmentToExtract segment46 = segment45.addPTWayMember(36);
-        extractAndAssertValues(36, segment45, segment46, cloneOfBus601RouteRelation,
-            W_37__79264891_A, W_37__79264891_A,
-            W_36_Tiensevest_78568409_A, "Tiensevest",
-            null,
-            "18;601");
-        final int W_35_Tiensevest_79193579_A = 79193579;
-
-        RouteSegmentToExtract segment47 = segment46.addPTWayMember(35);
-        extractAndAssertValues(35, segment46, segment47, cloneOfBus601RouteRelation,
-            W_36_Tiensevest_78568409_A, W_36_Tiensevest_78568409_A,
-            W_35_Tiensevest_79193579_A, "Tiensevest",
-            null,
-            "4;5;6;7;8;9;18;179;284;285;306 (student);315;316;317;334;335;337;380;601;616;658");
-        final int W_34_Bend_19793394_A = 19793394;
-        // ways 28 to 33 are the same as 146 - 151
-        final int W_27_Zoutstraat_3992548_A = 3992548;
-
-        RouteSegmentToExtract segment48 = segment47.addPTWayMember(34);
-        extractAndAssertValues(34, segment47, segment48, cloneOfBus601RouteRelation,
-            W_35_Tiensevest_79193579_A, W_35_Tiensevest_79193579_A,
-            W_34_Bend_19793394_A, null,
-            null,
-            "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;380;513;600;601;616;630;658");
-
-        final int W_26_Havenkant_510790349_M = 510790349;
-        final int W_14_Engels_Plein_338057820_A = 338057820;
-
-        RouteSegmentToExtract segment49 = segment48.addPTWayMember(33);
-        extractAndAssertValues(33, segment48, segment49, cloneOfBus601RouteRelation,
-            W_34_Bend_19793394_A, W_34_Bend_19793394_A,
-            W_33_151_Tiensevest_1_19793164_A, "Tiensevest",
-            null,
-            "334;335;513;601");
-
-        RouteSegmentToExtract segment50 = segment49.addPTWayMember(32);
-        Relation rel50 = extractAndAssertValues(32, segment49, segment50, cloneOfBus601RouteRelation,
-            W_33_151_Tiensevest_1_19793164_A, W_33_151_Tiensevest_1_19793164_A,
-            W_32_150_Diestsevest_4_NextToOostertunnel_6184898_D, "Diestsevest",
-            null,
-            "284;285;305;306;310;315;316;317;318;334;335;358;395;410;433;475;485;513;601;630;651;652;658");
-        assertEquals(rel8.getId(), rel50.getId());
-
-        for (int n = 31; n >= 29; n--) {returnValueNull =segment50.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment51 = segment50.addPTWayMember(28);
-        Relation rel51 = extractAndAssertValues(28, segment50, segment51, cloneOfBus601RouteRelation,
-            W_29_147_Diestsevest_1_8133608_A, W_32_150_Diestsevest_4_NextToOostertunnel_6184898_D,
-            W_28_146_Artoisplein_2_254800931_A, "Joanna-Maria Artoisplein",
-            null,
-            "305;318;334;335;358;410;513;601;630;651;652;658");
-        assertEquals(rel9.getId(), rel51.getId());
-
-        RouteSegmentToExtract segment52 = segment51.addPTWayMember(27);
-        Relation rel52 = extractAndAssertValues(27, segment51, segment52, cloneOfBus601RouteRelation,
-            W_28_146_Artoisplein_2_254800931_A, W_28_146_Artoisplein_2_254800931_A,
-            W_27_Zoutstraat_3992548_A, "Zoutstraat",
-            null,
-            "178;305;318;334;335;358;410;513;601;630;651;652;658");
-        assertEquals(rel10.getId(), rel52.getId());
-
-        RouteSegmentToExtract segment53 = segment52.addPTWayMember(26);
-        extractAndAssertValues(26, segment52, segment53, cloneOfBus601RouteRelation,
-            W_27_Zoutstraat_3992548_A, W_27_Zoutstraat_3992548_A,
-            W_26_Havenkant_510790349_M, "Havenkant",
-            null,
-            "334;335;513;601;630");
-
-        for (int n = 25; n >= 14; n--) {returnValueNull =segment53.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus601RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment54 = segment53.addPTWayMember(13);
-        extractAndAssertValues(13, segment53, segment54, cloneOfBus601RouteRelation,
-            W_14_Engels_Plein_338057820_A, W_26_Havenkant_510790349_M,
-            0, null,
-            null,
-            "601");
 
+        List<Val> expectedValues = Arrays.asList(
+            new Val( 158,  78579065,  78579065,  78579065, null),
+            new Val( 157, 377814547,  78579065, 377814547, null),
+
+            new Val( 156, 377814547,  78579065,  79596986, null,
+                "perron 1 & 2 (1;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;537;539;601;658)",
+                "1;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;537;539;601;658"),
+
+
+            new Val( 155,  79596986,  79596986,  79211473, "Tiensevest",
+                "(305;306;310;318;358;410;433;475;485;601;658)",
+                "305;306;310;318;358;410;433;475;485;601;658"),
+
+
+            new Val( 154,  79211473,  79211473,  79211472, "Tiensevest",
+                "Tiensevest (1;2;3;4;5;6;7;8;9;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;520;524;525;537;539;586;601;616;658)",
+                "1;2;3;4;5;6;7;8;9;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;520;524;525;537;539;586;601;616;658"),
+
+
+            new Val( 153,  79211472,  79211472,  79175435, "Tiensevest",
+                "Tiensevest (2;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;520;524;525;537;539;586;601;616;658)",
+                "2;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;520;524;525;537;539;586;601;616;658"),
+
+
+            new Val( 152,  79175435,  79175435,  80458208, "Tiensevest",
+                "Tiensevest (284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;524;537;601;651;652;658)",
+                "284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;524;537;601;651;652;658"),
+
+
+            new Val( 151,  80458208,  80458208,  19793164, "Tiensevest",
+                "Tiensevest (284;285;305;306;310;315;316;317;318;358;395;410;433;475;485;601;630;651;652;658)",
+                "284;285;305;306;310;315;316;317;318;358;395;410;433;475;485;601;630;651;652;658"),
+
+
+            new Val( 150,  19793164,  19793164,   6184898, "Diestsevest",
+                "Tiensevest (284;285;305;306;310;315;316;317;318;334;335;358;395;410;433;475;485;513;601;630;651;652;658)",
+                "284;285;305;306;310;315;316;317;318;334;335;358;395;410;433;475;485;513;601;630;651;652;658"),
+
+            new Val( 149,  81457878,   6184898,  81457878, "Diestsevest"),
+            new Val( 148,   4003924,   6184898,   4003924, "Diestsevest"),
+            new Val( 147,   8133608,   6184898,   8133608, "Diestsevest"),
+
+            new Val( 146,   8133608,   6184898, 254800931, "Joanna-Maria Artoisplein",
+                "Diestsevest (305;318;334;335;358;410;513;601;630;651;652;658)",
+                "305;318;334;335;358;410;513;601;630;651;652;658"),
+
+
+            new Val( 145, 254800931, 254800931,  23691158, "Joanna-Maria Artoisplein",
+                "Joanna-Maria Artoisplein (178;305;318;334;335;358;410;513;601;630;651;652;658)",
+                "178;305;318;334;335;358;410;513;601;630;651;652;658"),
+
+            new Val( 144, 254800932,  23691158, 254800932, "Lüdenscheidsingel"),
+            new Val( 143,  44932921,  23691158,  44932921, "Lüdenscheidsingel"),
+            new Val( 142,   3993388,  23691158,   3993388, "Lüdenscheidsingel"),
+            new Val( 141, 109267417,  23691158, 109267417, "Lüdenscheidsingel"),
+
+            new Val( 140, 109267417,  23691158,   3993387, "Lüdenscheidsingel",
+                "Lüdenscheidsingel - Joanna-Maria Artoisplein (178;305;318;358;410;601;651;652;658)",
+                "178;305;318;358;410;601;651;652;658"),
+
+            new Val( 139,   8131125,   3993387,   8131125, null),
+            new Val( 138,   3877105,   3993387,   3877105, null),
+            new Val( 137, 146171871,   3993387, 146171871, "Den Boschsingel"),
+            new Val( 136,  23837544,   3993387,  23837544, "Den Boschsingel"),
+
+            new Val( 135,  23837544,   3993387, 225605630, "Den Boschsingel",
+                "Den Boschsingel - Lüdenscheidsingel (318;358;410;601;651;658)",
+                "318;358;410;601;651;658"),
+
+            new Val( 134,   8131121, 225605630,   8131121, "Den Boschsingel"),
+            new Val( 133,   3680456, 225605630,   3680456, "Rennes-Singel"),
+            new Val( 132,   3994257, 225605630,   3994257, "Rennes-Singel"),
+            new Val( 131, 249333185, 225605630, 249333185, "Rennes-Singel"),
+
+            new Val( 130, 249333185, 225605630, 249333184, "Herestraat",
+                "Rennes-Singel - Den Boschsingel (318;410;601)",
+                "318;410;601"),
+
+            new Val( 129, 813970231, 249333184, 813970231, "Herestraat"),
+            new Val( 128, 681081951, 249333184, 681081951, "Herestraat"),
+
+            new Val( 127, 681081951, 249333184, 813970227, "Herestraat",
+                "Herestraat (410;601)",
+                "410;601"),
+
+            new Val( 126,  41403544, 813970227,  41403544, "Herestraat"),
+            new Val( 125,   8079995, 813970227,   8079995, "Herestraat"),
+
+            new Val( 124,   8079995, 813970227,  41403538, "Rotonde Het Teken",
+                "Herestraat (410;600;601)",
+                "410;600;601"),
+
+            new Val( 123,  79340950,  41403538,  79340950, "Ring Zuid"),
+
+            new Val( 122,  79340950,  41403538,  11369123, "Ring Zuid",
+                "Ring Zuid - Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+
+            new Val( 121,  11369123,  11369123, 159949154, null,
+                "Ring Zuid (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+
+            new Val( 120, 159949154, 159949154, 332258104, null,
+                "(3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+            new Val( 119,  78852604, 332258104,  78852604, null),
+
+            new Val( 118,  78852604, 332258104, 377918641, null,
+                "(3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+            new Val( 117,  14508736, 377918641,  14508736, null),
+
+            new Val( 116,  14508736, 377918641, 109267436, "Ring Zuid",
+                "(3;317;395;410;601)",
+                "3;317;395;410;601"),
+
+
+            new Val( 115, 109267436, 109267436,  14508739, "Ring Zuid",
+                "Ring Zuid (3;317;395;410;600;601)",
+                "3;317;395;410;600;601"),
+
+
+            new Val( 114,  14508739,  14508739,  14508740, "Ring Zuid",
+                "Ring Zuid (3;317;334;335;395;410;600;601)",
+                "3;317;334;335;395;410;600;601"),
+
+
+            new Val( 113,  14508740,  14508740, 502328838, "Ring Zuid",
+                "Ring Zuid (3;317;334;335;380;395;410;600;601)",
+                "3;317;334;335;380;395;410;600;601"),
+
+            new Val( 112, 502328837, 502328838, 502328837, "Ring Zuid"),
+            new Val( 111,   8080023, 502328838,   8080023, "Ring Zuid"),
+            new Val( 110,  78568660, 502328838,  78568660, "Rotonde Het Teken"),
+
+            new Val( 109,  78568660, 502328838,  78873921, "Rotonde Het Teken",
+                "Rotonde Het Teken - Ring Zuid (3;317;333;334;335;370;371;373;374;380;395;410;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;600;601"),
+
+
+            new Val( 108,  78873921,  78873921,   3752557, "Rotonde Het Teken",
+                "Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;600;601"),
+
+
+            new Val( 107,   3752557,   3752557, 249333188, "Rotonde Het Teken",
+                "Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;600;601"),
+
+
+            new Val( 106, 249333188, 249333188, 249333187, "Rotonde Het Teken",
+                "Rotonde Het Teken (3;410;600;601)",
+                "3;410;600;601"),
+
+
+            new Val( 105, 249333187, 249333187,  13067134, "Herestraat",
+                "Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+            new Val( 104, 813970232,  13067134, 813970232, "Herestraat"),
+            new Val( 103, 813970226,  13067134, 813970226, "Herestraat"),
+            new Val( 102, 813970228,  13067134, 813970228, "Herestraat"),
+
+            new Val( 101, 813970228,  13067134, 813970229, "Herestraat",
+                "Herestraat (410;600;601)",
+                "410;600;601"),
+
+            new Val( 100, 813970231, 813970229, 813970231, "Herestraat"),
+            new Val( 99, 249333184, 813970229, 249333184, "Herestraat"),
+
+            new Val( 98, 249333184, 813970229, 249333186, "Rennes-Singel",
+                "Herestraat (601)",
+                "601"),
+
+            new Val( 97, 192559628, 249333186, 192559628, "Rennes-Singel"),
+            new Val( 96, 161166589, 249333186, 161166589, "Rennes-Singel"),
+            new Val( 95, 813979470, 249333186, 813979470, "Rennes-Singel"),
+            new Val( 94,  79289746, 249333186,  79289746, "Rennes-Singel"),
+            new Val( 93, 813979472, 249333186, 813979472, "Rennes-Singel"),
+            new Val( 92,   8131120, 249333186,   8131120, "Rennes-Singel"),
+            new Val( 91, 429706864, 249333186, 429706864, "Rennes-Singel"),
+
+            new Val( 90, 429706864, 249333186,  99583853, "Tervuursevest",
+                "Rennes-Singel (318;601)",
+                "318;601"),
+
+            new Val( 89, 521193379,  99583853, 521193379, "Tervuursevest"),
+            new Val( 88, 521193380,  99583853, 521193380, "Tervuursevest"),
+            new Val( 87, 813979465,  99583853, 813979465, "Tervuursevest"),
+            new Val( 86, 174338458,  99583853, 174338458, "Tervuursevest"),
+            new Val( 85, 608715520,  99583853, 608715520, "Tervuursevest"),
+            new Val( 84, 608715521,  99583853, 608715521, "Tervuursevest"),
+            new Val( 83,   3677944,  99583853,   3677944, "Tervuursevest"),
+            new Val( 82, 174338459,  99583853, 174338459, "Tervuursevest"),
+            new Val( 81, 429706866,  99583853, 429706866, "Tervuursevest"),
+            new Val( 80,  88361317,  99583853,  88361317, "Tervuursevest"),
+
+            new Val( 79,  88361317,  99583853, 461159345, "Tervuursevest",
+                "Tervuursevest (601)",
+                "601"),
+
+
+            new Val( 78, 461159345, 461159345, 461159362, "Tervuursevest",
+                "Tervuursevest (178;179;306 (student);601)",
+                "178;179;306 (student);601"),
+
+            new Val( 77, 344507822, 461159362, 344507822, "Tervuursevest"),
+            new Val( 76, 461159367, 461159362, 461159367, "Tervuursevest"),
+            new Val( 75,   3677335, 461159362,   3677335, "Tervuursevest"),
+            new Val( 74,  31474001, 461159362,  31474001, "Tervuursevest"),
+            new Val( 73,  23237288, 461159362,  23237288, "Tervuursevest"),
+            new Val( 72,  90168773, 461159362,  90168773, "Tervuursevest"),
+            new Val( 71,  23237287, 461159362,  23237287, "Tervuursevest"),
+            new Val( 70, 608715561, 461159362, 608715561, "Tervuursevest"),
+            new Val( 69, 608715562, 461159362, 608715562, "Tervuursevest"),
+            new Val( 68,   3677330, 461159362,   3677330, "Tervuursevest"),
+
+            new Val( 67,   3677330, 461159362,  86164005, "Naamsevest",
+                "Tervuursevest (178;179;306 (student);520;524;525;537;601)",
+                "178;179;306 (student);520;524;525;537;601"),
+
+            new Val( 66, 655251293,  86164005, 655251293, "Naamsevest"),
+            new Val( 65, 131571763,  86164005, 131571763, "Naamsevest"),
+            new Val( 64, 661733369,  86164005, 661733369, "Naamsevest"),
+            new Val( 63, 655251292,  86164005, 655251292, "Naamsevest"),
+            new Val( 62,   3677823,  86164005,   3677823, "Naamsevest"),
+            new Val( 61,  24905257,  86164005,  24905257, "Geldenaaksevest"),
+
+            new Val( 60,  24905257,  86164005, 608715605, "Geldenaaksevest",
+                "Geldenaaksevest - Naamsevest (18;178;179;306 (student);337;601;616)",
+                "18;178;179;306 (student);337;601;616"),
+
+            new Val( 59, 608715606, 608715605, 608715606, "Geldenaaksevest"),
+            new Val( 58,  79299303, 608715605,  79299303, "Geldenaaksevest"),
+            new Val( 57,  10296368, 608715605,  10296368, "Geldenaaksevest"),
+            new Val( 56, 521193607, 608715605, 521193607, "Geldenaaksevest"),
+            new Val( 55,  94585453, 608715605,  94585453, "Geldenaaksevest"),
+            new Val( 54, 586268893, 608715605, 586268893, "Geldenaaksevest"),
+            new Val( 53,   8130906, 608715605,   8130906, "Geldenaaksevest"),
+
+            new Val( 52,   8130906, 608715605,  16775171, "Tiensepoort",
+                "Geldenaaksevest (18;178;179;306 (student);337;601;616;630)",
+                "18;178;179;306 (student);337;601;616;630"),
+
+            new Val( 51,   8131717,  16775171,   8131717, "Tiensevest"),
+            new Val( 50,  12712557,  16775171,  12712557, "Tiensevest"),
+            new Val( 49,   8590231,  16775171,   8590231, "Tiensevest"),
+
+            new Val( 48,   8590231,  16775171, 185988814, "Tiensevest",
+                "Tiensevest - Tiensepoort (7;8;9;18;178;179;306 (student);337;380;527;601;616;630)",
+                "7;8;9;18;178;179;306 (student);337;380;527;601;616;630"),
+
+
+            new Val( 47, 185988814, 185988814,  76856823, "Martelarenplein",
+                "Tiensevest (1;4;5;6;7;8;9;18;178;179;306 (student);337;380;527;601;616;630)",
+                "1;4;5;6;7;8;9;18;178;179;306 (student);337;380;527;601;616;630"),
+
+            new Val( 46, 459446598,  76856823, 459446598, "Martelarenplein"),
+            new Val( 45, 459446600,  76856823, 459446600, "Martelarenplein"),
+            new Val( 44,  78815533,  76856823,  78815533, null),
+
+            new Val( 43,  78815533,  76856823,  79264899, null,
+                "Martelarenplein (4;5;6;7;8;9;18;178;179;306 (student);337;380;527;601;630)",
+                "4;5;6;7;8;9;18;178;179;306 (student);337;380;527;601;630"),
+
+
+            new Val( 42,  79264899,  79264899, 377918635, null,
+                "(4;5;6;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;601;630)",
+                "4;5;6;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;601;630"),
+
+
+            new Val( 41, 377918635, 377918635,  79264888, null,
+                "(3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;601)",
+                "3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;601"),
+
+
+            new Val( 40,  79264888,  79264888,  79264897, null,
+                "(2;3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;525;601)",
+                "2;3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;525;601"),
+
+            new Val( 39,  71754927,  79264897,  71754927, null),
+
+            new Val( 38,  71754927,  79264897, 377918638, null,
+                "(2;3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;524;525;601)",
+                "2;3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;524;525;601"),
+
+
+            new Val( 37, 377918638, 377918638,  79264891, null,
+                "(18;601)",
+                "18;601"),
+
+
+            new Val( 36,  79264891,  79264891,  78568409, "Tiensevest",
+                "(18;601)",
+                "18;601"),
+
+
+            new Val( 35,  78568409,  78568409,  79193579, "Tiensevest",
+                "Tiensevest (4;5;6;7;8;9;18;179;284;285;306 (student);315;316;317;334;335;337;380;601;616;658)",
+                "4;5;6;7;8;9;18;179;284;285;306 (student);315;316;317;334;335;337;380;601;616;658"),
+
+
+            new Val( 34,  79193579,  79193579,  19793394, null,
+                "Tiensevest (3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;380;513;600;601;616;630;658)",
+                "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;380;513;600;601;616;630;658"),
+
+
+            new Val( 33,  19793394,  19793394,  19793164, "Tiensevest",
+                "(334;335;513;601)",
+                "334;335;513;601"),
+
+
+            new Val( 32,  19793164,  19793164,   6184898, "Diestsevest",
+                "Tiensevest (284;285;305;306;310;315;316;317;318;334;335;358;395;410;433;475;485;513;601;630;651;652;658)",
+                "284;285;305;306;310;315;316;317;318;334;335;358;395;410;433;475;485;513;601;630;651;652;658"),
+
+            new Val( 31,  81457878,   6184898,  81457878, "Diestsevest"),
+            new Val( 30,   4003924,   6184898,   4003924, "Diestsevest"),
+            new Val( 29,   8133608,   6184898,   8133608, "Diestsevest"),
+
+            new Val( 28,   8133608,   6184898, 254800931, "Joanna-Maria Artoisplein",
+                "Diestsevest (305;318;334;335;358;410;513;601;630;651;652;658)",
+                "305;318;334;335;358;410;513;601;630;651;652;658"),
+
+
+            new Val( 27, 254800931, 254800931,   3992548, "Zoutstraat",
+                "Joanna-Maria Artoisplein (178;305;318;334;335;358;410;513;601;630;651;652;658)",
+                "178;305;318;334;335;358;410;513;601;630;651;652;658"),
+
+
+            new Val( 26,   3992548,   3992548, 510790349, "Havenkant",
+                "Zoutstraat (334;335;513;601;630)",
+                "334;335;513;601;630"),
+
+            new Val( 25, 510790348, 510790349, 510790348, "Havenkant"),
+            new Val( 24, 314635787, 510790349, 314635787, "Havenkant"),
+            new Val( 23, 843534478, 510790349, 843534478, "Havenkant"),
+            new Val( 22, 406205781, 510790349, 406205781, "Havenkant"),
+            new Val( 21, 270181176, 510790349, 270181176, "Havenkant"),
+            new Val( 20, 330300725, 510790349, 330300725, "Havenkant"),
+            new Val( 19,   3869822, 510790349,   3869822, "Burchtstraat"),
+            new Val( 18, 330300723, 510790349, 330300723, "Achter de latten"),
+            new Val( 17, 659297690, 510790349, 659297690, "Wolvengang"),
+            new Val( 16,  25928482, 510790349,  25928482, "Wolvengang"),
+            new Val( 15,   3869812, 510790349,   3869812, "Engels Plein"),
+            new Val( 14, 338057820, 510790349, 338057820, "Engels Plein"),
+
+            new Val( 13, 338057820, 510790349, 338057820, "Engels Plein",
+                "Engels Plein - Havenkant (601)",
+                "601")
+        );        RouteSegmentToExtract previousSegment = new RouteSegmentToExtract(cloneOfBus601RouteRelation);
+        previousSegment.setActiveDataSet(ds);
+        RouteSegmentToExtract segment;
+        for (Val v: expectedValues) {
+            segment = previousSegment.addPTWayMember(v.index);
+            if (segment != null) {
+                extractAndAssertValues(v.index, previousSegment, segment, cloneOfBus601RouteRelation, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,
+                    null, v.expectedRouteRef);
+                previousSegment = segment;
+            }
+        }
+        System.out.print("\n");
 
         // ***********************************************************
         // ***********************************************************
@@ -730,602 +616,410 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         assertEquals("", segment101.getWayIdsSignature());
         assertEquals(Collections.emptyList(), segment101.getWayMembers());
 
-        final int W_169_Engels_Plein_608715622_O = 608715622;
-        final int W_155_Havenkant_29283599_A = 29283599;
-
-        final int W_154_Havenkant_304241968_B = 304241968;
-        final int W_153_Aarschotsesteenweg_304241967_A = 304241967;
-
-        for (int n = 169; n >= 155; n--) {returnValueNull =segment101.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment102 = segment101.addPTWayMember(154);
-        extractAndAssertValues(154, segment101, segment102, cloneOfBus600RouteRelation,
-            W_155_Havenkant_29283599_A, W_169_Engels_Plein_608715622_O,
-            W_154_Havenkant_304241968_B, "Havenkant",
-            null,
-            "600");
-
-        final int W_152_Redersstraat_340265961_B = 340265961;
-        final int W_151_Redersstraat_318825613_A = 318825613;
-
-        returnValueNull =segment102.addPTWayMember(153); assertNull(returnValueNull);
-        RouteSegmentToExtract segment103 = segment102.addPTWayMember(152);
-        extractAndAssertValues(152, segment102, segment103, cloneOfBus600RouteRelation,
-            W_153_Aarschotsesteenweg_304241967_A, W_154_Havenkant_304241968_B,
-            W_152_Redersstraat_340265961_B, "Redersstraat",
-            null,
-            "334;335;513;600;630");
-
-        final int W_150_Redersstraat_340265962_A = 340265962;
-
-        returnValueNull =segment103.addPTWayMember(151); assertNull(returnValueNull);
-        RouteSegmentToExtract segment104 = segment103.addPTWayMember(150);
-        extractAndAssertValues(150, segment103, segment104, cloneOfBus600RouteRelation,
-            W_151_Redersstraat_318825613_A, W_152_Redersstraat_340265961_B,
-            W_150_Redersstraat_340265962_A, "Redersstraat",
-            null,
-            "600");
-
-        final int W_149_Joanna_Maria_Artoisplein_254801390_B = 254801390;
-        final int W_148_Joanna_Maria_Artoisplein_61540068_A = 61540068;
-
-        RouteSegmentToExtract segment105 = segment104.addPTWayMember(149);
-        extractAndAssertValues(149, segment104, segment105, cloneOfBus600RouteRelation,
-            W_150_Redersstraat_340265962_A, W_150_Redersstraat_340265962_A,
-            W_149_Joanna_Maria_Artoisplein_254801390_B, "Joanna-Maria Artoisplein",
-            null,
-            "333;334;335;513;600;630");
-
-        final int W_147_Vuurkruisenlaan_23691160_C = 23691160;
-        final int W_145_Diestsepoort_8109264_A = 8109264;
-
-        returnValueNull =segment105.addPTWayMember(148); assertNull(returnValueNull);
-        RouteSegmentToExtract segment106 = segment105.addPTWayMember(147);
-        extractAndAssertValues(147, segment105, segment106, cloneOfBus600RouteRelation,
-            W_148_Joanna_Maria_Artoisplein_61540068_A, W_149_Joanna_Maria_Artoisplein_254801390_B,
-            W_147_Vuurkruisenlaan_23691160_C, "Vuurkruisenlaan",
-            null,
-            "178;305;318;333;334;335;410;513;600;630;651;652;658");
-
-        final int W_144_Diestsepoort_61556877_D = 61556877;
-        final int W_141_Diestsepoort_584356745_A = 584356745;
-
-        for (int n = 146; n >= 145; n--) {returnValueNull =segment106.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment107 = segment106.addPTWayMember(144);
-        extractAndAssertValues(144, segment106, segment107, cloneOfBus600RouteRelation,
-            W_145_Diestsepoort_8109264_A, W_147_Vuurkruisenlaan_23691160_C,
-            W_144_Diestsepoort_61556877_D, "Diestsepoort",
-            null,
-            "305;333;334;335;513;600;630;651;652;658");
-
-        final int W_140_Diestsepoort_198559166_E = 198559166;
-        final int W_136_Diestsepoort_451873774_A = 451873774;
-
-        for (int n = 143; n >= 141; n--) {returnValueNull =segment107.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment108 = segment107.addPTWayMember(140);
-        extractAndAssertValues(140, segment107, segment108, cloneOfBus600RouteRelation,
-            W_141_Diestsepoort_584356745_A, W_144_Diestsepoort_61556877_D,
-            W_140_Diestsepoort_198559166_E, "Diestsepoort",
-            null,
-            "2;3;179;305;306;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658");
-
-        final int W_135__76867049_C = 76867049;
-        // W_134__79264890_B = 79264890;
-        final int W_133__79596965_A = 79596965;
-
-        for (int n = 139; n >= 136; n--) {returnValueNull =segment108.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment109 = segment108.addPTWayMember(135);
-        extractAndAssertValues(135, segment108, segment109, cloneOfBus600RouteRelation,
-            W_136_Diestsepoort_451873774_A, W_140_Diestsepoort_198559166_E,
-            W_135__76867049_C, null,
-            null,
-            "2;3;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658");
-
-        final int W_132__79596974_B = 79596974;
-        final int W_131__79596982_A = 79596982;
-
-        for (int n = 134; n >= 133; n--) {returnValueNull =segment109.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment110 = segment109.addPTWayMember(132);
-        extractAndAssertValues(132, segment109, segment110, cloneOfBus600RouteRelation,
-            W_133__79596965_A, W_135__76867049_C,
-            W_132__79596974_B, null,
-            null,
-            "2;3;310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630");
-
-        final int W_130__79596987_C = 79596987;
-        final int W_128__79596980_A = 79596980;
-
-        returnValueNull =segment110.addPTWayMember(131); assertNull(returnValueNull);
-        RouteSegmentToExtract segment111 = segment110.addPTWayMember(130);
-        extractAndAssertValues(130, segment110, segment111, cloneOfBus600RouteRelation,
-            W_131__79596982_A, W_132__79596974_B,
-            W_130__79596987_C, null,
-            null,
-            "3;333;334;335;433;600;630");
-        final int W_127_Tiensevest_79193579_A = 79193579;
-
-        for (int n = 129; n >= 128; n--) {returnValueNull =segment111.addPTWayMember(n); assertNull(returnValueNull);}
-        RouteSegmentToExtract segment112 = segment111.addPTWayMember(127);
-        extractAndAssertValues(127, segment111, segment112, cloneOfBus600RouteRelation,
-            W_128__79596980_A, W_130__79596987_C,
-            W_127_Tiensevest_79193579_A, "Tiensevest",
-            null,
-            "3;333;334;335;513;600;630");
-
-        final int W_126_Tiensevest_258936980_A = 258936980;
-
-        RouteSegmentToExtract segment113 = segment112.addPTWayMember(126);
-        extractAndAssertValues(126, segment112, segment113, cloneOfBus600RouteRelation,
-            W_127_Tiensevest_79193579_A, W_127_Tiensevest_79193579_A,
-            W_126_Tiensevest_258936980_A, "Tiensevest",
-            null,
-            "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;380;513;600;601;616;630;658");
-
-        final int W_125_Tiensevest_79193580_A = 79193580;
-
-        RouteSegmentToExtract segment114 = segment113.addPTWayMember(125);
-        extractAndAssertValues(125, segment113, segment114, cloneOfBus600RouteRelation,
-            W_126_Tiensevest_258936980_A, W_126_Tiensevest_258936980_A,
-            W_125_Tiensevest_79193580_A, "Tiensevest",
-            null,
-            "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630;658");
-
-        final int W_124_Tiensevest_79193581_A = 79193581;
-
-        RouteSegmentToExtract segment115 = segment114.addPTWayMember(124);
-        extractAndAssertValues(124, segment114, segment115, cloneOfBus600RouteRelation,
-            W_125_Tiensevest_79193580_A, W_125_Tiensevest_79193580_A,
-            W_124_Tiensevest_79193581_A, "Tiensevest",
-            null,
-            "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630");
-
-        final int W_123_Tiensevest_78815505_A = 78815505;
-
-        RouteSegmentToExtract segment116 = segment115.addPTWayMember(123);
-        extractAndAssertValues(123, segment115, segment116, cloneOfBus600RouteRelation,
-            W_124_Tiensevest_79193581_A, W_124_Tiensevest_79193581_A,
-            W_123_Tiensevest_78815505_A, "Tiensevest",
-            null,
-            "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630");
-
-        final int W_122_Tiensevest_84696751_B = 84696751;
-        final int W_121_Tiensevest_79265237_A = 79265237;
-
-        RouteSegmentToExtract segment117 = segment116.addPTWayMember(122);
-        extractAndAssertValues(122, segment116, segment117, cloneOfBus600RouteRelation,
-            W_123_Tiensevest_78815505_A, W_123_Tiensevest_78815505_A,
-            W_122_Tiensevest_84696751_B, "Tiensevest",
-            null,
-            "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630");
-
-        final int W_120_Tiensevest_89574079_B = 89574079;
-        final int W_119_Tiensevest_81522744_A = 81522744;
-
-        final int W_118_Tiensevest_19793223_B = 19793223;
-        final int W_117_Tiensevest_185988814_A = 185988814;
-
-        for (int n = 121; n >= 121; n--) {returnValueNull =segment117.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment118 = segment117.addPTWayMember(120);
-        extractAndAssertValues(120, segment117, segment118, cloneOfBus600RouteRelation,
-            W_121_Tiensevest_79265237_A, W_122_Tiensevest_84696751_B,
-            W_120_Tiensevest_89574079_B, "Tiensevest",
-            null,
-            "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;527;600;616;630");
-
-        final int W_116_Tiensevest_185988816_B = 185988816;
-        final int W_115_Tiensevest_15083398_A = 15083398;
-
-        for (int n = 119; n >= 119; n--) {returnValueNull =segment118.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment119a = segment118.addPTWayMember(118);
-        extractAndAssertValues(118, segment118, segment119a, cloneOfBus600RouteRelation,
-            W_119_Tiensevest_81522744_A, W_120_Tiensevest_89574079_B,
-            W_118_Tiensevest_19793223_B, "Tiensevest",
-            null,
-            "1;2;3;4;5;6;7;8;9;18;179;284;285;306 (student);315;316;317;333;334;335;337;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539;600;616;630");
-
-        for (int n = 117; n >= 117; n--) {returnValueNull =segment119a.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment119b = segment119a.addPTWayMember(116);
-        extractAndAssertValues(116, segment119a, segment119b, cloneOfBus600RouteRelation,
-            W_117_Tiensevest_185988814_A, W_118_Tiensevest_19793223_B,
-            W_116_Tiensevest_185988816_B, "Tiensevest",
-            null,
-            "1;4;5;6;7;8;9;18;179;306 (student);337;380;600;616;630");
-
-        final int W_114_Tiensevest_8154434_E = 8154434;
-        final int W_110_Tiensevest_521193611_A = 521193611;
-
-        returnValueNull =segment119b.addPTWayMember(115); assertNull(returnValueNull);
-        RouteSegmentToExtract segment120 = segment119b.addPTWayMember(114);
-        extractAndAssertValues(114, segment119b, segment120, cloneOfBus600RouteRelation,
-            W_115_Tiensevest_15083398_A, W_116_Tiensevest_185988816_B,
-            W_114_Tiensevest_8154434_E, "Tiensevest",
-            null,
-            "7;8;9;18;179;306 (student);337;380;600;616;630");
-
-        final int W_109_Tiensepoort_4003928_G = 4003928;
-        final int W_103_Geldenaaksevest_199381120_A = 199381120;
-
-        for (int n = 113; n >= 110; n--) {returnValueNull =segment120.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment121 = segment120.addPTWayMember(109);
-        extractAndAssertValues(109, segment120, segment121, cloneOfBus600RouteRelation,
-            W_110_Tiensevest_521193611_A, W_114_Tiensevest_8154434_E,
-            W_109_Tiensepoort_4003928_G, "Tiensepoort",
-            null,
-            "7;8;9;18;178;179;306 (student);337;380;600;616;630");
-
-        final int W_102_Geldenaaksevest_3991775_E = 3991775;
-        final int W_99_Erasme_Ruelensvest_608715579_A = 608715579;
-
-        for (int n = 108; n >= 103; n--) {returnValueNull =segment121.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment122 = segment121.addPTWayMember(102);
-        extractAndAssertValues(102, segment121, segment122, cloneOfBus600RouteRelation,
-            W_103_Geldenaaksevest_199381120_A, W_109_Tiensepoort_4003928_G,
-            W_102_Geldenaaksevest_3991775_E, "Geldenaaksevest",
-            null,
-            "18;178;179;306 (student);337;600;616;630");
-
-        final int W_98_Erasme_Ruelensvest_3677822_B = 3677822;
-        final int W_97_Tervuursevest_120086003_A = 120086003;
-
-        for (int n = 100; n >= 99; n--) {returnValueNull =segment122.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment123 = segment122.addPTWayMember(98);
-        extractAndAssertValues(98, segment122, segment123, cloneOfBus600RouteRelation,
-            W_99_Erasme_Ruelensvest_608715579_A, W_102_Geldenaaksevest_3991775_E,
-            W_98_Erasme_Ruelensvest_3677822_B, "Erasme Ruelensvest",
-            null,
-            "18;178;179;306 (student);337;600;616");
-
-        final int W_96_Tervuursevest_90168774_F = 90168774;
-        final int W_92_Tervuursevest_85044922_A = 85044922;
-
-        final int W_91_Tervuursevest_16771611_A = 16771611;
-
-        returnValueNull =segment123.addPTWayMember(97); assertNull(String.format("%d %s%s\n", 97, rc, cloneOfBus600RouteRelation.getMember(97).getMember().getId()), returnValueNull);
-        RouteSegmentToExtract segment125 = segment123.addPTWayMember(96);
-        extractAndAssertValues(96, segment123, segment125, cloneOfBus600RouteRelation,
-            W_97_Tervuursevest_120086003_A, W_98_Erasme_Ruelensvest_3677822_B,
-            W_96_Tervuursevest_90168774_F, "Tervuursevest",
-            null,
-            "178;179;306 (student);600");
-
-        for (int n = 95; n >= 92; n--) {returnValueNull =segment125.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment127 = segment125.addPTWayMember(91);
-        extractAndAssertValues(91, segment125, segment127, cloneOfBus600RouteRelation,
-            W_92_Tervuursevest_85044922_A, W_96_Tervuursevest_90168774_F,
-            W_91_Tervuursevest_16771611_A, "Tervuursevest",
-            null,
-            "178;179;306 (student);520;524;525;537;586;600");
-
-        final int W_90_Tervuursevest_13246158_A = 13246158;
-
-        final int W_89_Tervuursevest_260405216_B = 260405216;
-        final int W_88_Tervuursevest_16771609_A = 16771609;
-
-        RouteSegmentToExtract segment128 = segment127.addPTWayMember(90);
-        extractAndAssertValues(90, segment127, segment128, cloneOfBus600RouteRelation,
-            W_91_Tervuursevest_16771611_A, W_91_Tervuursevest_16771611_A,
-            W_90_Tervuursevest_13246158_A, "Tervuursevest",
-            null,
-            "178;520;524;525;537;586;600");
-
-        final int W_87_Tervuursevest_608715518_J = 608715518;
-        final int W_78_Tervuursevest_3677945_A = 3677945;
-
-        RouteSegmentToExtract segment129 = segment128.addPTWayMember(89);
-        extractAndAssertValues(89, segment128, segment129, cloneOfBus600RouteRelation,
-            W_90_Tervuursevest_13246158_A, W_90_Tervuursevest_13246158_A,
-            W_89_Tervuursevest_260405216_B, "Tervuursevest",
-            null,
-            "7;8;9;178;520;524;525;527;537;586;600");
-
-        for (int n = 88; n >= 88; n--) {returnValueNull =segment129.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment130 = segment129.addPTWayMember(87);
-        extractAndAssertValues(87, segment129, segment130, cloneOfBus600RouteRelation,
-            W_88_Tervuursevest_16771609_A, W_89_Tervuursevest_260405216_B,
-            W_87_Tervuursevest_608715518_J, "Tervuursevest",
-            null,
-            "7;8;9;178;527;600");
-
-        final int W_77_Rennes_Singel_192559627_E = 192559627;
-        final int W_73_Rennes_Singel_28982660_A = 28982660;
-
-        final int W_72_Herestraat_78568455_A = 78568455;
-
-        for (int n = 86; n >= 78; n--) {returnValueNull =segment130.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment131 = segment130.addPTWayMember(77);
-        extractAndAssertValues(77, segment130, segment131, cloneOfBus600RouteRelation,
-            W_78_Tervuursevest_3677945_A, W_87_Tervuursevest_608715518_J,
-            W_77_Rennes_Singel_192559627_E, "Rennes-Singel",
-            null,
-            "178;600");
-
-        final int W_71_Herestraat_813970227_C = 813970227;
-        final int W_69_Herestraat_8079995_A = 8079995;
-
-        for (int n = 76; n >= 73; n--) {returnValueNull =segment131.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment132 = segment131.addPTWayMember(72);
-        extractAndAssertValues(72, segment131, segment132, cloneOfBus600RouteRelation,
-            W_73_Rennes_Singel_28982660_A, W_77_Rennes_Singel_192559627_E,
-            W_72_Herestraat_78568455_A, "Herestraat",
-            null,
-            "178;318;600");
-
-        final int W_68_Rotonde_Het_Teken_41403538_B = 41403538;
-        final int W_67_Ring_Zuid_79340950_A = 79340950;
-
-        RouteSegmentToExtract segment133 = segment132.addPTWayMember(71);
-        extractAndAssertValues(71, segment132, segment133, cloneOfBus600RouteRelation,
-            W_72_Herestraat_78568455_A, W_72_Herestraat_78568455_A,
-            W_71_Herestraat_813970227_C, "Herestraat",
-            null,
-            "600");
-
-        for (int n = 70; n >= 69; n--) {returnValueNull =segment133.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, cloneOfBus600RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment134 = segment133.addPTWayMember(68);
-        extractAndAssertValues(68, segment133, segment134, cloneOfBus600RouteRelation,
-            W_69_Herestraat_8079995_A, W_71_Herestraat_813970227_C,
-            W_68_Rotonde_Het_Teken_41403538_B, "Rotonde Het Teken",
-            null,
-            "410;600;601");
-
-        final int W_66_Ring_Zuid_11369123_A = 11369123;
-
-        for (int n = 67; n >= 67; n--) {returnValueNull =segment134.addPTWayMember(n); assertNull(n + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
-        RouteSegmentToExtract segment135 = segment134.addPTWayMember(66);
-        extractAndAssertValues(66, segment134, segment135, cloneOfBus600RouteRelation,
-            W_67_Ring_Zuid_79340950_A, W_68_Rotonde_Het_Teken_41403538_B,
-            W_66_Ring_Zuid_11369123_A, "Ring Zuid",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        final int W_65__159949154_A = 159949154;
-
-        final int W_64__332258104_B = 332258104;
-        final int W_63__78852604_A = 78852604;
-
-        RouteSegmentToExtract segment136 = segment135.addPTWayMember(65);
-        extractAndAssertValues(65, segment135, segment136, cloneOfBus600RouteRelation,
-            W_66_Ring_Zuid_11369123_A, W_66_Ring_Zuid_11369123_A,
-            W_65__159949154_A, null,
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        RouteSegmentToExtract segment137 = segment136.addPTWayMember(64);
-        extractAndAssertValues(64, segment136, segment137, cloneOfBus600RouteRelation,
-            W_65__159949154_A, W_65__159949154_A,
-            W_64__332258104_B, null,
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        final int W_62__14508735_A = 14508735;
-
-        for (int n = 63; n >= 63; n--) {returnValueNull =segment137.addPTWayMember(n); assertNull(n + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
-        RouteSegmentToExtract segment138 = segment137.addPTWayMember(62);
-        extractAndAssertValues(62, segment137, segment138, cloneOfBus600RouteRelation,
-            W_63__78852604_A, W_64__332258104_B,
-            W_62__14508735_A, null,
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        final int W_61__318878531_B = 318878531;
-        final int W_60__14506241_A = 14506241;
-
-        RouteSegmentToExtract segment139 = segment138.addPTWayMember(61);
-        extractAndAssertValues(61, segment138, segment139, cloneOfBus600RouteRelation,
-            W_62__14508735_A, W_62__14508735_A,
-            W_61__318878531_B, null,
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600");
-
-        final int W_59_Ring_Zuid_109267436_A = 109267436;
-
-        for (int n = 60; n >= 60; n--) {returnValueNull =segment139.addPTWayMember(n); assertNull(n + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
-        RouteSegmentToExtract segment142 = segment139.addPTWayMember(59);
-        extractAndAssertValues(59, segment139, segment142, cloneOfBus600RouteRelation,
-            W_60__14506241_A, W_61__318878531_B,
-            W_59_Ring_Zuid_109267436_A, "Ring Zuid",
-            null,
-            "3;317;395;410;600");
-
-        final int W_58_Ring_Zuid_14508739_A = 14508739;
-
-        RouteSegmentToExtract segment143 = segment142.addPTWayMember(58);
-        extractAndAssertValues(58, segment142, segment143, cloneOfBus600RouteRelation,
-            W_59_Ring_Zuid_109267436_A, W_59_Ring_Zuid_109267436_A,
-            W_58_Ring_Zuid_14508739_A, "Ring Zuid",
-            null,
-            "3;317;395;410;600;601");
-
-        final int W_57_Ring_Zuid_14508740_A = 14508740;
-
-        RouteSegmentToExtract segment144 = segment143.addPTWayMember(57);
-        extractAndAssertValues(57, segment143, segment144, cloneOfBus600RouteRelation,
-            W_58_Ring_Zuid_14508739_A, W_58_Ring_Zuid_14508739_A,
-            W_57_Ring_Zuid_14508740_A, "Ring Zuid",
-            null,
-            "3;317;334;335;395;410;600;601");
-
-        final int W_56_Ring_Zuid_502328838_D = 502328838;
-        final int W_53_Rotonde_Het_Teken_78568660_A = 78568660;
-
-        RouteSegmentToExtract segment145 = segment144.addPTWayMember(56);
-        extractAndAssertValues(56, segment144, segment145, cloneOfBus600RouteRelation,
-            W_57_Ring_Zuid_14508740_A, W_57_Ring_Zuid_14508740_A,
-            W_56_Ring_Zuid_502328838_D, "Ring Zuid",
-            null,
-            "3;317;334;335;380;395;410;600;601");
-
-        final int W_52_Rotonde_Het_Teken_78873921_A = 78873921;
-
-        for (int n = 55; n >= 53; n--) {returnValueNull =segment145.addPTWayMember(n); assertNull(n + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
-        RouteSegmentToExtract segment146 = segment145.addPTWayMember(52);
-        extractAndAssertValues(52, segment145, segment146, cloneOfBus600RouteRelation,
-            W_53_Rotonde_Het_Teken_78568660_A, W_56_Ring_Zuid_502328838_D,
-            W_52_Rotonde_Het_Teken_78873921_A, "Rotonde Het Teken",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;600;601");
-
-        final int W_51_Rotonde_Het_Teken_3752557_A = 3752557;
-
-        RouteSegmentToExtract segment148 = segment146.addPTWayMember(51);
-        extractAndAssertValues(51, segment146, segment148, cloneOfBus600RouteRelation,
-            W_52_Rotonde_Het_Teken_78873921_A, W_52_Rotonde_Het_Teken_78873921_A,
-            W_51_Rotonde_Het_Teken_3752557_A, "Rotonde Het Teken",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;600;601");
-
-        final int W_50_Rotonde_Het_Teken_249333188_A = 249333188;
-
-        RouteSegmentToExtract segment149 = segment148.addPTWayMember(50);
-        extractAndAssertValues(50, segment148, segment149, cloneOfBus600RouteRelation,
-            W_51_Rotonde_Het_Teken_3752557_A, W_51_Rotonde_Het_Teken_3752557_A,
-            W_50_Rotonde_Het_Teken_249333188_A, "Rotonde Het Teken",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;600;601");
-
-        final int W_49_Rotonde_Het_Teken_249333187_A = 249333187;
-
-        RouteSegmentToExtract segment150 = segment149.addPTWayMember(49);
-        extractAndAssertValues(49, segment149, segment150, cloneOfBus600RouteRelation,
-            W_50_Rotonde_Het_Teken_249333188_A, W_50_Rotonde_Het_Teken_249333188_A,
-            W_49_Rotonde_Het_Teken_249333187_A, "Rotonde Het Teken",
-            null,
-            "3;410;600;601");
-
-        final int W_48_Herestraat_13067134_D = 13067134;
-        final int W_45_Herestraat_813970228_A = 813970228;
-
-        RouteSegmentToExtract segment151 = segment150.addPTWayMember(48);
-        extractAndAssertValues(48, segment150, segment151, cloneOfBus600RouteRelation,
-            W_49_Rotonde_Het_Teken_249333187_A, W_49_Rotonde_Het_Teken_249333187_A,
-            W_48_Herestraat_13067134_D, "Herestraat",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        final int W_44_Herestraat_270181177_A = 270181177;
-
-        for (int n = 47; n >= 45; n--) {returnValueNull =segment151.addPTWayMember(n); assertNull(n + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
-        RouteSegmentToExtract segment152 = segment151.addPTWayMember(44);
-        extractAndAssertValues(44, segment151, segment152, cloneOfBus600RouteRelation,
-            W_45_Herestraat_813970228_A, W_48_Herestraat_13067134_D,
-            W_44_Herestraat_270181177_A, "Herestraat",
-            null,
-            "410;600;601");
-
-        final int W_43_Rennes_Singel_78568454_B = 78568454;
-        final int W_42_Rennes_Singel_225605633_A = 225605633;
-
-        RouteSegmentToExtract segment153 = segment152.addPTWayMember(43);
-        extractAndAssertValues(43, segment152, segment153, cloneOfBus600RouteRelation,
-            W_44_Herestraat_270181177_A, W_44_Herestraat_270181177_A,
-            W_43_Rennes_Singel_78568454_B, "Rennes-Singel",
-            null,
-            "410;600");
-
-        final int W_41_Rennes_Singel_8131123_D = 8131123;
-        final int W_38_Den_Boschsingel_23837543_A = 23837543;
-
-        for (int n = 42; n >= 42; n--) {returnValueNull =segment153.addPTWayMember(n); assertNull(n + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
-        RouteSegmentToExtract segment154 = segment153.addPTWayMember(41);
-        extractAndAssertValues(41, segment153, segment154, cloneOfBus600RouteRelation,
-            W_42_Rennes_Singel_225605633_A, W_43_Rennes_Singel_78568454_B,
-            W_41_Rennes_Singel_8131123_D, "Rennes-Singel",
-            null,
-            "178;318;410;600");
-
-        final int W_37_Den_Boschsingel_146171867_D = 146171867;
-        final int W_34_Lüdenscheidsingel_85048201_A = 85048201;
-
-        for (int n = 40; n >= 38; n--) {returnValueNull =segment154.addPTWayMember(n); assertNull(n + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
-        RouteSegmentToExtract segment155 = segment154.addPTWayMember(37);
-        extractAndAssertValues(37, segment154, segment155, cloneOfBus600RouteRelation,
-            W_38_Den_Boschsingel_23837543_A, W_41_Rennes_Singel_8131123_D,
-            W_37_Den_Boschsingel_146171867_D, "Den Boschsingel",
-            null,
-            "318;410;600");
-
-        final int W_33_Lüdenscheidsingel_12891213_D = 12891213;
-        final int W_30_Joanna_Maria_Artoisplein_61540098_A = 61540098;
-
-        for (int n = 36; n >= 34; n--) {returnValueNull =segment155.addPTWayMember(n); assertNull(n + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
-        RouteSegmentToExtract segment156 = segment155.addPTWayMember(33);
-        extractAndAssertValues(33, segment155, segment156, cloneOfBus600RouteRelation,
-            W_34_Lüdenscheidsingel_85048201_A, W_37_Den_Boschsingel_146171867_D,
-            W_33_Lüdenscheidsingel_12891213_D, "Lüdenscheidsingel",
-            null,
-            "318;410;600;651;658");
-
-        final int W_29_Joanna_Maria_Artoisplein_254801390_B = 254801390;
-        final int W_28_Joanna_Maria_Artoisplein_61540068_A = 61540068;
-
-        for (int n = 32; n >= 30; n--) {returnValueNull =segment156.addPTWayMember(n); assertNull(n + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
-        RouteSegmentToExtract segment157 = segment156.addPTWayMember(29);
-        extractAndAssertValues(29, segment156, segment157, cloneOfBus600RouteRelation,
-            W_30_Joanna_Maria_Artoisplein_61540098_A, W_33_Lüdenscheidsingel_12891213_D,
-            W_29_Joanna_Maria_Artoisplein_254801390_B, "Joanna-Maria Artoisplein",
-            null,
-            "178;305;318;410;600;651;652;658");
-
-        final int W_27_Vuurkruisenlaan_23691160_C = 23691160;
-        final int W_25_Diestsepoort_8109264_A = 8109264;
-
-        for (int n = 28; n >= 28; n--) {returnValueNull =segment157.addPTWayMember(n); assertNull(n + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
-        RouteSegmentToExtract segment158 = segment157.addPTWayMember(27);
-        extractAndAssertValues(27, segment157, segment158, cloneOfBus600RouteRelation,
-            W_28_Joanna_Maria_Artoisplein_61540068_A, W_29_Joanna_Maria_Artoisplein_254801390_B,
-            W_27_Vuurkruisenlaan_23691160_C, "Vuurkruisenlaan",
-            null,
-            "178;305;318;333;334;335;410;513;600;630;651;652;658");
-
-        final int W_24_Diestsepoort_61556877_D = 61556877;
-        final int W_21_Diestsepoort_584356745_A = 584356745;
-
-        for (int n = 26; n >= 25; n--) {returnValueNull =segment158.addPTWayMember(n); assertNull(n + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
-        RouteSegmentToExtract segment159 = segment158.addPTWayMember(24);
-        extractAndAssertValues(24, segment158, segment159, cloneOfBus600RouteRelation,
-            W_25_Diestsepoort_8109264_A, W_27_Vuurkruisenlaan_23691160_C,
-            W_24_Diestsepoort_61556877_D, "Diestsepoort",
-            null,
-            "305;333;334;335;513;600;630;651;652;658");
-
-        final int W_20_Diestsepoort_198559166_E = 198559166;
-        final int W_16_Diestsepoort_451873774_A = 451873774;
-
-        for (int n = 23; n >= 21; n--) {returnValueNull =segment159.addPTWayMember(n); assertNull(n + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
-        RouteSegmentToExtract segment160 = segment159.addPTWayMember(20);
-        extractAndAssertValues(20, segment159, segment160, cloneOfBus600RouteRelation,
-            W_21_Diestsepoort_584356745_A, W_24_Diestsepoort_61556877_D,
-            W_20_Diestsepoort_198559166_E, "Diestsepoort",
-            null,
-            "2;3;179;305;306;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658");
-
-        final int W_15_Diestsepoort_116797180_B = 116797180;
-        final int W_14_Diestsepoort_23691157_A = 23691157;
-
-        for (int n = 19; n >= 16; n--) {returnValueNull =segment160.addPTWayMember(n); assertNull(n + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
-        RouteSegmentToExtract segment161 = segment160.addPTWayMember(15);
-        extractAndAssertValues(15, segment160, segment161, cloneOfBus600RouteRelation,
-            W_16_Diestsepoort_451873774_A, W_20_Diestsepoort_198559166_E,
-            W_15_Diestsepoort_116797180_B, "Diestsepoort",
-            null,
-            "2;3;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658");
-
-        final int W_13_p12_to_Diestsepoort_78815527_B = 78815527;
-        final int W_12_perron_12_377918658_A = 377918658;
-
-        for (int n = 15; n >= 14; n--) {returnValueNull =segment161.addPTWayMember(n); assertNull(n + " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way" + cloneOfBus600RouteRelation.getMember(n).getMember().getId() + "\n", returnValueNull);}
-        RouteSegmentToExtract segment162 = segment161.addPTWayMember(13);
-        extractAndAssertValues(13, segment161, segment162, cloneOfBus600RouteRelation,
-            W_14_Diestsepoort_23691157_A, W_15_Diestsepoort_116797180_B,
-            W_13_p12_to_Diestsepoort_78815527_B, null,
-            null,
-            "4;5;6;7;8;9;179;306 (student);334;335;337;380;600;616;651;652;658");
-
-        RouteSegmentToExtract segment163 = segment162.addPTWayMember(12);
-        extractAndAssertValues(12, segment162, segment163, cloneOfBus600RouteRelation,
-            W_12_perron_12_377918658_A, W_13_p12_to_Diestsepoort_78815527_B,
-            0, null,
-            null,
-            "395;600;651;652");
+        expectedValues = Arrays.asList(
+            new Val( 169, 608715622, 608715622, 608715622, "Engels Plein"),
+            new Val( 168, 338057819, 608715622, 338057819, "Engels Plein"),
+            new Val( 167, 305316104, 608715622, 305316104, "Engels Plein"),
+            new Val( 166,   3869812, 608715622,   3869812, "Engels Plein"),
+            new Val( 165,  25928482, 608715622,  25928482, "Wolvengang"),
+            new Val( 164, 659297690, 608715622, 659297690, "Wolvengang"),
+            new Val( 163, 330300723, 608715622, 330300723, "Achter de latten"),
+            new Val( 162,   3869822, 608715622,   3869822, "Burchtstraat"),
+            new Val( 161, 330300725, 608715622, 330300725, "Havenkant"),
+            new Val( 160, 270181176, 608715622, 270181176, "Havenkant"),
+            new Val( 159, 406205781, 608715622, 406205781, "Havenkant"),
+            new Val( 158, 843534478, 608715622, 843534478, "Havenkant"),
+            new Val( 157, 314635787, 608715622, 314635787, "Havenkant"),
+            new Val( 156, 510790348, 608715622, 510790348, "Havenkant"),
+            new Val( 155,  29283599, 608715622,  29283599, "Havenkant"),
+
+            new Val( 154,  29283599, 608715622, 304241968, "Havenkant",
+                "Havenkant - Engels Plein (600)",
+                "600"),
+
+            new Val( 153, 304241967, 304241968, 304241967, "Aarschotsesteenweg"),
+
+            new Val( 152, 304241967, 304241968, 340265961, "Redersstraat",
+                "Aarschotsesteenweg - Havenkant (334;335;513;600;630)",
+                "334;335;513;600;630"),
+
+            new Val( 151, 318825613, 340265961, 318825613, "Redersstraat"),
+
+            new Val( 150, 318825613, 340265961, 340265962, "Redersstraat",
+                "Redersstraat (600)",
+                "600"),
+
+
+            new Val( 149, 340265962, 340265962, 254801390, "Joanna-Maria Artoisplein",
+                "Redersstraat (333;334;335;513;600;630)",
+                "333;334;335;513;600;630"),
+
+            new Val( 148,  61540068, 254801390,  61540068, "Joanna-Maria Artoisplein"),
+
+            new Val( 147,  61540068, 254801390,  23691160, "Vuurkruisenlaan",
+                "Joanna-Maria Artoisplein (178;305;318;333;334;335;410;513;600;630;651;652;658)",
+                "178;305;318;333;334;335;410;513;600;630;651;652;658"),
+
+            new Val( 146,   4061640,  23691160,   4061640, "Vuurkruisenlaan"),
+            new Val( 145,   8109264,  23691160,   8109264, "Diestsepoort"),
+
+            new Val( 144,   8109264,  23691160,  61556877, "Diestsepoort",
+                "Diestsepoort - Vuurkruisenlaan (305;333;334;335;513;600;630;651;652;658)",
+                "305;333;334;335;513;600;630;651;652;658"),
+
+            new Val( 143, 663770966,  61556877, 663770966, "Diestsepoort"),
+            new Val( 142, 584356749,  61556877, 584356749, "Diestsepoort"),
+            new Val( 141, 584356745,  61556877, 584356745, "Diestsepoort"),
+
+            new Val( 140, 584356745,  61556877, 198559166, "Diestsepoort",
+                "Diestsepoort (2;3;179;305;306;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658)",
+                "2;3;179;305;306;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658"),
+
+            new Val( 139, 584356751, 198559166, 584356751, "Diestsepoort"),
+            new Val( 138, 451873773, 198559166, 451873773, "Diestsepoort"),
+            new Val( 137, 584356742, 198559166, 584356742, "Diestsepoort"),
+            new Val( 136, 451873774, 198559166, 451873774, "Diestsepoort"),
+
+            new Val( 135, 451873774, 198559166,  76867049, null,
+                "Diestsepoort (2;3;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658)",
+                "2;3;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658"),
+
+            new Val( 134,  79264890,  76867049,  79264890, null),
+            new Val( 133,  79596965,  76867049,  79596965, null),
+
+            new Val( 132,  79596965,  76867049,  79596974, null,
+                "(2;3;310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630)",
+                "2;3;310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630"),
+
+            new Val( 131,  79596982,  79596974,  79596982, null),
+
+            new Val( 130,  79596982,  79596974,  79596987, null,
+                "perron 11 & 12 (3;333;334;335;433;600;630)",
+                "3;333;334;335;433;600;630"),
+
+            new Val( 129, 377918658,  79596987, 377918658, null),
+            new Val( 128,  79596980,  79596987,  79596980, null),
+
+            new Val( 127,  79596980,  79596987,  79193579, "Tiensevest",
+                "perron 11 & 12 (3;333;334;335;513;600;630)",
+                "3;333;334;335;513;600;630"),
+
+
+            new Val( 126,  79193579,  79193579, 258936980, "Tiensevest",
+                "Tiensevest (3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;380;513;600;601;616;630;658)",
+                "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;380;513;600;601;616;630;658"),
+
+
+            new Val( 125, 258936980, 258936980,  79193580, "Tiensevest",
+                "Tiensevest (3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630;658)",
+                "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630;658"),
+
+
+            new Val( 124,  79193580,  79193580,  79193581, "Tiensevest",
+                "Tiensevest (3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630)",
+                "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630"),
+
+
+            new Val( 123,  79193581,  79193581,  78815505, "Tiensevest",
+                "Tiensevest (2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630)",
+                "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630"),
+
+
+            new Val( 122,  78815505,  78815505,  84696751, "Tiensevest",
+                "Tiensevest (2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630)",
+                "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630"),
+
+            new Val( 121,  79265237,  84696751,  79265237, "Tiensevest"),
+
+            new Val( 120,  79265237,  84696751,  89574079, "Tiensevest",
+                "Tiensevest (2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;527;600;616;630)",
+                "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;527;600;616;630"),
+
+            new Val( 119,  81522744,  89574079,  81522744, "Tiensevest"),
+
+            new Val( 118,  81522744,  89574079,  19793223, "Tiensevest",
+                "Tiensevest (1;2;3;4;5;6;7;8;9;18;179;284;285;306 (student);315;316;317;333;334;335;337;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539;600;616;630)",
+                "1;2;3;4;5;6;7;8;9;18;179;284;285;306 (student);315;316;317;333;334;335;337;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539;600;616;630"),
+
+            new Val( 117, 185988814,  19793223, 185988814, "Tiensevest"),
+
+            new Val( 116, 185988814,  19793223, 185988816, "Tiensevest",
+                "Tiensevest (1;4;5;6;7;8;9;18;179;306 (student);337;380;600;616;630)",
+                "1;4;5;6;7;8;9;18;179;306 (student);337;380;600;616;630"),
+
+            new Val( 115,  15083398, 185988816,  15083398, "Tiensevest"),
+
+            new Val( 114,  15083398, 185988816,   8154434, "Tiensevest",
+                "Tiensevest (7;8;9;18;179;306 (student);337;380;600;616;630)",
+                "7;8;9;18;179;306 (student);337;380;600;616;630"),
+
+            new Val( 113,   4003927,   8154434,   4003927, "Tiensevest"),
+            new Val( 112, 521193609,   8154434, 521193609, "Tiensevest"),
+            new Val( 111, 586268892,   8154434, 586268892, "Tiensevest"),
+            new Val( 110, 521193611,   8154434, 521193611, "Tiensevest"),
+
+            new Val( 109, 521193611,   8154434,   4003928, "Tiensepoort",
+                "Tiensevest (7;8;9;18;178;179;306 (student);337;380;600;616;630)",
+                "7;8;9;18;178;179;306 (student);337;380;600;616;630"),
+
+            new Val( 108,   8130905,   4003928,   8130905, "Geldenaaksevest"),
+            new Val( 107,  24905256,   4003928,  24905256, "Geldenaaksevest"),
+            new Val( 106,  24905255,   4003928,  24905255, "Geldenaaksevest"),
+            new Val( 105, 491728135,   4003928, 491728135, "Geldenaaksevest"),
+            new Val( 104,  24905254,   4003928,  24905254, "Geldenaaksevest"),
+            new Val( 103, 199381120,   4003928, 199381120, "Geldenaaksevest"),
+
+            new Val( 102, 199381120,   4003928,   3991775, "Geldenaaksevest",
+                "Geldenaaksevest - Tiensepoort (18;178;179;306 (student);337;600;616;630)",
+                "18;178;179;306 (student);337;600;616;630"),
+
+            new Val( 101, 120086001,   3991775, 120086001, "Erasme Ruelensvest"),
+            new Val( 100, 608715575,   3991775, 608715575, "Erasme Ruelensvest"),
+            new Val( 99, 608715579,   3991775, 608715579, "Erasme Ruelensvest"),
+
+            new Val( 98, 608715579,   3991775,   3677822, "Erasme Ruelensvest",
+                "Erasme Ruelensvest - Geldenaaksevest (18;178;179;306 (student);337;600;616)",
+                "18;178;179;306 (student);337;600;616"),
+
+            new Val( 97, 120086003,   3677822, 120086003, "Tervuursevest"),
+
+            new Val( 96, 120086003,   3677822,  90168774, "Tervuursevest",
+                "Tervuursevest - Erasme Ruelensvest (178;179;306 (student);600)",
+                "178;179;306 (student);600"),
+
+            new Val( 95,   3677329,  90168774,   3677329, "Tervuursevest"),
+            new Val( 94, 608715614,  90168774, 608715614, "Tervuursevest"),
+            new Val( 93, 608715615,  90168774, 608715615, "Tervuursevest"),
+            new Val( 92,  85044922,  90168774,  85044922, "Tervuursevest"),
+
+            new Val( 91,  85044922,  90168774,  16771611, "Tervuursevest",
+                "Tervuursevest (178;179;306 (student);520;524;525;537;586;600)",
+                "178;179;306 (student);520;524;525;537;586;600"),
+
+
+            new Val( 90,  16771611,  16771611,  13246158, "Tervuursevest",
+                "Tervuursevest (178;520;524;525;537;586;600)",
+                "178;520;524;525;537;586;600"),
+
+
+            new Val( 89,  13246158,  13246158, 260405216, "Tervuursevest",
+                "Tervuursevest (7;8;9;178;520;524;525;527;537;586;600)",
+                "7;8;9;178;520;524;525;527;537;586;600"),
+
+            new Val( 88,  16771609, 260405216,  16771609, "Tervuursevest"),
+
+            new Val( 87,  16771609, 260405216, 608715518, "Tervuursevest",
+                "Tervuursevest (7;8;9;178;527;600)",
+                "7;8;9;178;527;600"),
+
+            new Val( 86, 608715519, 608715518, 608715519, "Tervuursevest"),
+            new Val( 85,   3677336, 608715518,   3677336, "Tervuursevest"),
+            new Val( 84,  15051052, 608715518,  15051052, "Tervuursevest"),
+            new Val( 83, 814322832, 608715518, 814322832, "Tervuursevest"),
+            new Val( 82,  80194318, 608715518,  80194318, "Tervuursevest"),
+            new Val( 81, 813979466, 608715518, 813979466, "Tervuursevest"),
+            new Val( 80, 521193382, 608715518, 521193382, "Tervuursevest"),
+            new Val( 79, 521193383, 608715518, 521193383, "Tervuursevest"),
+            new Val( 78,   3677945, 608715518,   3677945, "Tervuursevest"),
+
+            new Val( 77,   3677945, 608715518, 192559627, "Rennes-Singel",
+                "Tervuursevest (178;600)",
+                "178;600"),
+
+            new Val( 76, 813979469, 192559627, 813979469, "Rennes-Singel"),
+            new Val( 75, 192559626, 192559627, 192559626, "Rennes-Singel"),
+            new Val( 74, 813979473, 192559627, 813979473, "Rennes-Singel"),
+            new Val( 73,  28982660, 192559627,  28982660, "Rennes-Singel"),
+
+            new Val( 72,  28982660, 192559627,  78568455, "Herestraat",
+                "Rennes-Singel (178;318;600)",
+                "178;318;600"),
+
+
+            new Val( 71,  78568455,  78568455, 813970227, "Herestraat",
+                "Herestraat (600)",
+                "600"),
+
+            new Val( 70,  41403544, 813970227,  41403544, "Herestraat"),
+            new Val( 69,   8079995, 813970227,   8079995, "Herestraat"),
+
+            new Val( 68,   8079995, 813970227,  41403538, "Rotonde Het Teken",
+                "Herestraat (410;600;601)",
+                "410;600;601"),
+
+            new Val( 67,  79340950,  41403538,  79340950, "Ring Zuid"),
+
+            new Val( 66,  79340950,  41403538,  11369123, "Ring Zuid",
+                "Ring Zuid - Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+
+            new Val( 65,  11369123,  11369123, 159949154, null,
+                "Ring Zuid (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+
+            new Val( 64, 159949154, 159949154, 332258104, null,
+                "(3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+            new Val( 63,  78852604, 332258104,  78852604, null),
+
+            new Val( 62,  78852604, 332258104,  14508735, null,
+                "(3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+
+            new Val( 61,  14508735,  14508735, 318878531, null,
+                "(3;317;333;334;335;370;371;373;374;380;395;410;513;600)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600"),
+
+            new Val( 60,  14506241, 318878531,  14506241, null),
+
+            new Val( 59,  14506241, 318878531, 109267436, "Ring Zuid",
+                "(3;317;395;410;600)",
+                "3;317;395;410;600"),
+
+
+            new Val( 58, 109267436, 109267436,  14508739, "Ring Zuid",
+                "Ring Zuid (3;317;395;410;600;601)",
+                "3;317;395;410;600;601"),
+
+
+            new Val( 57,  14508739,  14508739,  14508740, "Ring Zuid",
+                "Ring Zuid (3;317;334;335;395;410;600;601)",
+                "3;317;334;335;395;410;600;601"),
+
+
+            new Val( 56,  14508740,  14508740, 502328838, "Ring Zuid",
+                "Ring Zuid (3;317;334;335;380;395;410;600;601)",
+                "3;317;334;335;380;395;410;600;601"),
+
+            new Val( 55, 502328837, 502328838, 502328837, "Ring Zuid"),
+            new Val( 54,   8080023, 502328838,   8080023, "Ring Zuid"),
+            new Val( 53,  78568660, 502328838,  78568660, "Rotonde Het Teken"),
+
+            new Val( 52,  78568660, 502328838,  78873921, "Rotonde Het Teken",
+                "Rotonde Het Teken - Ring Zuid (3;317;333;334;335;370;371;373;374;380;395;410;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;600;601"),
+
+
+            new Val( 51,  78873921,  78873921,   3752557, "Rotonde Het Teken",
+                "Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;600;601"),
+
+
+            new Val( 50,   3752557,   3752557, 249333188, "Rotonde Het Teken",
+                "Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;600;601"),
+
+
+            new Val( 49, 249333188, 249333188, 249333187, "Rotonde Het Teken",
+                "Rotonde Het Teken (3;410;600;601)",
+                "3;410;600;601"),
+
+
+            new Val( 48, 249333187, 249333187,  13067134, "Herestraat",
+                "Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+            new Val( 47, 813970232,  13067134, 813970232, "Herestraat"),
+            new Val( 46, 813970226,  13067134, 813970226, "Herestraat"),
+            new Val( 45, 813970228,  13067134, 813970228, "Herestraat"),
+
+            new Val( 44, 813970228,  13067134, 270181177, "Herestraat",
+                "Herestraat (410;600;601)",
+                "410;600;601"),
+
+
+            new Val( 43, 270181177, 270181177,  78568454, "Rennes-Singel",
+                "Herestraat (410;600)",
+                "410;600"),
+
+            new Val( 42, 225605633,  78568454, 225605633, "Rennes-Singel"),
+
+            new Val( 41, 225605633,  78568454,   8131123, "Rennes-Singel",
+                "Rennes-Singel (178;318;410;600)",
+                "178;318;410;600"),
+
+            new Val( 40,   3680457,   8131123,   3680457, "Rennes-Singel"),
+            new Val( 39, 192559625,   8131123, 192559625, "Den Boschsingel"),
+            new Val( 38,  23837543,   8131123,  23837543, "Den Boschsingel"),
+
+            new Val( 37,  23837543,   8131123, 146171867, "Den Boschsingel",
+                "Den Boschsingel - Rennes-Singel (318;410;600)",
+                "318;410;600"),
+
+            new Val( 36, 125835586, 146171867, 125835586, "Den Boschsingel"),
+            new Val( 35,   3877104, 146171867,   3877104, null),
+            new Val( 34,  85048201, 146171867,  85048201, "Lüdenscheidsingel"),
+
+            new Val( 33,  85048201, 146171867,  12891213, "Lüdenscheidsingel",
+                "Lüdenscheidsingel - Den Boschsingel (318;410;600;651;658)",
+                "318;410;600;651;658"),
+
+            new Val( 32,  44932919,  12891213,  44932919, "Lüdenscheidsingel"),
+            new Val( 31,   8131040,  12891213,   8131040, "Lüdenscheidsingel"),
+            new Val( 30,  61540098,  12891213,  61540098, "Joanna-Maria Artoisplein"),
+
+            new Val( 29,  61540098,  12891213, 254801390, "Joanna-Maria Artoisplein",
+                "Joanna-Maria Artoisplein - Lüdenscheidsingel (178;305;318;410;600;651;652;658)",
+                "178;305;318;410;600;651;652;658"),
+
+            new Val( 28,  61540068, 254801390,  61540068, "Joanna-Maria Artoisplein"),
+
+            new Val( 27,  61540068, 254801390,  23691160, "Vuurkruisenlaan",
+                "Joanna-Maria Artoisplein (178;305;318;333;334;335;410;513;600;630;651;652;658)",
+                "178;305;318;333;334;335;410;513;600;630;651;652;658"),
+
+            new Val( 26,   4061640,  23691160,   4061640, "Vuurkruisenlaan"),
+            new Val( 25,   8109264,  23691160,   8109264, "Diestsepoort"),
+
+            new Val( 24,   8109264,  23691160,  61556877, "Diestsepoort",
+                "Diestsepoort - Vuurkruisenlaan (305;333;334;335;513;600;630;651;652;658)",
+                "305;333;334;335;513;600;630;651;652;658"),
+
+            new Val( 23, 663770966,  61556877, 663770966, "Diestsepoort"),
+            new Val( 22, 584356749,  61556877, 584356749, "Diestsepoort"),
+            new Val( 21, 584356745,  61556877, 584356745, "Diestsepoort"),
+
+            new Val( 20, 584356745,  61556877, 198559166, "Diestsepoort",
+                "Diestsepoort (2;3;179;305;306;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658)",
+                "2;3;179;305;306;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658"),
+
+            new Val( 19, 584356751, 198559166, 584356751, "Diestsepoort"),
+            new Val( 18, 451873773, 198559166, 451873773, "Diestsepoort"),
+            new Val( 17, 584356742, 198559166, 584356742, "Diestsepoort"),
+            new Val( 16, 451873774, 198559166, 451873774, "Diestsepoort"),
+
+            new Val( 15, 451873774, 198559166, 116797180, "Diestsepoort",
+                "Diestsepoort (2;3;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658)",
+                "2;3;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658"),
+
+            new Val( 14,  23691157, 116797180,  23691157, "Diestsepoort"),
+
+            new Val( 13,  23691157, 116797180,  78815527, null,
+                "Diestsepoort (4;5;6;7;8;9;179;306 (student);334;335;337;380;600;616;651;652;658)",
+                "4;5;6;7;8;9;179;306 (student);334;335;337;380;600;616;651;652;658"),
+
+            new Val( 12, 377918658,  78815527, 377918658, null),
+
+            new Val( 11, 377918658,  78815527, 377918658, null,
+                "perron 11 & 12 (395;600;651;652)",
+                "395;600;651;652")
+        );
+        previousSegment = new RouteSegmentToExtract(cloneOfBus600RouteRelation);
+        previousSegment.setActiveDataSet(ds);
+        for (Val v: expectedValues) {
+            segment = previousSegment.addPTWayMember(v.index);
+            if (segment != null) {
+                extractAndAssertValues(v.index, previousSegment, segment, cloneOfBus600RouteRelation, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,
+                    null, v.expectedRouteRef);
+                previousSegment = segment;
+            }
+        }
+
+        System.out.print("\n");
 
         // ***********************************************************
         // Line 3 has the particularity that there are 2 variants
@@ -1349,69 +1043,324 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         assertEquals("", segment201.getWayIdsSignature());
         assertEquals(Collections.emptyList(), segment201.getWayMembers());
 
-        final int W_194_Dorpskring_27684829_D = 27684829;
-        final int W_191_Dorpskring_112917099_A = 112917099;
+        expectedValues = Arrays.asList(
+            new Val( 194,  27684829,  27684829,  27684829, "Dorpskring"),
+            new Val( 193, 349396917,  27684829, 349396917, "Dorpskring"),
+            new Val( 192, 349396921,  27684829, 349396921, "Dorpskring"),
+            new Val( 191, 112917099,  27684829, 112917099, "Dorpskring"),
 
-        final int W_190_Dorpskring_125835538_A = 125835538;
+            new Val( 190, 112917099,  27684829, 125835538, "Dorpskring",
+                "Dorpskring (3)",
+                "3"),
 
-        final int W_189_Bollenberg_81197019_Z = 81197019;
-        final int W_179_Kapelstraat_16377612_A = 16377612;
 
-        final int W_178_Lostraat_40189518_Z = 40189518;
-        final int W_130_Oude_Diestsesteenweg_10230617_A = 10230617;
+            new Val( 189, 125835538, 125835538,  81197019, "Bollenberg",
+                "Dorpskring (3;373;485)",
+                "3;373;485"),
 
-        final int W_129_Diestsesteenweg_23707243_A = 23707243;
+            new Val( 188, 112917100,  81197019, 112917100, "Bollenberg"),
+            new Val( 187, 694551612,  81197019, 694551612, "Bollenberg"),
+            new Val( 186, 645048305,  81197019, 645048305, "Bollenberg"),
+            new Val( 185,  27688813,  81197019,  27688813, "Bollenberg"),
+            new Val( 184, 232474772,  81197019, 232474772, "Lubbeekstraat"),
+            new Val( 183,  10658839,  81197019,  10658839, "Lubbeekstraat"),
+            new Val( 182, 319269331,  81197019, 319269331, "Kapelstraat"),
+            new Val( 181, 636950670,  81197019, 636950670, "Kapelstraat"),
+            new Val( 180,  16377722,  81197019,  16377722, "Kapelstraat"),
+            new Val( 179,  16377612,  81197019,  16377612, "Kapelstraat"),
 
-        final int W_128_Diestsesteenweg_23707244_B = 23707244;
-        final int W_127_Diestsesteenweg_12715116_A = 12715116;
+            new Val( 178,  16377612,  81197019,  40189518, "Lostraat",
+                "Kapelstraat - Bollenberg (3)",
+                "3"),
 
-        final int W_126_Diestsepoort_61556877_D = 61556877;
+            new Val( 177, 351196789,  40189518, 351196789, "Lostraat"),
+            new Val( 176, 350992067,  40189518, 350992067, "Lostraat"),
+            new Val( 175, 636491595,  40189518, 636491595, "Lostraat"),
+            new Val( 174, 636491594,  40189518, 636491594, "Lostraat"),
+            new Val( 173, 124913579,  40189518, 124913579, "Lostraat"),
+            new Val( 172,  10672044,  40189518,  10672044, "Lostraat"),
+            new Val( 171, 633919766,  40189518, 633919766, "Lostraat"),
+            new Val( 170,  10672080,  40189518,  10672080, "Heidebergstraat"),
+            new Val( 169,  10672083,  40189518,  10672083, "Heidebergstraat"),
+            new Val( 168,  79801761,  40189518,  79801761, "Heidebergstraat"),
+            new Val( 167, 112917249,  40189518, 112917249, "Heidebergstraat"),
+            new Val( 166, 112917247,  40189518, 112917247, "Heidebergstraat"),
+            new Val( 165, 192706264,  40189518, 192706264, "Heidebergstraat"),
+            new Val( 164, 318216944,  40189518, 318216944, "Heidebergstraat"),
+            new Val( 163, 192706265,  40189518, 192706265, "Heidebergstraat"),
+            new Val( 162, 586861164,  40189518, 586861164, "Heidebergstraat"),
+            new Val( 161,  10672031,  40189518,  10672031, "Heidebergstraat"),
+            new Val( 160,  10672135,  40189518,  10672135, "Koetsweg"),
+            new Val( 159, 608754691,  40189518, 608754691, "Koetsweg"),
+            new Val( 158, 608754692,  40189518, 608754692, "Koetsweg"),
+            new Val( 157,  10672174,  40189518,  10672174, "Gaston Eyskenslaan"),
+            new Val( 156,  23436182,  40189518,  23436182, "Platte-Lostraat"),
+            new Val( 155, 112917234,  40189518, 112917234, "Duivenstraat"),
+            new Val( 154,  23707216,  40189518,  23707216, "Duivenstraat"),
+            new Val( 153, 608754700,  40189518, 608754700, "Lijsterlaan"),
+            new Val( 152,  10672177,  40189518,  10672177, "Lijsterlaan"),
+            new Val( 151, 112917228,  40189518, 112917228, "Prins Regentplein"),
+            new Val( 150, 112917229,  40189518, 112917229, "Prins Regentplein"),
+            new Val( 149,  10672178,  40189518,  10672178, "Prins Regentplein"),
+            new Val( 148,  10657957,  40189518,  10657957, "Prins-Regentlaan"),
+            new Val( 147,  25155107,  40189518,  25155107, "Willem Coosemansstraat"),
+            new Val( 146,  79784138,  40189518,  79784138, "Koning Albertlaan"),
+            new Val( 145,  23707241,  40189518,  23707241, "Koning Albertlaan"),
+            new Val( 144, 112917227,  40189518, 112917227, "Koning Albertlaan"),
+            new Val( 143, 101619135,  40189518, 101619135, "Koning Albertlaan"),
+            new Val( 142, 622063635,  40189518, 622063635, "Koning Albertlaan"),
+            new Val( 141, 622063636,  40189518, 622063636, "Koning Albertlaan"),
+            new Val( 140, 101619136,  40189518, 101619136, "Koning Albertlaan"),
+            new Val( 139,  16377030,  40189518,  16377030, "Martelarenlaan"),
+            new Val( 138, 485802425,  40189518, 485802425, "Spoordijk"),
+            new Val( 137,  23707242,  40189518,  23707242, "Martelarenlaan"),
+            new Val( 136, 608715582,  40189518, 608715582, "Martelarenlaan"),
+            new Val( 135, 608715584,  40189518, 608715584, "Martelarenlaan"),
+            new Val( 134, 284832275,  40189518, 284832275, "Martelarenlaan"),
+            new Val( 133, 608715586,  40189518, 608715586, "Martelarenlaan"),
+            new Val( 132, 608715590,  40189518, 608715590, "Martelarenlaan"),
+            new Val( 131,   3992546,  40189518,   3992546, "Martelarenlaan"),
+            new Val( 130,  10230617,  40189518,  10230617, "Oude Diestsesteenweg"),
 
-        for (int n = 194; n >= 191; n--) {returnValueNull =segment201.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment202 = segment201.addPTWayMember(190);
-        extractAndAssertValues(190, segment201, segment202, bus3_GHB_Lubbeek_RouteRelation,
-            W_191_Dorpskring_112917099_A, W_194_Dorpskring_27684829_D,
-            W_190_Dorpskring_125835538_A, "Dorpskring",
-            null,
-            "3");
+            new Val( 129,  10230617,  40189518,  23707243, "Diestsesteenweg",
+                "Oude Diestsesteenweg - Lostraat (3)",
+                "3"),
 
-        RouteSegmentToExtract segment203 = segment202.addPTWayMember(189);
-        extractAndAssertValues(189, segment202, segment203, bus3_GHB_Lubbeek_RouteRelation,
-            W_190_Dorpskring_125835538_A, W_190_Dorpskring_125835538_A,
-            W_189_Bollenberg_81197019_Z, "Bollenberg",
-            null,
-            "3;373;485");
 
-        for (int n = 188; n >= 179; n--) {returnValueNull =segment203.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment204 = segment203.addPTWayMember(178);
-        extractAndAssertValues(178, segment203, segment204, bus3_GHB_Lubbeek_RouteRelation,
-            W_179_Kapelstraat_16377612_A, W_189_Bollenberg_81197019_Z,
-            W_178_Lostraat_40189518_Z, "Lostraat",
-            null,
-            "3");
+            new Val( 128,  23707243,  23707243,  23707244, "Diestsesteenweg",
+                "Diestsesteenweg (3;370;371;373;374;475;485;524;525)",
+                "3;370;371;373;374;475;485;524;525"),
 
-        for (int n = 177; n >= 130; n--) {returnValueNull =segment204.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment205 = segment204.addPTWayMember(129);
-        extractAndAssertValues(129, segment204, segment205, bus3_GHB_Lubbeek_RouteRelation,
-            W_130_Oude_Diestsesteenweg_10230617_A, W_178_Lostraat_40189518_Z,
-            W_129_Diestsesteenweg_23707243_A, "Diestsesteenweg",
-            null,
-            "3");
+            new Val( 127,  12715116,  23707244,  12715116, "Diestsesteenweg"),
 
-        RouteSegmentToExtract segment206 = segment205.addPTWayMember(128);
-        extractAndAssertValues(128, segment205, segment206, bus3_GHB_Lubbeek_RouteRelation,
-            W_129_Diestsesteenweg_23707243_A, W_129_Diestsesteenweg_23707243_A,
-            W_128_Diestsesteenweg_23707244_B, "Diestsesteenweg",
-            null,
-            "3;370;371;373;374;475;485;524;525");
+            new Val( 126,  12715116,  23707244,  61556877, "Diestsepoort",
+                "Diestsesteenweg (2;3;179;306;306 (student);310;370;371;373;374;433;475;485;520;524;525)",
+                "2;3;179;306;306 (student);310;370;371;373;374;433;475;485;520;524;525"),
 
-        for (int n = 127; n >= 127; n--) {returnValueNull =segment206.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment207 = segment206.addPTWayMember(126);
-        extractAndAssertValues(126, segment206, segment207, bus3_GHB_Lubbeek_RouteRelation,
-            W_127_Diestsesteenweg_12715116_A, W_128_Diestsesteenweg_23707244_B,
-            W_126_Diestsepoort_61556877_D, "Diestsepoort",
-            null,
-            "2;3;179;306;306 (student);310;370;371;373;374;433;475;485;520;524;525");
+            new Val( 125, 663770966,  61556877, 663770966, "Diestsepoort"),
+            new Val( 124, 584356749,  61556877, 584356749, "Diestsepoort"),
+            new Val( 123, 584356745,  61556877, 584356745, "Diestsepoort"),
+
+            new Val( 122, 584356745,  61556877, 198559166, "Diestsepoort",
+                "Diestsepoort (2;3;179;305;306;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658)",
+                "2;3;179;305;306;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658"),
+
+            new Val( 121, 584356751, 198559166, 584356751, "Diestsepoort"),
+            new Val( 120, 451873773, 198559166, 451873773, "Diestsepoort"),
+            new Val( 119, 584356742, 198559166, 584356742, "Diestsepoort"),
+            new Val( 118, 451873774, 198559166, 451873774, "Diestsepoort"),
+
+            new Val( 117, 451873774, 198559166,  76867049, null,
+                "Diestsepoort (2;3;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658)",
+                "2;3;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658"),
+
+            new Val( 116,  79264890,  76867049,  79264890, null),
+            new Val( 115,  79596965,  76867049,  79596965, null),
+
+            new Val( 114,  79596965,  76867049,  71754927, null,
+                "(2;3;310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630)",
+                "2;3;310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630"),
+
+
+            new Val( 113,  71754927,  71754927,  79264897, null,
+                "(2;3;310;370;371;373;374;475;485;513;520;524;525)",
+                "2;3;310;370;371;373;374;475;485;513;520;524;525"),
+
+            new Val( 112,  79596983,  79264897,  79596983, null),
+            new Val( 111, 377918665,  79264897, 377918665, null),
+
+            new Val( 110, 377918665,  79264897,  78815513, null,
+                "perron 7 & 8 (2;3;310)",
+                "2;3;310"),
+
+            new Val( 109, 377918666,  78815513, 377918666, null),
+            new Val( 108,  79596978,  78815513,  79596978, null),
+
+            new Val( 107,  79596978,  78815513,  79193581, "Tiensevest",
+                "perron 7 & 8 (2;3)",
+                "2;3"),
+
+
+            new Val( 106,  79193581,  79193581,  78815505, "Tiensevest",
+                "Tiensevest (2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630)",
+                "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630"),
+
+
+            new Val( 105,  78815505,  78815505,  84696751, "Tiensevest",
+                "Tiensevest (2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630)",
+                "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630"),
+
+            new Val( 104,  79265237,  84696751,  79265237, "Tiensevest"),
+
+            new Val( 103,  79265237,  84696751,  89574079, "Tiensevest",
+                "Tiensevest (2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;527;600;616;630)",
+                "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;527;600;616;630"),
+
+            new Val( 102,  81522744,  89574079,  81522744, "Tiensevest"),
+
+            new Val( 101,  81522744,  89574079, 305434579, "Bondgenotenlaan",
+                "Tiensevest (1;2;3;4;5;6;7;8;9;18;179;284;285;306 (student);315;316;317;333;334;335;337;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539;600;616;630)",
+                "1;2;3;4;5;6;7;8;9;18;179;284;285;306 (student);315;316;317;333;334;335;337;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539;600;616;630"),
+
+            new Val( 100, 578662093, 305434579, 578662093, "Bondgenotenlaan"),
+            new Val( 99, 578662092, 305434579, 578662092, "Bondgenotenlaan"),
+            new Val( 98, 578662095, 305434579, 578662095, "Bondgenotenlaan"),
+            new Val( 97, 578662094, 305434579, 578662094, "Bondgenotenlaan"),
+            new Val( 96,   3991636, 305434579,   3991636, "Bondgenotenlaan"),
+            new Val( 95, 174985125, 305434579, 174985125, "Rector De Somerplein"),
+            new Val( 94, 521211977, 305434579, 521211977, "Rector De Somerplein"),
+
+            new Val( 93, 521211977, 305434579, 521211976, "Rector De Somerplein",
+                "Rector De Somerplein - Bondgenotenlaan (2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539)",
+                "2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539"),
+
+            new Val( 92,  16771741, 521211976,  16771741, "Rector De Somerplein"),
+
+            new Val( 91,  16771741, 521211976,   3991635, "Margarethaplein",
+                "Rector De Somerplein (2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539)",
+                "2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539"),
+
+            new Val( 90, 521211973,   3991635, 521211973, "Margarethaplein"),
+            new Val( 89, 608715546,   3991635, 608715546, "Margarethaplein"),
+            new Val( 88, 453538107,   3991635, 453538107, "Margarethaplein"),
+            new Val( 87,  80194313,   3991635,  80194313, "Mathieu de Layensplein"),
+            new Val( 86, 293288706,   3991635, 293288706, "Mathieu de Layensplein"),
+            new Val( 85,  10269271,   3991635,  10269271, "Dirk Boutslaan"),
+            new Val( 84, 578662072,   3991635, 578662072, "Dirk Boutslaan"),
+            new Val( 83, 608715541,   3991635, 608715541, "Dirk Boutslaan"),
+            new Val( 82, 293149632,   3991635, 293149632, "Dirk Boutslaan"),
+            new Val( 81,   3992578,   3991635,   3992578, "Dirk Boutslaan"),
+            new Val( 80, 438252643,   3991635, 438252643, "Dirk Boutslaan"),
+            new Val( 79, 284664268,   3991635, 284664268, "Brouwersstraat"),
+
+            new Val( 78, 284664268,   3991635, 608715545, "Brouwersstraat",
+                "Brouwersstraat - Margarethaplein (3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537)",
+                "3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537"),
+
+            new Val( 77, 608715543, 608715545, 608715543, "Brouwersstraat"),
+            new Val( 76, 608715542, 608715545, 608715542, "Brouwersstraat"),
+            new Val( 75, 608715544, 608715545, 608715544, "Brouwersstraat"),
+            new Val( 74, 284664272, 608715545, 284664272, "Brouwersstraat"),
+
+            new Val( 73, 284664272, 608715545, 147856945, "Tessenstraat - Fonteinstraat",
+                "Brouwersstraat (3;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537)",
+                "3;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537"),
+
+            new Val( 72, 123929547, 147856945, 123929547, "Kapucijnenvoer"),
+
+            new Val( 71, 123929547, 147856945,   3358673, "Biezenstraat",
+                "Kapucijnenvoer - Tessenstraat - Fonteinstraat (3;7;8;9;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537)",
+                "3;7;8;9;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537"),
+
+            new Val( 70, 578662071,   3358673, 578662071, "Sint-Jacobsplein"),
+            new Val( 69, 521211966,   3358673, 521211966, "Sint-Jacobsplein"),
+            new Val( 68,   3358671,   3358673,   3358671, "Sint-Jacobsplein"),
+            new Val( 67, 123929615,   3358673, 123929615, "Sint-Hubertusstraat"),
+
+            new Val( 66, 123929615,   3358673, 189453003, "Monseigneur Van Waeyenberghlaan",
+                "Sint-Hubertusstraat - Biezenstraat (3;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513)",
+                "3;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513"),
+
+            new Val( 65,  79289753, 189453003,  79289753, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 64, 189453004, 189453003, 189453004, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 63, 189453002, 189453003, 189453002, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 62, 189453001, 189453003, 189453001, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 61, 810592121, 189453003, 810592121, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 60, 249333181, 189453003, 249333181, "Monseigneur Van Waeyenberghlaan"),
+
+            new Val( 59, 249333181, 189453003, 249333187, "Rotonde Het Teken",
+                "Monseigneur Van Waeyenberghlaan (3;317;333;334;335;370;371;373;374;380;395;513)",
+                "3;317;333;334;335;370;371;373;374;380;395;513"),
+
+
+            new Val( 58, 249333187, 249333187, 813970230, "Rotonde Het Teken",
+                "Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+            new Val( 57,  41403540, 813970230,  41403540, "Rotonde Het Teken"),
+
+            new Val( 56,  41403540, 813970230,  41403538, "Rotonde Het Teken",
+                "Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;513)",
+                "3;317;333;334;335;370;371;373;374;380;395;513"),
+
+            new Val( 55,  79340950,  41403538,  79340950, "Ring Zuid"),
+
+            new Val( 54,  79340950,  41403538,  11369123, "Ring Zuid",
+                "Ring Zuid - Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+
+            new Val( 53,  11369123,  11369123, 159949154, null,
+                "Ring Zuid (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+
+            new Val( 52, 159949154, 159949154, 332258104, null,
+                "(3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+            new Val( 51,  78852604, 332258104,  78852604, null),
+
+            new Val( 50,  78852604, 332258104,  14508735, null,
+                "(3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+
+            new Val( 49,  14508735,  14508735, 318878531, null,
+                "(3;317;333;334;335;370;371;373;374;380;395;410;513;600)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600"),
+
+            new Val( 48,  14506241, 318878531,  14506241, null),
+
+            new Val( 47,  14506241, 318878531, 109267436, "Ring Zuid",
+                "(3;317;395;410;600)",
+                "3;317;395;410;600"),
+
+
+            new Val( 46, 109267436, 109267436,  14508739, "Ring Zuid",
+                "Ring Zuid (3;317;395;410;600;601)",
+                "3;317;395;410;600;601"),
+
+
+            new Val( 45,  14508739,  14508739,  14508740, "Ring Zuid",
+                "Ring Zuid (3;317;334;335;395;410;600;601)",
+                "3;317;334;335;395;410;600;601"),
+
+
+            new Val( 44,  14508740,  14508740, 502328838, "Ring Zuid",
+                "Ring Zuid (3;317;334;335;380;395;410;600;601)",
+                "3;317;334;335;380;395;410;600;601"),
+
+            new Val( 43, 502328837, 502328838, 502328837, "Ring Zuid"),
+            new Val( 42,   8080023, 502328838,   8080023, "Ring Zuid"),
+            new Val( 41,  78568660, 502328838,  78568660, "Rotonde Het Teken"),
+
+            new Val( 40,  78568660, 502328838,  15945426, "Ring Noord",
+                "Rotonde Het Teken - Ring Zuid (3;317;333;334;335;370;371;373;374;380;395;410;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;600;601"),
+
+            new Val( 39, 502317795,  15945426, 502317795, "Ring Noord"),
+            new Val( 38, 810580948,  15945426, 810580948, "Ring Noord"),
+            new Val( 37, 502317796,  15945426, 502317796, "Ring Noord"),
+            new Val( 36, 112917238,  15945426, 112917238, "Ring Noord"),
+            new Val( 35, 608754690,  15945426, 608754690, "Ring Noord"),
+            new Val( 34, 377918625,  15945426, 377918625, "Ring Noord"),
+
+            new Val( 33, 377918625,  15945426, 377918625, "Ring Noord",
+                "Ring Noord (3)",
+                "3")
+        );        previousSegment = new RouteSegmentToExtract(bus3_GHB_Lubbeek_RouteRelation);
+        previousSegment.setActiveDataSet(ds);
+        for (Val v: expectedValues) {
+            segment = previousSegment.addPTWayMember(v.index);
+            if (segment != null) {
+                extractAndAssertValues(v.index, previousSegment, segment, bus3_GHB_Lubbeek_RouteRelation, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,
+                    null, v.expectedRouteRef);
+                previousSegment = segment;
+            }
+        }
+
+        System.out.print("\n");
 
         // ***********************************************************
         // Line 3 has the particularity that there are 2 variants
@@ -1435,435 +1384,368 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         assertEquals("", segment301.getWayIdsSignature());
         assertEquals(Collections.emptyList(), segment301.getWayMembers());
 
-        final int W_217_Dorpskring_27684829_D = 27684829;
-        final int W_214_Dorpskring_112917099_A = 112917099;
+        expectedValues = Arrays.asList(
+            new Val( 217,  27684829,  27684829,  27684829, "Dorpskring"),
+            new Val( 216, 349396917,  27684829, 349396917, "Dorpskring"),
+            new Val( 215, 349396921,  27684829, 349396921, "Dorpskring"),
+            new Val( 214, 112917099,  27684829, 112917099, "Dorpskring"),
+
+            new Val( 213, 112917099,  27684829, 125835538, "Dorpskring",
+                "Dorpskring (3)",
+                "3"),
+
+
+            new Val( 212, 125835538, 125835538,  81197019, "Bollenberg",
+                "Dorpskring (3;373;485)",
+                "3;373;485"),
+
+            new Val( 211, 112917100,  81197019, 112917100, "Bollenberg"),
+            new Val( 210, 694551612,  81197019, 694551612, "Bollenberg"),
+            new Val( 209, 645048305,  81197019, 645048305, "Bollenberg"),
+            new Val( 208,  27688813,  81197019,  27688813, "Bollenberg"),
+            new Val( 207, 232474772,  81197019, 232474772, "Lubbeekstraat"),
+            new Val( 206,  10658839,  81197019,  10658839, "Lubbeekstraat"),
+            new Val( 205, 319269331,  81197019, 319269331, "Kapelstraat"),
+            new Val( 204, 636950670,  81197019, 636950670, "Kapelstraat"),
+            new Val( 203,  16377722,  81197019,  16377722, "Kapelstraat"),
+            new Val( 202,  16377612,  81197019,  16377612, "Kapelstraat"),
+
+            new Val( 201,  16377612,  81197019, 112917224, "Ganzendries",
+                "Kapelstraat - Bollenberg (3)",
+                "3"),
+
+            new Val( 200, 319264895, 112917224, 319264895, "Ganzendries"),
+            new Val( 199,  27682732, 112917224,  27682732, "Sint Barbaradreef"),
+            new Val( 198, 527248228, 112917224, 527248228, null),
+            new Val( 197,  27686451, 112917224,  27686451, null),
+            new Val( 196, 847554912, 112917224, 847554912, null),
+
+            new Val( 195, 847554912, 112917224,  27686453, null,
+                "Sint Barbaradreef - Ganzendries (3)",
+                "3"),
+
+            new Val( 194, 110643012,  27686453, 110643012, null),
+            new Val( 193, 112917220,  27686453, 112917220, null),
+            new Val( 192,  70869366,  27686453,  70869366, null),
+            new Val( 191,  27682735,  27686453,  27682735, null),
+            new Val( 190, 319269351,  27686453, 319269351, "Sint Barbaradreef"),
+            new Val( 189, 112917225,  27686453, 112917225, "Sint Barbaradreef"),
+
+            new Val( 188, 112917225,  27686453, 847554912, null,
+                "Sint Barbaradreef (3)",
+                "3"),
+
+            new Val( 187,  27686451, 847554912,  27686451, null),
+            new Val( 186, 527248228, 847554912, 527248228, null),
+            new Val( 185,  27682732, 847554912,  27682732, "Sint Barbaradreef"),
+            new Val( 184, 319264895, 847554912, 319264895, "Ganzendries"),
+            new Val( 183, 112917224, 847554912, 112917224, "Ganzendries"),
+
+            new Val( 182, 112917224, 847554912,  40189518, "Lostraat",
+                "Ganzendries - Sint Barbaradreef (3)",
+                "3"),
+
+            new Val( 181, 351196789,  40189518, 351196789, "Lostraat"),
+            new Val( 180, 350992067,  40189518, 350992067, "Lostraat"),
+            new Val( 179, 636491595,  40189518, 636491595, "Lostraat"),
+            new Val( 178, 636491594,  40189518, 636491594, "Lostraat"),
+            new Val( 177, 124913579,  40189518, 124913579, "Lostraat"),
+            new Val( 176,  10672044,  40189518,  10672044, "Lostraat"),
+            new Val( 175, 633919766,  40189518, 633919766, "Lostraat"),
+            new Val( 174,  10672080,  40189518,  10672080, "Heidebergstraat"),
+            new Val( 173,  10672083,  40189518,  10672083, "Heidebergstraat"),
+            new Val( 172,  79801761,  40189518,  79801761, "Heidebergstraat"),
+            new Val( 171, 112917249,  40189518, 112917249, "Heidebergstraat"),
+            new Val( 170, 112917247,  40189518, 112917247, "Heidebergstraat"),
+            new Val( 169, 192706264,  40189518, 192706264, "Heidebergstraat"),
+            new Val( 168, 318216944,  40189518, 318216944, "Heidebergstraat"),
+            new Val( 167, 192706265,  40189518, 192706265, "Heidebergstraat"),
+            new Val( 166, 586861164,  40189518, 586861164, "Heidebergstraat"),
+            new Val( 165,  10672031,  40189518,  10672031, "Heidebergstraat"),
+            new Val( 164,  10672135,  40189518,  10672135, "Koetsweg"),
+            new Val( 163, 608754691,  40189518, 608754691, "Koetsweg"),
+            new Val( 162, 608754692,  40189518, 608754692, "Koetsweg"),
+            new Val( 161,  10672174,  40189518,  10672174, "Gaston Eyskenslaan"),
+            new Val( 160,  23436182,  40189518,  23436182, "Platte-Lostraat"),
+            new Val( 159, 112917234,  40189518, 112917234, "Duivenstraat"),
+            new Val( 158,  23707216,  40189518,  23707216, "Duivenstraat"),
+            new Val( 157, 608754700,  40189518, 608754700, "Lijsterlaan"),
+            new Val( 156,  10672177,  40189518,  10672177, "Lijsterlaan"),
+            new Val( 155, 112917228,  40189518, 112917228, "Prins Regentplein"),
+            new Val( 154, 112917229,  40189518, 112917229, "Prins Regentplein"),
+            new Val( 153,  10672178,  40189518,  10672178, "Prins Regentplein"),
+            new Val( 152,  10657957,  40189518,  10657957, "Prins-Regentlaan"),
+            new Val( 151,  25155107,  40189518,  25155107, "Willem Coosemansstraat"),
+            new Val( 150,  79784138,  40189518,  79784138, "Koning Albertlaan"),
+            new Val( 149,  23707241,  40189518,  23707241, "Koning Albertlaan"),
+            new Val( 148, 112917227,  40189518, 112917227, "Koning Albertlaan"),
+            new Val( 147, 101619135,  40189518, 101619135, "Koning Albertlaan"),
+            new Val( 146, 622063635,  40189518, 622063635, "Koning Albertlaan"),
+            new Val( 145, 622063636,  40189518, 622063636, "Koning Albertlaan"),
+            new Val( 144, 101619136,  40189518, 101619136, "Koning Albertlaan"),
+            new Val( 143,  16377030,  40189518,  16377030, "Martelarenlaan"),
+            new Val( 142, 485802425,  40189518, 485802425, "Spoordijk"),
+            new Val( 141,  23707242,  40189518,  23707242, "Martelarenlaan"),
+            new Val( 140, 608715582,  40189518, 608715582, "Martelarenlaan"),
+            new Val( 139, 608715584,  40189518, 608715584, "Martelarenlaan"),
+            new Val( 138, 284832275,  40189518, 284832275, "Martelarenlaan"),
+            new Val( 137, 608715586,  40189518, 608715586, "Martelarenlaan"),
+            new Val( 136, 608715590,  40189518, 608715590, "Martelarenlaan"),
+            new Val( 135,   3992546,  40189518,   3992546, "Martelarenlaan"),
+            new Val( 134,  10230617,  40189518,  10230617, "Oude Diestsesteenweg"),
 
-        final int W_213_Dorpskring_125835538_A = 125835538;
+            new Val( 133,  10230617,  40189518,  23707243, "Diestsesteenweg",
+                "Oude Diestsesteenweg - Lostraat (3)",
+                "3"),
 
-        final int W_212_Bollenberg_81197019_Z = 81197019;
-        final int W_202_Kapelstraat_16377612_A = 16377612;
 
-        final int W_201_Ganzendries_112917224_F = 112917224;
-        final int W_196__847554912_A = 847554912;
+            new Val( 132,  23707243,  23707243,  23707244, "Diestsesteenweg",
+                "Diestsesteenweg (3;370;371;373;374;475;485;524;525)",
+                "3;370;371;373;374;475;485;524;525"),
 
-        final int W_195__27686453_G = 27686453;
-        final int W_189__112917225_A = 112917225;
+            new Val( 131,  12715116,  23707244,  12715116, "Diestsesteenweg"),
 
-        final int W_188__847554912_F = 847554912;
-        final int W_183_Ganzendries_112917224_A = 112917224;
+            new Val( 130,  12715116,  23707244,  61556877, "Diestsepoort",
+                "Diestsesteenweg (2;3;179;306;306 (student);310;370;371;373;374;433;475;485;520;524;525)",
+                "2;3;179;306;306 (student);310;370;371;373;374;433;475;485;520;524;525"),
 
-        final int W_182_Lostraat_40189518_Z = 40189518;
-        final int W_134_Oude_Diestsesteenweg_10230617_A = 10230617;
+            new Val( 129, 663770966,  61556877, 663770966, "Diestsepoort"),
+            new Val( 128, 584356749,  61556877, 584356749, "Diestsepoort"),
+            new Val( 127, 584356745,  61556877, 584356745, "Diestsepoort"),
 
-        final int W_133_Diestsesteenweg_23707243_A = 23707243;
+            new Val( 126, 584356745,  61556877, 198559166, "Diestsepoort",
+                "Diestsepoort (2;3;179;305;306;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658)",
+                "2;3;179;305;306;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658"),
 
-        final int W_132_Diestsesteenweg_23707244_B = 23707244;
-        final int W_131_Diestsesteenweg_12715116_A = 12715116;
+            new Val( 125, 584356751, 198559166, 584356751, "Diestsepoort"),
+            new Val( 124, 451873773, 198559166, 451873773, "Diestsepoort"),
+            new Val( 123, 584356742, 198559166, 584356742, "Diestsepoort"),
+            new Val( 122, 451873774, 198559166, 451873774, "Diestsepoort"),
 
-        final int W_130_Diestsepoort_61556877_D = 61556877;
-        final int W_127_Diestsepoort_584356745_A = 584356745;
+            new Val( 121, 451873774, 198559166,  76867049, null,
+                "Diestsepoort (2;3;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658)",
+                "2;3;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658"),
 
-        final int W_126_Diestsepoort_198559166_E = 198559166;
-        final int W_122_Diestsepoort_451873774_A = 451873774;
+            new Val( 120,  79264890,  76867049,  79264890, null),
+            new Val( 119,  79596965,  76867049,  79596965, null),
 
-        final int W_121__76867049_C = 76867049;
-        final int W_119__79596965_A = 79596965;
+            new Val( 118,  79596965,  76867049,  79596974, null,
+                "(2;3;310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630)",
+                "2;3;310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630"),
 
-        final int W_118__79596974_B = 79596974;
-        final int W_117__79596982_A = 79596982;
+            new Val( 117,  79596982,  79596974,  79596982, null),
 
-        final int W_116__79596987_C = 79596987;
-        final int W_114__79596980_A = 79596980;
+            new Val( 116,  79596982,  79596974,  79596987, null,
+                "perron 11 & 12 (3;333;334;335;433;600;630)",
+                "3;333;334;335;433;600;630"),
 
-        final int W_113_Tiensevest_79193579_A = 79193579;
+            new Val( 115, 377918658,  79596987, 377918658, null),
+            new Val( 114,  79596980,  79596987,  79596980, null),
 
-        final int W_112_Tiensevest_258936980_A = 258936980;
+            new Val( 113,  79596980,  79596987,  79193579, "Tiensevest",
+                "perron 11 & 12 (3;333;334;335;513;600;630)",
+                "3;333;334;335;513;600;630"),
 
-        final int W_111_Tiensevest_79193580_A = 79193580;
 
-        final int W_110_Tiensevest_79193581_A = 79193581;
+            new Val( 112,  79193579,  79193579, 258936980, "Tiensevest",
+                "Tiensevest (3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;380;513;600;601;616;630;658)",
+                "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;380;513;600;601;616;630;658"),
 
-        final int W_109_Tiensevest_78815505_A = 78815505;
 
-        final int W_108_Tiensevest_84696751_B = 84696751;
-        final int W_107_Tiensevest_79265237_A = 79265237;
+            new Val( 111, 258936980, 258936980,  79193580, "Tiensevest",
+                "Tiensevest (3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630;658)",
+                "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630;658"),
 
-        final int W_106_Tiensevest_89574079_B = 89574079;
-        final int W_105_Tiensevest_81522744_A = 81522744;
 
-        final int W_104_Bondgenotenlaan_305434579_H = 305434579;
-        final int W_97_Rector_De_Somerplein_521211977_A = 521211977;
+            new Val( 110,  79193580,  79193580,  79193581, "Tiensevest",
+                "Tiensevest (3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630)",
+                "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630"),
 
-        final int W_96_Rector_De_Somerplein_521211976_B = 521211976;
-        final int W_95_Rector_De_Somerplein_16771741_A = 16771741;
 
-        final int W_94_Margarethaplein_3991635_M = 3991635;
-        final int W_82_Brouwersstraat_284664268_A = 284664268;
+            new Val( 109,  79193581,  79193581,  78815505, "Tiensevest",
+                "Tiensevest (2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630)",
+                "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630"),
 
-        final int W_81_Brouwersstraat_608715545_E = 608715545;
-        final int W_77_Brouwersstraat_284664272_A = 284664272;
 
-        final int W_76_Tessenstraat___Fonteinstraat_147856945_B = 147856945;
-        final int W_75_Kapucijnenvoer_123929547_A = 123929547;
+            new Val( 108,  78815505,  78815505,  84696751, "Tiensevest",
+                "Tiensevest (2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630)",
+                "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630"),
 
-        final int W_74_Biezenstraat_3358673_E = 3358673;
-        final int W_70_Sint_Hubertusstraat_123929615_A = 123929615;
+            new Val( 107,  79265237,  84696751,  79265237, "Tiensevest"),
 
-        final int W_69_Monseigneur_Van_Waeyenberghlaan_189453003_G = 189453003;
-        final int W_63_Monseigneur_Van_Waeyenberghlaan_249333181_A = 249333181;
+            new Val( 106,  79265237,  84696751,  89574079, "Tiensevest",
+                "Tiensevest (2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;527;600;616;630)",
+                "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;527;600;616;630"),
 
-        final int W_62_Rotonde_Het_Teken_249333187_A = 249333187;
-        final int W_61_Rotonde_Het_Teken_813970230_B = 813970230;
+            new Val( 105,  81522744,  89574079,  81522744, "Tiensevest"),
 
-        final int W_60_Rotonde_Het_Teken_41403540_A = 41403540;
-        final int W_59_Rotonde_Het_Teken_41403538_B = 41403538;
+            new Val( 104,  81522744,  89574079, 305434579, "Bondgenotenlaan",
+                "Tiensevest (1;2;3;4;5;6;7;8;9;18;179;284;285;306 (student);315;316;317;333;334;335;337;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539;600;616;630)",
+                "1;2;3;4;5;6;7;8;9;18;179;284;285;306 (student);315;316;317;333;334;335;337;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539;600;616;630"),
 
-        final int W_58_Ring_Zuid_79340950_A = 79340950;
+            new Val( 103, 578662093, 305434579, 578662093, "Bondgenotenlaan"),
+            new Val( 102, 578662092, 305434579, 578662092, "Bondgenotenlaan"),
+            new Val( 101, 578662095, 305434579, 578662095, "Bondgenotenlaan"),
+            new Val( 100, 578662094, 305434579, 578662094, "Bondgenotenlaan"),
+            new Val( 99,   3991636, 305434579,   3991636, "Bondgenotenlaan"),
+            new Val( 98, 174985125, 305434579, 174985125, "Rector De Somerplein"),
+            new Val( 97, 521211977, 305434579, 521211977, "Rector De Somerplein"),
 
-        final int W_57_Ring_Zuid_11369123_A = 11369123;
+            new Val( 96, 521211977, 305434579, 521211976, "Rector De Somerplein",
+                "Rector De Somerplein - Bondgenotenlaan (2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539)",
+                "2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539"),
 
-        final int W_56__159949154_A = 159949154;
+            new Val( 95,  16771741, 521211976,  16771741, "Rector De Somerplein"),
 
-        final int W_55__332258104_B = 332258104;
-        final int W_54__78852604_A = 78852604;
+            new Val( 94,  16771741, 521211976,   3991635, "Margarethaplein",
+                "Rector De Somerplein (2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539)",
+                "2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539"),
 
-        final int W_53__14508735_A = 14508735;
+            new Val( 93, 521211973,   3991635, 521211973, "Margarethaplein"),
+            new Val( 92, 608715546,   3991635, 608715546, "Margarethaplein"),
+            new Val( 91, 453538107,   3991635, 453538107, "Margarethaplein"),
+            new Val( 90,  80194313,   3991635,  80194313, "Mathieu de Layensplein"),
+            new Val( 89, 293288706,   3991635, 293288706, "Mathieu de Layensplein"),
+            new Val( 88,  10269271,   3991635,  10269271, "Dirk Boutslaan"),
+            new Val( 87, 578662072,   3991635, 578662072, "Dirk Boutslaan"),
+            new Val( 86, 608715541,   3991635, 608715541, "Dirk Boutslaan"),
+            new Val( 85, 293149632,   3991635, 293149632, "Dirk Boutslaan"),
+            new Val( 84,   3992578,   3991635,   3992578, "Dirk Boutslaan"),
+            new Val( 83, 438252643,   3991635, 438252643, "Dirk Boutslaan"),
+            new Val( 82, 284664268,   3991635, 284664268, "Brouwersstraat"),
 
-        final int W_52__109267438_A = 109267438;
+            new Val( 81, 284664268,   3991635, 608715545, "Brouwersstraat",
+                "Brouwersstraat - Margarethaplein (3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537)",
+                "3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537"),
 
-        final int W_51__318878532_A = 318878532;
+            new Val( 80, 608715543, 608715545, 608715543, "Brouwersstraat"),
+            new Val( 79, 608715542, 608715545, 608715542, "Brouwersstraat"),
+            new Val( 78, 608715544, 608715545, 608715544, "Brouwersstraat"),
+            new Val( 77, 284664272, 608715545, 284664272, "Brouwersstraat"),
 
-        final int W_50__100687528_A = 100687528;
+            new Val( 76, 284664272, 608715545, 147856945, "Tessenstraat - Fonteinstraat",
+                "Brouwersstraat (3;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537)",
+                "3;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537"),
 
-        final int W_49_Ring_Zuid_14508739_A = 14508739;
-
-        final int W_48_Ring_Zuid_14508740_A = 14508740;
-
-        final int W_47_Ring_Zuid_502328838_D = 502328838;
-        final int W_44_Rotonde_Het_Teken_78568660_A = 78568660;
-
-        final int W_43_Ring_Noord_15945426_G = 15945426;
-        final int W_37_Ring_Noord_377918625_A = 377918625;
-
-        for (int n = 217; n >= 214; n--) {returnValueNull =segment301.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment302 = segment301.addPTWayMember(213);
-        extractAndAssertValues(213, segment301, segment302, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_214_Dorpskring_112917099_A, W_217_Dorpskring_27684829_D,
-            W_213_Dorpskring_125835538_A, "Dorpskring",
-            null,
-            "3");
-
-        RouteSegmentToExtract segment303 = segment302.addPTWayMember(212);
-        extractAndAssertValues(212, segment302, segment303, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_213_Dorpskring_125835538_A, W_213_Dorpskring_125835538_A,
-            W_212_Bollenberg_81197019_Z, "Bollenberg",
-            null,
-            "3;373;485");
-
-        for (int n = 211; n >= 202; n--) {returnValueNull =segment303.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment304 = segment303.addPTWayMember(201);
-        extractAndAssertValues(201, segment303, segment304, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_202_Kapelstraat_16377612_A, W_212_Bollenberg_81197019_Z,
-            W_201_Ganzendries_112917224_F, "Ganzendries",
-            null,
-            "3");
-
-        for (int n = 200; n >= 196; n--) {returnValueNull =segment304.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment305 = segment304.addPTWayMember(195);
-        extractAndAssertValues(195, segment304, segment305, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_196__847554912_A, W_201_Ganzendries_112917224_F,
-            W_195__27686453_G, null,
-            null,
-            "3");
-
-        for (int n = 194; n >= 189; n--) {returnValueNull =segment305.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment306 = segment305.addPTWayMember(188);
-        extractAndAssertValues(188, segment305, segment306, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_189__112917225_A, W_195__27686453_G,
-            W_188__847554912_F, null,
-            null,
-            "3");
-
-        for (int n = 187; n >= 183; n--) {returnValueNull =segment306.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment307 = segment306.addPTWayMember(182);
-        extractAndAssertValues(182, segment306, segment307, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_183_Ganzendries_112917224_A, W_188__847554912_F,
-            W_182_Lostraat_40189518_Z, "Lostraat",
-            null,
-            "3");
-
-        for (int n = 181; n >= 134; n--) {returnValueNull =segment307.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment308 = segment307.addPTWayMember(133);
-        extractAndAssertValues(133, segment307, segment308, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_134_Oude_Diestsesteenweg_10230617_A, W_182_Lostraat_40189518_Z,
-            W_133_Diestsesteenweg_23707243_A, "Diestsesteenweg",
-            null,
-            "3");
-
-        RouteSegmentToExtract segment309 = segment308.addPTWayMember(132);
-        extractAndAssertValues(132, segment308, segment309, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_133_Diestsesteenweg_23707243_A, W_133_Diestsesteenweg_23707243_A,
-            W_132_Diestsesteenweg_23707244_B, "Diestsesteenweg",
-            null,
-            "3;370;371;373;374;475;485;524;525");
-
-        for (int n = 131; n >= 131; n--) {returnValueNull =segment309.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment310 = segment309.addPTWayMember(130);
-        extractAndAssertValues(130, segment309, segment310, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_131_Diestsesteenweg_12715116_A, W_132_Diestsesteenweg_23707244_B,
-            W_130_Diestsepoort_61556877_D, "Diestsepoort",
-            null,
-            "2;3;179;306;306 (student);310;370;371;373;374;433;475;485;520;524;525");
-
-        for (int n = 129; n >= 127; n--) {returnValueNull =segment310.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment311 = segment310.addPTWayMember(126);
-        extractAndAssertValues(126, segment310, segment311, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_127_Diestsepoort_584356745_A, W_130_Diestsepoort_61556877_D,
-            W_126_Diestsepoort_198559166_E, "Diestsepoort",
-            null,
-            "2;3;179;305;306;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658");
-
-        for (int n = 125; n >= 122; n--) {returnValueNull =segment311.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment312 = segment311.addPTWayMember(121);
-        extractAndAssertValues(121, segment311, segment312, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_122_Diestsepoort_451873774_A, W_126_Diestsepoort_198559166_E,
-            W_121__76867049_C, null,
-            null,
-            "2;3;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658");
-
-        for (int n = 120; n >= 119; n--) {returnValueNull =segment312.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment313 = segment312.addPTWayMember(118);
-        extractAndAssertValues(118, segment312, segment313, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_119__79596965_A, W_121__76867049_C,
-            W_118__79596974_B, null,
-            null,
-            "2;3;310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630");
-
-        for (int n = 117; n >= 117; n--) {returnValueNull =segment313.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment314 = segment313.addPTWayMember(116);
-        extractAndAssertValues(116, segment313, segment314, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_117__79596982_A, W_118__79596974_B,
-            W_116__79596987_C, null,
-            null,
-            "3;333;334;335;433;600;630");
-
-        for (int n = 115; n >= 114; n--) {returnValueNull =segment314.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment315 = segment314.addPTWayMember(113);
-        extractAndAssertValues(113, segment314, segment315, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_114__79596980_A, W_116__79596987_C,
-            W_113_Tiensevest_79193579_A, "Tiensevest",
-            null,
-            "3;333;334;335;513;600;630");
-
-        RouteSegmentToExtract segment316 = segment315.addPTWayMember(112);
-        extractAndAssertValues(112, segment315, segment316, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_113_Tiensevest_79193579_A, W_113_Tiensevest_79193579_A,
-            W_112_Tiensevest_258936980_A, "Tiensevest",
-            null,
-            "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;380;513;600;601;616;630;658");
-
-        RouteSegmentToExtract segment317 = segment316.addPTWayMember(111);
-        extractAndAssertValues(111, segment316, segment317, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_112_Tiensevest_258936980_A, W_112_Tiensevest_258936980_A,
-            W_111_Tiensevest_79193580_A, "Tiensevest",
-            null,
-            "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630;658");
-
-        RouteSegmentToExtract segment318 = segment317.addPTWayMember(110);
-        extractAndAssertValues(110, segment317, segment318, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_111_Tiensevest_79193580_A, W_111_Tiensevest_79193580_A,
-            W_110_Tiensevest_79193581_A, "Tiensevest",
-            null,
-            "3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630");
-
-        RouteSegmentToExtract segment319 = segment318.addPTWayMember(109);
-        extractAndAssertValues(109, segment318, segment319, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_110_Tiensevest_79193581_A, W_110_Tiensevest_79193581_A,
-            W_109_Tiensevest_78815505_A, "Tiensevest",
-            null,
-            "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630");
-
-        RouteSegmentToExtract segment320 = segment319.addPTWayMember(108);
-        extractAndAssertValues(108, segment319, segment320, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_109_Tiensevest_78815505_A, W_109_Tiensevest_78815505_A,
-            W_108_Tiensevest_84696751_B, "Tiensevest",
-            null,
-            "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;600;616;630");
-
-        for (int n = 107; n >= 107; n--) {returnValueNull =segment320.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment321 = segment320.addPTWayMember(106);
-        extractAndAssertValues(106, segment320, segment321, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_107_Tiensevest_79265237_A, W_108_Tiensevest_84696751_B,
-            W_106_Tiensevest_89574079_B, "Tiensevest",
-            null,
-            "2;3;4;5;6;7;8;9;18;179;306 (student);333;334;335;337;370;371;373;374;380;513;520;524;525;527;600;616;630");
-
-        for (int n = 105; n >= 105; n--) {returnValueNull =segment321.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment322 = segment321.addPTWayMember(104);
-        extractAndAssertValues(104, segment321, segment322, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_105_Tiensevest_81522744_A, W_106_Tiensevest_89574079_B,
-            W_104_Bondgenotenlaan_305434579_H, "Bondgenotenlaan",
-            null,
-            "1;2;3;4;5;6;7;8;9;18;179;284;285;306 (student);315;316;317;333;334;335;337;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539;600;616;630");
-
-        for (int n = 103; n >= 97; n--) {returnValueNull =segment322.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment323 = segment322.addPTWayMember(96);
-        extractAndAssertValues(96, segment322, segment323, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_97_Rector_De_Somerplein_521211977_A, W_104_Bondgenotenlaan_305434579_H,
-            W_96_Rector_De_Somerplein_521211976_B, "Rector De Somerplein",
-            null,
-            "2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539");
-
-        for (int n = 95; n >= 95; n--) {returnValueNull =segment323.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment324 = segment323.addPTWayMember(94);
-        extractAndAssertValues(94, segment323, segment324, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_95_Rector_De_Somerplein_16771741_A, W_96_Rector_De_Somerplein_521211976_B,
-            W_94_Margarethaplein_3991635_M, "Margarethaplein",
-            null,
-            "2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537;539");
-
-        for (int n = 93; n >= 82; n--) {returnValueNull =segment324.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment325 = segment324.addPTWayMember(81);
-        extractAndAssertValues(81, segment324, segment325, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_82_Brouwersstraat_284664268_A, W_94_Margarethaplein_3991635_M,
-            W_81_Brouwersstraat_608715545_E, "Brouwersstraat",
-            null,
-            "3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537");
-
-        for (int n = 80; n >= 77; n--) {returnValueNull =segment325.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment326 = segment325.addPTWayMember(76);
-        extractAndAssertValues(76, segment325, segment326, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_77_Brouwersstraat_284664272_A, W_81_Brouwersstraat_608715545_E,
-            W_76_Tessenstraat___Fonteinstraat_147856945_B, "Tessenstraat - Fonteinstraat",
-            null,
-            "3;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537");
-
-        for (int n = 75; n >= 75; n--) {returnValueNull =segment326.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment327 = segment326.addPTWayMember(74);
-        extractAndAssertValues(74, segment326, segment327, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_75_Kapucijnenvoer_123929547_A, W_76_Tessenstraat___Fonteinstraat_147856945_B,
-            W_74_Biezenstraat_3358673_E, "Biezenstraat",
-            null,
-            "3;7;8;9;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537");
-
-        for (int n = 73; n >= 70; n--) {returnValueNull =segment327.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment328 = segment327.addPTWayMember(69);
-        extractAndAssertValues(69, segment327, segment328, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_70_Sint_Hubertusstraat_123929615_A, W_74_Biezenstraat_3358673_E,
-            W_69_Monseigneur_Van_Waeyenberghlaan_189453003_G, "Monseigneur Van Waeyenberghlaan",
-            null,
-            "3;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513");
-
-        for (int n = 68; n >= 63; n--) {returnValueNull =segment328.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment329 = segment328.addPTWayMember(62);
-        extractAndAssertValues(62, segment328, segment329, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_63_Monseigneur_Van_Waeyenberghlaan_249333181_A, W_69_Monseigneur_Van_Waeyenberghlaan_189453003_G,
-            W_62_Rotonde_Het_Teken_249333187_A, "Rotonde Het Teken",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;513");
-
-        RouteSegmentToExtract segment330 = segment329.addPTWayMember(61);
-        extractAndAssertValues(61, segment329, segment330, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_62_Rotonde_Het_Teken_249333187_A, W_62_Rotonde_Het_Teken_249333187_A,
-            W_61_Rotonde_Het_Teken_813970230_B, "Rotonde Het Teken",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        for (int n = 60; n >= 60; n--) {returnValueNull =segment330.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment331 = segment330.addPTWayMember(59);
-        extractAndAssertValues(59, segment330, segment331, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_60_Rotonde_Het_Teken_41403540_A, W_61_Rotonde_Het_Teken_813970230_B,
-            W_59_Rotonde_Het_Teken_41403538_B, "Rotonde Het Teken",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;513");
-
-        for (int n = 58; n >= 58; n--) {returnValueNull =segment331.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment332 = segment331.addPTWayMember(57);
-        extractAndAssertValues(57, segment331, segment332, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_58_Ring_Zuid_79340950_A, W_59_Rotonde_Het_Teken_41403538_B,
-            W_57_Ring_Zuid_11369123_A, "Ring Zuid",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        RouteSegmentToExtract segment333 = segment332.addPTWayMember(56);
-        extractAndAssertValues(56, segment332, segment333, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_57_Ring_Zuid_11369123_A, W_57_Ring_Zuid_11369123_A,
-            W_56__159949154_A, null,
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        RouteSegmentToExtract segment334 = segment333.addPTWayMember(55);
-        extractAndAssertValues(55, segment333, segment334, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_56__159949154_A, W_56__159949154_A,
-            W_55__332258104_B, null,
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        for (int n = 54; n >= 54; n--) {returnValueNull =segment334.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment335 = segment334.addPTWayMember(53);
-        extractAndAssertValues(53, segment334, segment335, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_54__78852604_A, W_55__332258104_B,
-            W_53__14508735_A, null,
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
-
-        RouteSegmentToExtract segment336 = segment335.addPTWayMember(52);
-        extractAndAssertValues(52, segment335, segment336, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_53__14508735_A, W_53__14508735_A,
-            W_52__109267438_A, null,
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600");
-
-        RouteSegmentToExtract segment337 = segment336.addPTWayMember(51);
-        extractAndAssertValues(51, segment336, segment337, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_52__109267438_A, W_52__109267438_A,
-            W_51__318878532_A, null,
-            null,
-            "3;333;334;335;370;371;373;374;380;513");
-
-        RouteSegmentToExtract segment338 = segment337.addPTWayMember(50);
-        extractAndAssertValues(50, segment337, segment338, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_51__318878532_A, W_51__318878532_A,
-            W_50__100687528_A, null,
-            null,
-            "3;333;334;335;513");
-
-        RouteSegmentToExtract segment339 = segment338.addPTWayMember(49);
-        extractAndAssertValues(49, segment338, segment339, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_50__100687528_A, W_50__100687528_A,
-            W_49_Ring_Zuid_14508739_A, "Ring Zuid",
-            null,
-            "3;334;335");
-
-        RouteSegmentToExtract segment340 = segment339.addPTWayMember(48);
-        extractAndAssertValues(48, segment339, segment340, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_49_Ring_Zuid_14508739_A, W_49_Ring_Zuid_14508739_A,
-            W_48_Ring_Zuid_14508740_A, "Ring Zuid",
-            null,
-            "3;317;334;335;395;410;600;601");
-
-        RouteSegmentToExtract segment341 = segment340.addPTWayMember(47);
-        extractAndAssertValues(47, segment340, segment341, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_48_Ring_Zuid_14508740_A, W_48_Ring_Zuid_14508740_A,
-            W_47_Ring_Zuid_502328838_D, "Ring Zuid",
-            null,
-            "3;317;334;335;380;395;410;600;601");
-
-        for (int n = 46; n >= 44; n--) {returnValueNull =segment341.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment342 = segment341.addPTWayMember(43);
-        extractAndAssertValues(43, segment341, segment342, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_44_Rotonde_Het_Teken_78568660_A, W_47_Ring_Zuid_502328838_D,
-            W_43_Ring_Noord_15945426_G, "Ring Noord",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;600;601");
-
-        for (int n = 42; n >= 37; n--) {returnValueNull =segment342.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_GHB_Pellenberg_Lubbeek_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment343 = segment342.addPTWayMember(36);
-        extractAndAssertValues(36, segment342, segment343, bus3_GHB_Pellenberg_Lubbeek_RouteRelation,
-            W_37_Ring_Noord_377918625_A, W_43_Ring_Noord_15945426_G,
-            0, null,
-            null,
-            "3");
+            new Val( 75, 123929547, 147856945, 123929547, "Kapucijnenvoer"),
+
+            new Val( 74, 123929547, 147856945,   3358673, "Biezenstraat",
+                "Kapucijnenvoer - Tessenstraat - Fonteinstraat (3;7;8;9;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537)",
+                "3;7;8;9;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513;520;524;525;527;537"),
+
+            new Val( 73, 578662071,   3358673, 578662071, "Sint-Jacobsplein"),
+            new Val( 72, 521211966,   3358673, 521211966, "Sint-Jacobsplein"),
+            new Val( 71,   3358671,   3358673,   3358671, "Sint-Jacobsplein"),
+            new Val( 70, 123929615,   3358673, 123929615, "Sint-Hubertusstraat"),
+
+            new Val( 69, 123929615,   3358673, 189453003, "Monseigneur Van Waeyenberghlaan",
+                "Sint-Hubertusstraat - Biezenstraat (3;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513)",
+                "3;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;513"),
+
+            new Val( 68,  79289753, 189453003,  79289753, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 67, 189453004, 189453003, 189453004, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 66, 189453002, 189453003, 189453002, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 65, 189453001, 189453003, 189453001, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 64, 810592121, 189453003, 810592121, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 63, 249333181, 189453003, 249333181, "Monseigneur Van Waeyenberghlaan"),
+
+            new Val( 62, 249333181, 189453003, 249333187, "Rotonde Het Teken",
+                "Monseigneur Van Waeyenberghlaan (3;317;333;334;335;370;371;373;374;380;395;513)",
+                "3;317;333;334;335;370;371;373;374;380;395;513"),
+
+
+            new Val( 61, 249333187, 249333187, 813970230, "Rotonde Het Teken",
+                "Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+            new Val( 60,  41403540, 813970230,  41403540, "Rotonde Het Teken"),
+
+            new Val( 59,  41403540, 813970230,  41403538, "Rotonde Het Teken",
+                "Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;513)",
+                "3;317;333;334;335;370;371;373;374;380;395;513"),
+
+            new Val( 58,  79340950,  41403538,  79340950, "Ring Zuid"),
+
+            new Val( 57,  79340950,  41403538,  11369123, "Ring Zuid",
+                "Ring Zuid - Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+
+            new Val( 56,  11369123,  11369123, 159949154, null,
+                "Ring Zuid (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+
+            new Val( 55, 159949154, 159949154, 332258104, null,
+                "(3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+            new Val( 54,  78852604, 332258104,  78852604, null),
+
+            new Val( 53,  78852604, 332258104,  14508735, null,
+                "(3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
+
+
+            new Val( 52,  14508735,  14508735, 109267438, null,
+                "(3;317;333;334;335;370;371;373;374;380;395;410;513;600)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600"),
+
+
+            new Val( 51, 109267438, 109267438, 318878532, null,
+                "(3;333;334;335;370;371;373;374;380;513)",
+                "3;333;334;335;370;371;373;374;380;513"),
+
+
+            new Val( 50, 318878532, 318878532, 100687528, null,
+                "(3;333;334;335;513)",
+                "3;333;334;335;513"),
+
+
+            new Val( 49, 100687528, 100687528,  14508739, "Ring Zuid",
+                "(3;334;335)",
+                "3;334;335"),
+
+
+            new Val( 48,  14508739,  14508739,  14508740, "Ring Zuid",
+                "Ring Zuid (3;317;334;335;395;410;600;601)",
+                "3;317;334;335;395;410;600;601"),
+
+
+            new Val( 47,  14508740,  14508740, 502328838, "Ring Zuid",
+                "Ring Zuid (3;317;334;335;380;395;410;600;601)",
+                "3;317;334;335;380;395;410;600;601"),
+
+            new Val( 46, 502328837, 502328838, 502328837, "Ring Zuid"),
+            new Val( 45,   8080023, 502328838,   8080023, "Ring Zuid"),
+            new Val( 44,  78568660, 502328838,  78568660, "Rotonde Het Teken"),
+
+            new Val( 43,  78568660, 502328838,  15945426, "Ring Noord",
+                "Rotonde Het Teken - Ring Zuid (3;317;333;334;335;370;371;373;374;380;395;410;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;600;601"),
+
+            new Val( 42, 502317795,  15945426, 502317795, "Ring Noord"),
+            new Val( 41, 810580948,  15945426, 810580948, "Ring Noord"),
+            new Val( 40, 502317796,  15945426, 502317796, "Ring Noord"),
+            new Val( 39, 112917238,  15945426, 112917238, "Ring Noord"),
+            new Val( 38, 608754690,  15945426, 608754690, "Ring Noord"),
+            new Val( 37, 377918625,  15945426, 377918625, "Ring Noord"),
+
+            new Val( 36, 377918625,  15945426, 377918625, "Ring Noord",
+                "Ring Noord (3)",
+                "3")
+        );        previousSegment = new RouteSegmentToExtract(bus3_GHB_Pellenberg_Lubbeek_RouteRelation);
+        previousSegment.setActiveDataSet(ds);
+        for (Val v: expectedValues) {
+            segment = previousSegment.addPTWayMember(v.index);
+            if (segment != null) {
+                extractAndAssertValues(v.index, previousSegment, segment, bus3_GHB_Pellenberg_Lubbeek_RouteRelation, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,
+                    null, v.expectedRouteRef);
+                previousSegment = segment;
+            }
+        }
+
+        System.out.print("\n");
 
         // ***********************************************************
         // Line 3 has the particularity that there are 2 variants
@@ -1887,393 +1769,690 @@ public class RouteSegmentToExtractTest extends AbstractTest{
 
         assertEquals("", segment401.getWayIdsSignature());
         assertEquals(Collections.emptyList(), segment401.getWayMembers());
-        final int W_221_Ring_Noord_377918626_I = 377918626;
-        final int W_213_Ring_Noord_112917239_A = 112917239;
-        final int W_212_Rotonde_Het_Teken_3752557_A = 3752557;
-        final int W_211_Rotonde_Het_Teken_249333188_A = 249333188;
-        final int W_210_Rotonde_Het_Teken_249333187_A = 249333187;
-        final int W_209_Rotonde_Het_Teken_813970230_B = 813970230;
-        final int W_208_Rotonde_Het_Teken_41403540_A = 41403540;
-        final int W_207_Rotonde_Het_Teken_41403538_B = 41403538;
-        final int W_206_Ring_Zuid_79340950_A = 79340950;
-        final int W_205_Ring_Zuid_11369123_A = 11369123;
-        final int W_204__159949154_A = 159949154;
-        final int W_203__332258104_B = 332258104;
-        final int W_202__78852604_A = 78852604;
-        final int W_201__377918641_B = 377918641;
-        final int W_200__14508736_A = 14508736;
-        final int W_199_Ring_Zuid_109267436_A = 109267436;
-        final int W_198_Ring_Zuid_14508739_A = 14508739;
-        final int W_197_Ring_Zuid_14508740_A = 14508740;
-        final int W_196_Ring_Zuid_502328838_D = 502328838;
-        final int W_193_Rotonde_Het_Teken_78568660_A = 78568660;
-        final int W_192_Rotonde_Het_Teken_78873921_A = 78873921;
-        final int W_191_Rotonde_Het_Teken_3752557_A = 3752557;
-        final int W_190_Monseigneur_Van_Waeyenberghlaan_249333183_G = 249333183;
-        final int W_184_Monseigneur_Van_Waeyenberghlaan_189453003_A = 189453003;
-        final int W_183_Sint_Hubertusstraat_123929615_E = 123929615;
-        final int W_179_Biezenstraat_3358673_A = 3358673;
-        final int W_178_Kapucijnenvoer_123929547_B = 123929547;
-        final int W_177_Tessenstraat___Fonteinstraat_147856945_A = 147856945;
-        final int W_176_Brouwersstraat_284664272_E = 284664272;
-        final int W_172_Brouwersstraat_608715545_A = 608715545;
-        final int W_171_Brouwersstraat_284664268_M = 284664268;
-        final int W_159_Margarethaplein_3991635_A = 3991635;
-        final int W_158_Rector_De_Somerplein_16771741_J = 16771741;
-        final int W_149_Bondgenotenlaan_305434579_A = 305434579;
-        final int W_148_Tiensevest_81522744_B = 81522744;
-        final int W_147_Tiensevest_89574079_A = 89574079;
-        final int W_146_Tiensevest_79265237_A = 79265237;
-        final int W_145_Tiensevest_79211473_A = 79211473;
-        final int W_144__79605527_F = 79605527;
-        final int W_139__79596971_A = 79596971;
-        final int W_138__377918635_A = 377918635;
-        final int W_137__79264888_A = 79264888;
-        final int W_136__79264897_B = 79264897;
-        final int W_135__71754927_A = 71754927;
-        final int W_134__79596965_C = 79596965;
-        final int W_132__76867049_A = 76867049;
-        final int W_131_Diestsepoort_451873774_B = 451873774;
-        final int W_130_Diestsepoort_584356742_A = 584356742;
-        final int W_129_Diestsepoort_451873773_G = 451873773;
-        final int W_123_Diestsepoort_61556877_A = 61556877;
-        final int W_122_Diestsepoort_8109264_C = 8109264;
-        final int W_120_Diestsesteenweg_23707244_A = 23707244;
-        final int W_119_Diestsesteenweg_23707243_A = 23707243;
-        final int W_118_Oude_Diestsesteenweg_10230617_Z = 10230617;
-        final int W_70_Lostraat_40189518_A = 40189518;
-        final int W_69_Ganzendries_112917224_F = 112917224;
-        final int W_64__847554912_A = 847554912;
-        final int W_63__27686453_G = 27686453;
-        final int W_57_Sint_Barbaradreef_112917225_A = 112917225;
-        final int W_56__847554912_F = 847554912;
-        final int W_51_Ganzendries_112917224_A = 112917224;
-        final int W_50_Kapelstraat_16377612_K = 16377612;
-        final int W_40_Bollenberg_81197019_A = 81197019;
-        final int W_39_Dorpskring_125835541_A = 125835541;
-        final int W_38_Dorpskring_81083332_C = 81083332;
-        final int W_37_Dorpskring_125835543_B = 125835543;
-        final int W_36_Dorpskring_608754701_A = 608754701;
 
-        for (int n = 221; n >= 213; n--) {returnValueNull =segment401.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment402 = segment401.addPTWayMember(212);
-        extractAndAssertValues(212, segment401, segment402, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_213_Ring_Noord_112917239_A, W_221_Ring_Noord_377918626_I,
-            W_212_Rotonde_Het_Teken_3752557_A, "Rotonde Het Teken",
-            null,
-            "3");
+        expectedValues = Arrays.asList(
+            new Val( 221, 377918626, 377918626, 377918626, "Ring Noord"),
+            new Val( 220, 243915691, 377918626, 243915691, "Ring Noord"),
+            new Val( 219, 126304975, 377918626, 126304975, null),
+            new Val( 218, 326736776, 377918626, 326736776, null),
+            new Val( 217, 333580518, 377918626, 333580518, null),
+            new Val( 216, 608754690, 377918626, 608754690, "Ring Noord"),
+            new Val( 215, 112917238, 377918626, 112917238, "Ring Noord"),
+            new Val( 214, 502317797, 377918626, 502317797, "Ring Noord"),
+            new Val( 213, 112917239, 377918626, 112917239, "Ring Noord"),
 
-        RouteSegmentToExtract segment403 = segment402.addPTWayMember(211);
-        extractAndAssertValues(211, segment402, segment403, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_212_Rotonde_Het_Teken_3752557_A, W_212_Rotonde_Het_Teken_3752557_A,
-            W_211_Rotonde_Het_Teken_249333188_A, "Rotonde Het Teken",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;600;601");
+            new Val( 212, 112917239, 377918626,   3752557, "Rotonde Het Teken",
+                "Ring Noord (3)",
+                "3"),
 
-        RouteSegmentToExtract segment404 = segment403.addPTWayMember(210);
-        extractAndAssertValues(210, segment403, segment404, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_211_Rotonde_Het_Teken_249333188_A, W_211_Rotonde_Het_Teken_249333188_A,
-            W_210_Rotonde_Het_Teken_249333187_A, "Rotonde Het Teken",
-            null,
-            "3;410;600;601");
 
-        RouteSegmentToExtract segment405 = segment404.addPTWayMember(209);
-        extractAndAssertValues(209, segment404, segment405, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_210_Rotonde_Het_Teken_249333187_A, W_210_Rotonde_Het_Teken_249333187_A,
-            W_209_Rotonde_Het_Teken_813970230_B, "Rotonde Het Teken",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
+            new Val( 211,   3752557,   3752557, 249333188, "Rotonde Het Teken",
+                "Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;600;601"),
 
-        for (int n = 208; n >= 208; n--) {returnValueNull =segment405.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment406 = segment405.addPTWayMember(207);
-        extractAndAssertValues(207, segment405, segment406, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_208_Rotonde_Het_Teken_41403540_A, W_209_Rotonde_Het_Teken_813970230_B,
-            W_207_Rotonde_Het_Teken_41403538_B, "Rotonde Het Teken",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;513");
 
-        for (int n = 206; n >= 206; n--) {returnValueNull =segment406.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment407 = segment406.addPTWayMember(205);
-        extractAndAssertValues(205, segment406, segment407, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_206_Ring_Zuid_79340950_A, W_207_Rotonde_Het_Teken_41403538_B,
-            W_205_Ring_Zuid_11369123_A, "Ring Zuid",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
+            new Val( 210, 249333188, 249333188, 249333187, "Rotonde Het Teken",
+                "Rotonde Het Teken (3;410;600;601)",
+                "3;410;600;601"),
 
-        RouteSegmentToExtract segment408 = segment407.addPTWayMember(204);
-        extractAndAssertValues(204, segment407, segment408, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_205_Ring_Zuid_11369123_A, W_205_Ring_Zuid_11369123_A,
-            W_204__159949154_A, null,
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
 
-        RouteSegmentToExtract segment409 = segment408.addPTWayMember(203);
-        extractAndAssertValues(203, segment408, segment409, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_204__159949154_A, W_204__159949154_A,
-            W_203__332258104_B, null,
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
+            new Val( 209, 249333187, 249333187, 813970230, "Rotonde Het Teken",
+                "Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
 
-        for (int n = 202; n >= 202; n--) {returnValueNull =segment409.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment410 = segment409.addPTWayMember(201);
-        extractAndAssertValues(201, segment409, segment410, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_202__78852604_A, W_203__332258104_B,
-            W_201__377918641_B, null,
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601");
+            new Val( 208,  41403540, 813970230,  41403540, "Rotonde Het Teken"),
 
-        for (int n = 200; n >= 200; n--) {returnValueNull =segment410.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment411 = segment410.addPTWayMember(199);
-        extractAndAssertValues(199, segment410, segment411, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_200__14508736_A, W_201__377918641_B,
-            W_199_Ring_Zuid_109267436_A, "Ring Zuid",
-            null,
-            "3;317;395;410;601");
+            new Val( 207,  41403540, 813970230,  41403538, "Rotonde Het Teken",
+                "Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;513)",
+                "3;317;333;334;335;370;371;373;374;380;395;513"),
 
-        RouteSegmentToExtract segment412 = segment411.addPTWayMember(198);
-        extractAndAssertValues(198, segment411, segment412, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_199_Ring_Zuid_109267436_A, W_199_Ring_Zuid_109267436_A,
-            W_198_Ring_Zuid_14508739_A, "Ring Zuid",
-            null,
-            "3;317;395;410;600;601");
+            new Val( 206,  79340950,  41403538,  79340950, "Ring Zuid"),
 
-        RouteSegmentToExtract segment413 = segment412.addPTWayMember(197);
-        extractAndAssertValues(197, segment412, segment413, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_198_Ring_Zuid_14508739_A, W_198_Ring_Zuid_14508739_A,
-            W_197_Ring_Zuid_14508740_A, "Ring Zuid",
-            null,
-            "3;317;334;335;395;410;600;601");
+            new Val( 205,  79340950,  41403538,  11369123, "Ring Zuid",
+                "Ring Zuid - Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
 
-        RouteSegmentToExtract segment414 = segment413.addPTWayMember(196);
-        extractAndAssertValues(196, segment413, segment414, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_197_Ring_Zuid_14508740_A, W_197_Ring_Zuid_14508740_A,
-            W_196_Ring_Zuid_502328838_D, "Ring Zuid",
-            null,
-            "3;317;334;335;380;395;410;600;601");
 
-        for (int n = 195; n >= 193; n--) {returnValueNull =segment414.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment415 = segment414.addPTWayMember(192);
-        extractAndAssertValues(192, segment414, segment415, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_193_Rotonde_Het_Teken_78568660_A, W_196_Ring_Zuid_502328838_D,
-            W_192_Rotonde_Het_Teken_78873921_A, "Rotonde Het Teken",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;600;601");
+            new Val( 204,  11369123,  11369123, 159949154, null,
+                "Ring Zuid (3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
 
-        RouteSegmentToExtract segment416 = segment415.addPTWayMember(191);
-        extractAndAssertValues(191, segment415, segment416, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_192_Rotonde_Het_Teken_78873921_A, W_192_Rotonde_Het_Teken_78873921_A,
-            W_191_Rotonde_Het_Teken_3752557_A, "Rotonde Het Teken",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;600;601");
 
-        RouteSegmentToExtract segment417 = segment416.addPTWayMember(190);
-        extractAndAssertValues(190, segment416, segment417, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_191_Rotonde_Het_Teken_3752557_A, W_191_Rotonde_Het_Teken_3752557_A,
-            W_190_Monseigneur_Van_Waeyenberghlaan_249333183_G, "Monseigneur Van Waeyenberghlaan",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395;410;600;601");
+            new Val( 203, 159949154, 159949154, 332258104, null,
+                "(3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
 
-        for (int n = 189; n >= 184; n--) {returnValueNull =segment417.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment418 = segment417.addPTWayMember(183);
-        extractAndAssertValues(183, segment417, segment418, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_184_Monseigneur_Van_Waeyenberghlaan_189453003_A, W_190_Monseigneur_Van_Waeyenberghlaan_249333183_G,
-            W_183_Sint_Hubertusstraat_123929615_E, "Sint-Hubertusstraat",
-            null,
-            "3;317;333;334;335;370;371;373;374;380;395");
+            new Val( 202,  78852604, 332258104,  78852604, null),
 
-        for (int n = 182; n >= 179; n--) {returnValueNull =segment418.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment419 = segment418.addPTWayMember(178);
-        extractAndAssertValues(178, segment418, segment419, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_179_Biezenstraat_3358673_A, W_183_Sint_Hubertusstraat_123929615_E,
-            W_178_Kapucijnenvoer_123929547_B, "Kapucijnenvoer",
-            null,
-            "3;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395");
+            new Val( 201,  78852604, 332258104, 377918641, null,
+                "(3;317;333;334;335;370;371;373;374;380;395;410;513;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;513;600;601"),
 
-        for (int n = 177; n >= 177; n--) {returnValueNull =segment419.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment420 = segment419.addPTWayMember(176);
-        extractAndAssertValues(176, segment419, segment420, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_177_Tessenstraat___Fonteinstraat_147856945_A, W_178_Kapucijnenvoer_123929547_B,
-            W_176_Brouwersstraat_284664272_E, "Brouwersstraat",
-            null,
-            "3;7;8;9;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;586");
+            new Val( 200,  14508736, 377918641,  14508736, null),
 
-        for (int n = 175; n >= 172; n--) {returnValueNull =segment420.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment421 = segment420.addPTWayMember(171);
-        extractAndAssertValues(171, segment420, segment421, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_172_Brouwersstraat_608715545_A, W_176_Brouwersstraat_284664272_E,
-            W_171_Brouwersstraat_284664268_M, "Brouwersstraat",
-            null,
-            "3;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;586");
+            new Val( 199,  14508736, 377918641, 109267436, "Ring Zuid",
+                "(3;317;395;410;601)",
+                "3;317;395;410;601"),
 
-        for (int n = 170; n >= 159; n--) {returnValueNull =segment421.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment422 = segment421.addPTWayMember(158);
-        extractAndAssertValues(158, segment421, segment422, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_159_Margarethaplein_3991635_A, W_171_Brouwersstraat_284664268_M,
-            W_158_Rector_De_Somerplein_16771741_J, "Rector De Somerplein",
-            null,
-            "3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;586");
 
-        for (int n = 157; n >= 149; n--) {returnValueNull =segment422.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment423 = segment422.addPTWayMember(148);
-        extractAndAssertValues(148, segment422, segment423, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_149_Bondgenotenlaan_305434579_A, W_158_Rector_De_Somerplein_16771741_J,
-            W_148_Tiensevest_81522744_B, "Tiensevest",
-            null,
-            "2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;539;586");
+            new Val( 198, 109267436, 109267436,  14508739, "Ring Zuid",
+                "Ring Zuid (3;317;395;410;600;601)",
+                "3;317;395;410;600;601"),
 
-        for (int n = 147; n >= 147; n--) {returnValueNull =segment423.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment424 = segment423.addPTWayMember(146);
-        extractAndAssertValues(146, segment423, segment424, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_147_Tiensevest_89574079_A, W_148_Tiensevest_81522744_B,
-            W_146_Tiensevest_79265237_A, "Tiensevest",
-            null,
-            "1;2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;539;586;616");
 
-        RouteSegmentToExtract segment425 = segment424.addPTWayMember(145);
-        extractAndAssertValues(145, segment424, segment425, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_146_Tiensevest_79265237_A, W_146_Tiensevest_79265237_A,
-            W_145_Tiensevest_79211473_A, "Tiensevest",
-            null,
-            "1;2;3;4;5;6;7;8;9;284;285;315;316;317;351;352;358;395;520;524;525;537;539;586;616");
+            new Val( 197,  14508739,  14508739,  14508740, "Ring Zuid",
+                "Ring Zuid (3;317;334;335;395;410;600;601)",
+                "3;317;334;335;395;410;600;601"),
 
-        RouteSegmentToExtract segment426 = segment425.addPTWayMember(144);
-        extractAndAssertValues(144, segment425, segment426, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_145_Tiensevest_79211473_A, W_145_Tiensevest_79211473_A,
-            W_144__79605527_F, null,
-            null,
-            "1;2;3;4;5;6;7;8;9;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;520;524;525;537;539;586;601;616;658");
 
-        for (int n = 143; n >= 139; n--) {returnValueNull =segment426.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment428 = segment426.addPTWayMember(138);
-        extractAndAssertValues(138, segment426, segment428, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_139__79596971_A, W_144__79605527_F,
-            W_138__377918635_A, null,
-            null,
-            "3;4;5;6;7;8;9");
+            new Val( 196,  14508740,  14508740, 502328838, "Ring Zuid",
+                "Ring Zuid (3;317;334;335;380;395;410;600;601)",
+                "3;317;334;335;380;395;410;600;601"),
 
-        RouteSegmentToExtract segment429 = segment428.addPTWayMember(137);
-        extractAndAssertValues(137, segment428, segment429, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_138__377918635_A, W_138__377918635_A,
-            W_137__79264888_A, null,
-            null,
-            "3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;601");
+            new Val( 195, 502328837, 502328838, 502328837, "Ring Zuid"),
+            new Val( 194,   8080023, 502328838,   8080023, "Ring Zuid"),
+            new Val( 193,  78568660, 502328838,  78568660, "Rotonde Het Teken"),
+            new Val( 192,  78873921, 502328838,  78873921, "Rotonde Het Teken"),
 
-        RouteSegmentToExtract segment430 = segment429.addPTWayMember(136);
-        extractAndAssertValues(136, segment429, segment430, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_137__79264888_A, W_137__79264888_A,
-            W_136__79264897_B, null,
-            null,
-            "2;3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;525;601");
+            new Val( 191,  78873921, 502328838,   3752557, "Rotonde Het Teken",
+                "Rotonde Het Teken - Ring Zuid (3;317;333;334;335;370;371;373;374;380;395;410;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;600;601"),
 
-        for (int n = 135; n >= 135; n--) {returnValueNull =segment430.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment432 = segment430.addPTWayMember(134);
-        extractAndAssertValues(134, segment430, segment432, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_135__71754927_A, W_136__79264897_B,
-            W_134__79596965_C, null,
-            null,
-            "2;3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;524;525;601");
 
-        for (int n = 133; n >= 132; n--) {returnValueNull =segment432.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment433 = segment432.addPTWayMember(131);
-        extractAndAssertValues(131, segment432, segment433, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_132__76867049_A, W_134__79596965_C,
-            W_131_Diestsepoort_451873774_B, "Diestsepoort",
-            null,
-            "2;3;4;5;6;7;8;9;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;524;525");
+            new Val( 190,   3752557,   3752557, 249333183, "Monseigneur Van Waeyenberghlaan",
+                "Rotonde Het Teken (3;317;333;334;335;370;371;373;374;380;395;410;600;601)",
+                "3;317;333;334;335;370;371;373;374;380;395;410;600;601"),
 
-        for (int n = 130; n >= 130; n--) {returnValueNull =segment433.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment434 = segment433.addPTWayMember(129);
-        extractAndAssertValues(129, segment433, segment434, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_130_Diestsepoort_584356742_A, W_131_Diestsepoort_451873774_B,
-            W_129_Diestsepoort_451873773_G, "Diestsepoort",
-            null,
-            "2;3;178;179;306;306 (student);310;318;333;337;370;371;373;374;410;433;475;485;512;520;524;525");
+            new Val( 189, 810592121, 249333183, 810592121, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 188, 189453001, 249333183, 189453001, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 187, 189453002, 249333183, 189453002, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 186, 189453004, 249333183, 189453004, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 185,  79289753, 249333183,  79289753, "Monseigneur Van Waeyenberghlaan"),
+            new Val( 184, 189453003, 249333183, 189453003, "Monseigneur Van Waeyenberghlaan"),
 
-        for (int n = 128; n >= 123; n--) {returnValueNull =segment434.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment436 = segment434.addPTWayMember(122);
-        extractAndAssertValues(122, segment434, segment436, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_123_Diestsepoort_61556877_A, W_129_Diestsepoort_451873773_G,
-            W_122_Diestsepoort_8109264_C, "Diestsepoort",
-            null,
-            "2;3;178;179;306;306 (student);310;333;370;371;373;374;433;475;485;512;520;524;525");
+            new Val( 183, 189453003, 249333183, 123929615, "Sint-Hubertusstraat",
+                "Monseigneur Van Waeyenberghlaan (3;317;333;334;335;370;371;373;374;380;395)",
+                "3;317;333;334;335;370;371;373;374;380;395"),
 
-        for (int n = 121; n >= 120; n--) {returnValueNull =segment436.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment437 = segment436.addPTWayMember(119);
-        extractAndAssertValues(119, segment436, segment437, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_120_Diestsesteenweg_23707244_A, W_122_Diestsepoort_8109264_C,
-            W_119_Diestsesteenweg_23707243_A, "Diestsesteenweg",
-            null,
-            "2;3;179;306;306 (student);310;333;370;371;373;374;433;475;485;512;520;524;525");
+            new Val( 182,   3358671, 123929615,   3358671, "Sint-Jacobsplein"),
+            new Val( 181, 521211966, 123929615, 521211966, "Sint-Jacobsplein"),
+            new Val( 180, 578662071, 123929615, 578662071, "Sint-Jacobsplein"),
+            new Val( 179,   3358673, 123929615,   3358673, "Biezenstraat"),
 
-        RouteSegmentToExtract segment438 = segment437.addPTWayMember(118);
-        extractAndAssertValues(118, segment437, segment438, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_119_Diestsesteenweg_23707243_A, W_119_Diestsesteenweg_23707243_A,
-            W_118_Oude_Diestsesteenweg_10230617_Z, "Oude Diestsesteenweg",
-            null,
-            "3;370;371;373;374;475;485;524;525");
+            new Val( 178,   3358673, 123929615, 123929547, "Kapucijnenvoer",
+                "Biezenstraat - Sint-Hubertusstraat (3;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395)",
+                "3;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395"),
 
-        for (int n = 117; n >= 70; n--) {returnValueNull =segment438.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment439 = segment438.addPTWayMember(69);
-        extractAndAssertValues(69, segment438, segment439, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_70_Lostraat_40189518_A, W_118_Oude_Diestsesteenweg_10230617_Z,
-            W_69_Ganzendries_112917224_F, "Ganzendries",
-            null,
-            "3");
+            new Val( 177, 147856945, 123929547, 147856945, "Tessenstraat - Fonteinstraat"),
 
-        for (int n = 68; n >= 64; n--) {returnValueNull =segment439.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment440 = segment439.addPTWayMember(63);
-        extractAndAssertValues(63, segment439, segment440, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_64__847554912_A, W_69_Ganzendries_112917224_F,
-            W_63__27686453_G, null,
-            null,
-            "3");
+            new Val( 176, 147856945, 123929547, 284664272, "Brouwersstraat",
+                "Tessenstraat - Fonteinstraat - Kapucijnenvoer (3;7;8;9;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;586)",
+                "3;7;8;9;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;586"),
 
-        for (int n = 62; n >= 57; n--) {returnValueNull =segment440.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment441 = segment440.addPTWayMember(56);
-        extractAndAssertValues(56, segment440, segment441, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_57_Sint_Barbaradreef_112917225_A, W_63__27686453_G,
-            W_56__847554912_F, null,
-            null,
-            "3");
+            new Val( 175, 608715544, 284664272, 608715544, "Brouwersstraat"),
+            new Val( 174, 608715542, 284664272, 608715542, "Brouwersstraat"),
+            new Val( 173, 608715543, 284664272, 608715543, "Brouwersstraat"),
+            new Val( 172, 608715545, 284664272, 608715545, "Brouwersstraat"),
 
-        for (int n = 55; n >= 51; n--) {returnValueNull =segment441.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment442 = segment441.addPTWayMember(50);
-        extractAndAssertValues(50, segment441, segment442, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_51_Ganzendries_112917224_A, W_56__847554912_F,
-            W_50_Kapelstraat_16377612_K, "Kapelstraat",
-            null,
-            "3");
+            new Val( 171, 608715545, 284664272, 284664268, "Brouwersstraat",
+                "Brouwersstraat (3;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;586)",
+                "3;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;586"),
 
-        for (int n = 49; n >= 40; n--) {returnValueNull =segment442.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment443 = segment442.addPTWayMember(39);
-        extractAndAssertValues(39, segment442, segment443, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_40_Bollenberg_81197019_A, W_50_Kapelstraat_16377612_K,
-            W_39_Dorpskring_125835541_A, "Dorpskring",
-            null,
-            "3");
+            new Val( 170, 438252643, 284664268, 438252643, "Dirk Boutslaan"),
+            new Val( 169,   3992578, 284664268,   3992578, "Dirk Boutslaan"),
+            new Val( 168, 293149632, 284664268, 293149632, "Dirk Boutslaan"),
+            new Val( 167, 608715541, 284664268, 608715541, "Dirk Boutslaan"),
+            new Val( 166, 578662072, 284664268, 578662072, "Dirk Boutslaan"),
+            new Val( 165,  10269271, 284664268,  10269271, "Dirk Boutslaan"),
+            new Val( 164, 293288706, 284664268, 293288706, "Mathieu de Layensplein"),
+            new Val( 163,  80194313, 284664268,  80194313, "Mathieu de Layensplein"),
+            new Val( 162, 453538107, 284664268, 453538107, "Margarethaplein"),
+            new Val( 161, 608715546, 284664268, 608715546, "Margarethaplein"),
+            new Val( 160, 521211973, 284664268, 521211973, "Margarethaplein"),
+            new Val( 159,   3991635, 284664268,   3991635, "Margarethaplein"),
 
-        RouteSegmentToExtract segment444 = segment443.addPTWayMember(38);
-        extractAndAssertValues(38, segment443, segment444, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_39_Dorpskring_125835541_A, W_39_Dorpskring_125835541_A,
-            W_38_Dorpskring_81083332_C, "Dorpskring",
-            null,
-            "3;373;485");
+            new Val( 158,   3991635, 284664268,  16771741, "Rector De Somerplein",
+                "Margarethaplein - Brouwersstraat (3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;586)",
+                "3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;586"),
 
-        // todo This is not the behaviour I wanted. It shouldn't actually split at index 36
-        for (int n = 37; n >= 37; n--) {returnValueNull =segment444.addPTWayMember(n); assertNull(String.format("%d %s%s\n", n, rc, bus3_Lubbeek_Pellenberg_GHB_RouteRelation.getMember(n).getMember().getId()), returnValueNull);}
-        RouteSegmentToExtract segment445 = segment444.addPTWayMember(36);
-        extractAndAssertValues(36, segment444, segment445, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_37_Dorpskring_125835543_B, W_38_Dorpskring_81083332_C,
-            W_36_Dorpskring_608754701_A, "Dorpskring",
-            null,
-            "3;373;485");
+            new Val( 157, 521211976,  16771741, 521211976, "Rector De Somerplein"),
+            new Val( 156, 521211977,  16771741, 521211977, "Rector De Somerplein"),
+            new Val( 155, 174985125,  16771741, 174985125, "Rector De Somerplein"),
+            new Val( 154,   3991636,  16771741,   3991636, "Bondgenotenlaan"),
+            new Val( 153, 578662094,  16771741, 578662094, "Bondgenotenlaan"),
+            new Val( 152, 578662095,  16771741, 578662095, "Bondgenotenlaan"),
+            new Val( 151, 578662092,  16771741, 578662092, "Bondgenotenlaan"),
+            new Val( 150, 578662093,  16771741, 578662093, "Bondgenotenlaan"),
+            new Val( 149, 305434579,  16771741, 305434579, "Bondgenotenlaan"),
 
-        RouteSegmentToExtract segment446 = segment445.addPTWayMember(35);
-        extractAndAssertValues(35, segment445, segment446, bus3_Lubbeek_Pellenberg_GHB_RouteRelation,
-            W_36_Dorpskring_608754701_A, W_36_Dorpskring_608754701_A,
-            0, null,
-            null,
-            "3;373;485");
+            new Val( 148, 305434579,  16771741,  81522744, "Tiensevest",
+                "Bondgenotenlaan - Rector De Somerplein (2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;539;586)",
+                "2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;539;586"),
+
+            new Val( 147,  89574079,  81522744,  89574079, "Tiensevest"),
+
+            new Val( 146,  89574079,  81522744,  79265237, "Tiensevest",
+                "Tiensevest (1;2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;539;586;616)",
+                "1;2;3;4;5;6;7;8;9;284;285;315;316;317;333;334;335;351;352;358;370;371;373;374;380;395;520;524;525;537;539;586;616"),
+
+
+            new Val( 145,  79265237,  79265237,  79211473, "Tiensevest",
+                "Tiensevest (1;2;3;4;5;6;7;8;9;284;285;315;316;317;351;352;358;395;520;524;525;537;539;586;616)",
+                "1;2;3;4;5;6;7;8;9;284;285;315;316;317;351;352;358;395;520;524;525;537;539;586;616"),
+
+
+            new Val( 144,  79211473,  79211473,  79605527, null,
+                "Tiensevest (1;2;3;4;5;6;7;8;9;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;520;524;525;537;539;586;601;616;658)",
+                "1;2;3;4;5;6;7;8;9;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;520;524;525;537;539;586;601;616;658"),
+
+            new Val( 143,  79605524,  79605527,  79605524, null),
+            new Val( 142, 377918661,  79605527, 377918661, null),
+            new Val( 141,  79596984,  79605527,  79596984, null),
+            new Val( 140, 377918662,  79605527, 377918662, null),
+            new Val( 139,  79596971,  79605527,  79596971, null),
+
+            new Val( 138,  79596971,  79605527, 377918635, null,
+                "perron 3 & 4 (3;4;5;6;7;8;9)",
+                "3;4;5;6;7;8;9"),
+
+
+            new Val( 137, 377918635, 377918635,  79264888, null,
+                "(3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;601)",
+                "3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;601"),
+
+
+            new Val( 136,  79264888,  79264888,  79264897, null,
+                "(2;3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;525;601)",
+                "2;3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;525;601"),
+
+            new Val( 135,  71754927,  79264897,  71754927, null),
+
+            new Val( 134,  71754927,  79264897,  79596965, null,
+                "(2;3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;524;525;601)",
+                "2;3;4;5;6;7;8;9;18;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;524;525;601"),
+
+            new Val( 133,  79264890,  79596965,  79264890, null),
+            new Val( 132,  76867049,  79596965,  76867049, null),
+
+            new Val( 131,  76867049,  79596965, 451873774, "Diestsepoort",
+                "(2;3;4;5;6;7;8;9;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;524;525)",
+                "2;3;4;5;6;7;8;9;178;179;306 (student);333;334;335;337;370;371;373;374;380;512;520;524;525"),
+
+            new Val( 130, 584356742, 451873774, 584356742, "Diestsepoort"),
+
+            new Val( 129, 584356742, 451873774, 451873773, "Diestsepoort",
+                "Diestsepoort (2;3;178;179;306;306 (student);310;318;333;337;370;371;373;374;410;433;475;485;512;520;524;525)",
+                "2;3;178;179;306;306 (student);310;318;333;337;370;371;373;374;410;433;475;485;512;520;524;525"),
+
+            new Val( 128, 584356751, 451873773, 584356751, "Diestsepoort"),
+            new Val( 127, 198559166, 451873773, 198559166, "Diestsepoort"),
+            new Val( 126, 584356745, 451873773, 584356745, "Diestsepoort"),
+            new Val( 125, 584356749, 451873773, 584356749, "Diestsepoort"),
+            new Val( 124, 663770966, 451873773, 663770966, "Diestsepoort"),
+            new Val( 123,  61556877, 451873773,  61556877, "Diestsepoort"),
+
+            new Val( 122,  61556877, 451873773,   8109264, "Diestsepoort",
+                "Diestsepoort (2;3;178;179;306;306 (student);310;333;370;371;373;374;433;475;485;512;520;524;525)",
+                "2;3;178;179;306;306 (student);310;333;370;371;373;374;433;475;485;512;520;524;525"),
+
+            new Val( 121, 125835524,   8109264, 125835524, "Diestsesteenweg"),
+            new Val( 120,  23707244,   8109264,  23707244, "Diestsesteenweg"),
+
+            new Val( 119,  23707244,   8109264,  23707243, "Diestsesteenweg",
+                "Diestsesteenweg - Diestsepoort (2;3;179;306;306 (student);310;333;370;371;373;374;433;475;485;512;520;524;525)",
+                "2;3;179;306;306 (student);310;333;370;371;373;374;433;475;485;512;520;524;525"),
+
+
+            new Val( 118,  23707243,  23707243,  10230617, "Oude Diestsesteenweg",
+                "Diestsesteenweg (3;370;371;373;374;475;485;524;525)",
+                "3;370;371;373;374;475;485;524;525"),
+
+            new Val( 117,   3992546,  10230617,   3992546, "Martelarenlaan"),
+            new Val( 116, 608715590,  10230617, 608715590, "Martelarenlaan"),
+            new Val( 115, 608715586,  10230617, 608715586, "Martelarenlaan"),
+            new Val( 114, 284832275,  10230617, 284832275, "Martelarenlaan"),
+            new Val( 113, 608715584,  10230617, 608715584, "Martelarenlaan"),
+            new Val( 112, 608715582,  10230617, 608715582, "Martelarenlaan"),
+            new Val( 111,  23707242,  10230617,  23707242, "Martelarenlaan"),
+            new Val( 110, 485802425,  10230617, 485802425, "Spoordijk"),
+            new Val( 109,  16377030,  10230617,  16377030, "Martelarenlaan"),
+            new Val( 108, 101619136,  10230617, 101619136, "Koning Albertlaan"),
+            new Val( 107, 622063636,  10230617, 622063636, "Koning Albertlaan"),
+            new Val( 106, 622063635,  10230617, 622063635, "Koning Albertlaan"),
+            new Val( 105, 101619135,  10230617, 101619135, "Koning Albertlaan"),
+            new Val( 104,  12195285,  10230617,  12195285, "Koning Albertlaan"),
+            new Val( 103,  25155107,  10230617,  25155107, "Willem Coosemansstraat"),
+            new Val( 102,  10657957,  10230617,  10657957, "Prins-Regentlaan"),
+            new Val( 101,  10672178,  10230617,  10672178, "Prins Regentplein"),
+            new Val( 100, 112917229,  10230617, 112917229, "Prins Regentplein"),
+            new Val( 99, 112917228,  10230617, 112917228, "Prins Regentplein"),
+            new Val( 98,  10672177,  10230617,  10672177, "Lijsterlaan"),
+            new Val( 97, 608754700,  10230617, 608754700, "Lijsterlaan"),
+            new Val( 96, 112917233,  10230617, 112917233, "Lijsterlaan"),
+            new Val( 95, 608754699,  10230617, 608754699, "Lijsterlaan"),
+            new Val( 94,  10672176,  10230617,  10672176, "Duivenstraat"),
+            new Val( 93, 112917234,  10230617, 112917234, "Duivenstraat"),
+            new Val( 92,  23436182,  10230617,  23436182, "Platte-Lostraat"),
+            new Val( 91,  10672174,  10230617,  10672174, "Gaston Eyskenslaan"),
+            new Val( 90, 608754692,  10230617, 608754692, "Koetsweg"),
+            new Val( 89, 608754691,  10230617, 608754691, "Koetsweg"),
+            new Val( 88,  10672135,  10230617,  10672135, "Koetsweg"),
+            new Val( 87,  10672031,  10230617,  10672031, "Heidebergstraat"),
+            new Val( 86, 586861164,  10230617, 586861164, "Heidebergstraat"),
+            new Val( 85, 192706265,  10230617, 192706265, "Heidebergstraat"),
+            new Val( 84, 318216944,  10230617, 318216944, "Heidebergstraat"),
+            new Val( 83, 192706264,  10230617, 192706264, "Heidebergstraat"),
+            new Val( 82, 112917248,  10230617, 112917248, "Heidebergstraat"),
+            new Val( 81,  79801760,  10230617,  79801760, "Heidebergstraat"),
+            new Val( 80,  61596758,  10230617,  61596758, "Heidebergstraat"),
+            new Val( 79,  10672083,  10230617,  10672083, "Heidebergstraat"),
+            new Val( 78,  10672080,  10230617,  10672080, "Heidebergstraat"),
+            new Val( 77, 633919766,  10230617, 633919766, "Lostraat"),
+            new Val( 76,  10672044,  10230617,  10672044, "Lostraat"),
+            new Val( 75, 124913579,  10230617, 124913579, "Lostraat"),
+            new Val( 74, 636491594,  10230617, 636491594, "Lostraat"),
+            new Val( 73, 636491595,  10230617, 636491595, "Lostraat"),
+            new Val( 72, 350992067,  10230617, 350992067, "Lostraat"),
+            new Val( 71, 351196789,  10230617, 351196789, "Lostraat"),
+            new Val( 70,  40189518,  10230617,  40189518, "Lostraat"),
+
+            new Val( 69,  40189518,  10230617, 112917224, "Ganzendries",
+                "Lostraat - Oude Diestsesteenweg (3)",
+                "3"),
+
+            new Val( 68, 319264895, 112917224, 319264895, "Ganzendries"),
+            new Val( 67,  27682732, 112917224,  27682732, "Sint Barbaradreef"),
+            new Val( 66, 527248228, 112917224, 527248228, null),
+            new Val( 65,  27686451, 112917224,  27686451, null),
+            new Val( 64, 847554912, 112917224, 847554912, null),
+
+            new Val( 63, 847554912, 112917224,  27686453, null,
+                "Sint Barbaradreef - Ganzendries (3)",
+                "3"),
+
+            new Val( 62, 110643012,  27686453, 110643012, null),
+            new Val( 61, 112917220,  27686453, 112917220, null),
+            new Val( 60,  70869366,  27686453,  70869366, null),
+            new Val( 59,  27682735,  27686453,  27682735, null),
+            new Val( 58, 319269351,  27686453, 319269351, "Sint Barbaradreef"),
+            new Val( 57, 112917225,  27686453, 112917225, "Sint Barbaradreef"),
+
+            new Val( 56, 112917225,  27686453, 847554912, null,
+                "Sint Barbaradreef (3)",
+                "3"),
+
+            new Val( 55,  27686451, 847554912,  27686451, null),
+            new Val( 54, 527248228, 847554912, 527248228, null),
+            new Val( 53,  27682732, 847554912,  27682732, "Sint Barbaradreef"),
+            new Val( 52, 319264895, 847554912, 319264895, "Ganzendries"),
+            new Val( 51, 112917224, 847554912, 112917224, "Ganzendries"),
+
+            new Val( 50, 112917224, 847554912,  16377612, "Kapelstraat",
+                "Ganzendries - Sint Barbaradreef (3)",
+                "3"),
+
+            new Val( 49,  16377722,  16377612,  16377722, "Kapelstraat"),
+            new Val( 48, 636950670,  16377612, 636950670, "Kapelstraat"),
+            new Val( 47, 319269331,  16377612, 319269331, "Kapelstraat"),
+            new Val( 46,  10658839,  16377612,  10658839, "Lubbeekstraat"),
+            new Val( 45, 232474772,  16377612, 232474772, "Lubbeekstraat"),
+            new Val( 44,  27688813,  16377612,  27688813, "Bollenberg"),
+            new Val( 43, 645048305,  16377612, 645048305, "Bollenberg"),
+            new Val( 42, 694551612,  16377612, 694551612, "Bollenberg"),
+            new Val( 41, 112917100,  16377612, 112917100, "Bollenberg"),
+            new Val( 40,  81197019,  16377612,  81197019, "Bollenberg"),
+
+            new Val( 39,  81197019,  16377612, 125835541, "Dorpskring",
+                "Bollenberg - Kapelstraat (3)",
+                "3"),
+
+
+            new Val( 38, 125835541, 125835541,  81083332, "Dorpskring",
+                "Dorpskring (3;373;485)",
+                "3;373;485"),
+
+            new Val( 37, 125835543,  81083332, 125835543, "Dorpskring"),
+
+            new Val( 36, 125835543,  81083332, 608754701, "Dorpskring",
+                "Dorpskring (3;373;485)",
+                "3;373;485"),
+
+
+            new Val( 35, 608754701,  608754701, 608754701, "Dorpskring",
+                "Dorpskring (3;373;485)",
+                "3;373;485")
+        );
+        previousSegment = new RouteSegmentToExtract(bus3_Lubbeek_Pellenberg_GHB_RouteRelation);
+        previousSegment.setActiveDataSet(ds);
+        for (Val v: expectedValues) {
+            segment = previousSegment.addPTWayMember(v.index);
+            if (segment != null) {
+                extractAndAssertValues(v.index, previousSegment, segment, bus3_Lubbeek_Pellenberg_GHB_RouteRelation, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,
+                    null, v.expectedRouteRef);
+                previousSegment = segment;
+            }
+        }
+
+        System.out.print("\n");
+
+        // ***********************************************************
+        // Line 310 has 3 variants
+        // The shorter version goes from Leuven station to
+        // Aarschot station, making a spoon loop in Holsbeek
+        // ***********************************************************
+
+        Relation bus310_Leuven_Aarschot_Station_RouteRelation = allRelations.stream()
+            .filter(relation -> relation.getId() == 3297278)
+            .findFirst().orElse(null);
+
+        assertNotNull(bus310_Leuven_Aarschot_Station_RouteRelation);
+        RouteSegmentToExtract segment501 = new RouteSegmentToExtract(bus310_Leuven_Aarschot_Station_RouteRelation);
+        segment501.setActiveDataSet(ds);
+
+        assertEquals(bus310_Leuven_Aarschot_Station_RouteRelation.get("ref"), segment501.getLineIdentifiersSignature());
+        assertEquals(bus310_Leuven_Aarschot_Station_RouteRelation.get("colour"), segment501.getColoursSignature());
+
+        assertNull(segment501.extractToRelation(Collections.emptyList(), false));
+
+        assertEquals("", segment501.getWayIdsSignature());
+        assertEquals(Collections.emptyList(), segment501.getWayMembers());
+
+        expectedValues = Arrays.asList(
+            new Val( 213,  13856192,  13856192,  13856192, null),
+            new Val( 212, 100289896,  13856192, 100289896, "Statieplein"),
+
+            new Val( 211, 100289896,  13856192, 100289859, "Statieplein",
+                "Statieplein (310;334;335)",
+                "310;334;335"),
+
+            new Val( 210, 100289892, 100289859, 100289892, "Statieplein"),
+            new Val( 209, 100289852, 100289859, 100289852, "Statieplein"),
+            new Val( 208, 125101590, 100289859, 125101590, "Statieplein"),
+            new Val( 207, 101376793, 100289859, 101376793, "Statiestraat"),
+            new Val( 206,  41405911, 100289859,  41405911, "Statiestraat"),
+
+            new Val( 205,  41405911, 100289859, 125101554, "Albertlaan",
+                "Statiestraat - Statieplein (305;306;306 (student);310;334;335)",
+                "305;306;306 (student);310;334;335"),
+
+
+            new Val( 204, 125101554, 125101554,  13892080, "Albertlaan",
+                "Albertlaan (305;306;306 (student);310;334;335;513)",
+                "305;306;306 (student);310;334;335;513"),
+
+            new Val( 203, 412810122,  13892080, 412810122, "Leuvensesteenweg"),
+            new Val( 202, 125101584,  13892080, 125101584, "Leuvensesteenweg"),
+
+            new Val( 201, 125101584,  13892080, 188863432, "Leuvensesteenweg",
+                "Leuvensesteenweg - Albertlaan (310;334;335;513)",
+                "310;334;335;513"),
+
+            new Val( 200, 125101583, 188863432, 125101583, "Leuvensesteenweg"),
+
+            new Val( 199, 125101583, 188863432, 345152127, "Steenweg op Sint-Joris-Winge",
+                "Leuvensesteenweg (305;306;306 (student);310;334;335;513)",
+                "305;306;306 (student);310;334;335;513"),
+
+            new Val( 198, 412810127, 345152127, 412810127, "Steenweg op Sint-Joris-Winge"),
+            new Val( 197, 345152132, 345152127, 345152132, "Steenweg op Sint-Joris-Winge"),
+            new Val( 196, 602060323, 345152127, 602060323, "Steenweg op Sint-Joris-Winge"),
+            new Val( 195, 181252214, 345152127, 181252214, "Steenweg op Sint-Joris-Winge"),
+            new Val( 194, 102853195, 345152127, 102853195, "Steenweg op Sint-Joris-Winge"),
+            new Val( 193, 345152123, 345152127, 345152123, "Steenweg op Sint-Joris-Winge"),
+            new Val( 192, 345088986, 345152127, 345088986, "Steenweg op Sint-Joris-Winge"),
+            new Val( 191, 112565995, 345152127, 112565995, "Steenweg op Sint-Joris-Winge"),
+            new Val( 190, 102853233, 345152127, 102853233, null),
+            new Val( 189, 345088979, 345152127, 345088979, "Steenweg op Sint-Joris-Winge"),
+            new Val( 188, 345088980, 345152127, 345088980, "Steenweg op Sint-Joris-Winge"),
+            new Val( 187,  13226856, 345152127,  13226856, "Steenweg op Sint-Joris-Winge"),
+            new Val( 186, 137111763, 345152127, 137111763, "Steenweg op Sint-Joris-Winge"),
+            new Val( 185, 521257383, 345152127, 521257383, "Steenweg op Sint-Joris-Winge"),
+            new Val( 184, 521257382, 345152127, 521257382, "Steenweg op Sint-Joris-Winge"),
+            new Val( 183,  26431904, 345152127,  26431904, "Nieuwrodesesteenweg"),
+            new Val( 182, 345078866, 345152127, 345078866, "Nieuwrodesesteenweg"),
+            new Val( 181, 345078870, 345152127, 345078870, "Steenweg op Sint-Joris-Winge"),
+            new Val( 180, 345078865, 345152127, 345078865, "Steenweg op Sint-Joris-Winge"),
+            new Val( 179, 136845549, 345152127, 136845549, "Nieuwrodesesteenweg"),
+            new Val( 178,  22870199, 345152127,  22870199, "Rijksweg"),
+            new Val( 177, 345078875, 345152127, 345078875, "Rijksweg"),
+            new Val( 176,  13856508, 345152127,  13856508, "Rijksweg Aarschot-Winge"),
+
+            new Val( 175,  13856508, 345152127, 345078877, "Rijksweg",
+                "Rijksweg Aarschot-Winge - Steenweg op Sint-Joris-Winge (305;306;306 (student);310)",
+                "305;306;306 (student);310"),
+
+            new Val( 174, 345078878, 345078877, 345078878, "Rijksweg"),
+            new Val( 173,  38208830, 345078877,  38208830, "Rijksweg"),
+            new Val( 172,  38208831, 345078877,  38208831, "Rijksweg"),
+            new Val( 171, 609510456, 345078877, 609510456, "Rijksweg"),
+            new Val( 170, 609510455, 345078877, 609510455, "Rijksweg"),
+            new Val( 169, 151083447, 345078877, 151083447, "Sint-Lambertusstraat"),
+            new Val( 168, 137613438, 345078877, 137613438, "Sint-Lambertusstraat"),
+            new Val( 167, 187995152, 345078877, 187995152, "Dorp"),
+            new Val( 166,  10242649, 345078877,  10242649, "Dorp"),
+            new Val( 165, 137613417, 345078877, 137613417, "Appelweg"),
+            new Val( 164, 112565994, 345078877, 112565994, "Appelweg"),
+            new Val( 163,  10242646, 345078877,  10242646, "Rodestraat"),
+            new Val( 162, 615260297, 345078877, 615260297, "Rodestraat"),
+            new Val( 161, 137613436, 345078877, 137613436, "Rodestraat"),
+            new Val( 160, 318267938, 345078877, 318267938, "Rodestraat"),
+            new Val( 159, 318267937, 345078877, 318267937, "Rodestraat"),
+            new Val( 158, 117329495, 345078877, 117329495, "Rodestraat"),
+            new Val( 157, 182275361, 345078877, 182275361, "Rodestraat"),
+            new Val( 156, 182275362, 345078877, 182275362, "Rodestraat"),
+            new Val( 155, 118479385, 345078877, 118479385, "Rodestraat"),
+            new Val( 154,  13858504, 345078877,  13858504, "Rodestraat"),
+            new Val( 153, 137613435, 345078877, 137613435, "Rodestraat"),
+            new Val( 152,  23334102, 345078877,  23334102, "Gravenstraat"),
+            new Val( 151,  13858501, 345078877,  13858501, "Gravenstraat"),
+            new Val( 150,  38501970, 345078877,  38501970, "Gravenstraat"),
+            new Val( 149,  13858502, 345078877,  13858502, "Gravenstraat"),
+            new Val( 148,  13858500, 345078877,  13858500, "Gravenstraat"),
+            new Val( 147, 182275357, 345078877, 182275357, "Gravenstraat"),
+            new Val( 146, 540115503, 345078877, 540115503, "Gravenstraat"),
+            new Val( 145,  13858519, 345078877,  13858519, "Dutselstraat"),
+            new Val( 144, 185929630, 345078877, 185929630, "Dutselstraat"),
+            new Val( 143, 137613419, 345078877, 137613419, "Dutselstraat"),
+            new Val( 142, 185929632, 345078877, 185929632, "Dutselstraat"),
+            new Val( 141, 185929631, 345078877, 185929631, "Dutselstraat"),
+            new Val( 140, 310306260, 345078877, 310306260, "Dutselstraat"),
+            new Val( 139,  22724214, 345078877,  22724214, "Dutselstraat"),
+            new Val( 138, 310306259, 345078877, 310306259, "Dutselstraat"),
+            new Val( 137, 310306431, 345078877, 310306431, "Kortrijksebaan"),
+            new Val( 136,  38502235, 345078877,  38502235, "Kortrijksebaan"),
+            new Val( 135, 659289513, 345078877, 659289513, "Kortrijksebaan"),
+            new Val( 134, 441280731, 345078877, 441280731, "Kortrijksebaan"),
+            new Val( 133, 659289514, 345078877, 659289514, "Kortrijksebaan"),
+            new Val( 132,  19112638, 345078877,  19112638, "Kortrijksebaan"),
+            new Val( 131, 310435230, 345078877, 310435230, "Kortrijksebaan"),
+            new Val( 130,  23957648, 345078877,  23957648, "Kortrijksebaan"),
+            new Val( 129, 173566709, 345078877, 173566709, "Kortrijksebaan"),
+            new Val( 128,  13858520, 345078877,  13858520, "Kortrijksebaan"),
+            new Val( 127, 181347876, 345078877, 181347876, "Kortrijksebaan"),
+            new Val( 126,  19166177, 345078877,  19166177, "Kortrijksebaan"),
+            new Val( 125, 310435229, 345078877, 310435229, "Kortrijksebaan"),
+            new Val( 124, 450119553, 345078877, 450119553, "Kortrijksebaan"),
+            new Val( 123, 181347873, 345078877, 181347873, "Nobelberg"),
+            new Val( 122,  16302925, 345078877,  16302925, "Nobelberg"),
+
+            new Val( 121,  16302925, 345078877,  64487963, "Rotselaarsebaan",
+                "Nobelberg - Rijksweg (310)",
+                "310"),
+
+            new Val( 120, 310435233,  64487963, 310435233, "Rotselaarsebaan"),
+
+            new Val( 119, 310435233,  64487963, 112566004, "Sint-Maurusstraat",
+                "Rotselaarsebaan (310)",
+                "310"),
+
+            new Val( 118,  16302928, 112566004,  16302928, null),
+            new Val( 117,  25667798, 112566004,  25667798, "Rotselaarsebaan"),
+
+            new Val( 116,  25667798, 112566004, 310435233, "Rotselaarsebaan",
+                "Rotselaarsebaan - Sint-Maurusstraat (310)",
+                "310"),
+
+            new Val( 115,  64487963, 310435233,  64487963, "Rotselaarsebaan"),
+
+            new Val( 114,  64487963, 310435233, 310435232, "Nobelberg",
+                "Rotselaarsebaan (310)",
+                "310"),
+
+            new Val( 113,  19166179, 310435232,  19166179, "Nobelberg"),
+            new Val( 112, 492765776, 310435232, 492765776, "Nobelberg"),
+            new Val( 111, 310461931, 310435232, 310461931, "Nobelberg"),
+            new Val( 110,  37370702, 310435232,  37370702, "Nobelberg"),
+            new Val( 109,  16302927, 310435232,  16302927, "Leuvensebaan"),
+            new Val( 108,  16302926, 310435232,  16302926, "Leuvensebaan"),
+            new Val( 107, 440732697, 310435232, 440732697, "Leuvensebaan"),
+            new Val( 106, 311007037, 310435232, 311007037, "Leuvensebaan"),
+            new Val( 105, 311007042, 310435232, 311007042, "Leuvensebaan"),
+            new Val( 104, 311007035, 310435232, 311007035, "Leuvensebaan"),
+            new Val( 103, 311007040, 310435232, 311007040, "Leuvensebaan"),
+            new Val( 102, 192559618, 310435232, 192559618, "Leuvensebaan"),
+            new Val( 101, 311007036, 310435232, 311007036, "Leuvensebaan"),
+            new Val( 100, 311007033, 310435232, 311007033, "Leuvensebaan"),
+            new Val( 99, 311007041, 310435232, 311007041, "Leuvensebaan"),
+            new Val( 98, 311007034, 310435232, 311007034, "Leuvensebaan"),
+            new Val( 97, 311007039, 310435232, 311007039, "Leuvensebaan"),
+            new Val( 96, 311007038, 310435232, 311007038, "Leuvensebaan"),
+            new Val( 95,  10699037, 310435232,  10699037, "Leuvensebaan"),
+            new Val( 94,  14393833, 310435232,  14393833, "Leuvensebaan"),
+            new Val( 93,  18943297, 310435232,  18943297, "Wilselsesteenweg"),
+            new Val( 92, 192559637, 310435232, 192559637, "Wilselsesteenweg"),
+            new Val( 91, 114935420, 310435232, 114935420, "Wilselsesteenweg"),
+            new Val( 90, 243884410, 310435232, 243884410, "Wilselsesteenweg"),
+
+            new Val( 89, 243884410, 310435232,  98645243, "Wilselsesteenweg",
+                "Wilselsesteenweg - Nobelberg (310)",
+                "310"),
+
+            new Val( 88,  98645223,  98645243,  98645223, "Wilselsesteenweg"),
+            new Val( 87,  38209648,  98645243,  38209648, "Wilselsesteenweg"),
+            new Val( 86, 125835556,  98645243, 125835556, "Kesseldallaan"),
+            new Val( 85, 112566013,  98645243, 112566013, "Kesseldallaan"),
+
+            new Val( 84, 112566013,  98645243, 112566017, "Kesseldallaan",
+                "Kesseldallaan - Wilselsesteenweg (2;310)",
+                "2;310"),
+
+            new Val( 83, 112566021, 112566017, 112566021, "Kesseldallaan"),
+            new Val( 82, 440732696, 112566017, 440732696, "Kesseldallaan"),
+            new Val( 81, 112566010, 112566017, 112566010, "Kesseldallaan"),
+            new Val( 80, 440732694, 112566017, 440732694, "Kesseldallaan"),
+            new Val( 79, 440732695, 112566017, 440732695, "Kesseldallaan"),
+            new Val( 78, 112566011, 112566017, 112566011, "Kesseldallaan"),
+            new Val( 77, 112565986, 112566017, 112565986, "Kesseldallaan"),
+            new Val( 76, 242622340, 112566017, 242622340, "Kesseldallaan"),
+
+            new Val( 75, 242622340, 112566017,  33233154, "Kesseldallaan",
+                "Kesseldallaan (2;179;306;306 (student);310;433)",
+                "2;179;306;306 (student);310;433"),
+
+
+            new Val( 74,  33233154,  33233154, 112566015, "Eénmeilaan",
+                "Kesseldallaan (2;179;306;306 (student);310;433)",
+                "2;179;306;306 (student);310;433"),
+
+            new Val( 73,  80284458, 112566015,  80284458, "Eénmeilaan"),
+            new Val( 72,  38245753, 112566015,  38245753, "Eénmeilaan"),
+            new Val( 71,  38245752, 112566015,  38245752, "Eénmeilaan"),
+            new Val( 70, 138017385, 112566015, 138017385, "Eénmeilaan"),
+            new Val( 69, 125835546, 112566015, 125835546, "Eénmeilaan"),
+            new Val( 68, 180167956, 112566015, 180167956, "Eénmeilaan"),
+            new Val( 67, 608715591, 112566015, 608715591, "Eénmeilaan"),
+            new Val( 66, 608715592, 112566015, 608715592, "Eénmeilaan"),
+            new Val( 65,  22476094, 112566015,  22476094, "Eénmeilaan"),
+            new Val( 64, 138017384, 112566015, 138017384, "Eénmeilaan"),
+            new Val( 63, 138017382, 112566015, 138017382, "Eénmeilaan"),
+            new Val( 62,  22476095, 112566015,  22476095, "Eénmeilaan"),
+            new Val( 61, 138017381, 112566015, 138017381, "Eénmeilaan"),
+            new Val( 60, 125835547, 112566015, 125835547, "Eénmeilaan"),
+
+            new Val( 59, 125835547, 112566015,  79366165, "Baron August de Becker Remyplein",
+                "Eénmeilaan (179;306;306 (student);310;433)",
+                "179;306;306 (student);310;433"),
+
+
+            new Val( 58,  79366165,  79366165,  79366167, "Baron August de Becker Remyplein",
+                "Baron August de Becker Remyplein (2;179;306;306 (student);310;433;520)",
+                "2;179;306;306 (student);310;433;520"),
+
+            new Val( 57,  79366164,  79366167,  79366164, "Baron August de Becker Remyplein"),
+            new Val( 56,  35633068,  79366167,  35633068, "Baron August de Becker Remyplein"),
+            new Val( 55, 608715602,  79366167, 608715602, "Baron August de Becker Remyplein"),
+            new Val( 54, 608715601,  79366167, 608715601, "Baron August de Becker Remyplein"),
+            new Val( 53, 608715604,  79366167, 608715604, "Baron August de Becker Remyplein"),
+            new Val( 52, 608715603,  79366167, 608715603, "Baron August de Becker Remyplein"),
+            new Val( 51, 429571921,  79366167, 429571921, "Baron August de Becker Remyplein"),
+            new Val( 50, 125835568,  79366167, 125835568, "Leuvensestraat"),
+
+            new Val( 49, 125835568,  79366167,  23707244, "Diestsesteenweg",
+                "Leuvensestraat - Baron August de Becker Remyplein (2;179;306;306 (student);310;433;520)",
+                "2;179;306;306 (student);310;433;520"),
+
+            new Val( 48,  12715116,  23707244,  12715116, "Diestsesteenweg"),
+
+            new Val( 47,  12715116,  23707244,  61556877, "Diestsepoort",
+                "Diestsesteenweg (2;179;306;306 (student);310;370;371;373;374;433;475;485;520;524;525)",
+                "2;179;306;306 (student);310;370;371;373;374;433;475;485;520;524;525"),
+
+            new Val( 46, 663770966,  61556877, 663770966, "Diestsepoort"),
+            new Val( 45, 584356749,  61556877, 584356749, "Diestsepoort"),
+            new Val( 44, 584356745,  61556877, 584356745, "Diestsepoort"),
+
+            new Val( 43, 584356745,  61556877, 198559166, "Diestsepoort",
+                "Diestsepoort (2;179;305;306;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658)",
+                "2;179;305;306;306 (student);310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630;651;652;658"),
+
+            new Val( 42, 584356751, 198559166, 584356751, "Diestsepoort"),
+            new Val( 41, 451873773, 198559166, 451873773, "Diestsepoort"),
+            new Val( 40, 584356742, 198559166, 584356742, "Diestsepoort"),
+            new Val( 39, 451873774, 198559166, 451873774, "Diestsepoort"),
+
+            new Val( 38, 451873774, 198559166,  76867049, null,
+                "Diestsepoort (2;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658)",
+                "2;179;306 (student);310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658"),
+
+            new Val( 37,  79264890,  76867049,  79264890, null),
+            new Val( 36,  79596965,  76867049,  79596965, null),
+
+            new Val( 35,  79596965,  76867049,  71754927, null,
+                "(2;310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630)",
+                "2;310;333;334;335;370;371;373;374;433;475;485;513;520;524;525;600;630"),
+
+
+            new Val( 34,  71754927,  71754927,  79264897, null,
+                "(2;310;370;371;373;374;475;485;513;520;524;525)",
+                "2;310;370;371;373;374;475;485;513;520;524;525"),
+
+            new Val( 33,  79596983,  79264897,  79596983, null),
+
+            new Val( 32,  79596983,  79264897, 377918665, null,
+                "(2;310)",
+                "2;310"),
+
+
+            new Val( 31,  377918665,  377918665, 377918665, null,
+                "perron 7 & 8 (2;310)",
+                "2;310")
+        );
+
+        previousSegment = new RouteSegmentToExtract(bus310_Leuven_Aarschot_Station_RouteRelation);
+        previousSegment.setActiveDataSet(ds);
+        for (Val v: expectedValues) {
+            segment = previousSegment.addPTWayMember(v.index);
+            if (segment != null) {
+                extractAndAssertValues(v.index, previousSegment, segment, bus310_Leuven_Aarschot_Station_RouteRelation, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,
+                    null, v.expectedRouteRef);
+                previousSegment = segment;
+            }
+        }
+
+        System.out.print("\n");
+
+//        printListOfExpectedValues(bus310_Leuven_Aarschot_Station_RouteRelation, "bus310_Leuven_Aarschot_Station_RouteRelation", false);
+
     }
 
     public Relation extractAndAssertValues(int index, RouteSegmentToExtract createdSegment, RouteSegmentToExtract newSegment,
@@ -2287,9 +2466,10 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         if (expectedColours != null) assertEquals(expectedColours, createdSegment.getColoursSignature());
         final String actualRouteRef = createdSegment.getLineIdentifiersSignature();
         assertEquals(expectedRouteRef, actualRouteRef);
+        assertEquals(expectedRouteRef, extractedRelation.get("route_ref"));
 
         assertEquals(String.format("%d relation id not correct\n", index), extractedRelation.getId(), superRouteRelation.getMember(index+1).getMember().getId());
-        // newSegment should have the last way we tried to add to this segment
+        // newSegment should have the last that was added to this segment
         if (firstWayIdForNewSegment != 0) {
             assertNotNull(String.format("No new segment was created for way\n%s%s at position %d", rc, firstWayIdForNewSegment, index), newSegment);
             final long wayId = newSegment.getWayMembers().get(0).getWay().getId();
@@ -2300,25 +2480,80 @@ public class RouteSegmentToExtractTest extends AbstractTest{
     }
 
     /**
-     * This creates a list of variable definitions to be used in unit tests
+     * This prints a list of known values to be used in unit tests
      *
-     * @param relation the route relation to print a list of ways with their ids for
+     * @param relation the route relation to print a list of known values for
+     * @param nameOfVariable the variable name repeated as a string
+     * @param firstOne true if this is the first in a series of consecutive tests
+     *                 and the variables still need to be declared
      */
     @SuppressWarnings("unused")
-    public void printListOfWays(Relation relation) {
+    public void printListOfExpectedValues(Relation relation, String nameOfVariable, boolean firstOne) {
         List<RelationMember> members = relation.getMembers();
+        RouteSegmentToExtract segment = new RouteSegmentToExtract(relation);
+        List<RelationMember> wayMembers = segment.getWayMembers();
+        String listVal = "";
+        String className = "";
+        if (firstOne) {
+            listVal = "List<Val> ";
+            className = "RouteSegmentToExtract ";
+        }
+        Way way = null;
+        int lastIndex = 0;
+        System.out.printf("    %sexpectedValues = Arrays.asList(\n", listVal);
         for (int i = members.size() - 1; i >= 0; i--) {
             RelationMember member = members.get(i);
             if (member.isWay() && RouteUtils.isPTWay(member)) {
-                Way way = member.getWay();
-                String id = String.valueOf(way.getId());
-                String name = "";
-                if (way.hasKey("name")) name = way.get("name");
-                name = name.replace("-", "_");
-                name = name.replace(" ", "_");
-                name += "_";
-                System.out.printf("final int W_%s_%s%s_ = %s;%n", i, name, id, id);
+                way = member.getWay();
+                RouteSegmentToExtract ns = segment.addPTWayMember(i);
+                wayMembers = segment.getWayMembers();
+                if (ns != null) {
+                    System.out.printf("\n        new Val(% 3d,% 10d,% 10d,% 10d, %s,\n            \"%s\",\n            \"%s\"),\n\n",
+                        i,
+                        wayMembers.get(0).getMember().getId(),
+                        wayMembers.get(wayMembers.size() - 1).getMember().getId(),
+                        (way != null && way.getId() != 0) ? way.getId() : 0,
+                        (way != null && way.get("name") != null) ? "\"" + way.get("name") + "\"": null,
+                        segment.getNote(),
+                        segment.getLineIdentifiersSignature()
+                    );
+                    segment = ns;
+                } else {
+                    System.out.printf("        new Val(% 3d,% 10d,% 10d,% 10d, %s),\n",
+                        i,
+                        wayMembers.get(0).getMember().getId(),
+                        wayMembers.get(wayMembers.size() - 1).getMember().getId(),
+                        (way != null && way.getId() != 0) ? way.getId() : 0,
+                        (way != null && way.get("name") != null) ? "\"" + way.get("name") + "\"": null
+                    );
+                }
+            } else {
+                lastIndex = i;
+                break;
             }
         }
+        System.out.printf("\n        new Val(% 3d,% 10d,% 10d,% 10d, %s,\n            \"%s\",\n            \"%s\")\n    );\n\n",
+            lastIndex,
+            (wayMembers != null && wayMembers.size() > 0) ? wayMembers.get(0).getMember().getId() : 0,
+            (wayMembers != null && wayMembers.size() > 1) ? wayMembers.get(wayMembers.size() - 1).getMember().getId() : 0,
+            (way != null && way.getId() != 0) ? way.getId() : 0,
+            (way != null && way.get("name") != null) ? "\"" + way.get("name") + "\"": null,
+            segment.getNote(),
+            segment.getLineIdentifiersSignature()
+        );
+        System.out.printf("        %spreviousSegment = new RouteSegmentToExtract(%s);\n", className, nameOfVariable);
+        System.out.print ("        previousSegment.setActiveDataSet(ds);\n");
+        if (firstOne) {
+            System.out.printf("        %ssegment;\n", className);
+        }
+        System.out.print ("        for (Val v: expectedValues) {\n" +
+                          "            segment = previousSegment.addPTWayMember(v.index);\n" +
+                          "            if (segment != null) {\n");
+        System.out.printf("                extractAndAssertValues(v.index, previousSegment, segment, %s, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,\n", nameOfVariable);
+        System.out.print( "                    null, v.expectedRouteRef);\n" +
+                          "                previousSegment = segment;\n" +
+                          "            }\n" +
+                          "        }\n\n" +
+                          "        System.out.print(\"\\n\");\n\n");
     }
 }

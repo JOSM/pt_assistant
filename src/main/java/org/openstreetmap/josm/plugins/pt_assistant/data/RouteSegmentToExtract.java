@@ -173,6 +173,9 @@ public class RouteSegmentToExtract {
     public RouteSegmentToExtract addPTWayMember(Integer index) {
         assert relation != null;
         WaySequence ws = new WaySequence(relation, index);
+        if (ws.currentWay == null && ws.nextWay != null) {
+            return this; // make sure all segments are processed
+        }
         if (ws.currentWay == null || ws.hasGap) {
             return null;
         }
@@ -201,8 +204,8 @@ public class RouteSegmentToExtract {
                     .filter(RouteUtils::isVersionTwoPTRoute)
                     .collect(Collectors.toList());
             for (Relation sr : segmentRelations) {
-                RouteSegmentToExtract existingSegment = new RouteSegmentToExtract(sr, true);
-                if (existingSegment.getLastWay().equals(ws.currentWay)) {
+                RouteSegmentToExtract existingSegment = new RouteSegmentToExtract(sr, false);
+                if (existingSegment.isLastWay(ws.currentWay)) {
                     final int existingSegmentSize = existingSegment.getWayMembers().size();
                     if (existingSegmentSize < 2) break;
                     final int startIndexOfRange = index - existingSegmentSize + 1;
@@ -214,7 +217,7 @@ public class RouteSegmentToExtract {
                     }
                 }
                 parentRouteRelations.addAll(sr.getReferrers().stream()
-                    .filter(r -> Objects.equals(r.getType(), Relation.class) && "superroute".equals(r.get("type")))
+                    .filter(r -> "superroute".equals(r.get("type")))
                     .map(r -> (Relation) r)
                     .collect(Collectors.toList()));
             }
@@ -222,11 +225,10 @@ public class RouteSegmentToExtract {
             TreeSet<Relation> itinerariesInSameDirection = getItinerariesInSameDirection(ws, parentRouteRelations);
 
             if (this.itinerariesInSameDirection != null
-                && itinerariesInSameDirection.size() != 0
-                && !itinerariesInSameDirection.equals(this.itinerariesInSameDirection)
-                && !(getMembershipCount(ws.currentWay, relation) > 1
-                && ws.currentWay.equals(getFirstWay(relation)))
-            ) {
+                    && itinerariesInSameDirection.size() != 0
+                    && !itinerariesInSameDirection.equals(this.itinerariesInSameDirection)
+                    && !(isFirstWay(ws.currentWay) && getMembershipCount(ws.currentWay, relation) < 2)
+                 ) {
                 startNewSegment = true;
             } else {
                 this.itinerariesInSameDirection = itinerariesInSameDirection;
@@ -278,10 +280,18 @@ public class RouteSegmentToExtract {
     }
 
     /**
-     * @return The last way of the relation that is being processed
+     * @return The first way of the relation that is being processed
      */
-    public Way getLastWay() {
-        return wayMembers.get(wayMembers.size() - 1).getWay();
+    public boolean isFirstWay(Way way) {
+        return wayMembers.get(0).getWay().equals(way);
+    }
+
+    /**
+     * @param way to compare
+     * @return is this the last way of the relation that is being processed
+     */
+    public boolean isLastWay(Way way) {
+        return wayMembers.get(wayMembers.size() - 1).getWay().equals(way);
     }
 
     /**
@@ -361,7 +371,7 @@ public class RouteSegmentToExtract {
             for (Relation parentRoute : parentRouteRelations) {
                 final List<Way> parentRouteHighways = getItineraryWays(parentRoute);
                 if (!itinerariesInSameDirection.contains(parentRoute)) {
-                    if (getFirstWay(parentRoute) == ws.currentWay
+                    if (ws.currentWay.equals(getFirstWay(parentRoute))
                             && ws.previousWay != null
                             && !ws.previousWay.getNodes().contains(getSecondWay(parentRoute).getNode(0))) {
                         itinerariesInSameDirection.add(parentRoute);
@@ -539,9 +549,7 @@ public class RouteSegmentToExtract {
     }
 
     public TreeSet<String> getLineIdentifiers() {
-        if (lineIdentifiers.size() < 2) {
-            populateLineIdentifierAndColourLists();
-        }
+        populateLineIdentifierAndColourLists();
         return lineIdentifiers;
     }
 
@@ -599,6 +607,7 @@ public class RouteSegmentToExtract {
     /**
      * @return All the distinct street names or refs of the Way members as a ; delimited string
      */
+    @SuppressWarnings("unused")
     public String getStreetNamesSignature() {
         return String.join(";", getStreetNames());
     }
@@ -671,10 +680,8 @@ public class RouteSegmentToExtract {
         }
 
         if (atLeast1MemberAddedToExtractedRelation || extractedRelationAlreadyExists) {
+            updateTags();
             if (extractedRelation.getId() <= 0 && !extractedRelationAlreadyExists) {
-                if (relation.hasTag("public_transport:version", "2")) {
-                    updateTags();
-                }
                 getExtractRelationCommand().executeCommand();
                 addPtSegment();
             }
@@ -696,13 +703,13 @@ public class RouteSegmentToExtract {
         return new SequenceCommand(tr("Extract sub relation"), commands);
     }
 
+    public String getNote() {
+        return String.format("%s(%s)", getFirstAndLastStreetNameOrRef(), getLineIdentifiersSignature());
+    }
+
     public void updateTags() {
-        final String lineIdentifiersSignature = getLineIdentifiersSignature();
-        extractedRelation.put("note",
-            String.format("%s(%s)", getFirstAndLastStreetNameOrRef(), lineIdentifiersSignature));
-        extractedRelation.put("route_ref", lineIdentifiersSignature);
-        // extractedRelation.put("street_names", getStreetNamesSignature());
-        // extractedRelation.put("colour", getColoursSignature());
+        extractedRelation.put("note", getNote());
+        extractedRelation.put("route_ref", getLineIdentifiersSignature());
     }
 
     private void addPtSegment() {
