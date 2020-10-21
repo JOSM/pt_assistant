@@ -4,7 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 plugins {
   java
   jacoco
-  id("org.openstreetmap.josm") version "0.7.0"
+  id("org.openstreetmap.josm") version "0.7.1"
 }
 
 object Versions {
@@ -47,7 +47,7 @@ josm {
     oldVersionDownloadLink(13957, "v2.0.0", URL("https://github.com/JOSM/pt_assistant/releases/download/v2.0.0/pt_assistant.jar"))
   }
   i18n {
-    pathTransformer = getPathTransformer("github.com/JOSM/pt_assistant/blob")
+    pathTransformer = getPathTransformer(projectDir, "github.com/JOSM/pt_assistant/blob")
   }
 }
 

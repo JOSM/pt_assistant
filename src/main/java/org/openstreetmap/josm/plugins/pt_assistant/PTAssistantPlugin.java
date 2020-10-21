@@ -1,10 +1,12 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant;
 
+import static org.openstreetmap.josm.data.osm.visitor.paint.MapRendererFactory.PREF_KEY_RENDERER_CLASS_NAME;
 import static org.openstreetmap.josm.gui.help.HelpUtil.ht;
 import static org.openstreetmap.josm.tools.I18n.trc;
 
 import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,8 +14,10 @@ import java.util.List;
 
 import javax.swing.JMenu;
 
+import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.event.SelectionEventManager;
+import org.openstreetmap.josm.data.osm.visitor.paint.MapRendererFactory;
 import org.openstreetmap.josm.data.validation.OsmValidator;
 import org.openstreetmap.josm.gui.IconToggleButton;
 import org.openstreetmap.josm.gui.MainApplication;
@@ -41,10 +45,12 @@ import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersMen
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SplitRoundaboutAction;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.RainbowMapRenderer;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.BicycleFootRouteValidatorTest;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.PTAssistantValidatorTest;
 import org.openstreetmap.josm.plugins.ptl.DistanceBetweenStops;
 import org.openstreetmap.josm.plugins.ptl.PublicTransportLayer;
+import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 /**
@@ -86,6 +92,8 @@ public class PTAssistantPlugin extends Plugin {
         initialiseWizard();
         initialiseShorcutsForCreatePlatformNode();
         addButtonsToRelationEditor();
+
+        MapRendererFactory.getInstance().register(RainbowMapRenderer.class, "Rainbow", "This renders the colors of route relations on the map");
     }
 
     /**
@@ -145,6 +153,16 @@ public class PTAssistantPlugin extends Plugin {
     }
 
     private void addToMenu(JMenu menu) {
+        MainMenu.add(menu, new JosmAction("Enable/disable rainbow renderer", null, null, null, false) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (RainbowMapRenderer.class.getName().equals(Config.getPref().get(PREF_KEY_RENDERER_CLASS_NAME))) {
+                    MapRendererFactory.getInstance().activateDefault();
+                } else {
+                    MapRendererFactory.getInstance().activate(RainbowMapRenderer.class);
+                }
+            }
+        });
         MainMenu.add(menu, new SplitRoundaboutAction());
         MainMenu.add(menu, new CreatePlatformNodeAction());
         MainMenu.add(menu, new SortPTRouteMembersMenuBar());
