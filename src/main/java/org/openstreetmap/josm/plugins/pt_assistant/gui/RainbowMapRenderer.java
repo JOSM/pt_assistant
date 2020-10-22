@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.osm.INode;
+import org.openstreetmap.josm.data.osm.IPrimitive;
 import org.openstreetmap.josm.data.osm.IRelation;
 import org.openstreetmap.josm.data.osm.OsmData;
 import org.openstreetmap.josm.data.osm.Way;
@@ -62,7 +63,17 @@ public class RainbowMapRenderer extends AbstractMapRenderer {
 
     private static Color getRouteColorOf(final IRelation r) {
         if ("route".equals(r.get("type"))) {
-            final String colourString = r.get("colour");
+            String colourString = r.get("colour");
+            if (colourString == null) {
+                //  In case the colours are only defined in the routeMaster relation
+                final List<? extends IPrimitive> routeMasters = r.getReferrers().stream()
+                    .filter(rel -> rel.hasTag("type", "routeMaster"))
+                    .collect(Collectors.toList());
+                if (routeMasters != null && routeMasters.size() > 0) {
+                    // normally there is only a single routeMaster
+                    colourString = routeMasters.get(0).get("colour");
+                }
+            }
             if (colourString != null) {
                 final Matcher matcher = Pattern.compile("#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})").matcher(colourString);
                 if (matcher.matches()) {
