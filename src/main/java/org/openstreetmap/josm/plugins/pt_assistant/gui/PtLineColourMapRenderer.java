@@ -21,10 +21,11 @@ import org.openstreetmap.josm.data.osm.OsmData;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.visitor.paint.AbstractMapRenderer;
 import org.openstreetmap.josm.gui.NavigatableComponent;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.Pair;
 
-public class RainbowMapRenderer extends AbstractMapRenderer {
-    public RainbowMapRenderer(Graphics2D g, NavigatableComponent nc, boolean isInactiveMode) {
+public class PtLineColourMapRenderer extends AbstractMapRenderer {
+    public PtLineColourMapRenderer(Graphics2D g, NavigatableComponent nc, boolean isInactiveMode) {
         super(g, nc, isInactiveMode);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     }
@@ -37,7 +38,7 @@ public class RainbowMapRenderer extends AbstractMapRenderer {
         data.getRelations().stream()
             .filter(it -> "route".equals(it.get("type")))
             .flatMap(r -> {
-                final Color color = getRouteColorOf(r);
+                final Color color = getLineColourOf(r);
                 if (color != null) {
                     return r.findRelationMembers("").stream().filter(m -> m instanceof Way).map(w -> Pair.create((Way) w, color));
                 }
@@ -61,16 +62,14 @@ public class RainbowMapRenderer extends AbstractMapRenderer {
             });
     }
 
-    private static Color getRouteColorOf(final IRelation r) {
+    private static Color getLineColourOf(final IRelation r) {
         if ("route".equals(r.get("type"))) {
             String colourString = r.get("colour");
             if (colourString == null) {
-                //  In case the colours are only defined in the routeMaster relation
-                final List<? extends IPrimitive> routeMasters = r.getReferrers().stream()
-                    .filter(rel -> rel.hasTag("type", "routeMaster"))
-                    .collect(Collectors.toList());
+                //  In case the colours are only defined in the route_master relation
+                List<? extends IPrimitive> routeMasters = r.getReferrers();
                 if (routeMasters != null && routeMasters.size() > 0) {
-                    // normally there is only a single routeMaster
+                    // normally there is only a single route_master
                     colourString = routeMasters.get(0).get("colour");
                 }
             }

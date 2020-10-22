@@ -45,13 +45,14 @@ import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersMen
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SplitRoundaboutAction;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
-import org.openstreetmap.josm.plugins.pt_assistant.gui.RainbowMapRenderer;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.PtLineColourMapRenderer;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.BicycleFootRouteValidatorTest;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.PTAssistantValidatorTest;
 import org.openstreetmap.josm.plugins.ptl.DistanceBetweenStops;
 import org.openstreetmap.josm.plugins.ptl.PublicTransportLayer;
 import org.openstreetmap.josm.spi.preferences.Config;
 import org.openstreetmap.josm.tools.ImageProvider;
+import org.openstreetmap.josm.tools.Shortcut;
 
 /**
  * This is the main class of the PTAssistant plugin.
@@ -93,7 +94,7 @@ public class PTAssistantPlugin extends Plugin {
         initialiseShorcutsForCreatePlatformNode();
         addButtonsToRelationEditor();
 
-        MapRendererFactory.getInstance().register(RainbowMapRenderer.class, "Rainbow", "This renders the colors of route relations on the map");
+        MapRendererFactory.getInstance().register(PtLineColourMapRenderer.class, "PT Line Diagram", "This renders the colors of route relations on the map");
     }
 
     /**
@@ -153,13 +154,16 @@ public class PTAssistantPlugin extends Plugin {
     }
 
     private void addToMenu(JMenu menu) {
-        MainMenu.add(menu, new JosmAction("Enable/disable rainbow renderer", null, null, null, false) {
+        MainMenu.add(menu, new JosmAction("Enable/disable coloured line diagram renderer",
+            "bus", "Toggle coloured line diagram renderer",
+            Shortcut.registerShortcut("Toggle coloured line diagram renderer","Enable/disable coloured line diagram renderer",KeyEvent.VK_L, Shortcut.ALT),
+            true) {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (RainbowMapRenderer.class.getName().equals(Config.getPref().get(PREF_KEY_RENDERER_CLASS_NAME))) {
+                if (PtLineColourMapRenderer.class.getName().equals(Config.getPref().get(PREF_KEY_RENDERER_CLASS_NAME))) {
                     MapRendererFactory.getInstance().activateDefault();
                 } else {
-                    MapRendererFactory.getInstance().activate(RainbowMapRenderer.class);
+                    MapRendererFactory.getInstance().activate(PtLineColourMapRenderer.class);
                 }
             }
         });
