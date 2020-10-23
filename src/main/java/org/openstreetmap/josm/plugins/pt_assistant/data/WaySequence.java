@@ -1,9 +1,11 @@
 package org.openstreetmap.josm.plugins.pt_assistant.data;
 
+import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 
 import java.util.List;
 
@@ -15,6 +17,7 @@ import static org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils.isPTW
  */
 public final class WaySequence {
     public boolean hasGap = false;
+    public int traversalSense;
     public Way previousWay;
     public Way currentWay;
     public Way nextWay;
@@ -50,7 +53,6 @@ public final class WaySequence {
         } else {
             // the member was probably a stop or a platform
             currentWay = null;
-            return;
         }
         if (index > 1) setPreviousPtWay(relation.getMember(index - 1));
         final int membersCount = relation.getMembersCount();
@@ -97,6 +99,7 @@ public final class WaySequence {
             previousWay = null;
             hasGap = true;
         }
+        getTraversalSense();
     }
 
     /**
@@ -104,12 +107,13 @@ public final class WaySequence {
      *            a check is performed to make sure they actually connect
      */
     public void setNextWay(Way way) {
-        if (way == null || RouteUtils.waysTouch(currentWay, way)) {
+        if (way == null || currentWay == null || RouteUtils.waysTouch(currentWay, way)) {
             nextWay = way;
         } else {
             nextWay = null;
             hasGap = true;
         }
+        getTraversalSense();
     }
 
     /**
@@ -183,5 +187,66 @@ public final class WaySequence {
         } else {
             wayAfterNextWay = null;
         }
+    }
+
+    public int getTraversalSense() {
+        if (traversalSense == 0) {
+            if (currentWay != null) {
+                if (previousWay != null || nextWay != null) {
+                    if (currentWay.firstNode().equals(WayUtils.findCommonFirstLastNode(previousWay, currentWay).orElse(null))
+                      && currentWay.lastNode().equals(WayUtils.findCommonFirstLastNode(currentWay, nextWay).orElse(null))) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                }
+            }
+        } else {
+            return traversalSense;
+        }
+        return 0;
+    }
+
+    public boolean isItineraryInSameDirection(WaySequence parent_ws) {
+        assert currentWay == parent_ws.currentWay :
+            "this only works when comparing two equivalent way sequences" ;
+
+        // if all ways are present, try the simple solution first
+        if (previousWay != null
+            && nextWay != null
+            && parent_ws.previousWay != null
+            && parent_ws.nextWay != null
+            && (previousWay == parent_ws.previousWay
+                ||  nextWay == parent_ws.nextWay)
+        ) {
+            return (!previousWay.equals(parent_ws.nextWay) &&
+                    !nextWay.    equals(parent_ws.previousWay));
+        }
+
+        // if not, compare on the nodes
+        Node firstNodeCurrentWay = null;
+        if (previousWay != null) {
+            firstNodeCurrentWay = WayUtils.findCommonFirstLastNode(
+                previousWay, currentWay).orElse(null);
+        }
+        Node lastNodeCurrentWay = null;
+        if (nextWay != null) {
+            lastNodeCurrentWay = WayUtils.findCommonFirstLastNode(
+                currentWay, nextWay).orElse(null);
+        }
+        Node firstNodeWayOfParent = null;
+        if (parent_ws.previousWay != null) {
+            firstNodeWayOfParent = WayUtils.findCommonFirstLastNode(
+                parent_ws.previousWay, parent_ws.currentWay).orElse(null);
+        }
+        Node lastNodeWayOfParent = null;
+        if (parent_ws.nextWay != null) {
+            lastNodeWayOfParent = WayUtils.findCommonFirstLastNode(
+                parent_ws.currentWay, parent_ws.nextWay).orElse(null);
+        }
+
+        return (firstNodeCurrentWay != null && firstNodeCurrentWay.equals(firstNodeWayOfParent)
+                ||
+                lastNodeCurrentWay != null && lastNodeCurrentWay.equals(lastNodeWayOfParent));
     }
 }

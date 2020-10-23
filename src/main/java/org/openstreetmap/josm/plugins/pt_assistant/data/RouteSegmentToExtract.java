@@ -377,7 +377,7 @@ public class RouteSegmentToExtract {
                         itinerariesInSameDirection.add(parentRoute);
                     }
                     findPreviousAndNextWayInRoute(parentRouteHighways, ws.currentWay).stream()
-                        .filter(waysInParentRoute -> isItineraryInSameDirection(ws, waysInParentRoute))
+                        .filter(waysInParentRoute -> ws.isItineraryInSameDirection(waysInParentRoute))
                         .map(waysInParentRoute -> parentRoute)
                         .forEachOrdered(itinerariesInSameDirection::add);
                 }
@@ -410,8 +410,8 @@ public class RouteSegmentToExtract {
 
         int counter = indices.size();
         for (int i = 0; i < indices.size() - 1 ; i++) {
-            if (!isItineraryInSameDirection(new WaySequence(routeRelation, indices.get(i)),
-                                            new WaySequence(routeRelation, indices.get(i+1)))) {
+            if (!new WaySequence(routeRelation, indices.get(i)).isItineraryInSameDirection(
+                new WaySequence(routeRelation, indices.get(i+1)))) {
                 counter--;
             }
         }
@@ -428,50 +428,6 @@ public class RouteSegmentToExtract {
             }
         }
         return indices;
-    }
-
-    public boolean isItineraryInSameDirection(WaySequence ws,
-                                              WaySequence parent_ws) {
-        assert ws.currentWay == parent_ws.currentWay :
-            "this only works when comparing two equivalent way sequences" ;
-
-        // if all ways are present, try the simple solution first
-        if (ws.previousWay != null
-                && ws.nextWay != null
-                && parent_ws.previousWay != null
-                && parent_ws.nextWay != null
-                && (ws.previousWay == parent_ws.previousWay
-                    ||  ws.nextWay == parent_ws.nextWay)
-        ) {
-            return (!ws.previousWay.equals(parent_ws.nextWay) &&
-                    !ws.nextWay.    equals(parent_ws.previousWay));
-        }
-
-        // if not, compare on the nodes
-        Node firstNodeCurrentWay = null;
-        if (ws.previousWay != null) {
-            firstNodeCurrentWay = WayUtils.findCommonFirstLastNode(
-                ws.previousWay, ws.currentWay).orElse(null);
-        }
-        Node lastNodeCurrentWay = null;
-        if (ws.nextWay != null) {
-            lastNodeCurrentWay = WayUtils.findCommonFirstLastNode(
-                ws.currentWay, ws.nextWay).orElse(null);
-        }
-        Node firstNodeWayOfParent = null;
-        if (parent_ws.previousWay != null) {
-            firstNodeWayOfParent = WayUtils.findCommonFirstLastNode(
-                parent_ws.previousWay, parent_ws.currentWay).orElse(null);
-        }
-        Node lastNodeWayOfParent = null;
-        if (parent_ws.nextWay != null) {
-            lastNodeWayOfParent = WayUtils.findCommonFirstLastNode(
-                parent_ws.currentWay, parent_ws.nextWay).orElse(null);
-        }
-
-        return (firstNodeCurrentWay != null && firstNodeCurrentWay.equals(firstNodeWayOfParent)
-                ||
-                lastNodeCurrentWay != null && lastNodeCurrentWay.equals(lastNodeWayOfParent));
     }
 
     /**
