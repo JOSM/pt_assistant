@@ -161,14 +161,13 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
         final List<RelationMember> members = clonedRelation.getMembers();
         RouteSegmentToExtract segment = new RouteSegmentToExtract(clonedRelation);
         RouteSegmentToExtract newSegment = null;
-        for (int i = members.size() - 1; i >= 1; i--) {
+        for (int i = members.size() - 1; i >= 0; i--) {
             newSegment = segment.addPTWayMember(i);
             if (newSegment != null) {
                 segment.extractToRelation(Arrays.asList("type", "route"), true);
                 segment = newSegment;
             }
         }
-        segment.extractToRelation(Arrays.asList("type", "route"), true);
         if (convertToSuperroute) {
             clonedRelation.put("type", "superroute");
         }
