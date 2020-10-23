@@ -1,6 +1,5 @@
 package org.openstreetmap.josm.plugins.pt_assistant.data;
 
-import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;

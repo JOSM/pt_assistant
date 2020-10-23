@@ -54,7 +54,6 @@ class Val {
     }
 }
 
-@SuppressWarnings("NonAsciiCharacters")
 public class RouteSegmentToExtractTest extends AbstractTest{
 
     private static DataSet ds;

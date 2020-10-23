@@ -377,7 +377,7 @@ public class RouteSegmentToExtract {
                         itinerariesInSameDirection.add(parentRoute);
                     }
                     findPreviousAndNextWayInRoute(parentRouteHighways, ws.currentWay).stream()
-                        .filter(waysInParentRoute -> ws.compareTraversal(waysInParentRoute))
+                        .filter(ws::compareTraversal)
                         .map(waysInParentRoute -> parentRoute)
                         .forEachOrdered(itinerariesInSameDirection::add);
                 }
