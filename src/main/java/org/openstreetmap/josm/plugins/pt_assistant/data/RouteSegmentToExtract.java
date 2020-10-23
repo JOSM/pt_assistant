@@ -233,13 +233,13 @@ public class RouteSegmentToExtract {
             } else {
                 this.itinerariesInSameDirection = itinerariesInSameDirection;
                 for (Relation parentRoute : itinerariesInSameDirection) {
-                    final Node commonNode2 = WayUtils.findFirstCommonNode(ws.currentWay, ws.nextWay).orElseGet(null);
+                    final Optional<Node> commonNode2 = WayUtils.findFirstCommonNode(ws.currentWay, ws.nextWay);
                     final long membershipCountOfWayInSameDirectionInParentRoute =
                         getMembershipCountOfWayInSameDirection(ws.currentWay, parentRoute);
                     if (ws.currentWay == getLastWay(parentRoute)
                         || membershipCountOfWayInSameDirectionInParentRoute > 1
                         && !parentRoute.equals(relation)
-                        && (commonNode2.getParentWays().size() > 2)
+                        && (commonNode2.map(it -> it.getParentWays().size() > 2).orElse(false))
                     ) {
                         startNewSegment = true;
                         if (membershipCountOfWayInSameDirectionInParentRoute > 1) {
@@ -254,9 +254,14 @@ public class RouteSegmentToExtract {
 
                     if (!startNewSegment && !relation.equals(parentRoute)
                         && Objects.equals(relation.get("ref"), parentRoute.get("ref"))) {
-                        if (commonNode2.getParentWays().stream()
-                            .filter(w -> (getItineraryWays(parentRoute).contains(w)))
-                            .count() > 2) {
+                        if (commonNode2
+                            .map(it ->
+                                it.getParentWays().stream()
+                                    .filter(w -> (getItineraryWays(parentRoute).contains(w)))
+                                    .count() > 2
+                            )
+                            .orElse(false)
+                        ) {
                             startNewSegment = true;
                             break;
                         }
