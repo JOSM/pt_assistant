@@ -17,7 +17,7 @@ import static org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils.isPTW
  */
 public final class WaySequence {
     public boolean hasGap = false;
-    public int traversalSense;
+    public int traversalSense = 0;
     public Way previousWay;
     public Way currentWay;
     public Way nextWay;
@@ -189,64 +189,42 @@ public final class WaySequence {
         }
     }
 
+    /**
+     * @return sense currentWay is traversed
+     * 1 forward traversal
+     * -1 backward traversal
+     * 0 traversal can't be determined yet
+     * it needs either currentWay and previousWay to be defined
+     * of currentWay and nextWay to be defined already
+     */
     public int getTraversalSense() {
         if (traversalSense == 0) {
             if (currentWay != null) {
-                if (previousWay != null || nextWay != null) {
-                    if (currentWay.firstNode().equals(WayUtils.findCommonFirstLastNode(previousWay, currentWay).orElse(null))
-                      && currentWay.lastNode().equals(WayUtils.findCommonFirstLastNode(currentWay, nextWay).orElse(null))) {
-                        return 1;
+                if (previousWay != null && currentWay.firstNode()
+                    .equals(WayUtils.findCommonFirstLastNode(previousWay, currentWay).orElse(null))) {
+                    traversalSense = 1;
+                } else {
+                    if (nextWay != null && currentWay.lastNode()
+                        .equals(WayUtils.findCommonFirstLastNode(currentWay, nextWay).orElse(null))) {
+                        traversalSense = 1;
                     } else {
-                        return -1;
+                        traversalSense = -1;
                     }
                 }
             }
-        } else {
-            return traversalSense;
         }
-        return 0;
+        return traversalSense;
     }
 
-    public boolean isItineraryInSameDirection(WaySequence parent_ws) {
-        assert currentWay == parent_ws.currentWay :
+    /**
+     * compares the traversalSense of this WaySequence with the WaySequence in ws
+     * @param ws WaySequence to compare with
+     * @return true if currentWay is traversed in the same direction/sense
+     */
+    public boolean compareTraversal(WaySequence ws) {
+        assert currentWay == ws.currentWay :
             "this only works when comparing two equivalent way sequences" ;
 
-        // if all ways are present, try the simple solution first
-        if (previousWay != null
-            && nextWay != null
-            && parent_ws.previousWay != null
-            && parent_ws.nextWay != null
-            && (previousWay == parent_ws.previousWay
-                ||  nextWay == parent_ws.nextWay)
-        ) {
-            return (!previousWay.equals(parent_ws.nextWay) &&
-                    !nextWay.    equals(parent_ws.previousWay));
-        }
-
-        // if not, compare on the nodes
-        Node firstNodeCurrentWay = null;
-        if (previousWay != null) {
-            firstNodeCurrentWay = WayUtils.findCommonFirstLastNode(
-                previousWay, currentWay).orElse(null);
-        }
-        Node lastNodeCurrentWay = null;
-        if (nextWay != null) {
-            lastNodeCurrentWay = WayUtils.findCommonFirstLastNode(
-                currentWay, nextWay).orElse(null);
-        }
-        Node firstNodeWayOfParent = null;
-        if (parent_ws.previousWay != null) {
-            firstNodeWayOfParent = WayUtils.findCommonFirstLastNode(
-                parent_ws.previousWay, parent_ws.currentWay).orElse(null);
-        }
-        Node lastNodeWayOfParent = null;
-        if (parent_ws.nextWay != null) {
-            lastNodeWayOfParent = WayUtils.findCommonFirstLastNode(
-                parent_ws.currentWay, parent_ws.nextWay).orElse(null);
-        }
-
-        return (firstNodeCurrentWay != null && firstNodeCurrentWay.equals(firstNodeWayOfParent)
-                ||
-                lastNodeCurrentWay != null && lastNodeCurrentWay.equals(lastNodeWayOfParent));
+        return getTraversalSense() == ws.getTraversalSense();
     }
 }

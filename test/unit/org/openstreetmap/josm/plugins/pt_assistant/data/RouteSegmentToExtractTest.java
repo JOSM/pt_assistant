@@ -106,8 +106,8 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             bus371RouteRelation.getMembers().get(134).getWay());
         RouteSegmentToExtract segment601_1 = new RouteSegmentToExtract(bus601RouteRelation);
         segment601_1.setActiveDataSet(ds);
-        assertTrue(waysInParentRouteOf601.isItineraryInSameDirection(waysInParentRouteOf358));
-        assertFalse(waysInParentRouteOf601.isItineraryInSameDirection(waysInParentRouteOf371));
+        assertTrue(waysInParentRouteOf601.compareTraversal(waysInParentRouteOf358));
+        assertFalse(waysInParentRouteOf601.compareTraversal(waysInParentRouteOf371));
 
         Way commonWay = allWays.stream()
             .filter(way -> way.getId() == 75113358)
@@ -138,23 +138,23 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         WaySequence haasrodeToNeervelp = new WaySequence(toHaasrode,commonWay,toNeervelp);
         WaySequence blandenToNeervelp = new WaySequence(toBlanden,commonWay,toNeervelp);
 
-        assertTrue(leuvenToHaasrode.isItineraryInSameDirection(leuvenToBlanden));
-        assertTrue(leuvenToBlanden.isItineraryInSameDirection(leuvenToHaasrode));
-        assertTrue(haasrodeToLeuven.isItineraryInSameDirection(blandenToLeuven));
-        assertTrue(blandenToLeuven.isItineraryInSameDirection(haasrodeToLeuven));
-        assertTrue(neervelpToBlanden.isItineraryInSameDirection(neervelpToHaasrode));
-        assertTrue(neervelpToHaasrode.isItineraryInSameDirection(neervelpToBlanden));
-        assertTrue(blandenToNeervelp.isItineraryInSameDirection(blandenToLeuven));
-        assertTrue(blandenToLeuven.isItineraryInSameDirection(blandenToNeervelp));
+        assertTrue(leuvenToHaasrode.compareTraversal(leuvenToBlanden));
+        assertTrue(leuvenToBlanden.compareTraversal(leuvenToHaasrode));
+        assertTrue(haasrodeToLeuven.compareTraversal(blandenToLeuven));
+        assertTrue(blandenToLeuven.compareTraversal(haasrodeToLeuven));
+        assertTrue(neervelpToBlanden.compareTraversal(neervelpToHaasrode));
+        assertTrue(neervelpToHaasrode.compareTraversal(neervelpToBlanden));
+        assertTrue(blandenToNeervelp.compareTraversal(blandenToLeuven));
+        assertTrue(blandenToLeuven.compareTraversal(blandenToNeervelp));
 
-        assertFalse(leuvenToBlanden.isItineraryInSameDirection(blandenToLeuven));
-        assertFalse(blandenToLeuven.isItineraryInSameDirection(leuvenToBlanden));
-        assertFalse(leuvenToHaasrode.isItineraryInSameDirection(haasrodeToLeuven));
-        assertFalse(haasrodeToLeuven.isItineraryInSameDirection(leuvenToHaasrode));
-        assertFalse(neervelpToBlanden.isItineraryInSameDirection(blandenToNeervelp));
-        assertFalse(blandenToNeervelp.isItineraryInSameDirection(neervelpToBlanden));
-        assertFalse(neervelpToHaasrode.isItineraryInSameDirection(haasrodeToNeervelp));
-        assertFalse(haasrodeToNeervelp.isItineraryInSameDirection(neervelpToHaasrode));
+        assertFalse(leuvenToBlanden.compareTraversal(blandenToLeuven));
+        assertFalse(blandenToLeuven.compareTraversal(leuvenToBlanden));
+        assertFalse(leuvenToHaasrode.compareTraversal(haasrodeToLeuven));
+        assertFalse(haasrodeToLeuven.compareTraversal(leuvenToHaasrode));
+        assertFalse(neervelpToBlanden.compareTraversal(blandenToNeervelp));
+        assertFalse(blandenToNeervelp.compareTraversal(neervelpToBlanden));
+        assertFalse(neervelpToHaasrode.compareTraversal(haasrodeToNeervelp));
+        assertFalse(haasrodeToNeervelp.compareTraversal(neervelpToHaasrode));
 
         WaySequence missingToBlanden = new WaySequence(null,commonWay,toBlanden);
         WaySequence missingToHaasrode = new WaySequence(null,commonWay,toHaasrode);
@@ -165,23 +165,23 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         WaySequence leuvenToMissing = new WaySequence(toNeervelp,commonWay,null);
         WaySequence neervelpToMissing = new WaySequence(toNeervelp,commonWay,null);
 
-        assertTrue(missingToBlanden.isItineraryInSameDirection(leuvenToBlanden));
-        assertTrue(leuvenToBlanden.isItineraryInSameDirection(missingToBlanden));
-        assertTrue(missingToLeuven.isItineraryInSameDirection(blandenToLeuven));
-        assertTrue(blandenToLeuven.isItineraryInSameDirection(missingToLeuven));
-        assertTrue(missingToBlanden.isItineraryInSameDirection(neervelpToHaasrode));
-        assertTrue(neervelpToHaasrode.isItineraryInSameDirection(missingToBlanden));
-        assertTrue(missingToNeervelp.isItineraryInSameDirection(blandenToLeuven));
-        assertTrue(blandenToLeuven.isItineraryInSameDirection(missingToNeervelp));
+        assertTrue(missingToBlanden.compareTraversal(leuvenToBlanden));
+        assertTrue(leuvenToBlanden.compareTraversal(missingToBlanden));
+        assertTrue(missingToLeuven.compareTraversal(blandenToLeuven));
+        assertTrue(blandenToLeuven.compareTraversal(missingToLeuven));
+        assertTrue(missingToBlanden.compareTraversal(neervelpToHaasrode));
+        assertTrue(neervelpToHaasrode.compareTraversal(missingToBlanden));
+        assertTrue(missingToNeervelp.compareTraversal(blandenToLeuven));
+        assertTrue(blandenToLeuven.compareTraversal(missingToNeervelp));
 
-        assertFalse(leuvenToBlanden.isItineraryInSameDirection(blandenToLeuven));
-        assertFalse(blandenToLeuven.isItineraryInSameDirection(leuvenToBlanden));
-        assertFalse(leuvenToHaasrode.isItineraryInSameDirection(haasrodeToLeuven));
-        assertFalse(haasrodeToLeuven.isItineraryInSameDirection(leuvenToHaasrode));
-        assertFalse(neervelpToBlanden.isItineraryInSameDirection(blandenToNeervelp));
-        assertFalse(blandenToNeervelp.isItineraryInSameDirection(neervelpToBlanden));
-        assertFalse(neervelpToHaasrode.isItineraryInSameDirection(haasrodeToNeervelp));
-        assertFalse(haasrodeToNeervelp.isItineraryInSameDirection(neervelpToHaasrode));
+        assertFalse(leuvenToBlanden.compareTraversal(blandenToLeuven));
+        assertFalse(blandenToLeuven.compareTraversal(leuvenToBlanden));
+        assertFalse(leuvenToHaasrode.compareTraversal(haasrodeToLeuven));
+        assertFalse(haasrodeToLeuven.compareTraversal(leuvenToHaasrode));
+        assertFalse(neervelpToBlanden.compareTraversal(blandenToNeervelp));
+        assertFalse(blandenToNeervelp.compareTraversal(neervelpToBlanden));
+        assertFalse(neervelpToHaasrode.compareTraversal(haasrodeToNeervelp));
+        assertFalse(haasrodeToNeervelp.compareTraversal(neervelpToHaasrode));
     }
 
 
