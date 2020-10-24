@@ -1,11 +1,12 @@
 package org.openstreetmap.josm.plugins.pt_assistant.gui;
 
+import static java.awt.BasicStroke.CAP_ROUND;
+import static java.awt.BasicStroke.JOIN_MITER;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -20,6 +21,7 @@ import org.openstreetmap.josm.data.osm.IRelation;
 import org.openstreetmap.josm.data.osm.OsmData;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.visitor.paint.AbstractMapRenderer;
+import org.openstreetmap.josm.data.osm.visitor.paint.StyledMapRenderer;
 import org.openstreetmap.josm.gui.NavigatableComponent;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.Pair;
@@ -47,22 +49,29 @@ public class PtLineColourMapRenderer extends AbstractMapRenderer {
             .collect(Collectors.groupingBy(it -> it.a, Collectors.mapping(it -> it.b, Collectors.toSet())))
             .forEach((way, colors) -> {
                 final List<Color> colorList = new ArrayList<>(colors);
-                for (int i = 0; way.getNodesCount() >= 2 && i < colorList.size(); i++) {
-                    g.setStroke(new BasicStroke((colors.size() - i) * 6, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
-                    g.setColor(colorList.get(i));
-                    final Path2D path = new Path2D.Double();
-                    final Point p1 = nc.getPoint(way.firstNode());
-                    path.moveTo(p1.x, p1.y);
-                    for (int n = 1; n < way.getNodesCount(); n++) {
-                        final Point p = nc.getPoint(way.getNode(n));
-                        path.lineTo(p.x, p.y);
-                    }
-                    g.draw(path);
+                for (int i = 0; i < colorList.size(); i++) {
+                    final StyledMapRenderer styledRenderer = new StyledMapRenderer(g, nc, isInactiveMode);
+                    final float width = 4.0f;
+                    final BasicStroke line = new BasicStroke(width, CAP_ROUND, JOIN_MITER, width);
+                    final int onewayForPublicTransport = RouteUtils.isOnewayForPublicTransport(way);
+                    styledRenderer.drawWay(
+                        way,
+                        colorList.get(i),
+                        line,
+                        line,
+                        colorList.get(i),
+                        i * width,
+                        false,
+                        false,
+                        onewayForPublicTransport == 1,
+                        onewayForPublicTransport == -1
+                    );
                 }
             });
+
     }
 
-    private static Color getLineColourOf(final IRelation r) {
+    private static Color getLineColourOf(final IRelation<?> r) {
         if ("route".equals(r.get("type"))) {
             String colourString = r.get("colour");
             if (colourString == null) {
