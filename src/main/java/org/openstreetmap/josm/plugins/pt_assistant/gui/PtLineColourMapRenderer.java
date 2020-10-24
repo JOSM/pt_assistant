@@ -2,12 +2,14 @@ package org.openstreetmap.josm.plugins.pt_assistant.gui;
 
 import static java.awt.BasicStroke.CAP_SQUARE;
 import static java.awt.BasicStroke.JOIN_MITER;
+import static java.awt.Color.gray;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,11 +50,15 @@ public class PtLineColourMapRenderer extends AbstractMapRenderer {
             })
             .collect(Collectors.groupingBy(it -> it.a, Collectors.mapping(it -> it.b, Collectors.toSet())))
             .forEach((way, colors) -> {
-                final List<Color> colorList = new ArrayList<>(colors);
+                List<Color> colorList = new ArrayList<>(colors);
+                final StyledMapRenderer styledRenderer = new StyledMapRenderer(g, nc, isInactiveMode);
+                final float strokeWidth = 5.0f;
+                final BasicStroke line = new BasicStroke(strokeWidth, CAP_SQUARE, JOIN_MITER);
+                double scale = nc.getScale();
+                if (scale > 2 && colorList.size() > 6) {
+                    colorList = new ArrayList<>(Arrays.asList(gray, gray));
+                }
                 for (int i = 0; i < colorList.size(); i++) {
-                    final StyledMapRenderer styledRenderer = new StyledMapRenderer(g, nc, isInactiveMode);
-                    final float strokeWidth = 5.0f;
-                    final BasicStroke line = new BasicStroke(strokeWidth, CAP_SQUARE, JOIN_MITER);
                     g.setStroke(line);
                     final int onewayForPublicTransport = RouteUtils.isOnewayForPublicTransport(way);
                     styledRenderer.drawWay(
@@ -77,8 +83,8 @@ public class PtLineColourMapRenderer extends AbstractMapRenderer {
                             i * strokeWidth,
                             false,
                             false,
-                            onewayForPublicTransport == 1,
-                            onewayForPublicTransport == -1
+                            false,
+                            false
                         );
                     }
                 }
