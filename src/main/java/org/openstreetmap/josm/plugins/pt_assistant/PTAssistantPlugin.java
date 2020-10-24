@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JMenu;
@@ -80,6 +81,8 @@ public class PTAssistantPlugin extends Plugin {
      */
     public PTAssistantPlugin(PluginInformation info) {
         super(info);
+        MapRendererFactory.getInstance().register(PtLineColourMapRenderer.class, "PT Line Diagram", "This renders the colors of route relations on the map");
+
         OsmValidator.addTest(PTAssistantValidatorTest.class);
         OsmValidator.addTest(BicycleFootRouteValidatorTest.class);
 
@@ -91,10 +94,8 @@ public class PTAssistantPlugin extends Plugin {
         SelectionEventManager.getInstance().addSelectionListener(PTAssistantLayerManager.PTLM);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(PTAssistantLayerManager.PTLM);
         initialiseWizard();
-        initialiseShorcutsForCreatePlatformNode();
+        initialiseShortcutsForCreatePlatformNode();
         addButtonsToRelationEditor();
-
-        MapRendererFactory.getInstance().register(PtLineColourMapRenderer.class, "PT Line Diagram", "This renders the colors of route relations on the map");
     }
 
     /**
@@ -155,7 +156,7 @@ public class PTAssistantPlugin extends Plugin {
 
     private void addToMenu(JMenu menu) {
         MainMenu.add(menu, new JosmAction("Enable/disable coloured line diagram renderer",
-            "bus", "Toggle coloured line diagram renderer",
+            "bus.svg", "Toggle coloured line diagram renderer",
             Shortcut.registerShortcut("Toggle coloured line diagram renderer","Enable/disable coloured line diagram renderer",KeyEvent.VK_L, Shortcut.ALT),
             true) {
             @Override
@@ -185,7 +186,7 @@ public class PTAssistantPlugin extends Plugin {
         wizard.actionPerformed(null);
     }
 
-    private static void initialiseShorcutsForCreatePlatformNode() {
+    private static void initialiseShortcutsForCreatePlatformNode() {
         new CreatePlatformShortcutAction();
         new CreatePlatformNodeThroughReplaceAction();
         new ExtractPlatformNodeAction();
@@ -201,7 +202,7 @@ public class PTAssistantPlugin extends Plugin {
 
             @Override
             public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
-                return Arrays.asList(new RoutingAction(editorAccess));
+                return Collections.singletonList(new RoutingAction(editorAccess));
             }
         };
 
@@ -213,7 +214,7 @@ public class PTAssistantPlugin extends Plugin {
 
             @Override
             public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
-                return Arrays.asList(new SortPTRouteMembersAction(editorAccess));
+                return Collections.singletonList(new SortPTRouteMembersAction(editorAccess));
             }
         };
         RelationEditorHooks.addActionsToMembers(group1);

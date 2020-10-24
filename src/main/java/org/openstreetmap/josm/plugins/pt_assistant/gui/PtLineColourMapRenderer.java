@@ -1,6 +1,6 @@
 package org.openstreetmap.josm.plugins.pt_assistant.gui;
 
-import static java.awt.BasicStroke.CAP_ROUND;
+import static java.awt.BasicStroke.CAP_SQUARE;
 import static java.awt.BasicStroke.JOIN_MITER;
 
 import java.awt.BasicStroke;
@@ -51,21 +51,36 @@ public class PtLineColourMapRenderer extends AbstractMapRenderer {
                 final List<Color> colorList = new ArrayList<>(colors);
                 for (int i = 0; i < colorList.size(); i++) {
                     final StyledMapRenderer styledRenderer = new StyledMapRenderer(g, nc, isInactiveMode);
-                    final float width = 4.0f;
-                    final BasicStroke line = new BasicStroke(width, CAP_ROUND, JOIN_MITER, width);
+                    final float strokeWidth = 5.0f;
+                    final BasicStroke line = new BasicStroke(strokeWidth, CAP_SQUARE, JOIN_MITER);
+                    g.setStroke(line);
                     final int onewayForPublicTransport = RouteUtils.isOnewayForPublicTransport(way);
                     styledRenderer.drawWay(
                         way,
                         colorList.get(i),
                         line,
-                        line,
-                        colorList.get(i),
-                        i * width,
+                        null,
+                        null,
+                        i * strokeWidth * -1,
                         false,
                         false,
                         onewayForPublicTransport == 1,
                         onewayForPublicTransport == -1
                     );
+                    if (onewayForPublicTransport == 0) {
+                        styledRenderer.drawWay(
+                            way,
+                            colorList.get(i),
+                            line,
+                            null,
+                            null,
+                            i * strokeWidth,
+                            false,
+                            false,
+                            onewayForPublicTransport == 1,
+                            onewayForPublicTransport == -1
+                        );
+                    }
                 }
             });
 
