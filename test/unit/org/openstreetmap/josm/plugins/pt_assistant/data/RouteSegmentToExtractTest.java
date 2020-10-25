@@ -2549,21 +2549,22 @@ public class RouteSegmentToExtractTest extends AbstractTest{
     public void testPtLine(List<Val> expectedValues, final Relation busRouteRelation) {
 
         assertNotNull(busRouteRelation);
-        RouteSegmentToExtract segment = new RouteSegmentToExtract(busRouteRelation);
+
+        Relation clonedRelation = new Relation(busRouteRelation);
+
+        RouteSegmentToExtract segment = new RouteSegmentToExtract(clonedRelation);
         segment.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
 
-        assertEquals(busRouteRelation.get("ref"), segment.getLineIdentifiersSignature());
-        assertEquals(busRouteRelation.get("colour"), segment.getColoursSignature());
+        assertEquals(clonedRelation.get("ref"), segment.getLineIdentifiersSignature());
+        assertEquals(clonedRelation.get("colour"), segment.getColoursSignature());
 
         assertNull(segment.extractToRelation(Collections.emptyList(), false));
 
         assertEquals("", segment.getWayIdsSignature());
         assertEquals(Collections.emptyList(), segment.getWayMembers());
-        System.out.printf("***** %s *****\n\n     ", busRouteRelation.get("name"));
+        System.out.printf("***** %s *****\n\n     ", clonedRelation.get("name"));
 
         RouteSegmentToExtract previousSegment = segment;
-
-        Relation clonedRelation = new Relation(busRouteRelation);
 
         for (Val v: expectedValues) {
             segment = previousSegment.addPTWayMember(v.index);
