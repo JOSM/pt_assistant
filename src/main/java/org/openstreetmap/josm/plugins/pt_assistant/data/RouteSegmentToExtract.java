@@ -29,7 +29,7 @@ import static org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantPaintVi
  * @author Polyglot
  *
  */
-public class PTSegmentToExtract {
+public class RouteSegmentToExtract {
     /**
      *
      */
@@ -57,7 +57,7 @@ public class PTSegmentToExtract {
      * lineIdentifiers  The ref tag of the route parent route relations of the ways
      * colours          The colours of the public transport lines of this line bundle
      */
-    private PTSegmentToExtract() {
+    private RouteSegmentToExtract() {
         ptWays = new ArrayList<>();
         lineIdentifiers = new TreeSet<>(new RefTagComparator());
         colours = new TreeSet<>();
@@ -68,7 +68,7 @@ public class PTSegmentToExtract {
      * @param relation The route or superroute relation for which this route segment is created
      *                 use addPTWay() to add ways one by one
      */
-    public PTSegmentToExtract(Relation relation) {
+    public RouteSegmentToExtract(Relation relation) {
         this();
         this.relation = relation;
         extractedRelation = null;
@@ -81,7 +81,7 @@ public class PTSegmentToExtract {
      * @param relation The route or superroute relation for which this route segment is created
      * @param selectedIndices ways will be added for these indices
      */
-    public PTSegmentToExtract(Relation relation, List<Integer> selectedIndices) {
+    public RouteSegmentToExtract(Relation relation, List<Integer> selectedIndices) {
         this(relation);
 
         indices = selectedIndices;
@@ -96,7 +96,7 @@ public class PTSegmentToExtract {
      * @param existingRelation to be used when a potential sub route relation is encountered
      * @param updateTags update the tags automatically or not?
      */
-    public PTSegmentToExtract(Relation existingRelation, Boolean updateTags) {
+    public RouteSegmentToExtract(Relation existingRelation, Boolean updateTags) {
         this();
         this.relation = null;
         extractedRelation = existingRelation;

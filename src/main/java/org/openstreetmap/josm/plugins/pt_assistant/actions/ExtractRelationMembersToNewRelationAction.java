@@ -17,7 +17,7 @@ import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
-import org.openstreetmap.josm.plugins.pt_assistant.data.PTSegmentToExtract;
+import org.openstreetmap.josm.plugins.pt_assistant.data.RouteSegmentToExtract;
 import org.openstreetmap.josm.plugins.pt_assistant.data.WayTriplet;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.*;
@@ -105,7 +105,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                 splitInSegments(originalRelation, cbConvertToSuperroute.isSelected());
             } else {
                 final Relation clonedRelation = new Relation(originalRelation);
-                PTSegmentToExtract segment = new PTSegmentToExtract(clonedRelation,
+                RouteSegmentToExtract segment = new RouteSegmentToExtract(clonedRelation,
                     Arrays.stream(memberTableModel.getSelectedIndices()).boxed().collect(Collectors.toList()));
                 segment.put("name", tfNameTag.getText());
                 if (cbProposed.isSelected()) {
@@ -144,7 +144,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
         final long clonedRelationId = clonedRelation.getId();
         boolean startNewSegment = false;
         final List<RelationMember> members = clonedRelation.getMembers();
-        PTSegmentToExtract segment = new PTSegmentToExtract(clonedRelation);
+        RouteSegmentToExtract segment = new RouteSegmentToExtract(clonedRelation);
         segment.addPTWay(members.size() - 1);
         for (int i = members.size() - 2; i >= 1; i--) {
             final Way previousWay = getIfWay(members, i - 1);
@@ -160,7 +160,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
             if (startNewSegment) {
                 segment.extractToRelation(new ArrayList<>(Arrays.asList("type", "route")),
                                           true);
-                segment = new PTSegmentToExtract(clonedRelation);
+                segment = new RouteSegmentToExtract(clonedRelation);
                 startNewSegment = false;
             }
             segment.addPTWay(i);
@@ -179,7 +179,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                             startNewSegment = true;
                             String route_ref = parentRoute.get("route_ref");
                             if (waysInParentRoute.nextWay == null && route_ref != null) {
-                                new PTSegmentToExtract(parentRoute, false);
+                                new RouteSegmentToExtract(parentRoute, false);
                             }
                         }
                         long previousWayInParentRouteId = waysInParentRoute.previousWay != null ? waysInParentRoute.previousWay.getId() : 0;
@@ -303,7 +303,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                         // the position where this relation was in the parent
                         index++;
                     }
-                    index = PTSegmentToExtract.limitIntegerTo(index, superroute.getMembersCount());
+                    index = RouteSegmentToExtract.limitIntegerTo(index, superroute.getMembersCount());
                     clonedParentRelation.addMember(index, new RelationMember("", extractedRelation));
                     commands.add(new ChangeCommand(superroute, clonedParentRelation));
                     break;
