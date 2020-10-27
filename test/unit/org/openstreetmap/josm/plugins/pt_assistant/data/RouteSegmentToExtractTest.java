@@ -1,25 +1,27 @@
 package org.openstreetmap.josm.plugins.pt_assistant.data;
 
-import org.junit.BeforeClass;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.openstreetmap.josm.io.OsmReader.parseDataSet;
+
+import java.io.FileInputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Test;
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
-import org.openstreetmap.josm.data.osm.Way;
-
-import org.openstreetmap.josm.io.IllegalDataException;
-import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
 import org.openstreetmap.josm.data.osm.RelationMember;
+import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.*;
-import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.openstreetmap.josm.io.OsmReader.parseDataSet;
 
 /**
  * An ExpectedValue for each index
@@ -56,77 +58,61 @@ class Val {
 
 public class RouteSegmentToExtractTest extends AbstractTest{
 
-    private static DataSet ds;
-    private static Collection<Relation> allRelations;
-    private static Collection<Way> allWays;
-    private static DataSet ds2;
-    private static Collection<Relation> allRelations2;
-    private final static String rc = " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way";
+    private static final DataSet DATASET_BUSES_BEFORE_SPLITTING = loadDataSet(PATH_TO_PT_BEFORE_SPLITTING_TEST);
+    private static final DataSet DATASET_F74_F75 = loadDataSet(PATH_TO_F74_F75_TEST);
 
-    @BeforeClass
-    public static void init() throws FileNotFoundException, IllegalDataException {
-        ds = parseDataSet(new FileInputStream(PATH_TO_PT_BEFORE_SPLITTING_TEST), null);
-        allRelations = ds.getRelations();
-        allWays = ds.getWays();
-        ds2 = parseDataSet(new FileInputStream(PATH_TO_F74_F75_TEST), null);
-        allRelations2 = ds2.getRelations();
+    private static DataSet loadDataSet(final String path) {
+        try (final FileInputStream stream = new FileInputStream(path)) {
+            return parseDataSet(stream, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
+
+    private static final Relation PT_ROUTE_BUS_358 = (Relation) DATASET_BUSES_BEFORE_SPLITTING.getPrimitiveById(6695469, OsmPrimitiveType.RELATION);
+    private static final Relation PT_ROUTE_BUS_371 = (Relation) DATASET_BUSES_BEFORE_SPLITTING.getPrimitiveById(1606056, OsmPrimitiveType.RELATION);
+    private static final Relation PT_ROUTE_BUS_600 = (Relation) DATASET_BUSES_BEFORE_SPLITTING.getPrimitiveById(955908, OsmPrimitiveType.RELATION);
+    private static final Relation PT_ROUTE_BUS_601 = (Relation) DATASET_BUSES_BEFORE_SPLITTING.getPrimitiveById(3612781, OsmPrimitiveType.RELATION);
+
+    private static final Relation PT_ROUTE_BUS_3_TO_LUBBEEK_KERK = (Relation) DATASET_BUSES_BEFORE_SPLITTING.getPrimitiveById(3297543, OsmPrimitiveType.RELATION);
+    private static final Relation PT_ROUTE_BUS_3_TO_LUBBEEK_KERK_VIA_PELLENBERG = (Relation) DATASET_BUSES_BEFORE_SPLITTING.getPrimitiveById(2815, OsmPrimitiveType.RELATION);
+    private static final Relation PT_ROUTE_BUS_3_TO_LEUVEN_VIA_PELLENBERG = (Relation) DATASET_BUSES_BEFORE_SPLITTING.getPrimitiveById(1583303, OsmPrimitiveType.RELATION);
+
+    private static final Relation PT_ROUTE_BUS_310_FROM_LEUVEN_TO_AARSCHOT_STATION = (Relation) DATASET_BUSES_BEFORE_SPLITTING.getPrimitiveById(3297278, OsmPrimitiveType.RELATION);
+    private static final Relation PT_ROUTE_BUS_433_FROM_TREMELO_TO_LEUVEN = (Relation) DATASET_BUSES_BEFORE_SPLITTING.getPrimitiveById(5451452, OsmPrimitiveType.RELATION);
+
+    private static final Relation BICYCLE_ROUTE_F75 = (Relation) DATASET_F74_F75.getPrimitiveById(11021011, OsmPrimitiveType.RELATION);
+
+    private static final String rc = " http://127.0.0.1:8111/zoom?left=8&right=8&top=48&bottom=48&select=way";
 
     @Test
     public void isItineraryInSameDirectionTest() {
-        Relation bus601RouteRelation = allRelations.stream()
-            .filter(relation -> relation.getId() == 3612781)
-            .findFirst().orElse(null);
 
-        Relation bus358RouteRelation = allRelations.stream()
-            .filter(relation -> relation.getId() == 6695469)
-            .findFirst().orElse(null);
-
-        Relation bus371RouteRelation = allRelations.stream()
-            .filter(relation -> relation.getId() == 1606056)
-            .findFirst().orElse(null);
-
-        assertNotNull(bus601RouteRelation);
         WaySequence waysInParentRouteOf601 = new WaySequence(
-            bus601RouteRelation.getMembers().get(156).getWay(),
-            bus601RouteRelation.getMembers().get(157).getWay(),
-            bus601RouteRelation.getMembers().get(158).getWay());
+            PT_ROUTE_BUS_601.getMembers().get(156).getWay(),
+            PT_ROUTE_BUS_601.getMembers().get(157).getWay(),
+            PT_ROUTE_BUS_601.getMembers().get(158).getWay());
 
-        assertNotNull(bus358RouteRelation);
         WaySequence waysInParentRouteOf358 = new WaySequence(
-            bus358RouteRelation.getMembers().get(114).getWay(),
-            bus358RouteRelation.getMembers().get(115).getWay(),
-            bus358RouteRelation.getMembers().get(116).getWay());
+            PT_ROUTE_BUS_358.getMembers().get(114).getWay(),
+            PT_ROUTE_BUS_358.getMembers().get(115).getWay(),
+            PT_ROUTE_BUS_358.getMembers().get(116).getWay());
 
-        assertNotNull(bus371RouteRelation);
         WaySequence waysInParentRouteOf371 = new WaySequence(
-            bus371RouteRelation.getMembers().get(132).getWay(),
-            bus371RouteRelation.getMembers().get(133).getWay(),
-            bus371RouteRelation.getMembers().get(134).getWay());
-        RouteSegmentToExtract segment601_1 = new RouteSegmentToExtract(bus601RouteRelation);
-        segment601_1.setActiveDataSet(ds);
+            PT_ROUTE_BUS_371.getMembers().get(132).getWay(),
+            PT_ROUTE_BUS_371.getMembers().get(133).getWay(),
+            PT_ROUTE_BUS_371.getMembers().get(134).getWay());
+        RouteSegmentToExtract segment601_1 = new RouteSegmentToExtract(PT_ROUTE_BUS_601);
+        segment601_1.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
         assertTrue(waysInParentRouteOf601.compareTraversal(waysInParentRouteOf358));
         assertFalse(waysInParentRouteOf601.compareTraversal(waysInParentRouteOf371));
 
-        Way commonWay = allWays.stream()
-            .filter(way -> way.getId() == 75113358)
-            .findFirst().orElse(null);
-
-        Way toHaasrode = allWays.stream()
-            .filter(way -> way.getId() == 4866090)
-            .findFirst().orElse(null);
-
-        Way toBlanden = allWays.stream()
-            .filter(way -> way.getId() == 809484771)
-            .findFirst().orElse(null);
-
-        Way toNeervelp = allWays.stream()
-            .filter(way -> way.getId() == 243961945)
-            .findFirst().orElse(null);
-
-        Way toLeuven = allWays.stream()
-            .filter(way -> way.getId() == 809485597)
-            .findFirst().orElse(null);
+        final Way commonWay = (Way) DATASET_BUSES_BEFORE_SPLITTING.getPrimitiveById(75113358, OsmPrimitiveType.WAY);
+        final Way toHaasrode = (Way) DATASET_BUSES_BEFORE_SPLITTING.getPrimitiveById(4866090, OsmPrimitiveType.WAY);
+        final Way toBlanden = (Way) DATASET_BUSES_BEFORE_SPLITTING.getPrimitiveById(809484771, OsmPrimitiveType.WAY);
+        final Way toNeervelp = (Way) DATASET_BUSES_BEFORE_SPLITTING.getPrimitiveById(243961945, OsmPrimitiveType.WAY);
+        final Way toLeuven = (Way) DATASET_BUSES_BEFORE_SPLITTING.getPrimitiveById(809485597, OsmPrimitiveType.WAY);
 
         WaySequence leuvenToHaasrode = new WaySequence(toLeuven,commonWay,toHaasrode);
         WaySequence leuvenToBlanden = new WaySequence(toLeuven,commonWay,toBlanden);
@@ -186,21 +172,18 @@ public class RouteSegmentToExtractTest extends AbstractTest{
 
     @Test
     public void f74_F75_Test() {
-        Relation f75BicycleRouteRelation = allRelations2.stream()
-            .filter(relation -> relation.getId() == 11021011)
-            .findFirst().orElse(null);
-        assertNotNull(f75BicycleRouteRelation);
-        assertEquals(30, f75BicycleRouteRelation.getMembersCount());
+        assertNotNull(BICYCLE_ROUTE_F75);
+        assertEquals(30, BICYCLE_ROUTE_F75.getMembersCount());
 
         RouteSegmentToExtract s1 = new RouteSegmentToExtract(
-            f75BicycleRouteRelation,
+            BICYCLE_ROUTE_F75,
             Arrays.asList(23, 24, 25));
-        s1.setActiveDataSet(ds2);
+        s1.setActiveDataSet(DATASET_F74_F75);
         s1.put("state", "proposed");
 
         assertEquals(3, s1.getWayMembers().size());
         Relation rel1 = s1.extractToRelation(Arrays.asList("type", "route"), true);
-        assertEquals(28, f75BicycleRouteRelation.getMembersCount());
+        assertEquals(28, BICYCLE_ROUTE_F75.getMembersCount());
         assertEquals("proposed", rel1.get("state"));
     }
 
@@ -209,15 +192,12 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         List<Val> expectedValues;
         RouteSegmentToExtract previousSegment = null;
         RouteSegmentToExtract segment = null;
-        Relation bus601RouteRelation = allRelations.stream()
-            .filter(relation -> relation.getId() == 3612781)
-            .findFirst().orElse(null);
 
-        assertNotNull(bus601RouteRelation);
-        Relation cloneOfBus601RouteRelation = new Relation(bus601RouteRelation);
+        assertNotNull(PT_ROUTE_BUS_601);
+        final Relation cloneOfBus601RouteRelation = new Relation(PT_ROUTE_BUS_601);
         assertNotNull(cloneOfBus601RouteRelation);
         RouteSegmentToExtract segment1 = new RouteSegmentToExtract(cloneOfBus601RouteRelation);
-        segment1.setActiveDataSet(ds);
+        segment1.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
 
         assertEquals(cloneOfBus601RouteRelation.get("ref"), segment1.getLineIdentifiersSignature());
         assertEquals(cloneOfBus601RouteRelation.get("colour"), segment1.getColoursSignature());
@@ -586,7 +566,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
                 "601")
         );
         previousSegment = new RouteSegmentToExtract(cloneOfBus601RouteRelation);
-        previousSegment.setActiveDataSet(ds);
+        previousSegment.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
         for (Val v: expectedValues) {
             segment = previousSegment.addPTWayMember(v.index);
             if (segment != null) {
@@ -602,15 +582,11 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // ***********************************************************
 
 
-        Relation bus600RouteRelation = allRelations.stream()
-            .filter(relation -> relation.getId() == 955908)
-            .findFirst().orElse(null);
-
-        assertNotNull(bus600RouteRelation);
-        Relation cloneOfBus600RouteRelation = new Relation(bus600RouteRelation);
+        assertNotNull(PT_ROUTE_BUS_600);
+        Relation cloneOfBus600RouteRelation = new Relation(PT_ROUTE_BUS_600);
         assertNotNull(cloneOfBus600RouteRelation);
         RouteSegmentToExtract segment101 = new RouteSegmentToExtract(cloneOfBus600RouteRelation);
-        segment101.setActiveDataSet(ds);
+        segment101.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
 
         assertEquals(cloneOfBus600RouteRelation.get("ref"), segment101.getLineIdentifiersSignature());
         assertEquals(cloneOfBus600RouteRelation.get("colour"), segment101.getColoursSignature());
@@ -1013,7 +989,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
                 "395;600;651;652")
         );
         previousSegment = new RouteSegmentToExtract(cloneOfBus600RouteRelation);
-        previousSegment.setActiveDataSet(ds);
+        previousSegment.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
         for (Val v: expectedValues) {
             segment = previousSegment.addPTWayMember(v.index);
             if (segment != null) {
@@ -1031,16 +1007,13 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // The following test block is for the last stretch of the shorter version
         // ***********************************************************
 
-        Relation bus3_GHB_Lubbeek_RouteRelation = allRelations.stream()
-            .filter(relation -> relation.getId() == 3297543)
-            .findFirst().orElse(null);
 
-        assertNotNull(bus3_GHB_Lubbeek_RouteRelation);
-        RouteSegmentToExtract segment201 = new RouteSegmentToExtract(bus3_GHB_Lubbeek_RouteRelation);
-        segment201.setActiveDataSet(ds);
+        assertNotNull(PT_ROUTE_BUS_3_TO_LUBBEEK_KERK);
+        RouteSegmentToExtract segment201 = new RouteSegmentToExtract(PT_ROUTE_BUS_3_TO_LUBBEEK_KERK);
+        segment201.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
 
-        assertEquals(bus3_GHB_Lubbeek_RouteRelation.get("ref"), segment201.getLineIdentifiersSignature());
-        assertEquals(bus3_GHB_Lubbeek_RouteRelation.get("colour"), segment201.getColoursSignature());
+        assertEquals(PT_ROUTE_BUS_3_TO_LUBBEEK_KERK.get("ref"), segment201.getLineIdentifiersSignature());
+        assertEquals(PT_ROUTE_BUS_3_TO_LUBBEEK_KERK.get("colour"), segment201.getColoursSignature());
 
         assertNull(segment201.extractToRelation(Collections.emptyList(), false));
 
@@ -1353,12 +1326,12 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             new Val( 33, 377918625,  15945426, 377918625, "Ring Noord",
                 "Ring Noord (3)",
                 "3")
-        );        previousSegment = new RouteSegmentToExtract(bus3_GHB_Lubbeek_RouteRelation);
-        previousSegment.setActiveDataSet(ds);
+        );        previousSegment = new RouteSegmentToExtract(PT_ROUTE_BUS_3_TO_LUBBEEK_KERK);
+        previousSegment.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
         for (Val v: expectedValues) {
             segment = previousSegment.addPTWayMember(v.index);
             if (segment != null) {
-                extractAndAssertValues(v.index, previousSegment, segment, bus3_GHB_Lubbeek_RouteRelation, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,
+                extractAndAssertValues(v.index, previousSegment, segment, PT_ROUTE_BUS_3_TO_LUBBEEK_KERK, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,
                     null, v.expectedRouteRef);
                 previousSegment = segment;
             }
@@ -1372,16 +1345,12 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // This is testing the longer version completely
         // ***********************************************************
 
-        Relation bus3_GHB_Pellenberg_Lubbeek_RouteRelation = allRelations.stream()
-            .filter(relation -> relation.getId() == 2815)
-            .findFirst().orElse(null);
+        assertNotNull(PT_ROUTE_BUS_3_TO_LUBBEEK_KERK_VIA_PELLENBERG);
+        RouteSegmentToExtract segment301 = new RouteSegmentToExtract(PT_ROUTE_BUS_3_TO_LUBBEEK_KERK_VIA_PELLENBERG);
+        segment301.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
 
-        assertNotNull(bus3_GHB_Pellenberg_Lubbeek_RouteRelation);
-        RouteSegmentToExtract segment301 = new RouteSegmentToExtract(bus3_GHB_Pellenberg_Lubbeek_RouteRelation);
-        segment301.setActiveDataSet(ds);
-
-        assertEquals(bus3_GHB_Pellenberg_Lubbeek_RouteRelation.get("ref"), segment301.getLineIdentifiersSignature());
-        assertEquals(bus3_GHB_Pellenberg_Lubbeek_RouteRelation.get("colour"), segment301.getColoursSignature());
+        assertEquals(PT_ROUTE_BUS_3_TO_LUBBEEK_KERK_VIA_PELLENBERG.get("ref"), segment301.getLineIdentifiersSignature());
+        assertEquals(PT_ROUTE_BUS_3_TO_LUBBEEK_KERK_VIA_PELLENBERG.get("colour"), segment301.getColoursSignature());
 
         assertNull(segment301.extractToRelation(Collections.emptyList(), false));
 
@@ -1738,12 +1707,12 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             new Val( 36, 377918625,  15945426, 377918625, "Ring Noord",
                 "Ring Noord (3)",
                 "3")
-        );        previousSegment = new RouteSegmentToExtract(bus3_GHB_Pellenberg_Lubbeek_RouteRelation);
-        previousSegment.setActiveDataSet(ds);
+        );        previousSegment = new RouteSegmentToExtract(PT_ROUTE_BUS_3_TO_LUBBEEK_KERK_VIA_PELLENBERG);
+        previousSegment.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
         for (Val v: expectedValues) {
             segment = previousSegment.addPTWayMember(v.index);
             if (segment != null) {
-                extractAndAssertValues(v.index, previousSegment, segment, bus3_GHB_Pellenberg_Lubbeek_RouteRelation, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,
+                extractAndAssertValues(v.index, previousSegment, segment, PT_ROUTE_BUS_3_TO_LUBBEEK_KERK_VIA_PELLENBERG, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,
                     null, v.expectedRouteRef);
                 previousSegment = segment;
             }
@@ -1758,16 +1727,13 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // From Lubbeek, over Pellenberg to Leuven Gasthuisberg
         // ***********************************************************
 
-        Relation bus3_Lubbeek_Pellenberg_GHB_RouteRelation = allRelations.stream()
-            .filter(relation -> relation.getId() == 1583303)
-            .findFirst().orElse(null);
 
-        assertNotNull(bus3_Lubbeek_Pellenberg_GHB_RouteRelation);
-        RouteSegmentToExtract segment401 = new RouteSegmentToExtract(bus3_Lubbeek_Pellenberg_GHB_RouteRelation);
-        segment401.setActiveDataSet(ds);
+        assertNotNull(PT_ROUTE_BUS_3_TO_LEUVEN_VIA_PELLENBERG);
+        RouteSegmentToExtract segment401 = new RouteSegmentToExtract(PT_ROUTE_BUS_3_TO_LEUVEN_VIA_PELLENBERG);
+        segment401.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
 
-        assertEquals(bus3_Lubbeek_Pellenberg_GHB_RouteRelation.get("ref"), segment401.getLineIdentifiersSignature());
-        assertEquals(bus3_Lubbeek_Pellenberg_GHB_RouteRelation.get("colour"), segment401.getColoursSignature());
+        assertEquals(PT_ROUTE_BUS_3_TO_LEUVEN_VIA_PELLENBERG.get("ref"), segment401.getLineIdentifiersSignature());
+        assertEquals(PT_ROUTE_BUS_3_TO_LEUVEN_VIA_PELLENBERG.get("colour"), segment401.getColoursSignature());
 
         assertNull(segment401.extractToRelation(Collections.emptyList(), false));
 
@@ -2129,9 +2095,9 @@ public class RouteSegmentToExtractTest extends AbstractTest{
                 "Dorpskring (3;373;485)",
                 "3;373;485")
         );
-        System.out.printf("***** %s *****\n\n", bus3_Lubbeek_Pellenberg_GHB_RouteRelation.get("name"));
-        previousSegment = new RouteSegmentToExtract(bus3_Lubbeek_Pellenberg_GHB_RouteRelation);
-        previousSegment.setActiveDataSet(ds);
+        System.out.printf("***** %s *****\n\n", PT_ROUTE_BUS_3_TO_LEUVEN_VIA_PELLENBERG.get("name"));
+        previousSegment = new RouteSegmentToExtract(PT_ROUTE_BUS_3_TO_LEUVEN_VIA_PELLENBERG);
+        previousSegment.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
         for (Val v: expectedValues) {
             segment = previousSegment.addPTWayMember(v.index);
             if (v.expectedRouteRef == null) {
@@ -2140,7 +2106,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
                 assertNotNull(String.format("%d segment should have returned a new segment", v.index), segment);
             }
             if (segment != null) {
-                extractAndAssertValues(v.index, previousSegment, segment, bus3_Lubbeek_Pellenberg_GHB_RouteRelation, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,
+                extractAndAssertValues(v.index, previousSegment, segment, PT_ROUTE_BUS_3_TO_LEUVEN_VIA_PELLENBERG, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,
                     null, v.expectedRouteRef);
                 previousSegment = segment;
             }
@@ -2154,16 +2120,12 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // Aarschot station, making a spoon loop in Holsbeek
         // ***********************************************************
 
-        Relation bus310_Leuven_Aarschot_Station_RouteRelation = allRelations.stream()
-            .filter(relation -> relation.getId() == 3297278)
-            .findFirst().orElse(null);
+        assertNotNull(PT_ROUTE_BUS_310_FROM_LEUVEN_TO_AARSCHOT_STATION);
+        RouteSegmentToExtract segment501 = new RouteSegmentToExtract(PT_ROUTE_BUS_310_FROM_LEUVEN_TO_AARSCHOT_STATION);
+        segment501.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
 
-        assertNotNull(bus310_Leuven_Aarschot_Station_RouteRelation);
-        RouteSegmentToExtract segment501 = new RouteSegmentToExtract(bus310_Leuven_Aarschot_Station_RouteRelation);
-        segment501.setActiveDataSet(ds);
-
-        assertEquals(bus310_Leuven_Aarschot_Station_RouteRelation.get("ref"), segment501.getLineIdentifiersSignature());
-        assertEquals(bus310_Leuven_Aarschot_Station_RouteRelation.get("colour"), segment501.getColoursSignature());
+        assertEquals(PT_ROUTE_BUS_310_FROM_LEUVEN_TO_AARSCHOT_STATION.get("ref"), segment501.getLineIdentifiersSignature());
+        assertEquals(PT_ROUTE_BUS_310_FROM_LEUVEN_TO_AARSCHOT_STATION.get("colour"), segment501.getColoursSignature());
 
         assertNull(segment501.extractToRelation(Collections.emptyList(), false));
 
@@ -2451,13 +2413,13 @@ public class RouteSegmentToExtractTest extends AbstractTest{
                 "2;3;310")
         );
 
-        System.out.printf("*** %s ***", bus310_Leuven_Aarschot_Station_RouteRelation.get("name"));
-        previousSegment = new RouteSegmentToExtract(bus310_Leuven_Aarschot_Station_RouteRelation);
-        previousSegment.setActiveDataSet(ds);
+        System.out.printf("*** %s ***", PT_ROUTE_BUS_310_FROM_LEUVEN_TO_AARSCHOT_STATION.get("name"));
+        previousSegment = new RouteSegmentToExtract(PT_ROUTE_BUS_310_FROM_LEUVEN_TO_AARSCHOT_STATION);
+        previousSegment.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
         for (Val v: expectedValues) {
             segment = previousSegment.addPTWayMember(v.index);
             if (segment != null) {
-                extractAndAssertValues(v.index, previousSegment, segment, bus310_Leuven_Aarschot_Station_RouteRelation, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,
+                extractAndAssertValues(v.index, previousSegment, segment, PT_ROUTE_BUS_310_FROM_LEUVEN_TO_AARSCHOT_STATION, v.iDOfFirstWay, v.iDOfLastWay, v.iDOfNextWay, v.nameOfNextWay,
                     null, v.expectedRouteRef);
                 previousSegment = segment;
             }
@@ -2472,23 +2434,19 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         // Line 333 has the same issue, but this one is a bit shorter
         // ***********************************************************
 
-        Relation bus433_Tremelo_Leuven_RouteRelation = allRelations.stream()
-            .filter(relation -> relation.getId() == 5451452)
-            .findFirst().orElse(null);
+        assertNotNull(PT_ROUTE_BUS_433_FROM_TREMELO_TO_LEUVEN);
+        RouteSegmentToExtract segment601 = new RouteSegmentToExtract(PT_ROUTE_BUS_433_FROM_TREMELO_TO_LEUVEN);
+        segment601.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
 
-        assertNotNull(bus433_Tremelo_Leuven_RouteRelation);
-        RouteSegmentToExtract segment601 = new RouteSegmentToExtract(bus433_Tremelo_Leuven_RouteRelation);
-        segment601.setActiveDataSet(ds);
-
-        assertEquals(bus433_Tremelo_Leuven_RouteRelation.get("ref"), segment601.getLineIdentifiersSignature());
-        assertEquals(bus433_Tremelo_Leuven_RouteRelation.get("colour"), segment601.getColoursSignature());
+        assertEquals(PT_ROUTE_BUS_433_FROM_TREMELO_TO_LEUVEN.get("ref"), segment601.getLineIdentifiersSignature());
+        assertEquals(PT_ROUTE_BUS_433_FROM_TREMELO_TO_LEUVEN.get("colour"), segment601.getColoursSignature());
 
         assertNull(segment601.extractToRelation(Collections.emptyList(), false));
 
         assertEquals("", segment601.getWayIdsSignature());
         assertEquals(Collections.emptyList(), segment601.getWayMembers());
 
-        Relation clonedRelation = bus433_Tremelo_Leuven_RouteRelation;
+        Relation clonedRelation = PT_ROUTE_BUS_433_FROM_TREMELO_TO_LEUVEN;
 
         expectedValues = Arrays.asList(
             new Val( 167,  78579065,  78579065,  78579065, null),
@@ -2745,7 +2703,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         );
 
         previousSegment = new RouteSegmentToExtract(clonedRelation);
-        previousSegment.setActiveDataSet(ds);
+        previousSegment.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);
         for (Val v: expectedValues) {
             segment = previousSegment.addPTWayMember(v.index);
             if (segment != null) {
@@ -2753,10 +2711,10 @@ public class RouteSegmentToExtractTest extends AbstractTest{
                     null, v.expectedRouteRef);
                 previousSegment = segment;
             }
-            UndoRedoHandler.getInstance().add(new ChangeCommand(bus433_Tremelo_Leuven_RouteRelation, clonedRelation));
+            UndoRedoHandler.getInstance().add(new ChangeCommand(PT_ROUTE_BUS_433_FROM_TREMELO_TO_LEUVEN, clonedRelation));
             UndoRedoHandler.getInstance().undo();
         }
-        UndoRedoHandler.getInstance().add(new ChangeCommand(bus433_Tremelo_Leuven_RouteRelation, clonedRelation));
+        UndoRedoHandler.getInstance().add(new ChangeCommand(PT_ROUTE_BUS_433_FROM_TREMELO_TO_LEUVEN, clonedRelation));
 
         System.out.print("\n");
 
@@ -2851,7 +2809,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             segment.getLineIdentifiersSignature()
         );
         System.out.printf("        %spreviousSegment = new RouteSegmentToExtract(%s);\n", className, nameOfVariable);
-        System.out.print ("        previousSegment.setActiveDataSet(ds);\n");
+        System.out.print ("        previousSegment.setActiveDataSet(DATASET_BUSES_BEFORE_SPLITTING);\n");
         if (firstOne) {
             System.out.printf("        %ssegment;\n", className);
         }
