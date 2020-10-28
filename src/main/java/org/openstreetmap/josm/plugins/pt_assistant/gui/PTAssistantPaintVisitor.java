@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -502,8 +504,8 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
 
         Point p = mv.getPoint(n);
 
-        if (label != null && !label.equals("")) {
-            Font stringFont = new Font("SansSerif", Font.PLAIN, 24);
+        if (label != null && !label.isEmpty()) {
+            final Font stringFont = new Font(Font.SANS_SERIF, Font.PLAIN, 24);
             if (platform) {
                 g.setColor(new Color(255, 255, 102));
                 g.setFont(stringFont);
@@ -518,63 +520,45 @@ public class PTAssistantPaintVisitor extends PaintVisitor {
 
     /**
      * Compares route ref numbers
-     *
-     * @author darya
-     *
      */
     public static class RefTagComparator implements Comparator<String> {
+        private static final Pattern LEADING_UNSIGNED_INT_PATTERN = Pattern.compile("^([0-9]+).*$");
 
         @Override
-        public int compare(String s1, String s2) {
+        public int compare(final String s1, final String s2) {
 
-            if (s1 == null || s1.equals("") || s2 == null || s2.equals("")) {
-                // if at least one of the strings is null or empty, there is no
-                // point in comparing:
-                return 0;
+            final boolean s1Empty = s1 == null || s1.isEmpty();
+            final boolean s2Empty = s2 == null || s2.isEmpty();
+
+            if (s1Empty || s2Empty) {
+                // only s1 empty: -1 (s1 < s2)
+                // only s2 empty: 1 (s2 < s1)
+                // both empty: 0 (s1 == s2)
+                return (s1Empty ? -1 : 0) + (s2Empty ? 1 : 0);
             }
-
-            String[] splitString1 = s1.split("\\D");
-            String[] splitString2 = s2.split("\\D");
-
-            if (splitString1.length == 0 && splitString2.length != 0) {
-                // if the first ref does not start a digit and the second ref
-                // starts with a digit:
+            final Integer s1Number = getLeadingInt(s1);
+            final Integer s2Number = getLeadingInt(s2);
+            if (s1Number != null && s2Number != null) { // both start with integer
+                return Integer.compare(s1Number, s2Number);
+            } else if (s1Number != null) { // only s1 starts with integer
+                return -1;
+            } else if (s2Number != null) { // only s2 starts with integer
                 return 1;
             }
-
-            if (splitString1.length != 0 && splitString2.length == 0) {
-                // if the first ref starts a digit and the second ref does not
-                // start with a digit:
-                return -1;
-            }
-
-            if (splitString1.length == 0) {
-                // if both ref values do not start with a digit:
-                return s1.compareTo(s2);
-            }
-
-            String firstNumberString1 = splitString1[0];
-            String firstNumberString2 = splitString2[0];
-
-            try {
-                int firstNumber1 = Integer.parseInt(firstNumberString1);
-                int firstNumber2 = Integer.parseInt(firstNumberString2);
-                if (firstNumber1 > firstNumber2) {
-                    return 1;
-                } else if (firstNumber1 < firstNumber2) {
-                    return -1;
-                } else {
-                    // if the first number is the same:
-
-                    return s1.compareTo(s2);
-
-                }
-            } catch (NumberFormatException ex) {
-                return s1.compareTo(s2);
-            }
-
+            return s1.compareTo(s2);
         }
 
+        private Integer getLeadingInt(final CharSequence stringValue) {
+            final Matcher matcher = LEADING_UNSIGNED_INT_PATTERN.matcher(stringValue);
+            if (matcher.matches()) {
+                try {
+                    return Integer.parseInt(matcher.group(1));
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            }
+            return null;
+        }
     }
 
     /**

@@ -1,0 +1,160 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload="false" generator='JOSM'>
+  <node id='-209659' visible='true' lat='50.92715562902' lon='4.73691405728' />
+  <node id='-209660' visible='true' lat='50.92708146795' lon='4.73094896547' />
+  <node id='-209661' visible='true' lat='50.93137144088' lon='4.72715608551' />
+  <node id='-209662' visible='true' lat='50.93106586522' lon='4.75250741918' />
+  <node id='-209663' visible='true' lat='50.91981827539' lon='4.74281135249' />
+  <node id='-209664' visible='true' lat='50.92265686099' lon='4.74125694524' />
+  <node id='-209665' visible='true' lat='50.93081586662' lon='4.70829093286' />
+  <node id='-209666' visible='true' lat='50.92388300046' lon='4.70643595825' />
+  <node id='-209667' visible='true' lat='50.92936784347' lon='4.74332049519' />
+  <node id='-209668' visible='true' lat='50.92931572676' lon='4.71023189732' />
+  <node id='-209669' visible='true' lat='50.92733192995' lon='4.7173914089' />
+  <node id='-209670' visible='true' lat='50.93039319332' lon='4.72627439983' />
+  <node id='-209671' visible='true' lat='50.92760809947' lon='4.71156883813' />
+  <node id='-209672' visible='true' lat='50.92546072372' lon='4.70910751935' />
+  <node id='-209673' visible='true' lat='50.92710464803' lon='4.72477348072' />
+  <way id='-102980' visible='true'>
+    <nd ref='-209667' />
+    <nd ref='-209662' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='3;4' />
+  </way>
+  <way id='-102981' visible='true'>
+    <nd ref='-209666' />
+    <nd ref='-209672' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='1;4' />
+  </way>
+  <way id='-102982' visible='true'>
+    <nd ref='-209664' />
+    <nd ref='-209663' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='2' />
+  </way>
+  <way id='-102983' visible='true'>
+    <nd ref='-209673' />
+    <nd ref='-209660' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='2;3;4' />
+  </way>
+  <way id='-102984' visible='true'>
+    <nd ref='-209659' />
+    <nd ref='-209667' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='3;4' />
+  </way>
+  <way id='-102985' visible='true'>
+    <nd ref='-209659' />
+    <nd ref='-209664' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='2' />
+  </way>
+  <way id='-102986' visible='true'>
+    <nd ref='-209672' />
+    <nd ref='-209671' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='1;4' />
+  </way>
+  <way id='-102987' visible='true'>
+    <nd ref='-209668' />
+    <nd ref='-209671' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='2;3' />
+  </way>
+  <way id='-102988' visible='true'>
+    <nd ref='-209669' />
+    <nd ref='-209673' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='1;2;3;4' />
+  </way>
+  <way id='-102989' visible='true'>
+    <nd ref='-209665' />
+    <nd ref='-209668' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='2;3' />
+  </way>
+  <way id='-102990' visible='true'>
+    <nd ref='-209670' />
+    <nd ref='-209661' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='1' />
+  </way>
+  <way id='-102991' visible='true'>
+    <nd ref='-209673' />
+    <nd ref='-209670' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='1' />
+  </way>
+  <way id='-102992' visible='true'>
+    <nd ref='-209660' />
+    <nd ref='-209659' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='2;3;4' />
+  </way>
+  <way id='-102993' visible='true'>
+    <nd ref='-209671' />
+    <nd ref='-209669' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='1;2;3;4' />
+  </way>
+  <relation id='-99985' visible='true'>
+    <member type='way' ref='-102989' role='' />
+    <member type='way' ref='-102987' role='' />
+    <member type='way' ref='-102993' role='' />
+    <member type='way' ref='-102988' role='' />
+    <member type='way' ref='-102983' role='' />
+    <member type='way' ref='-102992' role='' />
+    <member type='way' ref='-102985' role='' />
+    <member type='way' ref='-102982' role='' />
+    <tag k='colour' v='#00ff00' />
+    <tag k='public_transport:version' v='2' />
+    <tag k='ref' v='2' />
+    <tag k='route' v='bus' />
+    <tag k='type' v='route' />
+  </relation>
+  <relation id='-99986' visible='true'>
+    <member type='way' ref='-102989' role='' />
+    <member type='way' ref='-102987' role='' />
+    <member type='way' ref='-102993' role='' />
+    <member type='way' ref='-102988' role='' />
+    <member type='way' ref='-102983' role='' />
+    <member type='way' ref='-102992' role='' />
+    <member type='way' ref='-102984' role='' />
+    <member type='way' ref='-102980' role='' />
+    <tag k='colour' v='#33CCFF' />
+    <tag k='public_transport:version' v='2' />
+    <tag k='ref' v='3' />
+    <tag k='route' v='bus' />
+    <tag k='type' v='route' />
+  </relation>
+  <relation id='-99987' visible='true'>
+    <member type='way' ref='-102981' role='' />
+    <member type='way' ref='-102986' role='' />
+    <member type='way' ref='-102993' role='' />
+    <member type='way' ref='-102988' role='' />
+    <member type='way' ref='-102991' role='' />
+    <member type='way' ref='-102990' role='' />
+    <tag k='colour' v='#ff0000' />
+    <tag k='public_transport:version' v='2' />
+    <tag k='ref' v='1' />
+    <tag k='route' v='bus' />
+    <tag k='type' v='route' />
+  </relation>
+  <relation id='-99988' visible='true'>
+    <member type='way' ref='-102981' role='' />
+    <member type='way' ref='-102986' role='' />
+    <member type='way' ref='-102993' role='' />
+    <member type='way' ref='-102988' role='' />
+    <member type='way' ref='-102983' role='' />
+    <member type='way' ref='-102992' role='' />
+    <member type='way' ref='-102984' role='' />
+    <member type='way' ref='-102980' role='' />
+    <tag k='colour' v='#ffff00' />
+    <tag k='public_transport:version' v='2' />
+    <tag k='ref' v='4' />
+    <tag k='route' v='bus' />
+    <tag k='type' v='route' />
+  </relation>
+</osm>
