@@ -1,14 +1,14 @@
 package org.openstreetmap.josm.plugins.pt_assistant.data;
 
+import static org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils.isPTWay;
+
+import java.util.List;
+
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
-
-import java.util.List;
-
-import static org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils.isPTWay;
 
 /**
  * This class keeps track of up to 4 consecutive ways

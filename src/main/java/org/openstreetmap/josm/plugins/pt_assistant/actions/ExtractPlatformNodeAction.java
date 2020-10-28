@@ -48,13 +48,13 @@ public class ExtractPlatformNodeAction extends JosmAction {
             tr("Extract platform node"),
             null,
             tr("Extracts platform node from a node"),
-            Shortcut.registerShortcut("tools:extplatformnode", "Tool: Extract platform node", KeyEvent.VK_G, Shortcut.ALT_CTRL),
+            Shortcut.registerShortcut("tools:extplatformnode", tr("Extract platform node"), KeyEvent.VK_G, Shortcut.ALT_CTRL),
             false
         );
         putValue("help", ht("/Action/ExtractPlatformNode"));
         MainApplication.registerActionShortcut(
             this,
-            Shortcut.registerShortcut("tools:extplatformnode", "Tool: ExtractPlatformNodeAction", KeyEvent.VK_G, Shortcut.ALT_CTRL)
+            Shortcut.registerShortcut("tools:extplatformnode", tr("ExtractPlatformNodeAction"), KeyEvent.VK_G, Shortcut.ALT_CTRL)
         );
         // CHECKSTYLE.ON: LineLength
     }

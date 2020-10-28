@@ -1,21 +1,33 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.data;
 
-import org.openstreetmap.josm.command.AddCommand;
-import org.openstreetmap.josm.command.Command;
-import org.openstreetmap.josm.command.SequenceCommand;
-import org.openstreetmap.josm.data.osm.*;
-import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
-import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
-import org.openstreetmap.josm.tools.Utils;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
 import static org.openstreetmap.josm.gui.MainApplication.getLayerManager;
 import static org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantPaintVisitor.RefTagComparator;
 import static org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils.isPTWay;
 import static org.openstreetmap.josm.tools.I18n.tr;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
+import org.openstreetmap.josm.command.AddCommand;
+import org.openstreetmap.josm.command.Command;
+import org.openstreetmap.josm.command.SequenceCommand;
+import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.OsmPrimitive;
+import org.openstreetmap.josm.data.osm.Relation;
+import org.openstreetmap.josm.data.osm.RelationMember;
+import org.openstreetmap.josm.data.osm.TagMap;
+import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
+import org.openstreetmap.josm.tools.Utils;
 
 /**
  * Represents a piece of a route that includes all the ways

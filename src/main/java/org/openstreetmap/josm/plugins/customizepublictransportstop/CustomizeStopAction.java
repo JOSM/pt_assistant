@@ -47,7 +47,7 @@ public class CustomizeStopAction extends JosmAction implements IStopAreaCustomiz
             tr("Customize stop"),
             "bus",
             tr("Customize stop under osm public transit standard v2"),
-            Shortcut.registerShortcut("tools:customizestop", tr("Tool: {0}", tr("Customize stop")), KeyEvent.VK_U, Shortcut.DIRECT),
+            Shortcut.registerShortcut("tools:customizestop", tr("Public Transport: {0}", tr("Customize stop")), KeyEvent.VK_U, Shortcut.DIRECT),
             true
         );
         action.putValue("help", ht("/Action/CustomizeStopAction"));

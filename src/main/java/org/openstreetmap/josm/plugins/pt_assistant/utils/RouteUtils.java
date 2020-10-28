@@ -1,27 +1,24 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
-import java.awt.event.ActionEvent;
+import static org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction.Mode.FROM_FIRST_MEMBER;
+import static org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction.Mode.TO_LAYER;
+import static org.openstreetmap.josm.plugins.pt_assistant.data.PTStop.isPTPlatform;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.openstreetmap.josm.data.gpx.GpxTrack;
+import org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.OsmUtils;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.gui.layer.GpxLayer;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
-import org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
-
-import static org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction.Mode.FROM_FIRST_MEMBER;
-import static org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction.Mode.TO_LAYER;
-import static org.openstreetmap.josm.plugins.pt_assistant.data.PTStop.*;
 
 
 /**

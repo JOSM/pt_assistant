@@ -1,16 +1,26 @@
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
+import static java.util.Collections.emptyList;
+
 import java.awt.event.ActionEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.*;
+import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.data.UndoRedoHandler;
-import org.openstreetmap.josm.data.osm.*;
+import org.openstreetmap.josm.data.osm.Relation;
+import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.gui.dialogs.relation.IRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.MemberTableModel;
 import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
@@ -19,9 +29,9 @@ import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorAction
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
 import org.openstreetmap.josm.plugins.pt_assistant.data.RouteSegmentToExtract;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
-import org.openstreetmap.josm.tools.*;
-
-import static java.util.Collections.*;
+import org.openstreetmap.josm.tools.I18n;
+import org.openstreetmap.josm.tools.ImageProvider;
+import org.openstreetmap.josm.tools.Utils;
 
 /*
 Extracts selected members to a new route relation
