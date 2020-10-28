@@ -4,14 +4,14 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 plugins {
   java
   jacoco
-  id("org.openstreetmap.josm") version "0.7.0"
+  id("org.openstreetmap.josm") version "0.7.1"
 }
 
 object Versions {
   const val awaitility = "4.0.3"
-  const val jacoco = "0.8.4"
-  const val junit = "5.6.2"
-  const val wiremock = "2.27.1"
+  const val jacoco = "0.8.6"
+  const val junit = "5.7.0"
+  const val wiremock = "2.27.2"
 }
 
 repositories {
@@ -40,14 +40,13 @@ java {
 }
 
 josm {
-  versionWithoutLeadingV = true
   manifest {
     oldVersionDownloadLink(14149, "2.1.6", URL("https://github.com/JOSM/pt_assistant/releases/download/v2.1.6/pt_assistant.jar"))
     oldVersionDownloadLink(14027, "v2.1.4", URL("https://github.com/JOSM/pt_assistant/releases/download/v2.1.4/pt_assistant.jar"))
     oldVersionDownloadLink(13957, "v2.0.0", URL("https://github.com/JOSM/pt_assistant/releases/download/v2.0.0/pt_assistant.jar"))
   }
   i18n {
-    pathTransformer = getPathTransformer("github.com/JOSM/pt_assistant/blob")
+    pathTransformer = getPathTransformer(project.projectDir, "github.com/JOSM/pt_assistant/blob")
   }
 }
 

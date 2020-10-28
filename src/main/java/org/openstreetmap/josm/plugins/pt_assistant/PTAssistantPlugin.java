@@ -84,7 +84,7 @@ public class PTAssistantPlugin extends Plugin {
         SelectionEventManager.getInstance().addSelectionListener(PTAssistantLayerManager.PTLM);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(PTAssistantLayerManager.PTLM);
         initialiseWizard();
-        initialiseShorcutsForCreatePlatformNode();
+        initialiseShortcutsForCreatePlatformNode();
         addButtonsToRelationEditor();
     }
 
@@ -163,7 +163,7 @@ public class PTAssistantPlugin extends Plugin {
         wizard.actionPerformed(null);
     }
 
-    private static void initialiseShorcutsForCreatePlatformNode() {
+    private static void initialiseShortcutsForCreatePlatformNode() {
         new CreatePlatformShortcutAction();
         new CreatePlatformNodeThroughReplaceAction();
         new ExtractPlatformNodeAction();

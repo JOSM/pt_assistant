@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JavaProjectCodeInsightSettings">
+    <excluded-names>
+      <name>ch.poole.openinghoursparser.I18n</name>
+      <name>com.sun.istack.internal.*</name>
+      <name>org.junit.jupiter.*</name>
+    </excluded-names>
+  </component>
+</project>

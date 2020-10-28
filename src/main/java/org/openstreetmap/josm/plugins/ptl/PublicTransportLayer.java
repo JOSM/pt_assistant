@@ -37,7 +37,6 @@ import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.MultiMap;
 import org.openstreetmap.josm.tools.Pair;
-import org.openstreetmap.josm.tools.Utils;
 
 /**
  * Public transport layer.
