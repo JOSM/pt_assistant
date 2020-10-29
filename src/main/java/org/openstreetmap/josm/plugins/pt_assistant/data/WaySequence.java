@@ -198,6 +198,7 @@ public final class WaySequence {
      */
     public int getTraversalSense() {
         if (traversalSense == 0) {
+            if (previousWay == null && nextWay == null) return 0;
             if (currentWay != null) {
                 if (previousWay != null && currentWay.firstNode()
                     .equals(WayUtils.findCommonFirstLastNode(previousWay, currentWay).orElse(null))) {

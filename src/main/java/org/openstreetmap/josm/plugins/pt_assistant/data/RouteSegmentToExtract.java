@@ -184,9 +184,12 @@ public class RouteSegmentToExtract {
 
     public RouteSegmentToExtract addPTWayMember(Integer index) {
         assert relation != null;
+        if (index < 1) {
+            return this; // make sure all segments are processed in route relations without stop members
+        }
         WaySequence ws = new WaySequence(relation, index);
         if (ws.currentWay == null && ws.nextWay != null) {
-            return this; // make sure all segments are processed
+            return this; // make sure all segments are processed for route relations when stop members are reached
         }
         if (ws.currentWay == null || ws.hasGap) {
             return null;
@@ -209,7 +212,7 @@ public class RouteSegmentToExtract {
             boolean startNewSegmentInNewSegment = false;
             List<Relation> segmentRelations =
                 Utils.filteredCollection(ws.currentWay.getReferrers(), Relation.class).stream()
-                    .filter(r -> "route".equals(r.get("type")) && "bus".equals(r.get("route")) && r.hasKey("route_ref"))
+                    .filter(r -> "route".equals(r.get("type")) && "bus".equals(r.get("route")) && r.hasKey("note"))
                     .collect(Collectors.toList());
             List<Relation> parentRouteRelations =
                 Utils.filteredCollection(ws.currentWay.getReferrers(), Relation.class).stream()
@@ -229,7 +232,6 @@ public class RouteSegmentToExtract {
                     }
                 }
                 parentRouteRelations.addAll(sr.getReferrers().stream()
-                    .filter(r -> "superroute".equals(r.get("type")))
                     .map(r -> (Relation) r)
                     .collect(Collectors.toList()));
             }
@@ -316,7 +318,11 @@ public class RouteSegmentToExtract {
      * @return the first highway/railway of ptRoute
      */
     public Way getFirstWay(Relation ptRoute) {
-        return getItineraryWays(ptRoute).get(0);
+        final ArrayList<Way> itineraryWays = getItineraryWays(ptRoute);
+        if (itineraryWays.size() > 0) {
+            return itineraryWays.get(0);
+        }
+        return null;
     }
 
     /**
@@ -324,7 +330,11 @@ public class RouteSegmentToExtract {
      * @return the second highway/railway of ptRoute
      */
     public Way getSecondWay(Relation ptRoute) {
-        return getItineraryWays(ptRoute).get(1);
+        final ArrayList<Way> itineraryWays = getItineraryWays(ptRoute);
+        if (itineraryWays.size() > 1) {
+            return itineraryWays.get(1);
+        }
+        return null;
     }
 
     /**
@@ -332,8 +342,11 @@ public class RouteSegmentToExtract {
      * @return the last highway/railway of ptRoute
      */
     public Way getLastWay(Relation ptRoute) {
-        final List<Way> highways = getItineraryWays(ptRoute);
-        return highways.get(highways.size() - 1);
+        final ArrayList<Way> itineraryWays = getItineraryWays(ptRoute);
+        if (itineraryWays.size() > 0) {
+            return itineraryWays.get(itineraryWays.size() - 1);
+        }
+        return null;
     }
 
     /**
@@ -451,7 +464,7 @@ public class RouteSegmentToExtract {
      * for all occurrences of wayToLocate this method returns the way before it and the way after it
      * @param highwayMembers          The members list of the relation
      * @param wayToLocate      The way to locate in the list
-     * @return a list of way triplets
+     * @return a list of way sequences
      */
     private static List<WaySequence> findPreviousAndNextWayInRoute(List<Way> highwayMembers, Way wayToLocate) {
         Way wayAtIndexPosition;
@@ -682,7 +695,7 @@ public class RouteSegmentToExtract {
 
     public void updateTags() {
         extractedRelation.put("note", getNote());
-        extractedRelation.put("route_ref", getLineIdentifiersSignature());
+//        extractedRelation.put("route_ref", getLineIdentifiersSignature());
     }
 
     private void addPtSegment() {
