@@ -174,9 +174,9 @@ public class RouteSegmentToExtract {
         final RelationMember member = relation.getMember(index);
         if (member.isWay()) {
             if (updateIndices) {
-                indices.add(0, index);
+                indices.add(index);
             }
-            wayMembers.add(0, member);
+            wayMembers.add(member);
             streetNames = null;
             wayIds = null;
         }
@@ -184,15 +184,13 @@ public class RouteSegmentToExtract {
 
     public RouteSegmentToExtract addPTWayMember(Integer index) {
         assert relation != null;
-        if (index < 1) {
-            return this; // make sure all segments are processed in route relations without stop members
-        }
         WaySequence ws = new WaySequence(relation, index);
-        if (ws.currentWay == null && ws.nextWay != null) {
-            return this; // make sure all segments are processed for route relations when stop members are reached
-        }
         if (ws.currentWay == null || ws.hasGap) {
             return null;
+        }
+        if (getLastWay(relation).equals(ws.currentWay)) {
+            addWay(index);
+            return this;
         }
 
         if (this.itinerariesInSameDirection == null) {
@@ -212,7 +210,11 @@ public class RouteSegmentToExtract {
             boolean startNewSegmentInNewSegment = false;
             List<Relation> segmentRelations =
                 Utils.filteredCollection(ws.currentWay.getReferrers(), Relation.class).stream()
-                    .filter(r -> "route".equals(r.get("type")) && "bus".equals(r.get("route")) && r.hasKey("note"))
+                    .filter(r -> !r.hasKey("name")
+                               && RouteUtils.isPTRoute(r)
+                               && r.hasKey("note")
+//                               && r.get("note").matches(".*\\([\\d;]+\\)")
+                    )
                     .collect(Collectors.toList());
             List<Relation> parentRouteRelations =
                 Utils.filteredCollection(ws.currentWay.getReferrers(), Relation.class).stream()
@@ -222,12 +224,11 @@ public class RouteSegmentToExtract {
                 RouteSegmentToExtract existingSegment = new RouteSegmentToExtract(sr, false);
                 if (existingSegment.isLastWay(ws.currentWay)) {
                     final int existingSegmentSize = existingSegment.getWayMembers().size();
-                    if (existingSegmentSize < 2) break;
                     final int startIndexOfRange = index - existingSegmentSize + 1;
                     if (startIndexOfRange > 0) {
                         List<RelationMember> sl = relation.getMembers().subList(startIndexOfRange, index + 1);
-                        if (sl.equals(existingSegment.getWayMembers())) {
-                            startNewSegment = true;
+                        if (sl.equals(existingSegment.getWayMembers()) && existingSegmentSize > 1) {
+                            startNewSegmentInNewSegment = true;
                         }
                     }
                 }
@@ -238,27 +239,20 @@ public class RouteSegmentToExtract {
 
             TreeSet<Relation> itinerariesInSameDirection = getItinerariesInSameDirection(ws, parentRouteRelations);
 
-            if (this.itinerariesInSameDirection != null
-                    && itinerariesInSameDirection.size() != 0
-                    && !itinerariesInSameDirection.equals(this.itinerariesInSameDirection)
-                    && !(isFirstWay(ws.currentWay) && getMembershipCount(ws.currentWay, relation) < 2)
-                 ) {
+            if (isDifferentBundleOfItinerariesAndNotFirstWayOrMultipleOccurrences(itinerariesInSameDirection)) {
                 startNewSegment = true;
             } else {
-                this.itinerariesInSameDirection = itinerariesInSameDirection;
+                if (!this.itinerariesInSameDirection.equals(itinerariesInSameDirection)) {
+                    this.itinerariesInSameDirection = itinerariesInSameDirection;
+                }
                 for (Relation parentRoute : itinerariesInSameDirection) {
+                    final Optional<Node> commonNode1 = WayUtils.findFirstCommonNode(ws.previousWay, ws.currentWay);
                     final Optional<Node> commonNode2 = WayUtils.findFirstCommonNode(ws.currentWay, ws.nextWay);
-                    final long membershipCountOfWayInSameDirectionInParentRoute =
-                        getMembershipCountOfWayInSameDirection(ws.currentWay, parentRoute);
-                    if (ws.currentWay == getLastWay(parentRoute)
-                        || membershipCountOfWayInSameDirectionInParentRoute > 1
-                        && !parentRoute.equals(relation)
-                        && (commonNode2.map(it -> it.getParentWays().size() > 2).orElse(false))
-                    ) {
+                    if (!parentRoute.equals(relation) && (ws.currentWay == getLastWay(parentRoute)
+                        || getMembershipCountOfWayInSameDirection(ws.currentWay, parentRoute) > 1
+                            || getMembershipCountOfWayInSameDirection(ws.previousWay, parentRoute) > 1
+                            && (commonNode1.map(it -> it.getParentWays().size() > 2).orElse(false)))) {
                         startNewSegment = true;
-                        if (membershipCountOfWayInSameDirectionInParentRoute > 1) {
-                            startNewSegmentInNewSegment = true;
-                        }
                         break;
                     }
                     // Some PT lines have variants that make a 'spoon like loop'
@@ -298,16 +292,18 @@ public class RouteSegmentToExtract {
         return null;
     }
 
-    /**
-     * @return The first way of the relation that is being processed
-     */
-    public boolean isFirstWay(Way way) {
-        return wayMembers.get(0).getWay().equals(way);
+    private boolean isDifferentBundleOfItinerariesAndNotFirstWayOrMultipleOccurrences(TreeSet<Relation> itinerariesInSameDirection) {
+        if (this.itinerariesInSameDirection == null) {
+            this.itinerariesInSameDirection = itinerariesInSameDirection;
+        }
+        return itinerariesInSameDirection != null
+                && itinerariesInSameDirection.size() != 0
+                && !itinerariesInSameDirection.equals(this.itinerariesInSameDirection);
     }
 
     /**
      * @param way to compare
-     * @return is this the last way of the relation that is being processed
+     * @return is this the last way in our list of wayMembers?
      */
     public boolean isLastWay(Way way) {
         return wayMembers.get(wayMembers.size() - 1).getWay().equals(way);
@@ -495,6 +491,7 @@ public class RouteSegmentToExtract {
         return waySequences;
     }
 
+    @SuppressWarnings("unused")
     public List<String> getWayIds() {
         if (wayIds == null) {
             wayIds = new ArrayList<>();
@@ -639,7 +636,7 @@ public class RouteSegmentToExtract {
      * @param substituteWaysWithRelation add the extracted relation where the ways were removed?
      * @return the relation that contains the extracted ways, or null if an empty relation would have been created
      */
-    public Relation extractToRelation(List<String> tagsToTransfer, Boolean substituteWaysWithRelation) {
+    public Relation extractToRelation(List<String> tagsToTransfer, Boolean removeWaysFromRelation , Boolean substituteWaysWithRelation) {
         assert relation != null;
         boolean extractedRelationAlreadyExists = false;
         if (ptSegments.containsKey(getWayIdsSignature())) {
@@ -657,7 +654,12 @@ public class RouteSegmentToExtract {
         int index = 0;
         for (int i = indices.size() - 1; i >= 0; i--) {
             index = indices.get(i);
-            RelationMember relationMember = relation.removeMember(index);
+            RelationMember relationMember;
+            if (removeWaysFromRelation) {
+                relationMember = relation.removeMember(index);
+            } else {
+                relationMember = relation.getMember(index);
+            }
             if (!extractedRelationAlreadyExists && isPTWay(relationMember)) {
                 extractedRelation.addMember(0,
                                             new RelationMember("", relationMember.getMember()));

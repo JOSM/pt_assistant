@@ -53,11 +53,6 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
         final MemberTableModel memberTableModel = editorAccess.getMemberTableModel();
         IRelationEditor editor = editorAccess.getEditor();
         final Relation originalRelation = editor.getRelation();
-//        Relation editedRelation = new Relation(originalRelation);
-//        // save the current state, otherwise accidents happen
-//        memberTableModel.applyToRelation(editedRelation);
-//        editorAccess.getTagModel().applyToPrimitive(editedRelation);
-//        UndoRedoHandler.getInstance().add(new ChangeCommand(originalRelation, editedRelation));
 
         final Collection<RelationMember> selectedMembers = memberTableModel.getSelectedMembers();
 
@@ -126,6 +121,7 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                 }
                 Relation extractedRelation = segment.extractToRelation(
                     Arrays.asList("type", "route", "cycle_network", "network", "operator", "ref"),
+                    true,
                     true);
                 if (extractedRelation != null) {
                     if (extractedRelation.isNew() && cbConvertToSuperroute.isSelected()) {
@@ -147,16 +143,8 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                 }
             }
             /*
-             Doing this suppresses the exception to be shown to the user,
-             something fishy is still happening though.
-             And the stack trace comes anyway when the user presses
-             the reload button in the relation editor.
-             This is annoying, I have no idea how to solve this.
-             The problem has been there since the beginning.
-             Oddly there are relations for which it doesn't happen.
-             It must have something to do with the fact that the member
-             count is always lower after converting ways to relations
-             that contain those ways.
+            This consistently causes an IndexOutOfBounds exception AND
+            I don't know why.
             */
             try {
                 editor.reloadDataFromRelation();
@@ -167,20 +155,34 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
     }
 
     public void splitInSegments(Relation originalRelation, Boolean convertToSuperroute) {
-        final Relation clonedRelation = new Relation(originalRelation);
-        final List<RelationMember> members = clonedRelation.getMembers();
-        RouteSegmentToExtract segment = new RouteSegmentToExtract(clonedRelation);
-        RouteSegmentToExtract newSegment = null;
-        for (int i = members.size() - 1; i >= 0; i--) {
+        ArrayList<RelationMember> segmentRelationsList = new ArrayList<>();
+        ArrayList<Integer> indicesToRemoveList = new ArrayList<>();
+        final List<RelationMember> members = originalRelation.getMembers();
+        RouteSegmentToExtract segment = new RouteSegmentToExtract(originalRelation);
+        segment.setActiveDataSet(originalRelation.getDataSet());
+        RouteSegmentToExtract newSegment;
+        for (int i = 0; i < members.size(); i++) {
             newSegment = segment.addPTWayMember(i);
             if (newSegment != null) {
-                segment.extractToRelation(Arrays.asList("type", "route"), true);
+                Relation extractedRelation = segment.extractToRelation(Arrays.asList("type", "route"),
+                    false, false);
+                if (extractedRelation != null) {
+                    segmentRelationsList.add(new RelationMember("", extractedRelation));
+                }
                 segment = newSegment;
             }
+            if (i < originalRelation.getMembersCount() && RouteUtils.isPTWay(originalRelation.getMembers().get(i))) {
+                indicesToRemoveList.add(0, i);
+            }
         }
+        final Relation clonedRelation = new Relation(originalRelation);
         if (convertToSuperroute) {
             clonedRelation.put("type", "superroute");
         }
+        for (Integer integer : indicesToRemoveList) {
+            clonedRelation.removeMember(integer);
+        }
+        segmentRelationsList.forEach(clonedRelation::addMember);
         UndoRedoHandler.getInstance().add(new ChangeCommand(originalRelation, clonedRelation));
     }
     /** This method modifies clonedRelation in place if substituteWaysWithRelation is true
