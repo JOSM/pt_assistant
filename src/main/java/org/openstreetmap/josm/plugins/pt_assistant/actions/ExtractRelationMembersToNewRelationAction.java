@@ -106,7 +106,12 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
             ) == JOptionPane.OK_OPTION
         ) {
             if (cbFindAllSegmentsAutomatically.isSelected()) {
-                splitInSegments(originalRelation, cbConvertToSuperroute.isSelected());
+                final Relation clonedRelation = new Relation(originalRelation);
+                splitInSegments(clonedRelation, cbConvertToSuperroute.isSelected());
+                commands.add(new ChangeCommand(originalRelation, clonedRelation));
+                UndoRedoHandler.getInstance().add(
+                    new SequenceCommand(I18n.tr("Replace ways with segment relations"), commands));
+
             } else {
                 Relation clonedRelation = new Relation(originalRelation);
                 RouteSegmentToExtract segment = new RouteSegmentToExtract(clonedRelation,
@@ -142,24 +147,16 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                     extraEditor.setAlwaysOnTop(true);
                 }
             }
-            /*
-            This consistently causes an IndexOutOfBounds exception AND
-            I don't know why.
-            */
-            try {
-                editor.reloadDataFromRelation();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            editor.reloadDataFromRelation();
         }
     }
 
-    public void splitInSegments(Relation originalRelation, Boolean convertToSuperroute) {
+    public void splitInSegments(Relation relation, Boolean convertToSuperroute) {
         ArrayList<RelationMember> segmentRelationsList = new ArrayList<>();
         ArrayList<Integer> indicesToRemoveList = new ArrayList<>();
-        final List<RelationMember> members = originalRelation.getMembers();
-        RouteSegmentToExtract segment = new RouteSegmentToExtract(originalRelation);
-        segment.setActiveDataSet(originalRelation.getDataSet());
+        final List<RelationMember> members = relation.getMembers();
+        RouteSegmentToExtract segment = new RouteSegmentToExtract(relation);
+//        segment.setActiveDataSet(relation.getDataSet());
         RouteSegmentToExtract newSegment;
         for (int i = 0; i < members.size(); i++) {
             newSegment = segment.addPTWayMember(i);
@@ -171,19 +168,17 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                 }
                 segment = newSegment;
             }
-            if (i < originalRelation.getMembersCount() && RouteUtils.isPTWay(originalRelation.getMembers().get(i))) {
+            if (i < relation.getMembersCount() && RouteUtils.isPTWay(relation.getMembers().get(i))) {
                 indicesToRemoveList.add(0, i);
             }
         }
-        final Relation clonedRelation = new Relation(originalRelation);
         if (convertToSuperroute) {
-            clonedRelation.put("type", "superroute");
+            relation.put("type", "superroute");
         }
         for (Integer integer : indicesToRemoveList) {
-            clonedRelation.removeMember(integer);
+            relation.removeMember(integer);
         }
-        segmentRelationsList.forEach(clonedRelation::addMember);
-        UndoRedoHandler.getInstance().add(new ChangeCommand(originalRelation, clonedRelation));
+        segmentRelationsList.forEach(relation::addMember);
     }
     /** This method modifies clonedRelation in place if substituteWaysWithRelation is true
      *  and if ways are extracted into a new relation

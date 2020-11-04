@@ -7,6 +7,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openstreetmap.josm.io.OsmReader.parseDataSet;
 
+import java.awt.datatransfer.StringSelection;
+import java.awt.Toolkit;
+
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -188,10 +191,10 @@ public class RouteSegmentToExtractTest extends AbstractTest{
 
     @Test
     public void bus601_600_3_Test() {
-        List<Val> expectedValues;
+    List<Val> expectedValues;
 
-    expectedValues = Arrays.asList(
-        new Val(  14, 338057820, 338057820, 338057820, "Engels Plein"),
+        expectedValues = Arrays.asList(
+        new Val(  14, 338057820,         0, 338057820, "Engels Plein"),
         new Val(  15, 338057820,   3869812,   3869812, "Engels Plein"),
         new Val(  16, 338057820,  25928482,  25928482, "Wolvengang"),
         new Val(  17, 338057820, 659297690, 659297690, "Wolvengang"),
@@ -209,7 +212,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
                   27, 338057820, 510790349,   3992548, "Zoutstraat"),
         new Val("Zoutstraat (334;335;513;601;630)",
 
-                  28,   3992548,   3992548,   254800931, "Joanna-Maria Artoisplein"),
+                  28,   3992548,   3992548, 254800931, "Joanna-Maria Artoisplein"),
         new Val("Joanna-Maria Artoisplein (178;305;318;334;335;358;410;513;601;630;651;652;658)",
 
                   29, 254800931, 254800931,   8133608, "Diestsevest"),
@@ -238,28 +241,28 @@ public class RouteSegmentToExtractTest extends AbstractTest{
 
                   39, 377918638, 377918638,  71754927, null),
         new Val(  40,  71754927,  79264897,  79264897, null),
-        new Val("(2;3;4;5;6;7;8;9;18;178;179;333;334;335;337;370;371;373;374;380;512;520;524;525;601)",
+        new Val("(2;3;4;5;6;7;8;9;18;178;179;306;333;334;335;337;370;371;373;374;380;512;520;524;525;601)",
 
                   41,  71754927,  79264897,  79264888, null),
-        new Val("(2;3;4;5;6;7;8;9;18;178;179;333;334;335;337;370;371;373;374;380;512;520;525;601)",
+        new Val("(2;3;4;5;6;7;8;9;18;178;179;306;333;334;335;337;370;371;373;374;380;512;520;525;601)",
 
                   42,  79264888,  79264888, 377918635, null),
-        new Val("(3;4;5;6;7;8;9;18;178;179;333;334;335;337;370;371;373;374;380;512;601)",
+        new Val("(3;4;5;6;7;8;9;18;178;179;306;333;334;335;337;370;371;373;374;380;512;601)",
 
                   43, 377918635, 377918635,  79264899, null),
-        new Val("(4;5;6;18;178;179;333;334;335;337;370;371;373;374;380;512;601;630)",
+        new Val("(4;5;6;18;178;179;306;333;334;335;337;370;371;373;374;380;512;601;630)",
 
                   44,  79264899,  79264899,  78815533, null),
         new Val(  45,  78815533, 459446600, 459446600, "Martelarenplein"),
         new Val(  46,  78815533, 459446598, 459446598, "Martelarenplein"),
         new Val(  47,  78815533,  76856823,  76856823, "Martelarenplein"),
-        new Val("Martelarenplein (4;5;6;7;8;9;18;178;179;337;380;527;601;630)",
+        new Val("Martelarenplein (4;5;6;7;8;9;18;178;179;306;337;380;527;601;630)",
 
                   48,  78815533,  76856823, 185988814, "Tiensevest"),
-        new Val("Tiensevest (1;4;5;6;7;8;9;18;178;179;337;380;527;601;630)",
+        new Val("Tiensevest (1;4;5;6;7;8;9;18;178;179;306;337;380;527;601;630)",
 
                   49, 185988814, 185988814,   8590231, "Tiensevest"),
-        new Val("Tiensevest (7;8;9;18;178;179;337;380;527;601;630)",
+        new Val("Tiensevest (7;8;9;18;178;179;306;337;380;527;601;630)",
 
                   50,   8590231,   8590231,  12712557, "Tiensevest"),
         new Val(  51,  12712557,   8131717,   8131717, "Tiensevest"),
@@ -269,7 +272,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         new Val(  55,  12712557, 863272995, 863272995, "Tiensevest"),
         new Val(  56,  12712557, 863272991, 863272991, "Tiensevest"),
         new Val(  57,  12712557,  16775171,  16775171, "Tiensepoort"),
-        new Val("Tiensevest - Tiensepoort (7;8;9;18;178;179;337;380;527;601;616;630)",
+        new Val("Tiensevest - Tiensepoort (7;8;9;18;178;179;306;337;380;527;601;616;630)",
 
                   58,  12712557,  16775171,   8130906, "Geldenaaksevest"),
         new Val(  59,   8130906, 586268893, 586268893, "Geldenaaksevest"),
@@ -277,20 +280,20 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         new Val(  61,   8130906, 521193607, 521193607, "Geldenaaksevest"),
         new Val(  62,   8130906,  10296368,  10296368, "Geldenaaksevest"),
         new Val(  63,   8130906,  79299303,  79299303, "Geldenaaksevest"),
-        new Val("Geldenaaksevest (18;178;179;337;601;616;630)",
+        new Val(  64,   8130906, 608715606, 608715606, "Geldenaaksevest"),
+        new Val(  65,   8130906, 608715605, 608715605, "Geldenaaksevest"),
+        new Val("Geldenaaksevest (18;178;179;306;337;601;616;630)",
 
-                  64,   8130906,  79299303, 608715606, "Geldenaaksevest"),
-        new Val(  65, 608715606, 608715605, 608715605, "Geldenaaksevest"),
-        new Val(  66, 608715606,  24905257,  24905257, "Geldenaaksevest"),
-        new Val(  67, 608715606,   3677823,   3677823, "Naamsevest"),
-        new Val(  68, 608715606, 655251292, 655251292, "Naamsevest"),
-        new Val(  69, 608715606, 661733369, 661733369, "Naamsevest"),
-        new Val(  70, 608715606, 131571763, 131571763, "Naamsevest"),
-        new Val(  71, 608715606, 655251293, 655251293, "Naamsevest"),
-        new Val(  72, 608715606,  86164005,  86164005, "Naamsevest"),
-        new Val("Geldenaaksevest - Naamsevest (18;178;179;337;601;616)",
+                  66,   8130906, 608715605,  24905257, "Geldenaaksevest"),
+        new Val(  67,  24905257,   3677823,   3677823, "Naamsevest"),
+        new Val(  68,  24905257, 655251292, 655251292, "Naamsevest"),
+        new Val(  69,  24905257, 661733369, 661733369, "Naamsevest"),
+        new Val(  70,  24905257, 131571763, 131571763, "Naamsevest"),
+        new Val(  71,  24905257, 655251293, 655251293, "Naamsevest"),
+        new Val(  72,  24905257,  86164005,  86164005, "Naamsevest"),
+        new Val("Geldenaaksevest - Naamsevest (18;178;179;306;337;601;616)",
 
-                  73, 608715606,  86164005,   3677330, "Tervuursevest"),
+                  73,  24905257,  86164005,   3677330, "Tervuursevest"),
         new Val(  74,   3677330, 608715562, 608715562, "Tervuursevest"),
         new Val(  75,   3677330, 608715561, 608715561, "Tervuursevest"),
         new Val(  76,   3677330,  23237287,  23237287, "Tervuursevest"),
@@ -301,10 +304,10 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         new Val(  81,   3677330, 461159367, 461159367, "Tervuursevest"),
         new Val(  82,   3677330, 344507822, 344507822, "Tervuursevest"),
         new Val(  83,   3677330, 461159362, 461159362, "Tervuursevest"),
-        new Val("Tervuursevest (178;179;520;524;525;537;601)",
+        new Val("Tervuursevest (178;179;306;520;524;525;537;601)",
 
                   84,   3677330, 461159362, 461159345, "Tervuursevest"),
-        new Val("Tervuursevest (178;179;601)",
+        new Val("Tervuursevest (178;179;306;601)",
 
                   85, 461159345, 461159345,  88361317, "Tervuursevest"),
         new Val(  86,  88361317, 429706866, 429706866, "Tervuursevest"),
@@ -320,15 +323,13 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         new Val("Tervuursevest (601)",
 
                   96,  88361317,  99583853, 429706864, "Rennes-Singel"),
-        new Val("Tervuursevest - Rennes-Singel (601)",
-
-                  97,  88361317, 429706864,   8131120, "Rennes-Singel"),
-        new Val(  98,   8131120, 813979472, 813979472, "Rennes-Singel"),
-        new Val(  99,   8131120,  79289746,  79289746, "Rennes-Singel"),
-        new Val( 100,   8131120, 813979470, 813979470, "Rennes-Singel"),
-        new Val( 101,   8131120, 161166589, 161166589, "Rennes-Singel"),
-        new Val( 102,   8131120, 192559628, 192559628, "Rennes-Singel"),
-        new Val( 103,   8131120, 249333186, 249333186, "Rennes-Singel"),
+        new Val(  97, 429706864,   8131120,   8131120, "Rennes-Singel"),
+        new Val(  98, 429706864, 813979472, 813979472, "Rennes-Singel"),
+        new Val(  99, 429706864,  79289746,  79289746, "Rennes-Singel"),
+        new Val( 100, 429706864, 813979470, 813979470, "Rennes-Singel"),
+        new Val( 101, 429706864, 161166589, 161166589, "Rennes-Singel"),
+        new Val( 102, 429706864, 192559628, 192559628, "Rennes-Singel"),
+        new Val( 103, 429706864, 249333186, 249333186, "Rennes-Singel"),
         new Val("Rennes-Singel (318;601)",
 
                  104, 429706864, 249333186, 249333184, "Herestraat"),
@@ -351,7 +352,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
                  113, 249333188, 249333188,   3752557, "Rotonde Het Teken (to Ring Noord)"),
         new Val("Rotonde Het Teken (to Ring Noord) (3;317;333;334;335;370;371;373;374;380;395;410;600;601)",
 
-                 114,   3752557,   3752557,  78873921, "Rotonde Het Teken (Ring Noord)"), // todo where Campus 3 loops
+                 114,   3752557,   3752557,  78873921, "Rotonde Het Teken (Ring Noord)"),
         new Val("Rotonde Het Teken (Ring Noord) (3;317;333;334;335;370;371;373;374;380;395;410;600;601)",
 
                  115,  78873921,  78873921,  78568660, "Rotonde Het Teken (from Ring Noord)"),
@@ -370,7 +371,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         new Val("Ring Zuid (3 - 4&5) (3;317;395;410;600;601)",
 
                  122, 109267436, 109267436,  14508736, null),
-        new Val( 123,  14508736, 377918641, 377918641, "perron 5"),
+        new Val( 123,  14508736, 377918641, 377918641, null),
         new Val("perron 5 (3;317;395;410;601)",
 
                  124,  14508736, 377918641,  78852604, null),
@@ -405,32 +406,26 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         new Val("Rennes-Singel - Den Boschsingel (318;410;601)",
 
                  141, 249333185, 225605630,  23837544, "Den Boschsingel"),
-        new Val("Rennes-Singel - Den Boschsingel (318;410;601)",
-
-                 142, 249333185,  23837544, 146171871, "Den Boschsingel"),
-        new Val( 143, 146171871,   3877105,   3877105, null),
-        new Val( 144, 146171871,   8131125,   8131125, null),
-        new Val( 145, 146171871,   3993387,   3993387, "Lüdenscheidsingel"),
+        new Val( 142,  23837544, 146171871, 146171871, "Den Boschsingel"),
+        new Val( 143,  23837544,   3877105,   3877105, null),
+        new Val( 144,  23837544,   8131125,   8131125, null),
+        new Val( 145,  23837544,   3993387,   3993387, "Lüdenscheidsingel"),
         new Val("Den Boschsingel - Lüdenscheidsingel (318;358;410;601;651;658)",
 
                  146,  23837544,   3993387, 109267417, "Lüdenscheidsingel"),
-        new Val("Den Boschsingel - Lüdenscheidsingel (318;358;410;601;651;658)",
-
-                 147, 146171871, 109267417,   3993388, "Lüdenscheidsingel"),
-        new Val( 148,   3993388,  44932921,  44932921, "Lüdenscheidsingel"),
-        new Val( 149,   3993388, 254800932, 254800932, "Lüdenscheidsingel"),
-        new Val("Lüdenscheidsingel (178;305;318;358;410;601;651;652;658)",
-
-                 150,   3993388, 254800932,  23691158, "Joanna-Maria Artoisplein"),
+        new Val( 147, 109267417,   3993388,   3993388, "Lüdenscheidsingel"),
+        new Val( 148, 109267417,  44932921,  44932921, "Lüdenscheidsingel"),
+        new Val( 149, 109267417, 254800932, 254800932, "Lüdenscheidsingel"),
+        new Val( 150, 109267417,  23691158,  23691158, "Joanna-Maria Artoisplein"),
         new Val("Lüdenscheidsingel - Joanna-Maria Artoisplein (178;305;318;358;410;601;651;652;658)",
 
                  151, 109267417,  23691158, 254800931, "Joanna-Maria Artoisplein"),
         new Val("Joanna-Maria Artoisplein (178;305;318;334;335;358;410;513;601;630;651;652;658)",
 
                  152, 254800931, 254800931,   8133608, "Diestsevest"),
-        new Val( 153, 254800931,   4003924,   4003924, "Diestsevest"),
-        new Val( 154, 254800931,  81457878,  81457878, "Diestsevest"),
-        new Val( 155, 254800931,   6184898,   6184898, "Diestsevest"),
+        new Val( 153,   8133608,   4003924,   4003924, "Diestsevest"),
+        new Val( 154,   8133608,  81457878,  81457878, "Diestsevest"),
+        new Val( 155,   8133608,   6184898,   6184898, "Diestsevest"),
         new Val("Diestsevest (305;318;334;335;358;410;513;601;630;651;652;658)",
 
                  156,   8133608,   6184898,  19793164, "Tiensevest"),
@@ -454,7 +449,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
                  162,  79596986,  79596986, 377814547, null),
         new Val("perron 1 & 2 (1;284;285;305;306;310;315;316;317;318;351;352;358;395;410;433;475;485;537;539;601;658)",
 
-                 163, 377814547,  78579065,  0, null)
+                 163, 377814547,  78579065,         0, null)
     );
 
     testPtLine(expectedValues, PT_ROUTE_BUS_601_TO_LEUVEN_STATION);
@@ -476,12 +471,10 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         new Val(  17, 451873774, 584356742, 584356742, "Diestsepoort"),
         new Val(  18, 451873774, 451873773, 451873773, "Diestsepoort"),
         new Val(  19, 451873774, 584356751, 584356751, "Diestsepoort"),
+        new Val(  20, 451873774, 584356751, 198559166, "Diestsepoort"),
         new Val("Diestsepoort (2;3;179;310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658)",
 
-                  20, 451873774, 584356751, 198559166, "Diestsepoort"),
-        new Val("Diestsepoort (2;3;179;310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658)",
-
-                  21, 198559166, 198559166, 584356745, "Diestsepoort"),
+                  21, 451873774, 198559166, 584356745, "Diestsepoort"),
         new Val(  22, 584356745, 584356749, 584356749, "Diestsepoort"),
         new Val(  23, 584356745, 663770966, 663770966, "Diestsepoort"),
         new Val(  24, 584356745,  61556877,  61556877, "Diestsepoort"),
@@ -512,13 +505,13 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         new Val(  39,  23837543, 192559625, 192559625, "Den Boschsingel"),
         new Val(  40,  23837543,   3680457,   3680457, "Rennes-Singel"),
         new Val(  41,  23837543,   8131123,   8131123, "Rennes-Singel"),
-        new Val(  42,  23837543, 225605633, 225605633, "Rennes-Singel"),
         new Val("Den Boschsingel - Rennes-Singel (318;410;600)",
 
-                  43,  23837543, 225605633,  78568454, "Rennes-Singel"),
+                  42,  23837543,   8131123, 225605633, "Rennes-Singel"),
+        new Val(  43, 225605633,  78568454,  78568454, "Rennes-Singel"),
         new Val("Rennes-Singel (178;318;410;600)",
 
-                  44,  78568454,  78568454, 270181177, "Herestraat"),
+                  44, 225605633,  78568454, 270181177, "Herestraat"),
         new Val("Herestraat (410;600)",
 
                   45, 270181177, 270181177, 813970228, "Herestraat"),
@@ -632,35 +625,29 @@ public class RouteSegmentToExtractTest extends AbstractTest{
                  103, 608715579,   3991775, 199381120, "Geldenaaksevest"),
         new Val( 104, 199381120,  24905254,  24905254, "Geldenaaksevest"),
         new Val( 105, 199381120, 491728135, 491728135, "Geldenaaksevest"),
-        new Val("Geldenaaksevest (18;178;179;337;600;616;630)",
+        new Val( 106, 199381120,  24905255,  24905255, "Geldenaaksevest"),
+        new Val( 107, 199381120,  24905256,  24905256, "Geldenaaksevest"),
+        new Val( 108, 199381120, 863272996, 863272996, "Geldenaaksevest"),
+        new Val( 109, 199381120, 857806575, 857806575, "Geldenaaksevest"),
+        new Val( 110, 199381120, 857806576, 857806576, "Geldenaaksevest"),
+        new Val( 111, 199381120, 857806574, 857806574, "Geldenaaksevest"),
+        new Val( 112, 199381120,   8130905,   8130905, "Geldenaaksevest"),
+        new Val( 113, 199381120,   4003928,   4003928, "Tiensepoort"),
+        new Val("Geldenaaksevest - Tiensepoort (18;178;179;337;600;616;630)",
 
-                 106, 199381120, 491728135,  24905255, "Geldenaaksevest"),
-        new Val( 107,  24905255,  24905256,  24905256, "Geldenaaksevest"),
-        new Val( 108,  24905255, 863272996, 863272996, "Geldenaaksevest"),
-        new Val( 109,  24905255, 857806575, 857806575, "Geldenaaksevest"),
-        new Val( 110,  24905255, 857806576, 857806576, "Geldenaaksevest"),
-        new Val( 111,  24905255, 857806574, 857806574, "Geldenaaksevest"),
-        new Val( 112,  24905255,   8130905,   8130905, "Geldenaaksevest"),
-        new Val("Geldenaaksevest (178;179;337;600;630)",
-
-                 113,  24905255,   8130905,   4003928, "Tiensepoort"),
-        new Val("Tiensepoort (18;178;179;337;600;616;630)",
-
-                 114,   4003928,   4003928, 521193611, "Tiensevest"),
+                 114, 199381120,   4003928, 521193611, "Tiensevest"),
         new Val( 115, 521193611, 586268892, 586268892, "Tiensevest"),
         new Val( 116, 521193611, 863272997, 863272997, "Tiensevest"),
         new Val( 117, 521193611, 521193609, 521193609, "Tiensevest"),
-        new Val("Tiensevest (7;8;9;178;179;337;380;600;630)",
-
-                 118, 521193611, 521193609,   4003927, "Tiensevest"),
+        new Val( 118, 521193611,   4003927,   4003927, "Tiensevest"),
+        new Val( 119, 521193611,   8154434,   8154434, "Tiensevest"),
         new Val("Tiensevest (7;8;9;18;178;179;337;380;600;616;630)",
 
-                 119,   4003927,   4003927,   8154434, "Tiensevest"),
-        new Val( 120,   8154434,  15083398,  15083398, "Tiensevest"),
-        new Val( 121,   8154434, 185988816, 185988816, "Tiensevest"),
+                 120, 521193611,   8154434,  15083398, "Tiensevest"),
+        new Val( 121,  15083398, 185988816, 185988816, "Tiensevest"),
         new Val("Tiensevest (7;8;9;18;179;337;380;600;616;630)",
 
-                 122,   8154434, 185988816, 185988814, "Tiensevest"),
+                 122,  15083398, 185988816, 185988814, "Tiensevest"),
         new Val( 123, 185988814,  19793223,  19793223, "Tiensevest"),
         new Val("Tiensevest (1;4;5;6;7;8;9;18;179;337;380;600;616;630)",
 
@@ -694,8 +681,8 @@ public class RouteSegmentToExtractTest extends AbstractTest{
                  135,  79596980, 377918658,  79596987, null),
         new Val("perron 11 & 12 (3;333;334;335;513;600;630)",
 
-                 136,  79596987,  79596987,  79596982, null),
-        new Val( 137,  79596982,  79596974,  79596974, null),
+                 136,  79596980,  79596987,  79596982, null),
+        new Val( 137,  79596980,  79596974,  79596974, null),
         new Val("perron 11 & 12 (3;333;334;335;433;600;630)",
 
                  138,  79596982,  79596974,  79596965, null),
@@ -707,12 +694,10 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         new Val( 142, 451873774, 584356742, 584356742, "Diestsepoort"),
         new Val( 143, 451873774, 451873773, 451873773, "Diestsepoort"),
         new Val( 144, 451873774, 584356751, 584356751, "Diestsepoort"),
+        new Val( 145, 451873774, 584356751, 198559166, "Diestsepoort"),
         new Val("Diestsepoort (2;3;179;310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658)",
 
-                 145, 451873774, 584356751, 198559166, "Diestsepoort"),
-        new Val("Diestsepoort (2;3;179;310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658)",
-
-                 146, 198559166, 198559166, 584356745, "Diestsepoort"),
+                 146, 451873774, 198559166, 584356745, "Diestsepoort"),
         new Val( 147, 584356745, 584356749, 584356749, "Diestsepoort"),
         new Val( 148, 584356745, 663770966, 663770966, "Diestsepoort"),
         new Val( 149, 584356745,  61556877,  61556877, "Diestsepoort"),
@@ -783,12 +768,10 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         new Val(  40, 451873774, 584356742, 584356742, "Diestsepoort"),
         new Val(  41, 451873774, 451873773, 451873773, "Diestsepoort"),
         new Val(  42, 451873774, 584356751, 584356751, "Diestsepoort"),
+        new Val(  43, 451873774, 198559166, 198559166, "Diestsepoort"),
         new Val("Diestsepoort (2;3;179;310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658)",
 
-                  43, 451873774, 584356751, 198559166, "Diestsepoort"),
-        new Val("Diestsepoort (2;3;179;310;333;334;335;337;370;371;373;374;433;475;485;513;520;524;525;600;616;630;651;652;658)",
-
-                  44, 198559166, 198559166, 584356745, "Diestsepoort"),
+                  44, 451873774, 198559166, 584356745, "Diestsepoort"),
         new Val(  45, 584356745, 584356749, 584356749, "Diestsepoort"),
         new Val(  46, 584356745, 663770966, 663770966, "Diestsepoort"),
         new Val(  47, 584356745,  61556877,  61556877, "Diestsepoort"),
@@ -847,12 +830,10 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         new Val(  86, 112566013, 125835556, 125835556, "Kesseldallaan"),
         new Val(  87, 112566013,  38209648,  38209648, "Wilselsesteenweg"),
         new Val(  88, 112566013,  98645223,  98645223, "Wilselsesteenweg"),
+        new Val(  89, 112566013,  98645243,  98645243, "Wilselsesteenweg"),
         new Val("Kesseldallaan - Wilselsesteenweg (2;310)",
 
-                  89, 112566013,  98645223,  98645243, "Wilselsesteenweg"),
-        new Val("Wilselsesteenweg (2;310)",
-
-                  90,  98645243,  98645243, 243884410, "Wilselsesteenweg"),
+                  90, 112566013,  98645243, 243884410, "Wilselsesteenweg"),
         new Val(  91, 243884410, 114935420, 114935420, "Wilselsesteenweg"),
         new Val(  92, 243884410, 192559637, 192559637, "Wilselsesteenweg"),
         new Val(  93, 243884410,  18943297,  18943297, "Wilselsesteenweg"),
@@ -876,83 +857,79 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         new Val( 111, 243884410, 310461931, 310461931, "Nobelberg"),
         new Val( 112, 243884410, 492765776, 492765776, "Nobelberg"),
         new Val( 113, 243884410,  19166179,  19166179, "Nobelberg"),
+        new Val( 114, 243884410, 310435232, 310435232, "Nobelberg"),
         new Val("Wilselsesteenweg - Nobelberg (310)",
 
-                 114, 243884410,  19166179, 310435232, "Nobelberg"),
-        new Val("Nobelberg (310)",
-
-                 115, 310435232, 310435232,  64487963, "Rotselaarsebaan"),
+                 115, 243884410, 310435232,  64487963, "Rotselaarsebaan"),
+        new Val( 116,  64487963, 310435233, 310435233, "Rotselaarsebaan"),
         new Val("Rotselaarsebaan (310)",
 
-                 116,  64487963,  64487963, 310435233, "Rotselaarsebaan"),
-        new Val( 117, 310435233,  25667798,  25667798, "Rotselaarsebaan"),
-        new Val( 118, 310435233,  16302928,  16302928, null),
+                 117,  64487963, 310435233,  25667798, "Rotselaarsebaan"),
+        new Val( 118,  25667798,  16302928,  16302928, null),
+        new Val( 119,  25667798, 112566004, 112566004, "Sint-Maurusstraat"),
+        new Val("Rotselaarsebaan - Sint-Maurusstraat (310)",
+
+                 120,  25667798, 112566004, 310435233, "Rotselaarsebaan"),
+        new Val( 121, 310435233,  64487963,  64487963, "Rotselaarsebaan"),
         new Val("Rotselaarsebaan (310)",
 
-                 119, 310435233,  16302928, 112566004, "Sint-Maurusstraat"),
-        new Val("Sint-Maurusstraat (310)",
+                 122, 310435233,  64487963,  16302925, "Nobelberg"),
+        new Val( 123,  16302925, 181347873, 181347873, "Nobelberg"),
+        new Val( 124,  16302925, 450119553, 450119553, "Kortrijksebaan"),
+        new Val( 125,  16302925, 310435229, 310435229, "Kortrijksebaan"),
+        new Val( 126,  16302925,  19166177,  19166177, "Kortrijksebaan"),
+        new Val( 127,  16302925, 181347876, 181347876, "Kortrijksebaan"),
+        new Val( 128,  16302925,  13858520,  13858520, "Kortrijksebaan"),
+        new Val( 129,  16302925, 173566709, 173566709, "Kortrijksebaan"),
+        new Val( 130,  16302925,  23957648,  23957648, "Kortrijksebaan"),
+        new Val( 131,  16302925, 310435230, 310435230, "Kortrijksebaan"),
+        new Val( 132,  16302925,  19112638,  19112638, "Kortrijksebaan"),
+        new Val( 133,  16302925, 659289514, 659289514, "Kortrijksebaan"),
+        new Val( 134,  16302925, 441280731, 441280731, "Kortrijksebaan"),
+        new Val( 135,  16302925, 659289513, 659289513, "Kortrijksebaan"),
+        new Val( 136,  16302925,  38502235,  38502235, "Kortrijksebaan"),
+        new Val( 137,  16302925, 310306431, 310306431, "Kortrijksebaan"),
+        new Val( 138,  16302925, 310306259, 310306259, "Dutselstraat"),
+        new Val( 139,  16302925,  22724214,  22724214, "Dutselstraat"),
+        new Val( 140,  16302925, 310306260, 310306260, "Dutselstraat"),
+        new Val( 141,  16302925, 185929631, 185929631, "Dutselstraat"),
+        new Val( 142,  16302925, 185929632, 185929632, "Dutselstraat"),
+        new Val( 143,  16302925, 137613419, 137613419, "Dutselstraat"),
+        new Val( 144,  16302925, 185929630, 185929630, "Dutselstraat"),
+        new Val( 145,  16302925,  13858519,  13858519, "Dutselstraat"),
+        new Val( 146,  16302925, 540115503, 540115503, "Gravenstraat"),
+        new Val( 147,  16302925, 182275357, 182275357, "Gravenstraat"),
+        new Val( 148,  16302925,  13858500,  13858500, "Gravenstraat"),
+        new Val( 149,  16302925,  13858502,  13858502, "Gravenstraat"),
+        new Val( 150,  16302925,  38501970,  38501970, "Gravenstraat"),
+        new Val( 151,  16302925,  13858501,  13858501, "Gravenstraat"),
+        new Val( 152,  16302925,  23334102,  23334102, "Gravenstraat"),
+        new Val( 153,  16302925, 137613435, 137613435, "Rodestraat"),
+        new Val( 154,  16302925,  13858504,  13858504, "Rodestraat"),
+        new Val( 155,  16302925, 118479385, 118479385, "Rodestraat"),
+        new Val( 156,  16302925, 182275362, 182275362, "Rodestraat"),
+        new Val( 157,  16302925, 182275361, 182275361, "Rodestraat"),
+        new Val( 158,  16302925, 117329495, 117329495, "Rodestraat"),
+        new Val( 159,  16302925, 318267937, 318267937, "Rodestraat"),
+        new Val( 160,  16302925, 318267938, 318267938, "Rodestraat"),
+        new Val( 161,  16302925, 137613436, 137613436, "Rodestraat"),
+        new Val( 162,  16302925, 615260297, 615260297, "Rodestraat"),
+        new Val( 163,  16302925,  10242646,  10242646, "Rodestraat"),
+        new Val( 164,  16302925, 112565994, 112565994, "Appelweg"),
+        new Val( 165,  16302925, 137613417, 137613417, "Appelweg"),
+        new Val( 166,  16302925,  10242649,  10242649, "Dorp"),
+        new Val( 167,  16302925, 187995152, 187995152, "Dorp"),
+        new Val( 168,  16302925, 137613438, 137613438, "Sint-Lambertusstraat"),
+        new Val( 169,  16302925, 151083447, 151083447, "Sint-Lambertusstraat"),
+        new Val( 170,  16302925, 609510455, 609510455, "Rijksweg"),
+        new Val( 171,  16302925, 609510456, 609510456, "Rijksweg"),
+        new Val( 172,  16302925,  38208831,  38208831, "Rijksweg"),
+        new Val( 173,  16302925,  38208830,  38208830, "Rijksweg"),
+        new Val( 174,  16302925, 345078878, 345078878, "Rijksweg"),
+        new Val( 175,  16302925, 345078877, 345078877, "Rijksweg"),
+        new Val("Nobelberg - Rijksweg (310)",
 
-                 120, 112566004, 112566004, 310435233, "Rotselaarsebaan"),
-        new Val("Rotselaarsebaan (310)",
-
-                 121, 310435233, 310435233,  64487963, "Rotselaarsebaan"),
-        new Val( 122,  64487963,  16302925,  16302925, "Nobelberg"),
-        new Val( 123,  64487963, 181347873, 181347873, "Nobelberg"),
-        new Val( 124,  64487963, 450119553, 450119553, "Kortrijksebaan"),
-        new Val( 125,  64487963, 310435229, 310435229, "Kortrijksebaan"),
-        new Val( 126,  64487963,  19166177,  19166177, "Kortrijksebaan"),
-        new Val( 127,  64487963, 181347876, 181347876, "Kortrijksebaan"),
-        new Val( 128,  64487963,  13858520,  13858520, "Kortrijksebaan"),
-        new Val( 129,  64487963, 173566709, 173566709, "Kortrijksebaan"),
-        new Val( 130,  64487963,  23957648,  23957648, "Kortrijksebaan"),
-        new Val( 131,  64487963, 310435230, 310435230, "Kortrijksebaan"),
-        new Val( 132,  64487963,  19112638,  19112638, "Kortrijksebaan"),
-        new Val( 133,  64487963, 659289514, 659289514, "Kortrijksebaan"),
-        new Val( 134,  64487963, 441280731, 441280731, "Kortrijksebaan"),
-        new Val( 135,  64487963, 659289513, 659289513, "Kortrijksebaan"),
-        new Val( 136,  64487963,  38502235,  38502235, "Kortrijksebaan"),
-        new Val( 137,  64487963, 310306431, 310306431, "Kortrijksebaan"),
-        new Val( 138,  64487963, 310306259, 310306259, "Dutselstraat"),
-        new Val( 139,  64487963,  22724214,  22724214, "Dutselstraat"),
-        new Val( 140,  64487963, 310306260, 310306260, "Dutselstraat"),
-        new Val( 141,  64487963, 185929631, 185929631, "Dutselstraat"),
-        new Val( 142,  64487963, 185929632, 185929632, "Dutselstraat"),
-        new Val( 143,  64487963, 137613419, 137613419, "Dutselstraat"),
-        new Val( 144,  64487963, 185929630, 185929630, "Dutselstraat"),
-        new Val( 145,  64487963,  13858519,  13858519, "Dutselstraat"),
-        new Val( 146,  64487963, 540115503, 540115503, "Gravenstraat"),
-        new Val( 147,  64487963, 182275357, 182275357, "Gravenstraat"),
-        new Val( 148,  64487963,  13858500,  13858500, "Gravenstraat"),
-        new Val( 149,  64487963,  13858502,  13858502, "Gravenstraat"),
-        new Val( 150,  64487963,  38501970,  38501970, "Gravenstraat"),
-        new Val( 151,  64487963,  13858501,  13858501, "Gravenstraat"),
-        new Val( 152,  64487963,  23334102,  23334102, "Gravenstraat"),
-        new Val( 153,  64487963, 137613435, 137613435, "Rodestraat"),
-        new Val( 154,  64487963,  13858504,  13858504, "Rodestraat"),
-        new Val( 155,  64487963, 118479385, 118479385, "Rodestraat"),
-        new Val( 156,  64487963, 182275362, 182275362, "Rodestraat"),
-        new Val( 157,  64487963, 182275361, 182275361, "Rodestraat"),
-        new Val( 158,  64487963, 117329495, 117329495, "Rodestraat"),
-        new Val( 159,  64487963, 318267937, 318267937, "Rodestraat"),
-        new Val( 160,  64487963, 318267938, 318267938, "Rodestraat"),
-        new Val( 161,  64487963, 137613436, 137613436, "Rodestraat"),
-        new Val( 162,  64487963, 615260297, 615260297, "Rodestraat"),
-        new Val( 163,  64487963,  10242646,  10242646, "Rodestraat"),
-        new Val( 164,  64487963, 112565994, 112565994, "Appelweg"),
-        new Val( 165,  64487963, 137613417, 137613417, "Appelweg"),
-        new Val( 166,  64487963,  10242649,  10242649, "Dorp"),
-        new Val( 167,  64487963, 187995152, 187995152, "Dorp"),
-        new Val( 168,  64487963, 137613438, 137613438, "Sint-Lambertusstraat"),
-        new Val( 169,  64487963, 151083447, 151083447, "Sint-Lambertusstraat"),
-        new Val( 170,  64487963, 609510455, 609510455, "Rijksweg"),
-        new Val( 171,  64487963, 609510456, 609510456, "Rijksweg"),
-        new Val( 172,  64487963,  38208831,  38208831, "Rijksweg"),
-        new Val( 173,  64487963,  38208830,  38208830, "Rijksweg"),
-        new Val( 174,  64487963, 345078878, 345078878, "Rijksweg"),
-        new Val( 175,  64487963, 345078877, 345078877, "Rijksweg"),
-        new Val("Rotselaarsebaan - Rijksweg (310)",
-
-                 176,  64487963, 345078877,  13856508, "Rijksweg Aarschot-Winge"),
+                 176,  16302925, 345078877,  13856508, "Rijksweg Aarschot-Winge"),
         new Val( 177,  13856508, 345078875, 345078875, "Rijksweg"),
         new Val( 178,  13856508,  22870199,  22870199, "Rijksweg"),
         new Val( 179,  13856508, 136845549, 136845549, "Nieuwrodesesteenweg"),
@@ -980,26 +957,32 @@ public class RouteSegmentToExtractTest extends AbstractTest{
 
                  200,  13856508, 345152127, 125101583, "Leuvensesteenweg"),
         new Val( 201, 125101583, 188863432, 188863432, "Leuvensesteenweg"),
-        new Val("Leuvensesteenweg (305;306;310;334;335;513)",
+        new Val("Leuvensesteenweg (37;305;306;310;334;335;513)",
 
                  202, 125101583, 188863432, 125101584, "Leuvensesteenweg"),
         new Val( 203, 125101584, 412810122, 412810122, "Leuvensesteenweg"),
         new Val( 204, 125101584,  13892080,  13892080, "Albertlaan"),
-        new Val("Leuvensesteenweg - Albertlaan (310;334;335;513)",
+        new Val("Leuvensesteenweg - Albertlaan (37;310;334;335;513)",
 
                  205, 125101584,  13892080, 125101554, "Albertlaan"),
-        new Val("Albertlaan (305;306;310;334;335;513)",
+        new Val("Albertlaan (37;220;305;306;310;334;335;513)",
 
                  206, 125101554, 125101554,  41405911, "Statiestraat"),
         new Val( 207,  41405911, 101376793, 101376793, "Statiestraat"),
         new Val( 208,  41405911, 125101590, 125101590, "Statieplein"),
-        new Val( 209,  41405911, 100289852, 100289852, "Statieplein"),
-        new Val( 210,  41405911, 100289892, 100289892, "Statieplein"),
-        new Val( 211,  41405911, 100289859, 100289859, "Statieplein"),
-        new Val("Statiestraat - Statieplein (305;306;310;334;335)",
+        new Val("Statiestraat - Statieplein (35;36;37;160;161;220;221;305;306;310;334;335;390;392;491;492;530;532;590)",
 
-                 212,  41405911, 100289859, 100289896, "Statieplein"),
-        new Val("Statieplein (310;334;335)",
+                 209,  41405911, 125101590, 100289852, "Statieplein"),
+        new Val("Statieplein (35;36;37;160;161;305;306;310;334;335;390;392;491;492;530;532;590)",
+
+                 210, 100289852, 100289852, 100289892, "Statieplein"),
+        new Val("Statieplein (35;36;37;305;306;310;334;335;390;392;491;492;530;532;590)",
+
+                 211, 100289892, 100289892, 100289859, "Statieplein"),
+        new Val("Statieplein (35;36;37;305;306;310;334;335;390;392;491;492;590)",
+
+                 212, 100289859, 100289859, 100289896, "Statieplein"),
+        new Val("Statieplein (35;36;37;310;334;335;390;392;590)",
 
                  213, 100289896,  13856192,         0, "Statieplein")
     );
@@ -1020,51 +1003,63 @@ public class RouteSegmentToExtractTest extends AbstractTest{
         new Val(  20, 520502050, 255018560, 255018560, null),
         new Val(  21, 520502050,  26614159,  26614159, null),
         new Val(  22, 520502050,  20402695,  20402695, "Astridstraat"),
-        new Val(  23, 520502050, 116911330, 116911330, "Schrieksebaan"),
-        new Val(  24, 520502050, 348402887, 348402887, "Schrieksebaan"),
-        new Val(  25, 520502050,  79057162,  79057162, "Schrieksebaan"),
-        new Val(  26, 520502050, 244077928, 244077928, "Schrieksebaan"),
-        new Val(  27, 520502050,  25706520,  25706520, "Schrieksebaan"),
-        new Val(  28, 520502050, 106526457, 106526457, null),
-        new Val(  29, 520502050,  79057173,  79057173, null),
-        new Val(  30, 520502050, 106526331, 106526331, null),
-        new Val(  31, 520502050, 106526391, 106526391, "Werchtersebaan"),
-        new Val(  32, 520502050, 106526409, 106526409, "Werchtersebaan"),
-        new Val(  33, 520502050, 116911314, 116911314, "Werchtersebaan"),
-        new Val(  34, 520502050, 116911310, 116911310, "Werchtersebaan"),
-        new Val(  35, 520502050, 116911322, 116911322, "Werchtersebaan"),
-        new Val(  36, 520502050, 116911317, 116911317, "Werchtersebaan"),
-        new Val(  37, 520502050,  22080665,  22080665, "Werchtersebaan"),
-        new Val(  38, 520502050,  22080651,  22080651, "Tremelobaan"),
-        new Val(  39, 520502050, 126264637, 126264637, "Tremelobaan"),
-        new Val(  40, 520502050,  25706405,  25706405, "Tremelobaan"),
-        new Val(  41, 520502050, 349648270, 349648270, "Tremelobaan"),
-        new Val(  42, 520502050, 349648273, 349648273, "Tremelobaan"),
-        new Val(  43, 520502050, 349648272, 349648272, "Tremelobaan"),
-        new Val(  44, 520502050,  25706363,  25706363, "Tremelobaan"),
-        new Val(  45, 520502050, 349648271, 349648271, "Tremelobaan"),
-        new Val(  46, 520502050,  32823731,  32823731, "Tremelobaan"),
-        new Val(  47, 520502050, 116704290, 116704290, "Tremelobaan"),
-        new Val(  48, 520502050,  49577807,  49577807, "Sint-Jansstraat"),
-        new Val(  49, 520502050, 205303320, 205303320, "Sint-Jansstraat"),
-        new Val(  50, 520502050, 205303322, 205303322, "Sint-Jansstraat"),
-        new Val(  51, 520502050, 205303321, 205303321, "Sint-Jansstraat"),
-        new Val(  52, 520502050, 116911351, 116911351, "Sint-Jansstraat"),
-        new Val(  53, 520502050,  21355673,  21355673, "Sint-Jansstraat"),
-        new Val(  54, 520502050,  26591703,  26591703, "Werchterplein"),
-        new Val(  55, 520502050,  24037032,  24037032, "Hoekje"),
-        new Val(  56, 520502050,  13858894,  13858894, "Hoekje"),
-        new Val(  57, 520502050, 292820652, 292820652, "Nieuwebaan"),
-        new Val(  58, 520502050,  98918943,  98918943, "Nieuwebaan"),
-        new Val(  59, 520502050, 292670109, 292670109, "Nieuwebaan"),
-        new Val(  60, 520502050, 292670115, 292670115, "Nieuwebaan"),
-        new Val(  61, 520502050, 292670113, 292670113, "Nieuwebaan"),
-        new Val(  62, 520502050, 292670113, 292670110, "Nieuwebaan"),
-        new Val(  63, 520502050, 292670113, 292670112, "Nieuwebaan"),
-        new Val(  64, 520502050, 292670113,  24041208, "Provinciebaan"),
-        new Val("Astridstraat - Nieuwebaan (333;433)",
+        new Val("Astridstraat (333;433;520;527;530)",
 
-                  65, 520502050, 292670113, 100086271, "Provinciebaan"),
+                  23, 520502050,  20402695, 116911330, "Schrieksebaan"),
+        new Val(  24, 116911330, 348402887, 348402887, "Schrieksebaan"),
+        new Val(  25, 116911330,  79057162,  79057162, "Schrieksebaan"),
+        new Val("Schrieksebaan (333;433;520;527;530)",
+
+                  26, 116911330,  79057162, 244077928, "Schrieksebaan"),
+        new Val("Schrieksebaan (333;433;520;527;530;532)",
+
+                  27, 244077928, 244077928,  25706520, "Schrieksebaan"),
+        new Val(  28,  25706520, 106526457, 106526457, null),
+        new Val(  29,  25706520,  79057173,  79057173, null),
+        new Val("Schrieksebaan (333;433;520;527;532)",
+
+                  30,  25706520,  79057173, 106526331, null),
+        new Val("(333;433;520;527;530;532)",
+
+                  31, 106526331, 106526331, 106526391, "Werchtersebaan"),
+        new Val(  32, 106526391, 106526409, 106526409, "Werchtersebaan"),
+        new Val(  33, 106526391, 116911314, 116911314, "Werchtersebaan"),
+        new Val(  34, 106526391, 116911310, 116911310, "Werchtersebaan"),
+        new Val(  35, 106526391, 116911322, 116911322, "Werchtersebaan"),
+        new Val(  36, 106526391, 116911317, 116911317, "Werchtersebaan"),
+        new Val(  37, 106526391,  22080665,  22080665, "Werchtersebaan"),
+        new Val(  38, 106526391,  22080651,  22080651, "Tremelobaan"),
+        new Val(  39, 106526391, 126264637, 126264637, "Tremelobaan"),
+        new Val(  40, 106526391,  25706405,  25706405, "Tremelobaan"),
+        new Val(  41, 106526391, 349648270, 349648270, "Tremelobaan"),
+        new Val(  42, 106526391, 349648273, 349648273, "Tremelobaan"),
+        new Val(  43, 106526391, 349648272, 349648272, "Tremelobaan"),
+        new Val(  44, 106526391,  25706363,  25706363, "Tremelobaan"),
+        new Val(  45, 106526391, 349648271, 349648271, "Tremelobaan"),
+        new Val("Werchtersebaan - Tremelobaan (333;433;532)",
+
+                  46, 106526391, 349648271,  32823731, "Tremelobaan"),
+        new Val(  47,  32823731, 116704290, 116704290, "Tremelobaan"),
+        new Val(  48,  32823731,  49577807,  49577807, "Sint-Jansstraat"),
+        new Val(  49,  32823731, 205303320, 205303320, "Sint-Jansstraat"),
+        new Val(  50,  32823731, 205303322, 205303322, "Sint-Jansstraat"),
+        new Val(  51,  32823731, 205303321, 205303321, "Sint-Jansstraat"),
+        new Val(  52,  32823731, 116911351, 116911351, "Sint-Jansstraat"),
+        new Val(  53,  32823731,  21355673,  21355673, "Sint-Jansstraat"),
+        new Val(  54,  32823731,  26591703,  26591703, "Werchterplein"),
+        new Val(  55,  32823731,  24037032,  24037032, "Hoekje"),
+        new Val(  56,  32823731,  13858894,  13858894, "Hoekje"),
+        new Val(  57,  32823731, 292820652, 292820652, "Nieuwebaan"),
+        new Val(  58,  32823731,  98918943,  98918943, "Nieuwebaan"),
+        new Val(  59,  32823731, 292670109, 292670109, "Nieuwebaan"),
+        new Val(  60,  32823731, 292670115, 292670115, "Nieuwebaan"),
+        new Val(  61,  32823731, 292670113, 292670113, "Nieuwebaan"),
+        new Val(  62,  32823731, 292670113, 292670110, "Nieuwebaan"),
+        new Val(  63,  32823731, 292670113, 292670112, "Nieuwebaan"),
+        new Val(  64,  32823731, 292670113,  24041208, "Provinciebaan"),
+        new Val("Tremelobaan - Nieuwebaan (333;433)",
+
+                  65,  32823731, 292670113, 100086271, "Provinciebaan"),
         new Val(  66, 100086271, 116535777, 116535777, "Provinciebaan"),
         new Val(  67, 100086271,  37712785,  37712785, "Provinciebaan"),
         new Val(  68, 100086271,  25706276,  25706276, "Provinciebaan"),
@@ -1219,7 +1214,7 @@ public class RouteSegmentToExtractTest extends AbstractTest{
 
     testPtLine(expectedValues, PT_ROUTE_BUS_433_TO_LEUVEN_STATION);
 
-        generateListOfExpectedValues(PT_ROUTE_BUS_358);
+//    generateListOfExpectedValues(PT_ROUTE_BUS_310_TO_AARSCHOT_STATION);
 
     }
 
@@ -1291,13 +1286,14 @@ public class RouteSegmentToExtractTest extends AbstractTest{
     public void generateListOfExpectedValues(Relation relation) {
         List<RelationMember> members = relation.getMembers();
         RouteSegmentToExtract segment = new RouteSegmentToExtract(relation);
-        List<RelationMember> wayMembers = null;
+        List<RelationMember> wayMembers;
         String listVal = "";
         String className = "";
         Way way;
         String wayName = null;
-        String note = null;
-        System.out.printf("    %sexpectedValues = Arrays.asList(\n", listVal);
+        String note;
+        StringBuilder output = new StringBuilder();
+        output.append(String.format("    %sexpectedValues = Arrays.asList(\n", listVal));
         for (int i = 0; i < members.size() - 1; i++) {
             RelationMember member = members.get(i);
             if (member.isWay() && RouteUtils.isPTWay(member)) {
@@ -1307,34 +1303,36 @@ public class RouteSegmentToExtractTest extends AbstractTest{
                 RouteSegmentToExtract ns = segment.addPTWayMember(i);
                 wayMembers = segment.getWayMembers();
                 if (ns != null) {
-                    System.out.printf("        new Val(\"%s\",\n\n                % 4d,% 10d,% 10d,% 10d, %s),\n",
+                    output.append(String.format("        new Val(\"%s\",\n\n                % 4d,% 10d,% 10d,% 10d, %s),\n",
                         note,
                         i,
                         wayMembers.get(0).getMember().getId(),
                         wayMembers.get(wayMembers.size() - 1).getMember().getId(),
                         (way != null && way.getId() != 0) ? way.getId() : 0,
                         wayName
-                    );
+                    ));
                     segment = ns;
                 } else {
-                    System.out.printf("        new Val(% 4d,% 10d,% 10d,% 10d, %s),\n",
+                    output.append(String.format("        new Val(% 4d,% 10d,% 10d,% 10d, %s),\n",
                         i,
-                        (wayMembers.size() > 0 ) ? wayMembers.get(0).getMember().getId() : 0,
-                        (wayMembers.size() > 1 ) ? wayMembers.get(wayMembers.size() - 1).getMember().getId() : 0,
+                        (wayMembers.size() > 0) ? wayMembers.get(0).getMember().getId() : 0,
+                        (wayMembers.size() > 1) ? wayMembers.get(wayMembers.size() - 1).getMember().getId() : 0,
                         (way != null && way.getId() != 0) ? way.getId() : 0,
                         wayName
-                    );
+                    ));
                 }
             }
         }
-        System.out.printf("        new Val(\"%s\",\n\n                % 4d,% 10d,% 10d,% 10d, %s)\n    );\n\n",
-            note,
+        List<RelationMember> lastSegmentMembers = segment.getWayMembers();
+        output.append(String.format("        new Val(\"%s\",\n\n                % 4d,% 10d,% 10d,% 10d, %s)\n    );\n\n",
+            segment.getNote(),
             members.size() - 1,
-            (wayMembers != null && wayMembers.size() > 0 ) ? wayMembers.get(0).getMember().getId() : 0,
+            lastSegmentMembers.get(0).getMember().getId(),
             members.get(members.size() - 1).getMember().getId(),
             0,
             wayName
-        );
+        ));
+
         StringBuilder lineName = new StringBuilder(relation.get("route"));
         if (relation.hasKey("ref")) lineName.append("_").append(relation.get("ref"));
         if (relation.hasKey("to")) lineName.append("_TO_").append(relation.get("to"));
@@ -1343,10 +1341,15 @@ public class RouteSegmentToExtractTest extends AbstractTest{
             if (!via.contains("-")) lineName.append("_VIA_").append(via);
         }
 
-        System.out.printf("    testPtLine(expectedValues, PT_ROUTE_%s);\n", lineName.toString()
+        output.append(String.format("    testPtLine(expectedValues, PT_ROUTE_%s);\n", lineName.toString()
             .toUpperCase(Locale.ROOT)
-                .replaceAll("\\sPERRON\\s\\d+", "")
-                .replaceAll("\\s+", " ")
-                .replaceAll(" ", "_"));
+            .replaceAll("\\sPERRON\\s\\d+", "")
+            .replaceAll("\\s+", " ")
+            .replaceAll(" ", "_")));
+
+        Toolkit.getDefaultToolkit().getSystemClipboard()
+            .setContents(new StringSelection(output.toString()), null);
+
+        System.out.print(output);
     }
 }

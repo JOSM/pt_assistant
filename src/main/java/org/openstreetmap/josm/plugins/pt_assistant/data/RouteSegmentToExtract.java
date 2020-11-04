@@ -213,7 +213,6 @@ public class RouteSegmentToExtract {
                     .filter(r -> !r.hasKey("name")
                                && RouteUtils.isPTRoute(r)
                                && r.hasKey("note")
-//                               && r.get("note").matches(".*\\([\\d;]+\\)")
                     )
                     .collect(Collectors.toList());
             List<Relation> parentRouteRelations =
@@ -247,8 +246,7 @@ public class RouteSegmentToExtract {
                 }
                 for (Relation parentRoute : itinerariesInSameDirection) {
                     final Optional<Node> commonNode1 = WayUtils.findFirstCommonNode(ws.previousWay, ws.currentWay);
-                    final Optional<Node> commonNode2 = WayUtils.findFirstCommonNode(ws.currentWay, ws.nextWay);
-                    if (!parentRoute.equals(relation) && (ws.currentWay == getLastWay(parentRoute)
+                    if (!parentRoute.equals(relation) && (ws.previousWay == getLastWay(parentRoute)
                         || getMembershipCountOfWayInSameDirection(ws.currentWay, parentRoute) > 1
                             || getMembershipCountOfWayInSameDirection(ws.previousWay, parentRoute) > 1
                             && (commonNode1.map(it -> it.getParentWays().size() > 2).orElse(false)))) {
@@ -262,7 +260,7 @@ public class RouteSegmentToExtract {
 
                     if (!startNewSegment && !relation.equals(parentRoute)
                         && Objects.equals(relation.get("ref"), parentRoute.get("ref"))) {
-                        if (commonNode2
+                        if (commonNode1
                             .map(it ->
                                 it.getParentWays().stream()
                                     .filter(w -> (getItineraryWays(parentRoute).contains(w)))
@@ -671,17 +669,16 @@ public class RouteSegmentToExtract {
             updateTags();
             if (extractedRelation.getId() <= 0 && !extractedRelationAlreadyExists) {
                 getExtractRelationCommand().executeCommand();
-                addPtSegment();
+                addToPtSegmentRelationsMap();
             }
             if (substituteWaysWithRelation) {
                 // replace removed members with the extracted relation
                 relation.addMember(limitIntegerTo(index, relation.getMembersCount()),
                                    new RelationMember("", extractedRelation));
             }
-        } else {
-            return null;
+            return extractedRelation;
         }
-        return extractedRelation;
+        return null;
     }
 
     public Command getExtractRelationCommand() {
@@ -700,7 +697,7 @@ public class RouteSegmentToExtract {
 //        extractedRelation.put("route_ref", getLineIdentifiersSignature());
     }
 
-    private void addPtSegment() {
+    private void addToPtSegmentRelationsMap() {
         if (extractedRelation != null) {
             ptSegments.put(getWayIdsSignature(), extractedRelation);
         }
