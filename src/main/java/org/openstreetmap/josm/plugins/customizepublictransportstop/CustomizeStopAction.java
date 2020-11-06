@@ -45,7 +45,7 @@ public class CustomizeStopAction extends JosmAction implements IStopAreaCustomiz
         // CHECKSTYLE.OFF: LineLength
         CustomizeStopAction action = new CustomizeStopAction(
             tr("Customize stop"),
-            "bus.png",
+            "bus",
             tr("Customize stop under osm public transit standard v2"),
             Shortcut.registerShortcut("tools:customizestop", tr("Public Transport: {0}", tr("Customize stop")), KeyEvent.VK_U, Shortcut.DIRECT),
             true

@@ -65,6 +65,10 @@ public abstract class AbstractTest {
 
  public static final String PATH_TO_BICYCLE_LOOP_BACK_TEST = "test/data/map4.osm";
 
+ public static final String PATH_TO_PT_BEFORE_SPLITTING_TEST = "test/data/buses_before_splitting.osm";
+
+ public static final String PATH_TO_F74_F75_TEST = "test/data/F74_F75.osm";
+
   /**
    * Initiates the basic parts of JOSM.
    */
