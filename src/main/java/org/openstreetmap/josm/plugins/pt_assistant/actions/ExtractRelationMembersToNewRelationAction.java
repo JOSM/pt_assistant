@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
+import static java.lang.Thread.sleep;
 import static java.util.Collections.emptyList;
 
 import java.awt.event.ActionEvent;
@@ -19,14 +20,19 @@ import org.openstreetmap.josm.command.ChangeCommand;
 import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.data.UndoRedoHandler;
+import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
+import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.dialogs.relation.IRelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.MemberTableModel;
+import org.openstreetmap.josm.gui.dialogs.relation.RelationDialogManager;
 import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorUpdateOn;
+import org.openstreetmap.josm.gui.layer.LayerManager;
+import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.plugins.pt_assistant.data.RouteSegmentToExtract;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.I18n;
@@ -106,12 +112,49 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
             ) == JOptionPane.OK_OPTION
         ) {
             if (cbFindAllSegmentsAutomatically.isSelected()) {
+                // To avoid an IndexOutOfBoundsError, let's close this relation editor...
+                OsmDataLayer layer = MainApplication.getLayerManager().getEditLayer();
+                RelationEditor ed = RelationDialogManager.getRelationDialogManager().getEditorForRelation(layer, originalRelation);
+                if (ed != null) {
+                    ed.dispose();
+                }
                 final Relation clonedRelation = new Relation(originalRelation);
                 splitInSegments(clonedRelation, cbConvertToSuperroute.isSelected());
                 commands.add(new ChangeCommand(originalRelation, clonedRelation));
                 UndoRedoHandler.getInstance().add(
                     new SequenceCommand(I18n.tr("Replace ways with segment relations"), commands));
 
+                // After changing the relation, let's open a fresh editor
+                // oddly it shows the old state of the relation
+                // even though I made a detour over the relation's id
+                RelationEditor newEditor = RelationEditor.getEditor(
+                    getEditor().getLayer(),
+                    (Relation) originalRelation.getDataSet().getPrimitiveById(originalRelation.getId(), OsmPrimitiveType.RELATION),
+                    emptyList());
+                newEditor.setVisible(true);
+                newEditor.setAlwaysOnTop(true);
+
+                // alas, when reloading there is still the pesky IndexOudOfBounds
+                // Closing the relation editor interactively
+                // and reopening it, DOES show the new state
+                // this is driving me crazy. Why is it a problem that the length
+                // of the memberList becomes shorter?
+                try {
+                    newEditor.reloadDataFromRelation();
+                } catch (IndexOutOfBoundsException e) {
+                    System.out.print(e);
+                    // no idea what to do here
+                    // the exception was caught, the relation editor
+                    // shows the new situation, sometimes instantaneously, sometimes after a few seconds
+
+                    // I don't see this one as often anymore:
+                    // java.lang.IllegalArgumentException: Width and height must be >= 0
+
+                    // But it does still happen.
+
+                    // This also shows (almost all the time):
+                    // WARNING: row index is bigger than sorter's row count. Most likely this is a wrong sorter usage.
+                }
             } else {
                 Relation clonedRelation = new Relation(originalRelation);
                 RouteSegmentToExtract segment = new RouteSegmentToExtract(clonedRelation,
@@ -146,8 +189,8 @@ public class ExtractRelationMembersToNewRelationAction extends AbstractRelationE
                     extraEditor.setVisible(true);
                     extraEditor.setAlwaysOnTop(true);
                 }
+                editor.reloadDataFromRelation();
             }
-            editor.reloadDataFromRelation();
         }
     }
 
