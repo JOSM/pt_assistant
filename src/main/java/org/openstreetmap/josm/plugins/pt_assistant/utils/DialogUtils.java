@@ -1,6 +1,8 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
+import java.awt.Component;
+
 import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.gui.MainApplication;
@@ -28,9 +30,9 @@ public final class DialogUtils {
      * @param question the question that is displayed in the dialog
      * @return {@code true}, iff the user clicked yes. In all other cases, {@code false} is returned.
      */
-    public static boolean showYesNoQuestion(final String title, final String question) {
+    public static boolean showYesNoQuestion(final Component parentComponent, final String title, final String question) {
         return JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-            MainApplication.getMainFrame(),
+            parentComponent,
             question,
             title,
             JOptionPane.YES_NO_OPTION,

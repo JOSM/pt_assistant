@@ -45,7 +45,6 @@ import org.openstreetmap.josm.plugins.pt_assistant.validation.BicycleFootRouteVa
 import org.openstreetmap.josm.plugins.pt_assistant.validation.PTAssistantValidatorTest;
 import org.openstreetmap.josm.plugins.ptl.DistanceBetweenStops;
 import org.openstreetmap.josm.plugins.ptl.PublicTransportLayer;
-import org.openstreetmap.josm.tools.ImageProvider;
 
 /**
  * This is the main class of the PTAssistant plugin.
@@ -54,7 +53,6 @@ import org.openstreetmap.josm.tools.ImageProvider;
  *
  */
 public class PTAssistantPlugin extends Plugin {
-    public static final ImageProvider ICON = new ImageProvider("bus");
 
     /**
      * last fix that was can be re-applied to all similar route segments, can be

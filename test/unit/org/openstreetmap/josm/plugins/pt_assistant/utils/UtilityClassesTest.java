@@ -1,9 +1,14 @@
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.openstreetmap.josm.plugins.pt_assistant.TestUtil;
+import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 public class UtilityClassesTest {
+
+    @Rule
+    public JOSMTestRules rules = new JOSMTestRules();
 
     @Test
     public void testAllUtilityClasses() {
@@ -14,6 +19,7 @@ public class UtilityClassesTest {
         TestUtil.testUtilityClass(NodeUtils.class);
         TestUtil.testUtilityClass(NotificationUtils.class);
         TestUtil.testUtilityClass(PrimitiveUtils.class);
+        TestUtil.testUtilityClass(PTIcons.class);
         TestUtil.testUtilityClass(PTProperties.class);
         TestUtil.testUtilityClass(RouteUtils.class);
         // StopToWayAssigner does not match the criteria

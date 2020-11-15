@@ -100,8 +100,13 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         editor.apply();
 
         if (rel.hasIncompleteMembers()) {
-            if (DialogUtils.showYesNoQuestion(tr("Not all members are downloaded"), tr(
-                    "The relation has incomplete members.\nDo you want to download them and continue with the sorting?"))) {
+            if (
+                DialogUtils.showYesNoQuestion(
+                    MainApplication.getMainFrame(),
+                    tr("Not all members are downloaded"),
+                    tr("The relation has incomplete members.\nDo you want to download them and continue with the sorting?")
+                )
+            ) {
 
                 List<Relation> incomplete = Collections.singletonList(rel);
                 Future<?> future = MainApplication.worker.submit(new DownloadRelationMemberTask(incomplete,
@@ -128,22 +133,34 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         boolean ask_to_create_return_route_and_routeMaster = false;
 
         if (!RouteUtils.isVersionTwoPTRoute(newRel)) {
-            if (DialogUtils.showYesNoQuestion(tr("This is not a PT v2 relation"),
+            if (
+                DialogUtils.showYesNoQuestion(
+                    MainApplication.getMainFrame(),
+                    tr("This is not a PT v2 relation"),
                     tr("This relation is not PT version 2. Sorting its stops wouldn't make sense.\n\n"
                             + "Would you like to set ''public_transport:version=2''?\n\n"
                             + "There will still be some extra work needed,\n\n"
                             + "but PT_Assistant can help prepare the \n" +
-                              "''route'' and ''route_master'' relations."))) {
+                              "''route'' and ''route_master'' relations."
+                    )
+                )
+            ) {
                 RouteUtils.setPTRouteVersion(newRel, "2");
                 ask_to_create_return_route_and_routeMaster = true;
-                if (DialogUtils.showYesNoQuestion(tr("Remove oneway and split roundabout ways?"),
-                    tr("To prepare for conversion to PT v2\n\n" +
-                        "it may help to remove oneway and split roundabout ways?\n\n" +
-                        "Would you like to do this automatically?\n\n" +
-                        "When asked to remove stops that cannot be served,\n" +
-                        "answer ''no'' and use the button to sort the stops\n" +
-                        "once more after adding the ways once again\n" +
-                        "by using the routing helper"))) {
+                if (
+                    DialogUtils.showYesNoQuestion(
+                        MainApplication.getMainFrame(),
+                        tr("Remove oneway and split roundabout ways?"),
+                        tr("To prepare for conversion to PT v2\n\n" +
+                            "it may help to remove oneway and split roundabout ways?\n\n" +
+                            "Would you like to do this automatically?\n\n" +
+                            "When asked to remove stops that cannot be served,\n" +
+                            "answer ''no'' and use the button to sort the stops\n" +
+                            "once more after adding the ways once again\n" +
+                            "by using the routing helper"
+                        )
+                    )
+                ) {
                     RouteUtils.removeOnewayAndSplitRoundaboutWays(newRel);
                     RouteUtils.addWayMembersAdjacentToPlatforms(newRel);
                 }
@@ -181,10 +198,18 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         final String from = route_manager.get("from");
         final Optional<String> firstStopName = Optional.ofNullable(route_manager.getFirstStop()).map(PTStop::getName)
                 .filter(name -> !name.isEmpty()).map(name -> {
-                    if ((from.isEmpty() && DialogUtils.showYesNoQuestion(tr("Set from tag?"),
-                            tr("''from'' tag not set. Set it to\n{0} ?", name)))
-                            || (!name.equals(from) && DialogUtils.showYesNoQuestion(tr("Change from tag?"),
-                                    tr("''from''={0}.\nChange it to\n''{1}''\n instead?", from, name)))) {
+                    if (
+                        (from.isEmpty() && DialogUtils.showYesNoQuestion(
+                            MainApplication.getMainFrame(),
+                            tr("Set from tag?"),
+                            tr("''from'' tag not set. Set it to\n{0} ?", name)
+                        )) ||
+                        (!name.equals(from) && DialogUtils.showYesNoQuestion(
+                            MainApplication.getMainFrame(),
+                            tr("Change from tag?"),
+                            tr("''from''={0}.\nChange it to\n''{1}''\n instead?", from, name)
+                        ))
+                    ) {
                         route_manager.set("from", name);
                     }
                     return name;
@@ -193,10 +218,18 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
         final Optional<String> lastStopName = Optional.ofNullable(route_manager.getLastStop()).map(PTStop::getName)
                 .filter(name -> !name.isEmpty()).map(name -> {
                     final String to = route_manager.get("to");
-                    if ((to.isEmpty() && DialogUtils.showYesNoQuestion(tr("Set to tag?"),
-                            tr("''to'' tag not set. Set it to\n{0} ?", name)))
-                            || (!name.equals(to) && DialogUtils.showYesNoQuestion(tr("Change to tag?"),
-                                    tr("''to''={0}.\nChange it to\n''{1}''\n instead?", to, name)))) {
+                    if (
+                        (to.isEmpty() && DialogUtils.showYesNoQuestion(
+                            MainApplication.getMainFrame(),
+                            tr("Set to tag?"),
+                            tr("''to'' tag not set. Set it to\n{0} ?", name)
+                        )) ||
+                        (!name.equals(to) && DialogUtils.showYesNoQuestion(
+                            MainApplication.getMainFrame(),
+                            tr("Change to tag?"),
+                            tr("''to''={0}.\nChange it to\n''{1}''\n instead?", to, name)
+                        ))
+                    ) {
                         route_manager.set("to", name);
                     }
                     return name;
@@ -204,8 +237,13 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
         String proposedRelationName = route_manager.getComposedName();
         if (!Objects.equals(proposedRelationName, route_manager.get("name"))) {
-            if (DialogUtils.showYesNoQuestion(tr("Change name tag?"),
-                    tr("Change name to\n''{0}''\n?", proposedRelationName))) {
+            if (
+                DialogUtils.showYesNoQuestion(
+                    MainApplication.getMainFrame(),
+                    tr("Change name tag?"),
+                    tr("Change name to\n''{0}''\n?", proposedRelationName)
+                )
+            ) {
                 route_manager.set("name", proposedRelationName);
             }
             route_manager.writeTagsToRelation();
@@ -214,8 +252,14 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             OsmDataLayer layer = MainApplication.getLayerManager().getEditLayer();
             Relation routeMaster;
 
-            if (ask_to_create_return_route_and_routeMaster && DialogUtils.showYesNoQuestion(tr("Opposite itinerary?"),
-                    tr("Create ''route'' relation for opposite direction of travel?"))) {
+            if (
+                ask_to_create_return_route_and_routeMaster &&
+                DialogUtils.showYesNoQuestion(
+                    MainApplication.getMainFrame(),
+                    tr("Opposite itinerary?"),
+                    tr("Create ''route'' relation for opposite direction of travel?")
+                )
+            ) {
 
                 // Reverse order of members in new route relation
                 final PTRouteDataManager return_route_manager = new PTRouteDataManager(otherDirRel);
@@ -254,8 +298,13 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
 
                 if (rmr.isPresent()) {
                     routeMaster = rmr.get();
-                } else if (DialogUtils.showYesNoQuestion(tr("Create a route_master?"),
-                        tr("Create ''route_master'' relation and add these route relations to it?"))) {
+                } else if (
+                    DialogUtils.showYesNoQuestion(
+                        MainApplication.getMainFrame(),
+                        tr("Create a route_master?"),
+                        tr("Create ''route_master'' relation and add these route relations to it?")
+                    )
+                ) {
                     routeMaster = new Relation();
                     routeMaster.put(OSMTags.KEY_RELATION_TYPE, OSMTags.VALUE_TYPE_ROUTE_MASTER);
                     if (rel.hasKey(OSMTags.KEY_ROUTE)) {

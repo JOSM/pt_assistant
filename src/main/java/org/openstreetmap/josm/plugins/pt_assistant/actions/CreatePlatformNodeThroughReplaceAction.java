@@ -39,7 +39,7 @@ import org.openstreetmap.josm.gui.datatransfer.PrimitiveTransferable;
 import org.openstreetmap.josm.gui.datatransfer.data.PrimitiveTransferData;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
-import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPlugin;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.PTIcons;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.MultiMap;
@@ -104,7 +104,7 @@ public class CreatePlatformNodeThroughReplaceAction extends JosmAction {
                     .ifPresent(node -> modify(node, stopPositionNode.get()));
             } else {
                 new Notification(I18n.tr("This action can only be performed if exactly one stop position node is selected."))
-                    .setIcon(PTAssistantPlugin.ICON.get())
+                    .setIcon(PTIcons.BUS.get())
                     .show();
             }
         }

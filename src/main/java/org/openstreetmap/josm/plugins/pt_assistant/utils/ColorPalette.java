@@ -17,5 +17,7 @@ public final class ColorPalette {
     public static final Color PINK = new Color(255, 175, 175, 180);
     public static final Color WHITE = new Color(255, 255, 255, 180);
 
+    public static final Color REF_LABEL_COLOR = new Color(0x80FFFFFF, true);
+
     public static Color[] FIVE_COLORS = { GREEN, RED, BLUE, YELLOW, CYAN };
 }

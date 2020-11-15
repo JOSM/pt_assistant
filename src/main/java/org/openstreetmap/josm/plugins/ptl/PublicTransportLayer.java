@@ -32,6 +32,7 @@ import org.openstreetmap.josm.gui.mappaint.MultiCascade;
 import org.openstreetmap.josm.gui.mappaint.StyleKeys;
 import org.openstreetmap.josm.gui.mappaint.styleelement.TextLabel;
 import org.openstreetmap.josm.gui.mappaint.styleelement.placement.OnLineStrategy;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.ColorPalette;
 import org.openstreetmap.josm.tools.ColorHelper;
 import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
@@ -98,12 +99,11 @@ public class PublicTransportLayer extends Layer {
         Cascade c = env.mc.getOrCreateCascade("default");
         c.put(StyleKeys.FONT_FAMILY, "SansSerif");
         c.put(StyleKeys.FONT_SIZE, 16);
-        Color color = new Color(0x80FFFFFF, true);
 
         for (Pair<Node, Node> nodePair : segmentRefs.keySet()) {
             final String label = String.join(", ", new TreeSet<>(segmentRefs.get(nodePair)));
             c.put(StyleKeys.TEXT, label);
-            final TextLabel text = TextLabel.create(env, color, false);
+            final TextLabel text = TextLabel.create(env, ColorPalette.REF_LABEL_COLOR, false);
             final Way way = new Way();
             way.addNode(nodePair.a);
             way.addNode(nodePair.b);
