@@ -1,5 +1,8 @@
 package org.openstreetmap.josm.plugins.pt_assistant.actions.routinghelper;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,16 +24,25 @@ public class BusTransportMode implements ITransportMode {
     @Override
     public boolean canTraverseWay(@NotNull final IWay<?> way, @NotNull final WayTraversalDirection direction) {
         final String onewayValue = way.get("oneway");
-        return way.hasTag("highway", "primary", "secondary", "tertiary", "residential") && (
+        List<String> majorHighways = Arrays.asList(
+            "motorway", "trunk", "primary", "secondary", "tertiary");
+        majorHighways.forEach(v -> majorHighways.add(String.format("%s_link", v)));
+        List<String> suitableHighwaysForBus = Arrays.asList(
+            "unclassified", "residential", "service", "living_street", "cyclestreet");
+        suitableHighwaysForBus.addAll(majorHighways); // TODO do this only once when plugin starts
+        return (way.hasTag("highway", suitableHighwaysForBus) ||
+                    way.hasTag("psv", "yes") || way.hasTag ("bus", "yes"))
+            && (
             onewayValue == null || "no".equals(way.get("oneway:bus")) ||
-            ("yes".equals(onewayValue) && direction == WayTraversalDirection.FORWARD) ||
-            ("-1".equals(onewayValue) && direction == WayTraversalDirection.BACKWARD)
+                ("yes".equals(onewayValue) && direction == WayTraversalDirection.FORWARD) ||
+                ("-1".equals(onewayValue) && direction == WayTraversalDirection.BACKWARD)
         );
     }
 
     @Override
     public boolean canBeUsedForRelation(@NotNull final IRelation<?> relation) {
-        return relation.hasTag("type", "route") && relation.hasTag("route", "bus");
+        return relation.hasTag("type", "route") && relation.hasTag("route",
+            "bus", "coach", "minibus");
     }
 
     @Override
@@ -38,12 +50,19 @@ public class BusTransportMode implements ITransportMode {
         final Set<Relation> restrictionRelations = from.getReferrers().stream()
             .map(it -> it.getType() == OsmPrimitiveType.RELATION ? (Relation) it : null)
             .filter(Objects::nonNull)
-            .filter(it -> "restriction".equals(it.get("type")))
+            .filter(it -> "restriction".equals(it.get("type")) || "restriction:bus".equals(it.get("type")))
             .filter(it -> it.findRelationMembers("from").contains(from))
             .filter(it -> it.findRelationMembers("via").contains(via))
             .filter(it -> it.findRelationMembers("to").contains(to))
             .collect(Collectors.toSet());
-        // TODO: Use the `restrictionRelations` to figure out the turning restrictions that apply
+        for (Relation restrictionRelation : restrictionRelations) {
+            final String restriction = restrictionRelation.get("restriction");
+            final String except = restrictionRelation.get("except");
+            if (restriction.startsWith("no_") && !except.contains("psv")) {
+                return false;
+            }
+        }
+
         return from.containsNode(via) && to.containsNode(via);
     }
 
