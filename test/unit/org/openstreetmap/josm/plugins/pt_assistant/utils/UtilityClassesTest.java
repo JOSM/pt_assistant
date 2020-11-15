@@ -16,6 +16,7 @@ public class UtilityClassesTest {
         TestUtil.testUtilityClass(ColorPalette.class);
         TestUtil.testUtilityClass(DialogUtils.class);
         TestUtil.testUtilityClass(GeometryUtils.class);
+        TestUtil.testUtilityClass(GuiUtils.class);
         TestUtil.testUtilityClass(NodeUtils.class);
         TestUtil.testUtilityClass(NotificationUtils.class);
         TestUtil.testUtilityClass(PrimitiveUtils.class);
