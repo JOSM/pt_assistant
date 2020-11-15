@@ -85,7 +85,8 @@ public class RoutingHelperPanel extends JPanel {
         add(containerPanel, BorderLayout.SOUTH);
     }
 
-    public void onRelationChange(@Nullable final Relation relation) {
+    public void onRelationChange(@Nullable final Relation relation, @NotNull Optional<ITransportMode> activeTransportMode) {
+        relationLabel.setIcon(activeTransportMode.map(it -> it.getIcon().setSize(ImageProvider.ImageSizes.SMALLICON).get()).orElse(null));
         relationLabel.setText(relation == null ? "‹no relation selected›" : "Relation #" + relation.getId());
         onCurrentWayCleared();
     }
@@ -102,11 +103,13 @@ public class RoutingHelperPanel extends JPanel {
         @NotNull final Relation parentRelation,
         @NotNull final RelationMember member,
         @NotNull final ConnectionType previousWayConnection,
-        @NotNull final ConnectionType nextWayConnection
+        @NotNull final ConnectionType nextWayConnection,
+        final int currentWayIndex,
+        final int numWaysTotal
     ) {
         highlighter.highlightOnly(member.getMember());
         Optional.ofNullable(MainApplication.getMap()).ifPresent(map -> map.mapView.zoomTo(BoundsUtils.fromBBox(member.getMember().getBBox())));
-        activeWayLabel.setText("Way #" + member.getMember().getId());
+        activeWayLabel.setText("Way" + (currentWayIndex + 1) + '/' + numWaysTotal + ": #" + member.getMember().getId());
         previousWayConnectionLabel.setIcon(previousWayConnection.icon);
         previousWayConnectionLabel.setText(previousWayConnection.previousWayText);
         nextWayConnectionLabel.setIcon(nextWayConnection.icon);

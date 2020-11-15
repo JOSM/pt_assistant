@@ -7,6 +7,7 @@ public final class PTIcons {
         // Private constructor to avoid instantiation
     }
 
+    public static final ImageProvider BICYCLE_DESIGNATED = new ImageProvider("presets/vehicle/restriction", "bicycle-designated");
     public static final ImageProvider BUS = new ImageProvider("bus");
 
     public static final ImageProvider STOP_SIGN = new ImageProvider("misc", "error");

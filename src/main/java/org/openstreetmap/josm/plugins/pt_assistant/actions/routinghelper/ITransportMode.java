@@ -5,6 +5,8 @@ import org.openstreetmap.josm.data.osm.IRelation;
 import org.openstreetmap.josm.data.osm.IWay;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.tools.I18n;
+import org.openstreetmap.josm.tools.ImageProvider;
 
 public interface ITransportMode {
     /**
@@ -40,4 +42,14 @@ public interface ITransportMode {
      *         This method assumes that both ways can be traversed by the transport mode, it does not check that.
      */
     boolean canTurn(@NotNull final Way from, @NotNull final Node via, @NotNull final Way to);
+
+    /**
+     * @return an icon representing the transport mode
+     */
+    ImageProvider getIcon();
+
+    /**
+     * @return a unique name for the transport mode. This string should be translatable, so please use {@link I18n#marktr} on the string that's returned!
+     */
+    String getName();
 }

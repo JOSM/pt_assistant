@@ -1,6 +1,8 @@
 package org.openstreetmap.josm.plugins.pt_assistant.actions.routinghelper;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,15 +28,17 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.I18n;
 
 public class RoutingHelperAction implements DataSelectionListener {
-    private static final Set<ITransportMode> TRANSPORT_MODES = Collections.singleton(new BusTransportMode());
+    private static final Set<ITransportMode> TRANSPORT_MODES = new HashSet<>(Arrays.asList(new BicycleTransportMode(), new BusTransportMode()));
 
-    private Optional<ITransportMode> activeTransportMode;
+    @NotNull
+    private Optional<ITransportMode> activeTransportMode = Optional.empty();
 
     private final RoutingHelperPanel routingHelperPanel = new RoutingHelperPanel(this);
 
     @NotNull
     private Optional<Relation> currentRelation = Optional.empty();
 
+    @NotNull
     private Optional<RelationMember> currentMember = Optional.empty();
 
     @Override
@@ -47,8 +51,9 @@ public class RoutingHelperAction implements DataSelectionListener {
                 .map(selectedPrimitive -> selectedPrimitive instanceof Relation ? (Relation) selectedPrimitive : null)
                 .filter(RouteUtils::isRoute);
             this.currentRelation = singleRelationSelection;
+            this.activeTransportMode = currentRelation.flatMap(relation -> TRANSPORT_MODES.stream().filter(it -> it.canBeUsedForRelation(relation)).findFirst());
             if (singleRelationSelection.isPresent()) {
-                routingHelperPanel.onRelationChange(singleRelationSelection.get());
+                routingHelperPanel.onRelationChange(singleRelationSelection.get(), activeTransportMode);
                 if (mapframe.getTopPanel(RoutingHelperPanel.class) == null) {
                     mapframe.addTopPanel(routingHelperPanel);
                 }
@@ -121,7 +126,9 @@ public class RoutingHelperAction implements DataSelectionListener {
                             WayUtils.isTouchingOtherWay(wayMembers.get(0).getWay(), wayMembers.get(1).getWay())
                                 ? RoutingHelperPanel.ConnectionType.CONNECTED
                                 : RoutingHelperPanel.ConnectionType.NOT_CONNECTED
-                        )
+                        ),
+                    0,
+                    wayMembers.size()
                 );
             }
         }
@@ -160,7 +167,9 @@ public class RoutingHelperAction implements DataSelectionListener {
                             WayUtils.isTouchingOtherWay(wayMembers.get(targetIndex).getWay(), wayMembers.get(targetIndex + 1).getWay())
                                 ? RoutingHelperPanel.ConnectionType.CONNECTED
                                 : RoutingHelperPanel.ConnectionType.NOT_CONNECTED
-                        )
+                        ),
+                        targetIndex,
+                        wayMembers.size()
                     );
                 }
             })
