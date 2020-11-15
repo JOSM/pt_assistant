@@ -49,4 +49,17 @@ public final class TestUtil {
       fail(e.getLocalizedMessage());
     }
   }
+
+  public static <T, O> O invokeHiddenMethod(
+      final T object,
+      final Class<T> clazz,
+      final String methodName,
+      final Class<O> returnType,
+      final Class<?>[] parameterTypes,
+      final Object... parameters
+  ) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+      final Method method = clazz.getDeclaredMethod(methodName, parameterTypes);
+      method.setAccessible(true);
+      return returnType.cast(method.invoke(object, parameters));
+  }
 }

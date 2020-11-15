@@ -5,13 +5,11 @@ import static org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction.
 import static org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction.Mode.TO_LAYER;
 import static org.openstreetmap.josm.plugins.pt_assistant.data.PTStop.isPTPlatform;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
 import org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction;
-import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.OsmUtils;
 import org.openstreetmap.josm.data.osm.Relation;
@@ -220,53 +218,6 @@ public final class RouteUtils {
             }
         }
         return 0;
-    }
-
-    /**
-     * Checks if the ways have a common node
-     *
-     * @param w1 first way
-     * @param w2 second way
-     * @return {@code true} if the ways have a common node
-     */
-    public static boolean waysTouch(Way w1, Way w2) {
-
-        if (w1 == null || w2 == null) {
-            return false;
-        }
-
-        Node w1FirstNode = w1.firstNode();
-        Node w1LastNode = w1.lastNode();
-        Node w2FirstNode = w2.firstNode();
-        Node w2LastNode = w2.lastNode();
-
-        return w1FirstNode == w2FirstNode || w1FirstNode == w2LastNode || w1LastNode == w2FirstNode
-                || w1LastNode == w2LastNode;
-    }
-
-    /**
-     * Checks if any way from the first collection touches any way from the
-     * second collection
-     *
-     * @param c1 first collection
-     * @param c2 second collection
-     * @return true if ways touch, false otherwise
-     */
-    public static boolean waysTouch(Collection<Way> c1, Collection<Way> c2) {
-
-        if (c1 == null || c2 == null) {
-            return false;
-        }
-
-        for (Way w1 : c1) {
-            for (Way w2 : c2) {
-                if (waysTouch(w1, w2)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     /**

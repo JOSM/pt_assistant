@@ -1,6 +1,7 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,38 @@ import org.openstreetmap.josm.data.osm.Way;
 public final class WayUtils {
     private WayUtils() {
         // Private constructor to avoid instantiation
+    }
+
+    /**
+     * Checks if the ways have start/end nodes in common
+     *
+     * @param w1 first way
+     * @param w2 second way
+     * @return {@code true} iff the ways have at least one of their {@link IWay#firstNode()}/{@link IWay#lastNode()} in common
+     */
+    public static boolean isTouchingOtherWay(IWay<Node> w1, IWay<Node> w2) {
+        if (w1 == null || w2 == null) {
+            return false;
+        }
+        return w1.isFirstLastNode(w2.firstNode()) || w1.isFirstLastNode(w2.lastNode());
+    }
+
+    /**
+     * Checks if any way from the first collection touches any way from the
+     * second collection
+     *
+     * @param ways1 first collection
+     * @param ways2 second collection
+     * @return {@code true} if at least one of the ways from {@code ways1} touch any one from {@code ways2}
+     *         according to {@link #isTouchingOtherWay(IWay, IWay)}, false otherwise
+     */
+    public static boolean isAnyWayTouchingAnyOtherWay(Collection<? extends IWay<Node>> ways1, Collection<? extends IWay<Node>> ways2) {
+        if (ways1 == null || ways2 == null) {
+            return false;
+        }
+        return ways1.stream().anyMatch(way1 ->
+            ways2.stream().anyMatch(way2 -> WayUtils.isTouchingOtherWay(way1, way2))
+        );
     }
 
     /**

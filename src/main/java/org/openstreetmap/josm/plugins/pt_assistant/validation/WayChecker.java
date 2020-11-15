@@ -22,6 +22,7 @@ import org.openstreetmap.josm.data.validation.Test;
 import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 
 /**
  * Performs tests of a route at the level of single ways: DirectionTest and
@@ -200,7 +201,7 @@ public class WayChecker extends Checker {
             changed = false;
             for (int i = 0; i < listOfSets.size(); i++) {
                 for (int j = i; j < listOfSets.size(); j++) {
-                    if (i != j && RouteUtils.waysTouch(listOfSets.get(i), listOfSets.get(j))) {
+                    if (i != j && WayUtils.isAnyWayTouchingAnyOtherWay(listOfSets.get(i), listOfSets.get(j))) {
                         listOfSets.get(i).addAll(listOfSets.get(j));
                         listOfSets.remove(j);
                         j = listOfSets.size();
@@ -238,7 +239,7 @@ public class WayChecker extends Checker {
             return true;
         }
 
-        if (prev != null && RouteUtils.waysTouch(curr, prev)) {
+        if (prev != null && WayUtils.isTouchingOtherWay(curr, prev)) {
             Node nodeInQuestion;
             if (RouteUtils.isOnewayForPublicTransport(curr) == 1) {
                 nodeInQuestion = curr.firstNode();
@@ -253,7 +254,7 @@ public class WayChecker extends Checker {
             }
         }
 
-        if (next != null && RouteUtils.waysTouch(curr, next)) {
+        if (next != null && WayUtils.isTouchingOtherWay(curr, next)) {
             Node nodeInQuestion;
             if (RouteUtils.isOnewayForPublicTransport(curr) == 1) {
                 nodeInQuestion = curr.lastNode();
