@@ -3,6 +3,10 @@ package org.openstreetmap.josm.plugins.pt_assistant.utils;
 import java.awt.Color;
 
 public final class ColorPalette {
+    private ColorPalette() {
+        // Private constructor to avoid instantiation
+    }
+
     public static final Color GREEN = new Color(0, 255, 0, 180);
     public static final Color RED = new Color(255, 0, 0, 180);
     public static final Color BLUE = new Color(0, 0, 255, 180);

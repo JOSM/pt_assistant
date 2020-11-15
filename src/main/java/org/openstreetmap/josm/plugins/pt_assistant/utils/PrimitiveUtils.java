@@ -10,7 +10,11 @@ import java.util.stream.IntStream;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
 
-public class PrimitiveUtils {
+public final class PrimitiveUtils {
+    private PrimitiveUtils() {
+        // Private constructor to avoid instantiation
+    }
+
     /**
      * @param primitive the primitive for which the occurences should be found
      * @param relations a {@link List} of {@link Relation}s in which this method searches for occurences

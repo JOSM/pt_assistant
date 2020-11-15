@@ -3,13 +3,12 @@ package org.openstreetmap.josm.plugins.pt_assistant.data;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
@@ -20,20 +19,24 @@ import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.io.IllegalDataException;
 import org.openstreetmap.josm.io.OsmReader;
-import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
+import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
+import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 /**
 * Unit tests of {@link StopToWayAssigner}.
 */
-public class PTStopTest extends AbstractTest {
+public class PTStopTest {
+
+    @Rule
+    public JOSMTestRules rules = new JOSMTestRules();
 
     private DataSet ds;
 
     @Before
-    public void init() throws FileNotFoundException, IllegalDataException {
-        ds = OsmReader.parseDataSet(new FileInputStream(AbstractTest.PATH_TO_SORT_PT_STOPS), null);
+    public void init() throws IllegalDataException {
+        ds = OsmReader.parseDataSet(TestFiles.SORT_PT_STOPS(), null);
     }
 
     List<PTStop> findAllStops() {

@@ -5,7 +5,7 @@ import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.gui.MainApplication;
 
-public class DialogUtils {
+public final class DialogUtils {
     private DialogUtils() {
         // Private constructor to avoid instantiation
     }

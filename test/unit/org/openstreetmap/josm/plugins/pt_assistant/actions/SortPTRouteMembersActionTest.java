@@ -4,10 +4,8 @@ package org.openstreetmap.josm.plugins.pt_assistant.actions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
@@ -15,21 +13,25 @@ import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.SimplePrimitiveId;
 import org.openstreetmap.josm.io.IllegalDataException;
 import org.openstreetmap.josm.io.OsmReader;
-import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
+import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
+import org.openstreetmap.josm.testutils.JOSMTestRules;
+
 /**
  * Unit tests for class {@link SortPTRouteMembersAction}.
  *
  * @author giack
  *
  */
-public class SortPTRouteMembersActionTest extends AbstractTest {
+public class SortPTRouteMembersActionTest {
 
+    @Rule
+    public JOSMTestRules rules = new JOSMTestRules().projection();
 
     private DataSet ds;
 
     @Before
-    public void init() throws FileNotFoundException, IllegalDataException {
-        ds = OsmReader.parseDataSet(new FileInputStream(AbstractTest.PATH_TO_SORT_PT_STOPS), null);
+    public void init() throws IllegalDataException {
+        ds = OsmReader.parseDataSet(TestFiles.SORT_PT_STOPS(), null);
 
     }
 
@@ -107,8 +109,8 @@ public class SortPTRouteMembersActionTest extends AbstractTest {
          assertNull(rel.getMember(32).getNode().getName());
      }
     @Test
-    public void test3() throws FileNotFoundException, IllegalDataException{
-        ds = OsmReader.parseDataSet(new FileInputStream(AbstractTest.PATH_TO_SORT_PT_STOPS_WITH_REPEATED_STOPS), null);
+    public void test3() throws IllegalDataException{
+        ds = OsmReader.parseDataSet(TestFiles.SORT_PT_STOPS_WITH_REPEATED_STOPS(), null);
         Relation rel = (Relation) ds.getPrimitiveById(
                 new SimplePrimitiveId(18601L, OsmPrimitiveType.RELATION));
         SortPTRouteMembersAction.sortPTRouteMembers(rel);

@@ -3,26 +3,27 @@ package org.openstreetmap.josm.plugins.pt_assistant.data;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-
+import org.junit.Rule;
 import org.junit.Test;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
-import org.openstreetmap.josm.plugins.pt_assistant.ImportUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
+import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 /**
  * Unit tests of {@link StopToWayAssigner}.
  */
-public class StopToWayAssignerTest extends AbstractTest {
+public class StopToWayAssignerTest {
+
+    @Rule
+    public JOSMTestRules rules = new JOSMTestRules();
 
     @Test
     public void test() {
 
-        File file = new File(AbstractTest.PATH_TO_ONEWAY_BAD_MEMBER_SORTING);
-        DataSet ds = ImportUtils.importOsmFile(file, "testLayer");
+        DataSet ds = TestFiles.importOsmFile(TestFiles.ONEWAY_BAD_MEMBER_SORTING(), "testLayer");
 
         Relation route = null;
         for (Relation r : ds.getRelations()) {

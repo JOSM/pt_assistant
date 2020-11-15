@@ -5,7 +5,7 @@ import org.openstreetmap.josm.actions.JoinNodeWayAction;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.gui.MainApplication;
 
-public class NodeUtils {
+public final class NodeUtils {
     private NodeUtils() {
         // Private constructor to avoid instantiation
     }

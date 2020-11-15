@@ -32,7 +32,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.data.PTWay;
  * @author darya
  *
  */
-public class StopToWayAssigner {
+public final class StopToWayAssigner {
 
     /* contains assigned stops */
     public static Map<PTStop, List<Way>> stopToWay = new HashMap<>();

@@ -3,21 +3,22 @@ package org.openstreetmap.josm.plugins.pt_assistant.validation;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-
+import org.junit.Rule;
 import org.junit.Test;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
-import org.openstreetmap.josm.plugins.pt_assistant.ImportUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
+import org.openstreetmap.josm.testutils.JOSMTestRules;
 
-public class SolitaryStopPositionTest extends AbstractTest {
+public class SolitaryStopPositionTest {
+
+    @Rule
+    public JOSMTestRules rules = new JOSMTestRules();
 
     @Test
     public void test1() {
 
-        File file = new File(AbstractTest.PATH_TO_SOLITARY_STOP_POSITION);
-        DataSet ds = ImportUtils.importOsmFile(file, "testLayer");
+        DataSet ds = TestFiles.importOsmFile(TestFiles.SOLITARY_STOP_POSITION(), "testLayer");
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
 
         Node platform = null;

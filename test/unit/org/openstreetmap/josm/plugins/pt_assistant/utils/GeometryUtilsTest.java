@@ -1,14 +1,13 @@
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
 import org.junit.Test;
 import org.openstreetmap.josm.data.coor.ILatLon;
 import org.openstreetmap.josm.data.coor.LatLon;
-import org.openstreetmap.josm.plugins.pt_assistant.TestUtil;
 import org.openstreetmap.josm.tools.Pair;
 
 public final class GeometryUtilsTest {
@@ -22,12 +21,6 @@ public final class GeometryUtilsTest {
     private static final ILatLon P_M2_3 = new LatLon(-2, 3);
     private static final ILatLon P_10_173_7_924 = new LatLon(10.173, 7.924);
 
-    @Test
-    public void testIsUtilityClass() {
-        TestUtil.testUtilityClass(GeometryUtils.class);
-    }
-
-    @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
     @Test
     public void testDirection() {
         assertEquals(0, GeometryUtils.direction(Pair.create(P_0_0, P_0_0), P_0_0), 1e-12);

@@ -4,13 +4,14 @@ package org.openstreetmap.josm.plugins.pt_assistant.actions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.openstreetmap.josm.command.SplitWayCommand;
 import org.openstreetmap.josm.data.osm.DataSet;
@@ -23,26 +24,33 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.io.IllegalDataException;
 import org.openstreetmap.josm.io.OsmReader;
-import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
+import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.PTProperties;
+import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 /**
  * Unit tests of {@link SplitRoundaboutAction}.
  */
-public class SplitRoundaboutTest extends AbstractTest {
+public class SplitRoundaboutTest {
 
+    @Rule
+    public JOSMTestRules rules = new JOSMTestRules();
 
     private DataSet ds, ds1, ds2;
     private OsmDataLayer layer;
     private SplitRoundaboutAction action;
     private Way r1, r2, r3, r4, r5;
 
-    public void init() throws FileNotFoundException, IllegalDataException {
-        ds = OsmReader.parseDataSet(new FileInputStream(AbstractTest.PATH_TO_ROUNDABOUT), null);
+    @Before
+    public void beforeEach() {
+        PTProperties.ROUNDABOUT_SPLITTER_ALIGN_ALWAYS.put(true);
+    }
+
+    public void init() throws IllegalDataException {
+        ds = OsmReader.parseDataSet(TestFiles.ROUNDABOUT(), null);
         layer = new OsmDataLayer(ds, OsmDataLayer.createNewName(), null);
         MainApplication.getLayerManager().addLayer(layer);
 
-        PTProperties.ROUNDABOUT_SPLITTER_ALIGN_ALWAYS.put(true);
         action = new SplitRoundaboutAction();
         r1 = (Way) ds.getPrimitiveById(new SimplePrimitiveId(293302077L, OsmPrimitiveType.WAY));
         r2 = (Way) ds.getPrimitiveById(new SimplePrimitiveId(205833435L, OsmPrimitiveType.WAY));
@@ -50,12 +58,11 @@ public class SplitRoundaboutTest extends AbstractTest {
         r4 = (Way) ds.getPrimitives(p -> p.hasTag("name", "r4")).iterator().next();
     }
 
-    public void init1() throws FileNotFoundException, IllegalDataException {
-        ds1 = OsmReader.parseDataSet(new FileInputStream(AbstractTest.PATH_TO_ROUNDABOUT1_BEFORE), null);
+    public void init1() throws IllegalDataException {
+        ds1 = OsmReader.parseDataSet(TestFiles.ROUNDABOUT1_BEFORE(), null);
         layer = new OsmDataLayer(ds1, OsmDataLayer.createNewName(), null);
         MainApplication.getLayerManager().addLayer(layer);
 
-        PTProperties.ROUNDABOUT_SPLITTER_ALIGN_ALWAYS.put(true);
         action = new SplitRoundaboutAction();
         r5 = (Way) ds1.getPrimitiveById(new SimplePrimitiveId(97417157, OsmPrimitiveType.WAY));
     }
@@ -175,7 +182,7 @@ public class SplitRoundaboutTest extends AbstractTest {
     public void test5() throws FileNotFoundException, IllegalDataException {
     		init1();
     		Collection<Way> sw5 = splitWay(r5);
-    		ds2 = OsmReader.parseDataSet(new FileInputStream(AbstractTest.PATH_TO_ROUNDABOUT1_AFTER), null);
+        ds2 = OsmReader.parseDataSet(TestFiles.ROUNDABOUT1_AFTER(), null);
     		for (Relation d1 : ds1.getRelations()) {
     			for (Relation d2 : ds2.getRelations()) {
     				if (d2.getId() == d1.getId()) {

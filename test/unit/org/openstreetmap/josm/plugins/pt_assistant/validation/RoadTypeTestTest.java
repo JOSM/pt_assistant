@@ -4,25 +4,27 @@ package org.openstreetmap.josm.plugins.pt_assistant.validation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.validation.TestError;
-import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
-import org.openstreetmap.josm.plugins.pt_assistant.ImportUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
+import org.openstreetmap.josm.testutils.JOSMTestRules;
 
-public class RoadTypeTestTest extends AbstractTest {
+public class RoadTypeTestTest {
+
+    @Rule
+    public JOSMTestRules rules = new JOSMTestRules();
 
     @Test
     public void test() {
 
-        File file = new File(AbstractTest.PATH_TO_ROAD_TYPE_ERROR);
-        DataSet ds = ImportUtils.importOsmFile(file, "testLayer");
+        DataSet ds = TestFiles.importOsmFile(TestFiles.ROAD_TYPE_ERROR(), "testLayer");
 
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
         List<TestError> errors = new ArrayList<>();

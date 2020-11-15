@@ -3,23 +3,24 @@ package org.openstreetmap.josm.plugins.pt_assistant.validation;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-
+import org.junit.Rule;
 import org.junit.Test;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Relation;
-import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
-import org.openstreetmap.josm.plugins.pt_assistant.ImportUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteDataManager;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
+import org.openstreetmap.josm.testutils.JOSMTestRules;
 
-public class SegmentCheckerTest extends AbstractTest {
+public class SegmentCheckerTest {
+
+    @Rule
+    public JOSMTestRules rules = new JOSMTestRules();
 
     @Test
     public void test() {
-        File file = new File(AbstractTest.PATH_TO_SEGMENT_TEST);
-        DataSet ds = ImportUtils.importOsmFile(file, "testLayer");
+        DataSet ds = TestFiles.importOsmFile(TestFiles.SEGMENT_TEST(), "testLayer");
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
 
         Relation route = null;

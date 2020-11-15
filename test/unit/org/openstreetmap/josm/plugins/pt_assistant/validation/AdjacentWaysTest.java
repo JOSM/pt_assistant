@@ -3,26 +3,27 @@ package org.openstreetmap.josm.plugins.pt_assistant.validation;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
-import org.openstreetmap.josm.plugins.pt_assistant.ImportUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
+import org.openstreetmap.josm.testutils.JOSMTestRules;
 
-public class AdjacentWaysTest extends AbstractTest {
+public class AdjacentWaysTest {
+
+    @Rule
+    public JOSMTestRules rules = new JOSMTestRules();
 
     @Test
     public void test1() {
-
-        File file = new File(AbstractTest.PATH_TO_ONEWAY_WRONG_DIRECTION);
-        DataSet ds = ImportUtils.importOsmFile(file, "testLayer");
+        DataSet ds = TestFiles.importOsmFile(TestFiles.ONEWAY_WRONG_DIRECTION(), "testLayer");
 
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
         long id = 24215210;
@@ -47,8 +48,7 @@ public class AdjacentWaysTest extends AbstractTest {
     @Test
     public void test2() {
 
-        File file = new File(AbstractTest.PATH_TO_ONEWAY_WRONG_DIRECTION2);
-        DataSet ds = ImportUtils.importOsmFile(file, "testLayer");
+        DataSet ds = TestFiles.importOsmFile(TestFiles.ONEWAY_WRONG_DIRECTION2(), "testLayer");
 
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
         long id = 24215210;

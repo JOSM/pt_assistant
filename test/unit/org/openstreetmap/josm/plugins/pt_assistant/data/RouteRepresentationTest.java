@@ -5,12 +5,13 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
+import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 /**
  * Tests if the representation of a route relation is created correctly in the
@@ -19,7 +20,10 @@ import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
  * @author darya
  *
  */
-public class RouteRepresentationTest extends AbstractTest {
+public class RouteRepresentationTest {
+
+    @Rule
+    public JOSMTestRules rules = new JOSMTestRules();
 
     @Test
     public void correctRouteTest() {

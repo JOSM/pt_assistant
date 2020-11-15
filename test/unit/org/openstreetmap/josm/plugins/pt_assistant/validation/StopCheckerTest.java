@@ -1,25 +1,26 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.validation;
 
-import java.io.File;
-
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Relation;
-import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
-import org.openstreetmap.josm.plugins.pt_assistant.ImportUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
+import org.openstreetmap.josm.testutils.JOSMTestRules;
 
-public class StopCheckerTest extends AbstractTest {
+public class StopCheckerTest {
+
+    @Rule
+    public JOSMTestRules rules = new JOSMTestRules();
 
     @Test
     public void nodePartOfStopAreaTest() {
 
         // check if stop positions or platforms are in any stop_area relation:
 
-        File file = new File(AbstractTest.PATH_TO_STOP_AREA_MEMBERS);
-        DataSet ds = ImportUtils.importOsmFile(file, "testLayer");
+        DataSet ds = TestFiles.importOsmFile(TestFiles.STOP_AREA_MEMBERS(), "testLayer");
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
         Node node = null;
 
@@ -41,8 +42,7 @@ public class StopCheckerTest extends AbstractTest {
 
         // Check if stop positions belong the same routes as related platform(s)
 
-        File file = new File(AbstractTest.PATH_TO_STOP_AREA_RELATIONS);
-        DataSet ds = ImportUtils.importOsmFile(file, "testLayer");
+        DataSet ds = TestFiles.importOsmFile(TestFiles.STOP_AREA_RELATIONS(), "testLayer");
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
         Relation stopArea = null;
 
@@ -63,9 +63,7 @@ public class StopCheckerTest extends AbstractTest {
     public void stopAreaStopPositionTest() {
 
         // Check if stop area relation has at least one stop position.
-
-        File file = new File(AbstractTest.PATH_TO_STOP_AREA_NO_STOPS);
-        DataSet ds = ImportUtils.importOsmFile(file, "testLayer");
+        DataSet ds = TestFiles.importOsmFile(TestFiles.STOP_AREA_NO_STOPS(), "testLayer");
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
         Relation stopArea = null;
 
@@ -86,9 +84,7 @@ public class StopCheckerTest extends AbstractTest {
     public void stopAreaPlatformTest() {
 
         // Check if stop area relation has at least one platform.
-
-        File file = new File(AbstractTest.PATH_TO_STOP_AREA_NO_PLATFORMS);
-        DataSet ds = ImportUtils.importOsmFile(file, "testLayer");
+        DataSet ds = TestFiles.importOsmFile(TestFiles.STOP_AREA_NO_PLATFORMS(), "testLayer");
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
         Relation stopArea = null;
 

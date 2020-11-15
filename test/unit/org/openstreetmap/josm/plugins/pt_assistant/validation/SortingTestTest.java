@@ -3,23 +3,25 @@ package org.openstreetmap.josm.plugins.pt_assistant.validation;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.validation.TestError;
-import org.openstreetmap.josm.plugins.pt_assistant.AbstractTest;
-import org.openstreetmap.josm.plugins.pt_assistant.ImportUtils;
+import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
+import org.openstreetmap.josm.testutils.JOSMTestRules;
 
-public class SortingTestTest extends AbstractTest {
+public class SortingTestTest {
+
+    @Rule
+    public JOSMTestRules rules = new JOSMTestRules();
 
     @Test
     public void sortingTestBeforeFile() {
-        File file = new File(AbstractTest.PATH_TO_DL131_BEFORE);
-        DataSet ds = ImportUtils.importOsmFile(file, "testLayer");
+        DataSet ds = TestFiles.importOsmFile(TestFiles.DL131_BEFORE(), "testLayer");
 
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
 
@@ -39,8 +41,7 @@ public class SortingTestTest extends AbstractTest {
 
     @Test
     public void sortingTestAfterFile() {
-        File file = new File(AbstractTest.PATH_TO_DL131_AFTER);
-        DataSet ds = ImportUtils.importOsmFile(file, "testLayer");
+        DataSet ds = TestFiles.importOsmFile(TestFiles.DL131_AFTER(), "testLayer");
 
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
 
@@ -78,8 +79,7 @@ public class SortingTestTest extends AbstractTest {
 
     @Test
     public void overshootTestAfterFile() {
-        File file = new File(AbstractTest.PATH_TO_DL286_AFTER);
-        DataSet ds = ImportUtils.importOsmFile(file, "testLayer");
+        DataSet ds = TestFiles.importOsmFile(TestFiles.DL286_AFTER(), "testLayer");
 
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
 
