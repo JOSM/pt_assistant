@@ -28,8 +28,8 @@ public class TrolleyBusTransportMode extends BusTransportMode {
 
     @Override
     public ImageProvider getIcon() {
-        return PTIcons.BUS;
-    } // TODO: find proper icon
+        return PTIcons.TROLLEY_BUS;
+    }
 
     @Override
     public String getName() {
