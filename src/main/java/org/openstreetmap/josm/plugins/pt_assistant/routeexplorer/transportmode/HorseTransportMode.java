@@ -1,4 +1,5 @@
-package org.openstreetmap.josm.plugins.pt_assistant.actions.routinghelper;
+// License: GPL. For details, see LICENSE file.
+package org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.transportmode;
 
 import java.util.List;
 import java.util.Objects;
@@ -13,31 +14,34 @@ import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.WayTraversalDirection;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.PTIcons;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 
-public class PedestrianTransportMode implements ITransportMode {
+public class HorseTransportMode implements ITransportMode {
 
-    private static final List<String> suitableHighwaysForPedestrians = Stream.concat(
+    private static final List<String> suitableHighwaysForHorseRiders = Stream.concat(
         // This list is ordered from most suitable to least suitable
         Stream.of(
-            "pedestrian", "footway", "path", "track", "living_street", "residential",
-            "unclassified", "cyclestreet", "service", "cycleway", "bridleway"
+            "bridleway", "pedestrian", "footway", "path", "track", "living_street", "residential",
+            "unclassified", "cyclestreet", "service", "cycleway"
         ),
         Stream.of("tertiary", "secondary", "primary", "trunk").flatMap(it -> Stream.of(it, it + "_link"))
     ).collect(Collectors.toList());
+
+    protected HorseTransportMode() {
+        // should only be instantiable in `ITransportMode`
+    }
 
     @Override
     public boolean canTraverseWay(@NotNull final IWay<?> way, @NotNull final WayTraversalDirection direction) {
         final String onewayValue = way.get("oneway");
         return
-            !way.hasTag("foot", "no")
-            && (way.hasTag("highway", suitableHighwaysForPedestrians) || way.hasTag("foot", "yes"))
+            !way.hasTag("horse", "no")
+            && (way.hasTag("highway", suitableHighwaysForHorseRiders) || way.hasTag("horse", "yes"))
             && (
                 onewayValue == null
-                || "no".equals(way.get("foot:backward"))
-                || "no".equals(way.get("oneway:foot"))
                 || ("yes".equals(onewayValue) && direction == WayTraversalDirection.FORWARD)
                 || ("-1".equals(onewayValue) && direction == WayTraversalDirection.BACKWARD)
             );
@@ -45,7 +49,7 @@ public class PedestrianTransportMode implements ITransportMode {
 
     @Override
     public boolean canBeUsedForRelation(@NotNull final IRelation<?> relation) {
-        return relation.hasTag("type", "route") && relation.hasTag("route", "foot", "walking", "hiking");
+        return relation.hasTag("type", "route") && relation.hasTag("route", "horse");
     }
 
     @Override
@@ -70,11 +74,11 @@ public class PedestrianTransportMode implements ITransportMode {
 
     @Override
     public ImageProvider getIcon() {
-        return PTIcons.PEDESTRIAN;
+        return PTIcons.HORSE;
     }
 
     @Override
     public String getName() {
-        return I18n.marktr("pedestrian");
+        return I18n.marktr("equestrian");
     }
 }

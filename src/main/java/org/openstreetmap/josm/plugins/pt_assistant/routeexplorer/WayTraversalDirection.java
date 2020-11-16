@@ -1,4 +1,5 @@
-package org.openstreetmap.josm.plugins.pt_assistant.actions.routinghelper;
+// License: GPL. For details, see LICENSE file.
+package org.openstreetmap.josm.plugins.pt_assistant.routeexplorer;
 
 import java.util.function.Function;
 

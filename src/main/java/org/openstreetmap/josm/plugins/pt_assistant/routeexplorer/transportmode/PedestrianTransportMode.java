@@ -1,4 +1,5 @@
-package org.openstreetmap.josm.plugins.pt_assistant.actions.routinghelper;
+// License: GPL. For details, see LICENSE file.
+package org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.transportmode;
 
 import java.util.List;
 import java.util.Objects;
@@ -13,27 +14,36 @@ import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.WayTraversalDirection;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.PTIcons;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 
-public class BicycleTransportMode implements ITransportMode {
+public class PedestrianTransportMode implements ITransportMode {
 
-    private static final List<String> suitableHighwaysForBicycle = Stream.concat(
+    private static final List<String> suitableHighwaysForPedestrians = Stream.concat(
         // This list is ordered from most suitable to least suitable
-        Stream.of("cycleway", "cyclestreet", "path", "residential", "unclassified", "service", "track", "living_street"),
+        Stream.of(
+            "pedestrian", "footway", "path", "track", "living_street", "residential",
+            "unclassified", "cyclestreet", "service", "cycleway", "bridleway"
+        ),
         Stream.of("tertiary", "secondary", "primary", "trunk").flatMap(it -> Stream.of(it, it + "_link"))
     ).collect(Collectors.toList());
+
+    protected PedestrianTransportMode() {
+        // should only be instantiable in `ITransportMode`
+    }
 
     @Override
     public boolean canTraverseWay(@NotNull final IWay<?> way, @NotNull final WayTraversalDirection direction) {
         final String onewayValue = way.get("oneway");
         return
-            !way.hasTag("bicycle", "no")
-            && (way.hasTag("highway", suitableHighwaysForBicycle) || way.hasTag("bicycle", "yes"))
+            !way.hasTag("foot", "no")
+            && (way.hasTag("highway", suitableHighwaysForPedestrians) || way.hasTag("foot", "yes"))
             && (
                 onewayValue == null
-                || "no".equals(way.get("oneway:bicycle"))
+                || "no".equals(way.get("foot:backward"))
+                || "no".equals(way.get("oneway:foot"))
                 || ("yes".equals(onewayValue) && direction == WayTraversalDirection.FORWARD)
                 || ("-1".equals(onewayValue) && direction == WayTraversalDirection.BACKWARD)
             );
@@ -41,7 +51,7 @@ public class BicycleTransportMode implements ITransportMode {
 
     @Override
     public boolean canBeUsedForRelation(@NotNull final IRelation<?> relation) {
-        return relation.hasTag("type", "route") && relation.hasTag("route", "bicycle");
+        return relation.hasTag("type", "route") && relation.hasTag("route", "foot", "walking", "hiking");
     }
 
     @Override
@@ -49,15 +59,14 @@ public class BicycleTransportMode implements ITransportMode {
         final Set<Relation> restrictionRelations = from.getReferrers().stream()
             .map(it -> it.getType() == OsmPrimitiveType.RELATION ? (Relation) it : null)
             .filter(Objects::nonNull)
-            .filter(it -> "restriction".equals(it.get("type")) || "restriction:bicycle".equals(it.get("type")))
+            .filter(it -> "restriction".equals(it.get("type")))
             .filter(it -> it.findRelationMembers("from").contains(from))
             .filter(it -> it.findRelationMembers("via").contains(via))
             .filter(it -> it.findRelationMembers("to").contains(to))
             .collect(Collectors.toSet());
         for (Relation restrictionRelation : restrictionRelations) {
             final String restriction = restrictionRelation.get("restriction");
-            final String except = restrictionRelation.get("except");
-            if (restriction.startsWith("no_") && !except.contains("bicycle")) {
+            if (restriction.startsWith("no_")) {
                 return false;
             }
         }
@@ -67,11 +76,11 @@ public class BicycleTransportMode implements ITransportMode {
 
     @Override
     public ImageProvider getIcon() {
-        return PTIcons.BICYCLE;
+        return PTIcons.PEDESTRIAN;
     }
 
     @Override
     public String getName() {
-        return I18n.marktr("bicycle");
+        return I18n.marktr("pedestrian");
     }
 }

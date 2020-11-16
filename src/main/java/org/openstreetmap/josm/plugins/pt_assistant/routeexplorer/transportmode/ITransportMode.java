@@ -1,14 +1,28 @@
-package org.openstreetmap.josm.plugins.pt_assistant.actions.routinghelper;
+// License: GPL. For details, see LICENSE file.
+package org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.transportmode;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.drew.lang.annotations.NotNull;
 import org.openstreetmap.josm.data.osm.IRelation;
 import org.openstreetmap.josm.data.osm.IWay;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.WayTraversalDirection;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 public interface ITransportMode {
+    Set<ITransportMode> TRANSPORT_MODES = Stream.of(
+        new BicycleTransportMode(),
+        new BusTransportMode(),
+        new HorseTransportMode(),
+        new PedestrianTransportMode(),
+        new TrolleyBusTransportMode()
+    ).collect(Collectors.toSet());
+
     /**
      * Just a convenience method for {@link #canTraverseWay(IWay, WayTraversalDirection)} that assumes {@link WayTraversalDirection#FORWARD}
      * @param way the way for which we check, if it can be traversed by the transport mode

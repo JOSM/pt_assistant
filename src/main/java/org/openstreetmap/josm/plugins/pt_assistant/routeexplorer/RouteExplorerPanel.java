@@ -1,4 +1,5 @@
-package org.openstreetmap.josm.plugins.pt_assistant.actions.routinghelper;
+// License: GPL. For details, see LICENSE file.
+package org.openstreetmap.josm.plugins.pt_assistant.routeexplorer;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -24,6 +25,7 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.dialogs.relation.GenericRelationEditor;
 import org.openstreetmap.josm.gui.util.HighlightHelper;
+import org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.transportmode.ITransportMode;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.BoundsUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.ColorPalette;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.GuiUtils;
@@ -33,9 +35,9 @@ import org.openstreetmap.josm.tools.ImageProvider;
 
 /**
  * The top panel that is added via {@link MapFrame#addTopPanel(Component)}.
- * This class should just handle the display and input. The state of the routing helper should be handled in {@link RoutingHelperAction}.
+ * This class should just handle the display and input. The state of the routing helper should be handled in {@link RouteExplorer}.
  */
-public class RoutingHelperPanel extends JPanel {
+public class RouteExplorerPanel extends JPanel {
 
     private final HighlightHelper highlighter = new HighlightHelper();
 
@@ -52,7 +54,7 @@ public class RoutingHelperPanel extends JPanel {
 
     private final JPanel wayTraversalPanel;
 
-    public RoutingHelperPanel(@NotNull final RoutingHelperAction routingHelperAction) {
+    public RouteExplorerPanel(@NotNull final RouteExplorer routingHelperAction) {
         this.defaultPanel = createDefaultPanel(routingHelperAction);
         this.wayTraversalPanel = createWayTraversalPanel(
             routingHelperAction,
@@ -70,7 +72,7 @@ public class RoutingHelperPanel extends JPanel {
         closeButton.setToolTipText(I18n.tr("Close the routing helper"));
         closeButton.addActionListener(__ ->
             Optional.ofNullable(MainApplication.getMap())
-                .ifPresent(map -> map.removeTopPanel(RoutingHelperPanel.class))
+                .ifPresent(map -> map.removeTopPanel(RouteExplorerPanel.class))
         );
 
         final JPanel mainPanel = GuiUtils.createJPanel(new BorderLayout());
@@ -136,7 +138,7 @@ public class RoutingHelperPanel extends JPanel {
      * Initializes the panel shown when traversing the ways one by one
      */
     private static JPanel createWayTraversalPanel(
-        final RoutingHelperAction routingHelperAction,
+        final RouteExplorer routingHelperAction,
         final JLabel activeWayLabel,
         final JLabel previousWayConnectionLabel,
         final JLabel nextWayConnectionLabel,
@@ -176,7 +178,7 @@ public class RoutingHelperPanel extends JPanel {
         return wayTraversalPanel;
     }
 
-    private static JPanel createDefaultPanel(final RoutingHelperAction routingHelperAction) {
+    private static JPanel createDefaultPanel(final RouteExplorer routingHelperAction) {
         return GuiUtils.createJPanel(
             new FlowLayout(FlowLayout.CENTER),
             GuiUtils.createJButton(

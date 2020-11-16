@@ -1,11 +1,9 @@
-package org.openstreetmap.josm.plugins.pt_assistant.actions.routinghelper;
+// License: GPL. For details, see LICENSE file.
+package org.openstreetmap.josm.plugins.pt_assistant.routeexplorer;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -22,18 +20,17 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.Notification;
 import org.openstreetmap.josm.gui.dialogs.relation.DownloadRelationMemberTask;
+import org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.transportmode.ITransportMode;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.DialogUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 import org.openstreetmap.josm.tools.I18n;
 
-public class RoutingHelperAction implements DataSelectionListener {
-    private static final Set<ITransportMode> TRANSPORT_MODES = new HashSet<>(Arrays.asList(new BicycleTransportMode(), new BusTransportMode()));
-
+public class RouteExplorer implements DataSelectionListener {
     @NotNull
     private Optional<ITransportMode> activeTransportMode = Optional.empty();
 
-    private final RoutingHelperPanel routingHelperPanel = new RoutingHelperPanel(this);
+    private final RouteExplorerPanel routingHelperPanel = new RouteExplorerPanel(this);
 
     @NotNull
     private Optional<Relation> currentRelation = Optional.empty();
@@ -42,7 +39,7 @@ public class RoutingHelperAction implements DataSelectionListener {
     private Optional<RelationMember> currentMember = Optional.empty();
 
     @Override
-    public void selectionChanged(SelectionChangeEvent event) {
+    public void selectionChanged(final SelectionChangeEvent event) {
         final MapFrame mapframe = MainApplication.getMap();
         if (mapframe != null) {
             final Optional<Relation> singleRelationSelection = Optional.of(event.getSelection())
@@ -51,14 +48,14 @@ public class RoutingHelperAction implements DataSelectionListener {
                 .map(selectedPrimitive -> selectedPrimitive instanceof Relation ? (Relation) selectedPrimitive : null)
                 .filter(RouteUtils::isRoute);
             this.currentRelation = singleRelationSelection;
-            this.activeTransportMode = currentRelation.flatMap(relation -> TRANSPORT_MODES.stream().filter(it -> it.canBeUsedForRelation(relation)).findFirst());
+            this.activeTransportMode = currentRelation.flatMap(relation -> ITransportMode.TRANSPORT_MODES.stream().filter(it -> it.canBeUsedForRelation(relation)).findFirst());
             if (singleRelationSelection.isPresent()) {
                 routingHelperPanel.onRelationChange(singleRelationSelection.get(), activeTransportMode);
-                if (mapframe.getTopPanel(RoutingHelperPanel.class) == null) {
+                if (mapframe.getTopPanel(RouteExplorerPanel.class) == null) {
                     mapframe.addTopPanel(routingHelperPanel);
                 }
             } else {
-                mapframe.removeTopPanel(RoutingHelperPanel.class);
+                mapframe.removeTopPanel(RouteExplorerPanel.class);
             }
         }
     }
@@ -119,13 +116,13 @@ public class RoutingHelperAction implements DataSelectionListener {
                 routingHelperPanel.onCurrentWayChange(
                     currentRelation.get(),
                     wayMembers.get(0),
-                    RoutingHelperPanel.ConnectionType.END,
+                    RouteExplorerPanel.ConnectionType.END,
                     wayMembers.size() == 1
-                        ? RoutingHelperPanel.ConnectionType.END
+                        ? RouteExplorerPanel.ConnectionType.END
                         : (
                             WayUtils.isTouchingOtherWay(wayMembers.get(0).getWay(), wayMembers.get(1).getWay())
-                                ? RoutingHelperPanel.ConnectionType.CONNECTED
-                                : RoutingHelperPanel.ConnectionType.NOT_CONNECTED
+                                ? RouteExplorerPanel.ConnectionType.CONNECTED
+                                : RouteExplorerPanel.ConnectionType.NOT_CONNECTED
                         ),
                     0,
                     wayMembers.size()
@@ -158,15 +155,15 @@ public class RoutingHelperAction implements DataSelectionListener {
                     routingHelperPanel.onCurrentWayChange(
                         relation,
                         wayMembers.get(targetIndex),
-                        targetIndex <= 0 ? RoutingHelperPanel.ConnectionType.END : (
+                        targetIndex <= 0 ? RouteExplorerPanel.ConnectionType.END : (
                             WayUtils.isTouchingOtherWay(wayMembers.get(targetIndex).getWay(), wayMembers.get(targetIndex - 1).getWay())
-                                ? RoutingHelperPanel.ConnectionType.CONNECTED
-                                : RoutingHelperPanel.ConnectionType.NOT_CONNECTED
+                                ? RouteExplorerPanel.ConnectionType.CONNECTED
+                                : RouteExplorerPanel.ConnectionType.NOT_CONNECTED
                         ),
-                        targetIndex >= wayMembers.size() - 1 ? RoutingHelperPanel.ConnectionType.END : (
+                        targetIndex >= wayMembers.size() - 1 ? RouteExplorerPanel.ConnectionType.END : (
                             WayUtils.isTouchingOtherWay(wayMembers.get(targetIndex).getWay(), wayMembers.get(targetIndex + 1).getWay())
-                                ? RoutingHelperPanel.ConnectionType.CONNECTED
-                                : RoutingHelperPanel.ConnectionType.NOT_CONNECTED
+                                ? RouteExplorerPanel.ConnectionType.CONNECTED
+                                : RouteExplorerPanel.ConnectionType.NOT_CONNECTED
                         ),
                         targetIndex,
                         wayMembers.size()
@@ -179,5 +176,4 @@ public class RoutingHelperAction implements DataSelectionListener {
     public void goToNextGap() {
         JOptionPane.showMessageDialog(routingHelperPanel, "Not implemented yet", "Not implemented", JOptionPane.ERROR_MESSAGE);
     }
-
 }
