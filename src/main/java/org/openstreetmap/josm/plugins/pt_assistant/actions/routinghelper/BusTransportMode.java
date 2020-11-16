@@ -1,13 +1,10 @@
 package org.openstreetmap.josm.plugins.pt_assistant.actions.routinghelper;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.swing.Icon;
+import java.util.stream.Stream;
 
 import com.drew.lang.annotations.NotNull;
 import org.openstreetmap.josm.data.osm.IRelation;
@@ -21,28 +18,30 @@ import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 public class BusTransportMode implements ITransportMode {
+
+    private static final List<String> suitableHighwaysForBus = Stream.concat(
+        Stream.of("unclassified", "residential", "service", "living_street", "cyclestreet"),
+        Stream.of("motorway", "trunk", "primary", "secondary", "tertiary").flatMap(it -> Stream.of(it, it + "_link"))
+    ).collect(Collectors.toList());
+
     @Override
     public boolean canTraverseWay(@NotNull final IWay<?> way, @NotNull final WayTraversalDirection direction) {
         final String onewayValue = way.get("oneway");
-        List<String> majorHighways = Arrays.asList(
-            "motorway", "trunk", "primary", "secondary", "tertiary");
-        majorHighways.forEach(v -> majorHighways.add(String.format("%s_link", v)));
-        List<String> suitableHighwaysForBus = Arrays.asList(
-            "unclassified", "residential", "service", "living_street", "cyclestreet");
-        suitableHighwaysForBus.addAll(majorHighways); // TODO do this only once when plugin starts
-        return (way.hasTag("highway", suitableHighwaysForBus) ||
-                    way.hasTag("psv", "yes") || way.hasTag ("bus", "yes"))
-            && (
-            onewayValue == null || "no".equals(way.get("oneway:bus")) ||
-                ("yes".equals(onewayValue) && direction == WayTraversalDirection.FORWARD) ||
-                ("-1".equals(onewayValue) && direction == WayTraversalDirection.BACKWARD)
+        return (
+            way.hasTag("highway", suitableHighwaysForBus)
+            || way.hasTag("psv", "yes") || way.hasTag ("bus", "yes")
+        )
+        && (
+            onewayValue == null
+            || "no".equals(way.get("oneway:bus"))
+            || ("yes".equals(onewayValue) && direction == WayTraversalDirection.FORWARD)
+            || ("-1".equals(onewayValue) && direction == WayTraversalDirection.BACKWARD)
         );
     }
 
     @Override
     public boolean canBeUsedForRelation(@NotNull final IRelation<?> relation) {
-        return relation.hasTag("type", "route") && relation.hasTag("route",
-            "bus", "coach", "minibus");
+        return relation.hasTag("type", "route") && relation.hasTag("route", "bus", "coach", "minibus");
     }
 
     @Override
