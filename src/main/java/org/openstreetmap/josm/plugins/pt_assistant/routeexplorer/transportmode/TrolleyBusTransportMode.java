@@ -12,6 +12,9 @@ import org.openstreetmap.josm.tools.ImageProvider;
 public class TrolleyBusTransportMode extends BusTransportMode {
     protected TrolleyBusTransportMode() {
         // should only be instantiable in `ITransportMode`
+        modeOfTransport = "trolleybus";
+        additionalTypeForTurnRestriction = "trolleybus";
+        oneWayExceptionFor = "psv";
     }
 
     @Override

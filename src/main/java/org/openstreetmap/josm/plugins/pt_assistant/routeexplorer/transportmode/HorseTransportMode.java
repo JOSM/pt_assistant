@@ -2,26 +2,20 @@
 package org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.transportmode;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.drew.lang.annotations.NotNull;
 import org.openstreetmap.josm.data.osm.IRelation;
 import org.openstreetmap.josm.data.osm.IWay;
-import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
-import org.openstreetmap.josm.data.osm.Relation;
-import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.WayTraversalDirection;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.PTIcons;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 
-public class HorseTransportMode implements ITransportMode {
+public class HorseTransportMode extends AbstractTransportMode {
 
-    private static final List<String> suitableHighwaysForHorseRiders = Stream.concat(
+    private static final List<String> suitableHighways = Stream.concat(
         // This list is ordered from most suitable to least suitable
         Stream.of(
             "bridleway", "pedestrian", "footway", "path", "track", "living_street", "residential",
@@ -32,6 +26,7 @@ public class HorseTransportMode implements ITransportMode {
 
     protected HorseTransportMode() {
         // should only be instantiable in `ITransportMode`
+        modeOfTransport = "horse";
     }
 
     @Override
@@ -39,7 +34,7 @@ public class HorseTransportMode implements ITransportMode {
         final String onewayValue = way.get("oneway");
         return
             !way.hasTag("horse", "no")
-            && (way.hasTag("highway", suitableHighwaysForHorseRiders) || way.hasTag("horse", "yes"))
+            && (way.hasTag("highway", suitableHighways) || way.hasTag("horse", "yes"))
             && (
                 onewayValue == null
                 || ("yes".equals(onewayValue) && direction == WayTraversalDirection.FORWARD)
@@ -49,27 +44,7 @@ public class HorseTransportMode implements ITransportMode {
 
     @Override
     public boolean canBeUsedForRelation(@NotNull final IRelation<?> relation) {
-        return relation.hasTag("type", "route") && relation.hasTag("route", "horse");
-    }
-
-    @Override
-    public boolean canTurn(@NotNull final Way from, @NotNull final Node via, @NotNull final Way to) {
-        final Set<Relation> restrictionRelations = from.getReferrers().stream()
-            .map(it -> it.getType() == OsmPrimitiveType.RELATION ? (Relation) it : null)
-            .filter(Objects::nonNull)
-            .filter(it -> "restriction".equals(it.get("type")))
-            .filter(it -> it.findRelationMembers("from").contains(from))
-            .filter(it -> it.findRelationMembers("via").contains(via))
-            .filter(it -> it.findRelationMembers("to").contains(to))
-            .collect(Collectors.toSet());
-        for (Relation restrictionRelation : restrictionRelations) {
-            final String restriction = restrictionRelation.get("restriction");
-            if (restriction.startsWith("no_")) {
-                return false;
-            }
-        }
-
-        return from.containsNode(via) && to.containsNode(via);
+        return relation.hasTag("route", "horse") && super.canBeUsedForRelation(relation);
     }
 
     @Override

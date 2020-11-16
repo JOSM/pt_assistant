@@ -19,56 +19,31 @@ import org.openstreetmap.josm.plugins.pt_assistant.utils.PTIcons;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
 
-public class BusTransportMode implements ITransportMode {
+public class BusTransportMode extends AbstractTransportMode {
 
-    private static final List<String> suitableHighwaysForBus = Stream.concat(
+    private static final List<String> suitableHighways = Stream.concat(
         Stream.of("unclassified", "residential", "service", "living_street", "cyclestreet"),
-        Stream.of("motorway", "trunk", "primary", "secondary", "tertiary").flatMap(it -> Stream.of(it, it + "_link"))
+        Stream.of("tertiary", "secondary", "primary", "trunk", "motorway").flatMap(it -> Stream.of(it, it + "_link"))
     ).collect(Collectors.toList());
 
     protected BusTransportMode() {
         // should only be instantiable in `ITransportMode`
+        modeOfTransport = "bus";
+        additionalTypeForTurnRestriction = "bus";
+        oneWayExceptionFor = "psv"; // TODO turn these 2 into lists, so they can also check for "oneway:bus", "except"="psv"
     }
 
     @Override
     public boolean canTraverseWay(@NotNull final IWay<?> way, @NotNull final WayTraversalDirection direction) {
-        final String onewayValue = way.get("oneway");
-        return (
-            way.hasTag("highway", suitableHighwaysForBus)
-            || way.hasTag("psv", "yes") || way.hasTag ("bus", "yes")
-        )
-        && (
-            onewayValue == null
-            || "no".equals(way.get("oneway:bus"))
-            || ("yes".equals(onewayValue) && direction == WayTraversalDirection.FORWARD)
-            || ("-1".equals(onewayValue) && direction == WayTraversalDirection.BACKWARD)
-        );
+        return ( way.hasTag("highway", suitableHighways)
+              || way.hasTag("psv", "yes")
+              || way.hasTag ("bus", "yes"))
+            && canTraverseWay(way, direction);
     }
 
     @Override
     public boolean canBeUsedForRelation(@NotNull final IRelation<?> relation) {
-        return relation.hasTag("type", "route") && relation.hasTag("route", "bus", "coach", "minibus");
-    }
-
-    @Override
-    public boolean canTurn(@NotNull final Way from, @NotNull final Node via, @NotNull final Way to) {
-        final Set<Relation> restrictionRelations = from.getReferrers().stream()
-            .map(it -> it.getType() == OsmPrimitiveType.RELATION ? (Relation) it : null)
-            .filter(Objects::nonNull)
-            .filter(it -> "restriction".equals(it.get("type")) || "restriction:bus".equals(it.get("type")))
-            .filter(it -> it.findRelationMembers("from").contains(from))
-            .filter(it -> it.findRelationMembers("via").contains(via))
-            .filter(it -> it.findRelationMembers("to").contains(to))
-            .collect(Collectors.toSet());
-        for (Relation restrictionRelation : restrictionRelations) {
-            final String restriction = restrictionRelation.get("restriction");
-            final String except = restrictionRelation.get("except");
-            if (restriction.startsWith("no_") && !except.contains("psv")) {
-                return false;
-            }
-        }
-
-        return from.containsNode(via) && to.containsNode(via);
+        return relation.hasTag("route", "bus", "coach", "minibus") && super.canBeUsedForRelation(relation);
     }
 
     @Override
