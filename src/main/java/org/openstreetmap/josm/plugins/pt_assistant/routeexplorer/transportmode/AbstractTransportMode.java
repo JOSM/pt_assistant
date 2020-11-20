@@ -2,6 +2,7 @@ package org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.transportmode;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -11,6 +12,7 @@ import com.drew.lang.annotations.NotNull;
 import org.openstreetmap.josm.data.osm.IRelation;
 import org.openstreetmap.josm.data.osm.IWay;
 import org.openstreetmap.josm.data.osm.Node;
+import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
@@ -40,15 +42,15 @@ public abstract class AbstractTransportMode implements ITransportMode {
     @Override
     public boolean canTurn(@NotNull final Way from, @NotNull final Node via, @NotNull final Way to) {
         List<String> types = new java.util.ArrayList<>(Collections.singletonList("restriction"));
-        if (!additionalTypesForTurnRestriction.equals("")) types.add("restriction:" + additionalTypesForTurnRestriction);
+        Arrays.stream(additionalTypesForTurnRestriction).map(at -> "restriction:" + at).forEach(types::add);
         final Set<Relation> restrictionRelations = from.getReferrers().stream()
             .map(it -> it.getType() == OsmPrimitiveType.RELATION ? (Relation) it : null)
-            .filter(Objects::nonNull)
-            .filter(it -> it.hasTag("type", types))
-            .filter(it -> it.findRelationMembers("from").contains(from))
-            .filter(it -> it.findRelationMembers("via").contains(via))
-            .filter(it -> it.findRelationMembers("to").contains(to))
-            .collect(Collectors.toSet());
+            .filter(relation ->
+                relation != null && types.contains(relation.get("type"))
+                && relation.findRelationMembers("from").contains(from)
+                && relation.findRelationMembers("via").contains(via)
+                && relation.findRelationMembers("to").contains(to)
+            ).collect(Collectors.toSet());
         for (Relation restrictionRelation : restrictionRelations) {
             final String restriction = restrictionRelation.get("restriction");
             final String except = ("".equals(modeOfTransport)) ? restrictionRelation.get("except") : "";

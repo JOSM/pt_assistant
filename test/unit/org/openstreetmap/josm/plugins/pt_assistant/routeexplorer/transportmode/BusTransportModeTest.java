@@ -7,8 +7,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.WayTraversalDirection.*;
 
+import org.openstreetmap.josm.data.coor.LatLon;
+import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Relation;
+import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.testutils.JOSMTestRules;
 
@@ -189,5 +192,68 @@ public class BusTransportModeTest {
 
     @Test
     public void testCanTurn() {
+        DataSet ds = new DataSet();
+        Node n1 = new Node();
+        Node n2 = new Node();
+        Node n3 = new Node();
+        n1.setCoor(new LatLon(50.0, 2.0));
+        n2.setCoor(new LatLon(50.1, 2.1));
+        n3.setCoor(new LatLon(50.2, 2.2));
+
+        Way w12 = new Way();
+        w12.addNode(n1);
+        w12.addNode(n2);
+
+        Way w23 = new Way();
+        w23.addNode(n2);
+        w23.addNode(n3);
+
+        Relation turnRestriction = new Relation();
+        turnRestriction.put("type", "restriction");
+
+        RelationMember rm1 = new RelationMember("", w12);
+        RelationMember rm2 = new RelationMember("", w23);
+
+        ds.addPrimitive(n1);
+        ds.addPrimitive(n2);
+        ds.addPrimitive(n3);
+        ds.addPrimitive(w12);
+        ds.addPrimitive(w23);
+        ds.addPrimitive(turnRestriction);
+
+        String[] noRestrictionTypes = {"no_right_turn", "no_left_turn", "no_u_turn", "no_straight_on", "no_entry", "no_exit"};
+        String[] onlyRestrictionTypes = {"only_right_turn", "only_left_turn", "only_u_turn", "only_straight_on"};
+        String[] appliesForOtherModeOfTransport = {"hgv", "caravan", "motorcar", "agricultural", "motorcycle", "bicycle", "hazmat"};
+        String[] exceptForOtherModeOfTransport = {"bicycle", "hgv", "motorcar", "emergency"};
+        String[] exceptForThisModeOfTransport = {"bus", "psv"};
+
+        for (String noType : noRestrictionTypes) {
+            Relation rel = new Relation(turnRestriction);
+            rel.addMember(rm1);
+            rel.addMember(rm2);
+            for (String mot : appliesForOtherModeOfTransport) {
+                rel.put("restriction:" + mot, noType);
+                assertTrue(transportMode.canTurn(w12, n2, w23));
+                rel.remove("restriction:" + mot);
+            }
+            rel.put("restriction:bus", noType);
+            assertFalse(transportMode.canTurn(w12, n2, w23));
+            rel.remove("restriction:bus");
+
+            rel.put("restriction", noType);
+            assertFalse(transportMode.canTurn(w12, n2, w23));
+
+            for (String exc : exceptForOtherModeOfTransport) {
+                rel.put("except", exc);
+                assertFalse(transportMode.canTurn(w12, n2, w23));
+            }
+
+            for (String exc : exceptForThisModeOfTransport) {
+                rel.put("except", exc);
+                assertTrue(transportMode.canTurn(w12, n2, w23));
+            }
+
+        }
+
     }
 }
