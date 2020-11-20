@@ -1,5 +1,6 @@
 package org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.transportmode;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -17,8 +18,8 @@ import org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.WayTraversalDir
 
 public abstract class AbstractTransportMode implements ITransportMode {
     String modeOfTransport = "";
-    String additionalTypeForTurnRestriction = "";
-    String oneWayExceptionFor = "";
+    String[] additionalTypesForTurnRestriction;
+    String[] oneWayExceptionsFor;
 
     @Override
     public boolean canBeUsedForRelation(@NotNull final IRelation<?> relation) {
@@ -27,18 +28,19 @@ public abstract class AbstractTransportMode implements ITransportMode {
 
     @Override
     public boolean canTraverseWay(@NotNull final IWay<?> way, @NotNull final WayTraversalDirection direction) {
-        final String onewayValue = way.get("oneway");
-        final Boolean onewayException = (!"".equals(oneWayExceptionFor)) ? "no".equals(way.get("oneway:" + oneWayExceptionFor)) : false;
-        return onewayValue == null
-                || onewayException
-                || ("yes".equals(onewayValue) && direction == WayTraversalDirection.FORWARD)
-                || ("-1".equals(onewayValue) && direction == WayTraversalDirection.BACKWARD);
+        final String oneway = way.get("oneway");
+        return oneway == null
+                || Arrays.stream(oneWayExceptionsFor)
+                    .map(mode -> way.get("oneway:" + mode))
+                    .anyMatch("no"::equals)
+                || ("yes".equals(oneway) && direction == WayTraversalDirection.FORWARD)
+                || ("-1".equals(oneway) && direction == WayTraversalDirection.BACKWARD);
     }
 
     @Override
     public boolean canTurn(@NotNull final Way from, @NotNull final Node via, @NotNull final Way to) {
         List<String> types = new java.util.ArrayList<>(Collections.singletonList("restriction"));
-        if (!additionalTypeForTurnRestriction.equals("")) types.add("restriction:" + additionalTypeForTurnRestriction);
+        if (!additionalTypesForTurnRestriction.equals("")) types.add("restriction:" + additionalTypesForTurnRestriction);
         final Set<Relation> restrictionRelations = from.getReferrers().stream()
             .map(it -> it.getType() == OsmPrimitiveType.RELATION ? (Relation) it : null)
             .filter(Objects::nonNull)

@@ -16,7 +16,7 @@ public class BusTransportModeTest {
     @Rule
     public JOSMTestRules rules = new JOSMTestRules();
 
-    private static ITransportMode transportMode;
+    private static final ITransportMode transportMode = new BusTransportMode();
 
 //        // Create stops:
 //        Node n1 = new Node();
@@ -86,7 +86,7 @@ public class BusTransportModeTest {
 
     @Test
     public void testCanBeUsedForRelation() {
-        transportMode = new BusTransportMode();
+
         Relation route = new Relation();
         route.put("type", "route");
         route.put("route", "bus");
@@ -151,19 +151,19 @@ public class BusTransportModeTest {
         motorWay.put("highway", "motorway");
 
         Way primaryLinkWay = new Way(w12);
-        primaryWay.put("highway", "primary");
+        primaryLinkWay.put("highway", "primary_link");
 
         Way secondaryLinkWay = new Way(w12);
-        secondaryWay.put("highway", "secondary");
+        secondaryLinkWay.put("highway", "secondary_link");
 
         Way tertiaryLinkWay = new Way(w12);
-        tertiaryWay.put("highway", "tertiary");
+        tertiaryLinkWay.put("highway", "tertiary_link");
 
         Way trunkLinkWay = new Way(w12);
-        trunkWay.put("highway", "trunk");
+        trunkLinkWay.put("highway", "trunk_link");
 
         Way motorWayLinkWay = new Way(w12);
-        motorWay.put("highway", "motorway");
+        motorWayLinkWay.put("highway", "motorway_link");
 
         Way trackWay = new Way(w12);
         trackWay.put("highway", "track");

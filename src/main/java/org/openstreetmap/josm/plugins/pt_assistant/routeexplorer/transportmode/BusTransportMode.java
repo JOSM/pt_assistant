@@ -2,18 +2,12 @@
 package org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.transportmode;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.drew.lang.annotations.NotNull;
 import org.openstreetmap.josm.data.osm.IRelation;
 import org.openstreetmap.josm.data.osm.IWay;
-import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
-import org.openstreetmap.josm.data.osm.Relation;
-import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.WayTraversalDirection;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.PTIcons;
 import org.openstreetmap.josm.tools.I18n;
@@ -29,8 +23,9 @@ public class BusTransportMode extends AbstractTransportMode {
     protected BusTransportMode() {
         // should only be instantiable in `ITransportMode`
         modeOfTransport = "bus";
-        additionalTypeForTurnRestriction = "bus";
-        oneWayExceptionFor = "psv"; // TODO turn these 2 into lists, so they can also check for "oneway:bus", "except"="psv"
+        additionalTypesForTurnRestriction = new String[]{"bus", "psv"};
+        oneWayExceptionsFor = new String[]{"bus", "psv"};
+
     }
 
     @Override
@@ -38,7 +33,7 @@ public class BusTransportMode extends AbstractTransportMode {
         return ( way.hasTag("highway", suitableHighways)
               || way.hasTag("psv", "yes")
               || way.hasTag ("bus", "yes"))
-            && canTraverseWay(way, direction);
+            && super.canTraverseWay(way, direction);
     }
 
     @Override
