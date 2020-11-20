@@ -18,75 +18,8 @@ public class BusTransportModeTest {
 
     private static final ITransportMode transportMode = new BusTransportMode();
 
-//        // Create stops:
-//        Node n1 = new Node();
-//        n1.put("name", "Stop1");
-//        n1.put("public_transport", "stop_position");
-//        RelationMember rm1 = new RelationMember("stop", n1);
-//        members.add(rm1);
-//        Way w1 = new Way();
-//        w1.put("name", "Stop2");
-//        w1.put("highway", "platform");
-//        RelationMember rm2 = new RelationMember("platform", w1);
-//        members.add(rm2);
-//        Node n2 = new Node();
-//        n2.put("name", "Stop3");
-//        n2.put("public_transport", "platform");
-//        RelationMember rm3 = new RelationMember("platform", n2);
-//        members.add(rm3);
-//        Node n3 = new Node();
-//        n3.put("name", "Stop4");
-//        n3.put("public_transport", "stop_position");
-//        RelationMember rm4 = new RelationMember("stop", n3);
-//        members.add(rm4);
-//        Node n4 = new Node();
-//        n4.put("name", "Stop4");
-//        n4.put("public_transport", "platform");
-//        RelationMember rm5 = new RelationMember("platform", n4);
-//        members.add(rm5);
-//        Node n5 = new Node();
-//        n5.put("name", "Stop5");
-//        n5.put("highway", "platform");
-//        RelationMember rm6 = new RelationMember("platform_exit_only", n5);
-//        members.add(rm6);
-//
-//        // Create ways:
-//        Way w2 = new Way();
-//        RelationMember rm7 = new RelationMember("", w2);
-//        members.add(rm7);
-//        Way w3 = new Way();
-//        RelationMember rm8 = new RelationMember("", w3);
-//        members.add(rm8);
-//        Relation r3 = new Relation(); // nested relation
-//        Way w4 = new Way();
-//        Way w5 = new Way();
-//        Way w6 = new Way();
-//        r3.addMember(new RelationMember("", w4));
-//        r3.addMember(new RelationMember("", w5));
-//        r3.addMember(new RelationMember("", w6));
-//        RelationMember rm9 = new RelationMember("", r3);
-//        members.add(rm9);
-//        Way w7 = new Way();
-//        RelationMember rm10 = new RelationMember("", w7);
-//        members.add(rm10);
-
-//    public static final Relation route = new Relation();
-//
-//    @BeforeClass
-//    public static void setUp() {
-//
-//        ArrayList<RelationMember> members = new ArrayList<>();
-//
-////        route.setMembers(members);
-//        route.put("type", "route");
-//        route.put("route", "bus");
-//
-//        transportMode = new BusTransportMode();
-//    }
-
     @Test
     public void testCanBeUsedForRelation() {
-
         Relation route = new Relation();
         route.put("type", "route");
         route.put("route", "bus");
@@ -177,51 +110,77 @@ public class BusTransportModeTest {
         Way footWay = new Way(w12);
         footWay.put("highway", "footway");
 
-        for (Way way : new Way[]{residentialWay, unclassifiedWay, serviceWay, livingStreetWay, cyclestreetWay,
-                primaryWay, secondaryWay, tertiaryWay, trunkWay, motorWay,
-                primaryLinkWay, secondaryLinkWay, tertiaryLinkWay, trunkLinkWay, motorWayLinkWay}) {
+        Way pedestrianWay = new Way(w12);
+        footWay.put("highway", "pedestrian");
+
+        Way railWay = new Way(w12);
+        footWay.put("railway", "rail");
+
+        Way tramWay = new Way(w12);
+        footWay.put("railway", "tram");
+
+        Way subWay = new Way(w12);
+        footWay.put("railway", "subway");
+
+        Way light_railWay = new Way(w12);
+        footWay.put("railway", "light_rail");
+
+        Way[] suitableWaysForBuses = new Way[]{
+            residentialWay, unclassifiedWay, serviceWay, livingStreetWay, cyclestreetWay,
+            primaryWay, secondaryWay, tertiaryWay, trunkWay, motorWay,
+            primaryLinkWay, secondaryLinkWay, tertiaryLinkWay, trunkLinkWay, motorWayLinkWay};
+
+        Way[] unSuitableWaysForBuses = new Way[]{cycleWay, footWay, pedestrianWay, railWay, tramWay, subWay, light_railWay};
+
+        for (Way way : suitableWaysForBuses) {
             assertTrue(transportMode.canTraverseWay(way));
             assertTrue(transportMode.canTraverseWay(way, FORWARD));
             assertTrue(transportMode.canTraverseWay(way, BACKWARD));
         }
 
-        for (Way way : new Way[]{cycleWay, footWay}) {
+        for (Way way : unSuitableWaysForBuses) {
             assertFalse(transportMode.canTraverseWay(way));
             assertFalse(transportMode.canTraverseWay(way, FORWARD));
             assertFalse(transportMode.canTraverseWay(way, BACKWARD));
         }
 
+        for (Way way : unSuitableWaysForBuses) {
+            way.put("bus", "yes");
+            assertTrue(transportMode.canTraverseWay(way));
+            assertTrue(transportMode.canTraverseWay(way, FORWARD));
+            assertTrue(transportMode.canTraverseWay(way, BACKWARD));
+        }
+
+        for (Way way : unSuitableWaysForBuses) {
+            way.put("psv", "yes");
+            assertTrue(transportMode.canTraverseWay(way));
+            assertTrue(transportMode.canTraverseWay(way, FORWARD));
+            assertTrue(transportMode.canTraverseWay(way, BACKWARD));
+        }
+
         // what if there is a general oneway tag?
-        for (Way way : new Way[]{residentialWay, unclassifiedWay, serviceWay, livingStreetWay, cyclestreetWay,
-            primaryWay, secondaryWay, tertiaryWay, trunkWay, motorWay,
-            primaryLinkWay, secondaryLinkWay, tertiaryLinkWay, trunkLinkWay, motorWayLinkWay}) {
+        for (Way way : suitableWaysForBuses) {
             way.put("oneway", "yes");
             assertTrue(transportMode.canTraverseWay(way, FORWARD));
             assertFalse(transportMode.canTraverseWay(way, BACKWARD));
         }
 
         // what if there is an exception for buses?
-        for (Way way : new Way[]{residentialWay, unclassifiedWay, serviceWay, livingStreetWay, cyclestreetWay,
-            primaryWay, secondaryWay, tertiaryWay, trunkWay, motorWay,
-            primaryLinkWay, secondaryLinkWay, tertiaryLinkWay, trunkLinkWay, motorWayLinkWay}) {
+        for (Way way : suitableWaysForBuses) {
             way.put("oneway:bus", "no");
             assertTrue(transportMode.canTraverseWay(way, FORWARD));
             assertTrue(transportMode.canTraverseWay(way, BACKWARD));
         }
 
         // what if there is an additional exception for psv?
-        for (Way way : new Way[]{residentialWay, unclassifiedWay, serviceWay, livingStreetWay, cyclestreetWay,
-            primaryWay, secondaryWay, tertiaryWay, trunkWay, motorWay,
-            primaryLinkWay, secondaryLinkWay, tertiaryLinkWay, trunkLinkWay, motorWayLinkWay}) {
+        for (Way way : suitableWaysForBuses) {
             way.put("oneway:psv", "no");
             assertTrue(transportMode.canTraverseWay(way, FORWARD));
             assertTrue(transportMode.canTraverseWay(way, BACKWARD));
         }
 
-        // what if there is just an exception for psv?
-        for (Way way : new Way[]{residentialWay, unclassifiedWay, serviceWay, livingStreetWay, cyclestreetWay,
-            primaryWay, secondaryWay, tertiaryWay, trunkWay, motorWay,
-            primaryLinkWay, secondaryLinkWay, tertiaryLinkWay, trunkLinkWay, motorWayLinkWay}) {
+        // what if there is just an exception for psv?;
+        for (Way way : suitableWaysForBuses) {
             way.remove("oneway:bus");
             assertTrue(transportMode.canTraverseWay(way, FORWARD));
             assertTrue(transportMode.canTraverseWay(way, BACKWARD));
