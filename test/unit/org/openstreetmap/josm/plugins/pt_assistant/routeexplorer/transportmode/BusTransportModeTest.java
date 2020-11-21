@@ -114,19 +114,19 @@ public class BusTransportModeTest {
         footWay.put("highway", "footway");
 
         Way pedestrianWay = new Way(w12);
-        footWay.put("highway", "pedestrian");
+        pedestrianWay.put("highway", "pedestrian");
 
         Way railWay = new Way(w12);
-        footWay.put("railway", "rail");
+        railWay.put("railway", "rail");
 
         Way tramWay = new Way(w12);
-        footWay.put("railway", "tram");
+        tramWay.put("railway", "tram");
 
         Way subWay = new Way(w12);
-        footWay.put("railway", "subway");
+        subWay.put("railway", "subway");
 
         Way light_railWay = new Way(w12);
-        footWay.put("railway", "light_rail");
+        light_railWay.put("railway", "light_rail");
 
         Way[] suitableWaysForBuses = new Way[]{
             residentialWay, unclassifiedWay, serviceWay, livingStreetWay, cyclestreetWay,
