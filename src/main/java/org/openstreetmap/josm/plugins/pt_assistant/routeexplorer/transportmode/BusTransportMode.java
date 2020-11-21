@@ -24,8 +24,8 @@ public class BusTransportMode extends AbstractTransportMode {
         // should only be instantiable in `ITransportMode`
         modeOfTransport = "bus";
         additionalTypesForTurnRestriction = new String[]{"bus", "psv"};
+        turnRestrictionExceptionsFor = new String[]{"bus", "psv"};
         oneWayExceptionsFor = new String[]{"bus", "psv"};
-
     }
 
     @Override

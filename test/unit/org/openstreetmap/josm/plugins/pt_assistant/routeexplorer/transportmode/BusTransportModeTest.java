@@ -192,7 +192,6 @@ public class BusTransportModeTest {
 
     @Test
     public void testCanTurn() {
-        DataSet ds = new DataSet();
         Node n1 = new Node();
         Node n2 = new Node();
         Node n3 = new Node();
@@ -211,9 +210,11 @@ public class BusTransportModeTest {
         Relation turnRestriction = new Relation();
         turnRestriction.put("type", "restriction");
 
-        RelationMember rm1 = new RelationMember("", w12);
-        RelationMember rm2 = new RelationMember("", w23);
+        RelationMember fromWayMember = new RelationMember("from", w12);
+        RelationMember viaNodeMember = new RelationMember("via", n2);
+        RelationMember toWayMember = new RelationMember("to", w23);
 
+        DataSet ds = new DataSet();
         ds.addPrimitive(n1);
         ds.addPrimitive(n2);
         ds.addPrimitive(n3);
@@ -221,29 +222,35 @@ public class BusTransportModeTest {
         ds.addPrimitive(w23);
         ds.addPrimitive(turnRestriction);
 
-        String[] noRestrictionTypes = {"no_right_turn", "no_left_turn", "no_u_turn", "no_straight_on", "no_entry", "no_exit"};
+        String[] prohibitingRestrictionTypes = {"no_right_turn", "no_left_turn", "no_u_turn", "no_straight_on", "no_entry", "no_exit"};
         String[] onlyRestrictionTypes = {"only_right_turn", "only_left_turn", "only_u_turn", "only_straight_on"};
-        String[] appliesForOtherModeOfTransport = {"hgv", "caravan", "motorcar", "agricultural", "motorcycle", "bicycle", "hazmat"};
-        String[] exceptForOtherModeOfTransport = {"bicycle", "hgv", "motorcar", "emergency"};
+        String[] appliesForOtherModesOfTransport = {"hgv", "caravan", "motorcar", "agricultural", "motorcycle", "bicycle", "hazmat"};
+        String[] exceptForOtherModesOfTransport = {"bicycle", "hgv", "motorcar", "emergency"};
         String[] exceptForThisModeOfTransport = {"bus", "psv"};
 
-        for (String noType : noRestrictionTypes) {
-            Relation rel = new Relation(turnRestriction);
-            rel.addMember(rm1);
-            rel.addMember(rm2);
-            for (String mot : appliesForOtherModeOfTransport) {
-                rel.put("restriction:" + mot, noType);
+        Relation rel = new Relation();
+        ds.addPrimitive(rel);
+
+        for (String prohibitingType : prohibitingRestrictionTypes) {
+            rel = new Relation(turnRestriction);
+            rel.addMember(fromWayMember);
+            rel.addMember(viaNodeMember);
+            rel.addMember(toWayMember);
+            ds.removePrimitive(rel);
+            ds.addPrimitive(rel);
+            for (String mot : appliesForOtherModesOfTransport) {
+                rel.put("restriction:" + mot, prohibitingType);
                 assertTrue(transportMode.canTurn(w12, n2, w23));
                 rel.remove("restriction:" + mot);
             }
-            rel.put("restriction:bus", noType);
+            rel.put("restriction:bus", prohibitingType);
             assertFalse(transportMode.canTurn(w12, n2, w23));
             rel.remove("restriction:bus");
 
-            rel.put("restriction", noType);
+            rel.put("restriction", prohibitingType);
             assertFalse(transportMode.canTurn(w12, n2, w23));
 
-            for (String exc : exceptForOtherModeOfTransport) {
+            for (String exc : exceptForOtherModesOfTransport) {
                 rel.put("except", exc);
                 assertFalse(transportMode.canTurn(w12, n2, w23));
             }
@@ -252,8 +259,6 @@ public class BusTransportModeTest {
                 rel.put("except", exc);
                 assertTrue(transportMode.canTurn(w12, n2, w23));
             }
-
         }
-
     }
 }

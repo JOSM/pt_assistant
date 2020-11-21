@@ -3,6 +3,7 @@ package org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.transportmode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -21,6 +22,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.WayTraversalDir
 public abstract class AbstractTransportMode implements ITransportMode {
     String modeOfTransport = "";
     String[] additionalTypesForTurnRestriction;
+    String[] turnRestrictionExceptionsFor;
     String[] oneWayExceptionsFor;
 
     @Override
@@ -52,10 +54,19 @@ public abstract class AbstractTransportMode implements ITransportMode {
                 && relation.findRelationMembers("to").contains(to)
             ).collect(Collectors.toSet());
         for (Relation restrictionRelation : restrictionRelations) {
-            final String restriction = restrictionRelation.get("restriction");
-            final String except = ("".equals(modeOfTransport)) ? restrictionRelation.get("except") : "";
-            if (restriction.startsWith("no_") && !except.contains(modeOfTransport)) {
-                return false;
+            for (String type : types) {
+                final String restriction = restrictionRelation.get(type);
+                if (restriction != null && restriction.startsWith("no_")) {
+                    final String except = !"".equals(modeOfTransport) ? restrictionRelation.get("except") : "";
+                    if (except != null) {
+                        for (String tre : turnRestrictionExceptionsFor) {
+                            if (except.contains(tre)) {
+                                return from.containsNode(via) && to.containsNode(via);
+                            }
+                        }
+                    }
+                    return false;
+                }
             }
         }
         return from.containsNode(via) && to.containsNode(via);
