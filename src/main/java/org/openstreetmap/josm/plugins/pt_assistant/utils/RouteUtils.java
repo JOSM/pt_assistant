@@ -5,6 +5,7 @@ import static org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction.
 import static org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction.Mode.TO_LAYER;
 import static org.openstreetmap.josm.plugins.pt_assistant.data.PTStop.isPTPlatform;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -125,6 +126,19 @@ public final class RouteUtils {
 
     public static boolean isPTRoute(Relation r) {
         return r != null && r.hasTag(OSMTags.KEY_ROUTE, acceptedRouteTags);
+    }
+
+    /**
+     * Checks, if the given relation member is a way that represents part of the route itself
+     * (i.e. not something along the way like a stop area for public transport).
+     * At the moment this check just checks the primitive type and the role of the member.
+     *
+     * @param member the relation member to check
+     * @return {@code true} iff the given member contains a primitive of type {@link Way} and has role
+     *         {@code forward}, {@code backward} or the empty role. Otherwise {@code false}.
+     */
+    public static boolean isRouteWayMember(final RelationMember member) {
+        return member.isWay() && Arrays.asList("", "forward", "backward").contains(member.getRole());
     }
 
     public static boolean isRoute(Relation r) {

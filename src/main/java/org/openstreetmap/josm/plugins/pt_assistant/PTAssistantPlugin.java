@@ -39,6 +39,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.actions.RoutingAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersMenuBar;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SplitRoundaboutAction;
+import org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.RouteExplorer;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.BicycleFootRouteValidatorTest;
@@ -79,6 +80,7 @@ public class PTAssistantPlugin extends Plugin {
             .addMenu("File", trc("menu", "Public Transport"), KeyEvent.VK_P, 5, ht("/Menu/Public Transport"));
         addToMenu(PublicTransportMenu);
 
+        SelectionEventManager.getInstance().addSelectionListener(new RouteExplorer());
         SelectionEventManager.getInstance().addSelectionListener(PTAssistantLayerManager.PTLM);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(PTAssistantLayerManager.PTLM);
         initialiseWizard();

@@ -18,6 +18,7 @@ public final class ColorPalette {
     public static final Color WHITE = new Color(255, 255, 255, 180);
 
     public static final Color REF_LABEL_COLOR = new Color(0x80FFFFFF, true);
+    public static final Color ROUTING_HELPER_BACKGROUND = new Color(0xFF9966);
 
     public static Color[] FIVE_COLORS = { GREEN, RED, BLUE, YELLOW, CYAN };
 }
