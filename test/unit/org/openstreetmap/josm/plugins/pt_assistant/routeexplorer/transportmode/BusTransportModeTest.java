@@ -223,7 +223,7 @@ public class BusTransportModeTest {
         ds.addPrimitive(turnRestriction);
 
         String[] prohibitingRestrictionTypes = {"no_right_turn", "no_left_turn", "no_u_turn", "no_straight_on", "no_entry", "no_exit"};
-        String[] onlyRestrictionTypes = {"only_right_turn", "only_left_turn", "only_u_turn", "only_straight_on"};
+        String[] mandatoryRestrictionTypes = {"only_right_turn", "only_left_turn", "only_u_turn", "only_straight_on"};
         String[] appliesForOtherModesOfTransport = {"hgv", "caravan", "motorcar", "agricultural", "motorcycle", "bicycle", "hazmat"};
         String[] exceptForOtherModesOfTransport = {"bicycle", "hgv", "motorcar", "emergency"};
         String[] exceptForThisModeOfTransport = {"bus", "psv"};
@@ -253,6 +253,36 @@ public class BusTransportModeTest {
             for (String exc : exceptForOtherModesOfTransport) {
                 rel.put("except", exc);
                 assertFalse(transportMode.canTurn(w12, n2, w23));
+            }
+
+            for (String exc : exceptForThisModeOfTransport) {
+                rel.put("except", exc);
+                assertTrue(transportMode.canTurn(w12, n2, w23));
+            }
+        }
+
+        for (String mandatoryType : mandatoryRestrictionTypes) {
+            rel = new Relation(turnRestriction);
+            rel.addMember(fromWayMember);
+            rel.addMember(viaNodeMember);
+            rel.addMember(toWayMember);
+            ds.removePrimitive(rel);
+            ds.addPrimitive(rel);
+            for (String mot : appliesForOtherModesOfTransport) {
+                rel.put("restriction:" + mot, mandatoryType);
+                assertTrue(transportMode.canTurn(w12, n2, w23));
+                rel.remove("restriction:" + mot);
+            }
+            rel.put("restriction:bus", mandatoryType);
+            assertTrue(transportMode.canTurn(w12, n2, w23));
+            rel.remove("restriction:bus");
+
+            rel.put("restriction", mandatoryType);
+            assertTrue(transportMode.canTurn(w12, n2, w23));
+
+            for (String exc : exceptForOtherModesOfTransport) {
+                rel.put("except", exc);
+                assertTrue(transportMode.canTurn(w12, n2, w23));
             }
 
             for (String exc : exceptForThisModeOfTransport) {
