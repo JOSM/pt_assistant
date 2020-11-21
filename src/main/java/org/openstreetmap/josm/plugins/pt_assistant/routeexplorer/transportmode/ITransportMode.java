@@ -51,11 +51,21 @@ public interface ITransportMode {
      * @param via the node that the vehicle travels through, must be part of {@code from} and {@code to} ways,
      *            or this method will return false
      * @param to the way onto which the vehicle makes the turn
-     * @return {@code true} iff the transport mode can make a turn from the given {@code from} way,
+     * @return {@code true} if the transport mode can make a turn from the given {@code from} way,
      *         via the given {@code via} node to the given {@code to} way. Otherwise {@code false}.
      *         This method assumes that both ways can be traversed by the transport mode, it does not check that.
      */
     boolean canTurn(@NotNull final Way from, @NotNull final Node via, @NotNull final Way to);
+
+    /**
+     * @param from the way from which the vehicle is coming
+     * @param via the way that the vehicle travels through
+     * @param to the way onto which the vehicle makes the turn
+     * @return {@code true} if the transport mode can make a turn from the given {@code from} way,
+     *         through the given {@code via} way to the given {@code to} way. Otherwise {@code false}.
+     *         This method assumes that all three ways can be traversed by the transport mode, it does not check that.
+     */
+    boolean canTurn(@NotNull final Way from, @NotNull final Way via, @NotNull final Way to);
 
     /**
      * @return an icon representing the transport mode

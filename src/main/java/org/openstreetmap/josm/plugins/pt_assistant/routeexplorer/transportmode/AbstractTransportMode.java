@@ -18,6 +18,7 @@ import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.plugins.pt_assistant.routeexplorer.WayTraversalDirection;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
 
 public abstract class AbstractTransportMode implements ITransportMode {
     String modeOfTransport = "";
@@ -45,15 +46,8 @@ public abstract class AbstractTransportMode implements ITransportMode {
     public boolean canTurn(@NotNull final Way from, @NotNull final Node via, @NotNull final Way to) {
         List<String> types = new java.util.ArrayList<>(Collections.singletonList("restriction"));
         Arrays.stream(additionalTypesForTurnRestriction).map(at -> "restriction:" + at).forEach(types::add);
-        final Set<Relation> restrictionRelations = from.getReferrers().stream()
-            .map(it -> it.getType() == OsmPrimitiveType.RELATION ? (Relation) it : null)
-            .filter(relation ->
-                relation != null && types.contains(relation.get("type"))
-                && relation.findRelationMembers("from").contains(from)
-                && relation.findRelationMembers("via").contains(via)
-                && relation.findRelationMembers("to").contains(to)
-            ).collect(Collectors.toSet());
-        for (Relation restrictionRelation : restrictionRelations) {
+        final boolean bothWaysAreConnectedAtViaNode = from.containsNode(via) && to.containsNode(via);
+        for (Relation restrictionRelation : getTurnRestrictions(from, via, to, types)) {
             for (String type : types) {
                 final String restriction = restrictionRelation.get(type);
                 if (restriction != null && restriction.startsWith("no_")) {
@@ -61,7 +55,7 @@ public abstract class AbstractTransportMode implements ITransportMode {
                     if (except != null) {
                         for (String tre : turnRestrictionExceptionsFor) {
                             if (except.contains(tre)) {
-                                return from.containsNode(via) && to.containsNode(via);
+                                return bothWaysAreConnectedAtViaNode;
                             }
                         }
                     }
@@ -69,6 +63,36 @@ public abstract class AbstractTransportMode implements ITransportMode {
                 }
             }
         }
-        return from.containsNode(via) && to.containsNode(via);
+        return bothWaysAreConnectedAtViaNode;
+    }
+
+    @Override
+    public boolean canTurn(@NotNull final Way from, @NotNull final Way via, @NotNull final Way to) {
+        List<String> types = new java.util.ArrayList<>(Collections.singletonList("restriction"));
+        Arrays.stream(additionalTypesForTurnRestriction).map(at -> "restriction:" + at).forEach(types::add);
+        for (Relation restrictionRelation : getTurnRestrictions(from, via, to, types)) {
+            for (String type : types) {
+                final String restriction = restrictionRelation.get(type);
+                if (restriction != null && restriction.startsWith("no_")) {
+                    final String except = !"".equals(modeOfTransport) ? restrictionRelation.get("except") : "";
+                    if (except != null) {
+                        return Arrays.stream(turnRestrictionExceptionsFor).anyMatch(except::contains);
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private Set<Relation> getTurnRestrictions(Way from, OsmPrimitive via, Way to, List<String> types) {
+        return from.getReferrers().stream()
+            .map(it -> it.getType() == OsmPrimitiveType.RELATION ? (Relation) it : null)
+            .filter(relation ->
+                relation != null && types.contains(relation.get("type"))
+                && relation.findRelationMembers("from").contains(from)
+                && relation.findRelationMembers("via").contains(via)
+                && relation.findRelationMembers("to").contains(to)
+            ).collect(Collectors.toSet());
     }
 }

@@ -195,9 +195,11 @@ public class BusTransportModeTest {
         Node n1 = new Node();
         Node n2 = new Node();
         Node n3 = new Node();
+        Node n4 = new Node();
         n1.setCoor(new LatLon(50.0, 2.0));
         n2.setCoor(new LatLon(50.1, 2.1));
         n3.setCoor(new LatLon(50.2, 2.2));
+        n4.setCoor(new LatLon(50.3, 2.3));
 
         Way w12 = new Way();
         w12.addNode(n1);
@@ -207,6 +209,10 @@ public class BusTransportModeTest {
         w23.addNode(n2);
         w23.addNode(n3);
 
+        Way w34 = new Way();
+        w34.addNode(n2);
+        w34.addNode(n3);
+
         Relation turnRestriction = new Relation();
         turnRestriction.put("type", "restriction");
 
@@ -214,12 +220,17 @@ public class BusTransportModeTest {
         RelationMember viaNodeMember = new RelationMember("via", n2);
         RelationMember toWayMember = new RelationMember("to", w23);
 
+        RelationMember viaWayMember = new RelationMember("via", w23);
+        RelationMember toWayMember2 = new RelationMember("to", w34);
+
         DataSet ds = new DataSet();
         ds.addPrimitive(n1);
         ds.addPrimitive(n2);
         ds.addPrimitive(n3);
+        ds.addPrimitive(n4);
         ds.addPrimitive(w12);
         ds.addPrimitive(w23);
+        ds.addPrimitive(w34);
         ds.addPrimitive(turnRestriction);
 
         String[] prohibitingRestrictionTypes = {"no_right_turn", "no_left_turn", "no_u_turn", "no_straight_on", "no_entry", "no_exit"};
@@ -231,6 +242,7 @@ public class BusTransportModeTest {
         Relation rel = new Relation();
         ds.addPrimitive(rel);
 
+        String restrictionFor = "";
         for (String prohibitingType : prohibitingRestrictionTypes) {
             rel = new Relation(turnRestriction);
             rel.addMember(fromWayMember);
@@ -239,25 +251,60 @@ public class BusTransportModeTest {
             ds.removePrimitive(rel);
             ds.addPrimitive(rel);
             for (String mot : appliesForOtherModesOfTransport) {
+                restrictionFor = "restriction:" + mot;
                 rel.put("restriction:" + mot, prohibitingType);
-                assertTrue(transportMode.canTurn(w12, n2, w23));
+                assertTrue(String.format("%s %s", restrictionFor, prohibitingType), transportMode.canTurn(w12, n2, w23));
                 rel.remove("restriction:" + mot);
             }
-            rel.put("restriction:bus", prohibitingType);
-            assertFalse(transportMode.canTurn(w12, n2, w23));
-            rel.remove("restriction:bus");
+            restrictionFor = "restriction:bus";
+            rel.put(restrictionFor, prohibitingType);
+            assertFalse(String.format("%s %s", restrictionFor, prohibitingType), transportMode.canTurn(w12, n2, w23));
+            rel.remove(restrictionFor);
 
             rel.put("restriction", prohibitingType);
-            assertFalse(transportMode.canTurn(w12, n2, w23));
+            assertFalse(String.format("%s", prohibitingType), transportMode.canTurn(w12, n2, w23));
 
             for (String exc : exceptForOtherModesOfTransport) {
                 rel.put("except", exc);
-                assertFalse(transportMode.canTurn(w12, n2, w23));
+                assertFalse(String.format("%s", exc), transportMode.canTurn(w12, n2, w23));
             }
 
             for (String exc : exceptForThisModeOfTransport) {
                 rel.put("except", exc);
-                assertTrue(transportMode.canTurn(w12, n2, w23));
+                assertTrue(String.format("%s", exc), transportMode.canTurn(w12, n2, w23));
+            }
+        }
+
+        for (String prohibitingType : prohibitingRestrictionTypes) {
+            rel = new Relation(turnRestriction);
+            rel.addMember(fromWayMember);
+            rel.addMember(viaWayMember);
+            rel.addMember(toWayMember2);
+            ds.removePrimitive(rel);
+            ds.addPrimitive(rel);
+
+            for (String mot : appliesForOtherModesOfTransport) {
+                restrictionFor = "restriction:" + mot;
+                rel.put(restrictionFor, prohibitingType);
+                assertTrue(String.format("%s %s", restrictionFor, prohibitingType), transportMode.canTurn(w12, w23, w34));
+                rel.remove(restrictionFor);
+            }
+            restrictionFor = "restriction:bus";
+            rel.put(restrictionFor, prohibitingType);
+            assertFalse(String.format("%s %s", restrictionFor, prohibitingType), transportMode.canTurn(w12, w23, w34));
+            rel.remove(restrictionFor);
+
+            rel.put("restriction", prohibitingType);
+            assertFalse(String.format("%s", prohibitingType), transportMode.canTurn(w12, w23, w34));
+
+            for (String exc : exceptForOtherModesOfTransport) {
+                rel.put("except", exc);
+                assertFalse(String.format("%s", exc), transportMode.canTurn(w12, w23, w34));
+            }
+
+            for (String exc : exceptForThisModeOfTransport) {
+                rel.put("except", exc);
+                assertTrue(String.format("%s", exc), transportMode.canTurn(w12, w23, w34));
             }
         }
 
@@ -269,13 +316,16 @@ public class BusTransportModeTest {
             ds.removePrimitive(rel);
             ds.addPrimitive(rel);
             for (String mot : appliesForOtherModesOfTransport) {
-                rel.put("restriction:" + mot, mandatoryType);
+                restrictionFor = "restriction:" + mot;
+                rel.put(restrictionFor, mandatoryType);
                 assertTrue(transportMode.canTurn(w12, n2, w23));
-                rel.remove("restriction:" + mot);
+                rel.remove(restrictionFor);
             }
-            rel.put("restriction:bus", mandatoryType);
+
+            restrictionFor = "restriction:bus";
+            rel.put(restrictionFor, mandatoryType);
             assertTrue(transportMode.canTurn(w12, n2, w23));
-            rel.remove("restriction:bus");
+            rel.remove(restrictionFor);
 
             rel.put("restriction", mandatoryType);
             assertTrue(transportMode.canTurn(w12, n2, w23));
