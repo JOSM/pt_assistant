@@ -20,6 +20,7 @@ import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
+import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
@@ -78,15 +79,14 @@ public abstract class Checker {
             if (PTStop.isPTStop(rm)) {
 
                 if (StopUtils.isStopPosition(rm.getMember())) {
-                    if (!rm.hasRole("stop") && !rm.hasRole("stop_entry_only") && !rm.hasRole("stop_exit_only")) {
+                    if (!OSMTags.STOP_ROLES.contains(rm.getRole())) {
                         RelationMember newMember = new RelationMember("stop", rm.getMember());
                         resultList.add(newMember);
                     } else {
                         resultList.add(rm);
                     }
                 } else { // if platform
-                    if (!rm.hasRole("platform") && !rm.hasRole("platform_entry_only")
-                            && !rm.hasRole("platform_exit_only")) {
+                    if (!OSMTags.PLATFORM_ROLES.contains(rm.getRole())) {
                         RelationMember newMember = new RelationMember("platform", rm.getMember());
                         resultList.add(newMember);
                     } else {

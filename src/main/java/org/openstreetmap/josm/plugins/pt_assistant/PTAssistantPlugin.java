@@ -4,7 +4,7 @@ package org.openstreetmap.josm.plugins.pt_assistant;
 import static org.openstreetmap.josm.gui.help.HelpUtil.ht;
 import static org.openstreetmap.josm.tools.I18n.trc;
 
-import java.awt.KeyboardFocusManager;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +41,8 @@ import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersMen
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SplitRoundaboutAction;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.LineRelationTabManager;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.PublicTransportLinePanel;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.BicycleFootRouteValidatorTest;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.PTAssistantValidatorTest;
 import org.openstreetmap.josm.plugins.ptl.DistanceBetweenStops;
@@ -168,7 +170,6 @@ public class PTAssistantPlugin extends Plugin {
     }
 
     private void addButtonsToRelationEditor() {
-
         IRelationEditorActionGroup group1 = new IRelationEditorActionGroup() {
             @Override
             public int order() {
@@ -194,5 +195,15 @@ public class PTAssistantPlugin extends Plugin {
         };
         RelationEditorHooks.addActionsToMembers(group1);
         RelationEditorHooks.addActionsToMembers(group2);
+
+        // Dirty hack, but works
+        RelationEditorHooks.addActionsToMembers(new IRelationEditorActionGroup() {
+            @Override
+            public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
+                EventQueue.invokeLater(() ->
+                    new LineRelationTabManager(editorAccess));
+                return List.of();
+            }
+        });
     }
 }

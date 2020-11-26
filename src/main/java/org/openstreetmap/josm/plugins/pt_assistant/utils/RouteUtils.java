@@ -124,11 +124,14 @@ public final class RouteUtils {
     }
 
     public static boolean isPTRoute(Relation r) {
-        return r != null && r.hasTag(OSMTags.KEY_ROUTE, acceptedRouteTags);
+        return r != null
+            && r.hasTag(OSMTags.KEY_RELATION_TYPE, OSMTags.KEY_ROUTE)
+            && r.hasTag(OSMTags.KEY_ROUTE, acceptedRouteTags);
     }
 
     public static boolean isRoute(Relation r) {
-        return r.get(OSMTags.KEY_ROUTE) != null;
+        return r.hasTag(OSMTags.KEY_RELATION_TYPE, OSMTags.KEY_ROUTE)
+            && r.get(OSMTags.KEY_ROUTE) != null;
     }
 
     /**

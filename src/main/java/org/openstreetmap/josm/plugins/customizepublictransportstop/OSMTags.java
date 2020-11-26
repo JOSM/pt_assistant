@@ -4,6 +4,7 @@ package org.openstreetmap.josm.plugins.customizepublictransportstop;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * OSM object tags
@@ -73,7 +74,13 @@ public final class OSMTags {
     public static final String PUBLIC_TRANSPORT_TAG = "public_transport";
     public static final String STOP_AREA_TAG_VALUE = "stop_area";
     public static final String STOP_ROLE = "stop";
+    public static final String STOP_ENTRY_ROLE = "stop_entry_only";
+    public static final String STOP_EXIT_ROLE = "stop_exit_only";
+    public static final Collection<String> STOP_ROLES = List.of(STOP_ROLE, STOP_ENTRY_ROLE, STOP_EXIT_ROLE);
     public static final String PLATFORM_ROLE = "platform";
+    public static final String PLATFORM_EXIT_ROLE = "platform_exit_only";
+    public static final String PLATFORM_ENTRY_ROLE = "platform_entry_only";
+    public static final Collection<String> PLATFORM_ROLES = List.of(PLATFORM_ROLE, PLATFORM_ENTRY_ROLE, PLATFORM_EXIT_ROLE);
     public static final String PLATFORM_TAG_VALUE = "platform";
     public static final String SERVICE_TAG = "service";
 
