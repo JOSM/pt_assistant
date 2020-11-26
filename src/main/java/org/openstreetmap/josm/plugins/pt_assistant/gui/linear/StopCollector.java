@@ -108,33 +108,59 @@ public class StopCollector {
         }
     }
 
-    private int index(StopWithNotes nextStop) {
-        int i = allStops.indexOf(nextStop.stop);
+    private int index(StopWithNotes stop) {
+        return index(stop.stop);
+    }
+
+    private int index(FoundStop stop) {
+        int i = allStops.indexOf(stop);
         if (i < 0) {
-            throw new IllegalArgumentException("Stop not contained in this collector: " + nextStop);
+            throw new IllegalArgumentException("Stop not contained in this collector: " + stop);
         }
         return i;
     }
 
     private void collectStops(CollectedStopsForRelation collectFor) {
-        int nextInsertPosition = allStops.size();
-        boolean isCollectingDownward = true; // < For better insert positions
+        int nextInsertPosition = 0;
+        boolean isCollectingDownward = true;
         int lastIndex = -1;
-        for (FoundStopPosition stop : collectFor.findStopPositions()) {
-            Optional<FoundStop> alreadyFoundStop = allStops.stream()
-                .filter(it -> it.matches(stop.member.getMember()))
-                .findFirst();
+        List<FoundStopPosition> stopPositions = collectFor.findStopPositions();
+        for (FoundStopPosition stop : stopPositions) {
+            Optional<FoundStop> alreadyFoundStop = findStop(stop);
             FoundStop actualStop;
             if (alreadyFoundStop.isPresent()) {
                 nextInsertPosition = allStops.indexOf(alreadyFoundStop.get());
                 isCollectingDownward = nextInsertPosition > lastIndex;
                 actualStop = alreadyFoundStop.get();
+                if (isCollectingDownward) {
+                    nextInsertPosition++;
+                }
             } else {
                 Optional<Relation> stopArea = stop.findStopArea();
                 if (stopArea.isPresent()) {
                     actualStop = new FoundStopArea(stopArea.get());
                 } else {
                     actualStop = stop;
+                }
+                if (lastIndex == -1) {
+                    // This is the first node. Guess the best insert position for now.
+                    // For this, we need to skip ahead and search the first stop that matches
+                    List<Integer> nextPositions = stopPositions.stream()
+                        .map(this::findStop)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .map(this::index)
+                        .limit(2)
+                        .collect(Collectors.toList());
+                    if (nextPositions.size() > 1) {
+                        isCollectingDownward = nextPositions.get(0) < nextPositions.get(1);
+                        nextInsertPosition = nextPositions.get(0) + (isCollectingDownward ? 0 : 1);
+                    } else if (nextPositions.size() == 1) {
+                        nextInsertPosition = nextPositions.get(0);
+                    } else {
+                        // No connection to any previous route. May also happen for first route
+                        nextInsertPosition = allStops.size();
+                    }
                 }
                 allStops.add(nextInsertPosition, actualStop);
                 if (isCollectingDownward) {
@@ -149,6 +175,12 @@ public class StopCollector {
         // Now we add two NOP stops to top + button. We need them for drawing U turns.
         allStops.add(new NopStop());
         allStops.add(0, new NopStop());
+    }
+
+    private Optional<FoundStop> findStop(FoundStopPosition stop) {
+        return allStops.stream()
+            .filter(it -> it.matches(stop.member.getMember()))
+            .findFirst();
     }
 
     public List<FoundStop> getAllStops() {
