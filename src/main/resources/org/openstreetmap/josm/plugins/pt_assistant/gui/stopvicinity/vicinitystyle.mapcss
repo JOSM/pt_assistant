@@ -1,0 +1,66 @@
+canvas {
+    fill-color: black;
+    default-points: false;
+    default-lines: false;
+}
+
+/* Background geometry */
+way[highway],
+way[railway] {
+    width: 4;
+    color: #b4b4b4;
+}
+
+way[highway=footway],
+way[highway=cycleway],
+way[highway=path] {
+    width: 2;
+}
+
+area[building] {
+    fill-color: #b4b4b4;
+}
+
+
+/* Highlighted PT geomentry */
+
+relation[type="route"] >[role="stop"],
+node[public_transport=stop_position] {
+    icon-image: "presets/transport/tram.svg";
+}
+
+node[public_transport=platform] {
+    icon-image: "presets/transport/platform.svg";
+}
+
+area[public_transport=platform]:closed {
+    width: 2;
+    color: #ffffff;
+    fill-color: #d4d4d4;
+    text: prop(ref, default);
+    font-size: 12;
+    font-weight: bold;
+    text-color: #ffffff;
+    text-anchor-horizontal: center;
+    text-anchor-vertical: center;
+}
+
+/* Current relation is colored blue */
+relation:selected > node[public_transport=platform] {
+    symbol-shape: circle;
+    symbol-fill-color: #336ec1;
+    symbol-size: 18;
+}
+
+relation:selected > area[public_transport="platform"]:closed,
+relation:selected >[role="platform"] way {
+    color: #4d9bff;
+    fill-color: #336ec1;
+    text-color: #4d9bff;
+}
+
+relation:selected >[role="stop"] node {
+    symbol-shape: circle;
+    symbol-fill-color: #336ec1;
+    symbol-size: 18;
+}

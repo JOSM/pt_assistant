@@ -15,6 +15,4 @@ public interface LineRelationsProvider {
     List<LineRelation> getRelations();
 
     Relation getCurrentRelation();
-
-    String getTabTitle();
 }

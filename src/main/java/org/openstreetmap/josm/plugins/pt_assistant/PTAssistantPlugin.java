@@ -43,6 +43,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.LineRelationTabManager;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.PublicTransportLinePanel;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.stopvicinity.StopVicinityTabManager;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.BicycleFootRouteValidatorTest;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.PTAssistantValidatorTest;
 import org.openstreetmap.josm.plugins.ptl.DistanceBetweenStops;
@@ -197,13 +198,14 @@ public class PTAssistantPlugin extends Plugin {
         RelationEditorHooks.addActionsToMembers(group2);
 
         // Dirty hack, but works
-        RelationEditorHooks.addActionsToMembers(new IRelationEditorActionGroup() {
-            @Override
-            public List<AbstractRelationEditorAction> getActions(IRelationEditorActionAccess editorAccess) {
-                EventQueue.invokeLater(() ->
-                    new LineRelationTabManager(editorAccess));
-                return List.of();
-            }
+        RelationEditorHooks.addActionsToMembers(editorAccess -> {
+            // We need invoke later here because while this method is called, UI is not filled.
+            EventQueue.invokeLater(() -> {
+                new LineRelationTabManager(editorAccess);
+                new StopVicinityTabManager(editorAccess);
+            });
+            // Don't add actions.
+            return Arrays.asList();
         });
     }
 }

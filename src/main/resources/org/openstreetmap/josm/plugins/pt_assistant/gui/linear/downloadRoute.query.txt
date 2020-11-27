@@ -1,0 +1,32 @@
+// Overpass turbo query to get all related routes to a given route.
+relation(##ROUTERELATIONID##)->.route;
+rel(br.route)["type"="route_master"] -> .routeMaster;
+
+// Include route as well, if we have no master
+(.route; rel(r.routeMaster)["type"="route"];) -> .allRoutesOfRouteMaster;
+
+(
+  node(r.allRoutesOfRouteMaster:"stop");
+  node(r.allRoutesOfRouteMaster:"platform");
+) -> .stopFeaturesN;
+(
+  way(r.allRoutesOfRouteMaster:"plaftorm");
+) -> .stopFeaturesW;
+(
+  relation(r.allRoutesOfRouteMaster:"plaftorm");
+) -> .stopFeaturesR;
+
+(
+  rel(bn.stopFeaturesN)["public_transport"="stop_area"];
+  rel(bw.stopFeaturesW)["public_transport"="stop_area"];
+  rel(br.stopFeaturesR)["public_transport"="stop_area"];
+) -> .stopAreas;
+
+(
+  .routeMaster;
+  .allRoutesOfRouteMaster;
+  .stopAreas;
+);
+
+(._; >>;);
+out meta;

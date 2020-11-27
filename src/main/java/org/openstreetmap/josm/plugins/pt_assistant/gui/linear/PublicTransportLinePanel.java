@@ -39,10 +39,7 @@ import org.openstreetmap.josm.tools.ImageProvider;
  */
 public class PublicTransportLinePanel extends JPanel {
 
-    private final String tabTitle;
-
     public PublicTransportLinePanel(LineRelationsProvider p) {
-        tabTitle = p.getTabTitle();
         Optional<Relation> master = Objects.requireNonNull(p.getMasterRelation(), "p.getMasterRelation()");
         List<LineRelation> relations = Objects.requireNonNull(p.getRelations(), "p.getRelations()");
         String color = master.map(it -> it.get("colour")).filter(Objects::nonNull).orElse("#888888");
@@ -144,107 +141,6 @@ public class PublicTransportLinePanel extends JPanel {
 
     private String safeHtml(String text) {
         return text == null ? "" : text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
-    }
-
-    public String getTabTitle() {
-        return tabTitle;
-    }
-
-    public static PublicTransportLinePanel forRelation(Relation relation) {
-        if (isVersionTwoPTRoute(relation)) {
-            Optional<Relation> master = relation.getReferrers().stream().filter(PublicTransportLinePanel::isRouteMaster).map(it -> (Relation) it).findFirst();
-            return new PublicTransportLinePanel(new LineRelationsProvider() {
-                @Override
-                public Optional<Relation> getMasterRelation() {
-                    return master;
-                }
-
-                @Override
-                public List<LineRelation> getRelations() {
-                    return master.map(m -> getRouteRelations(m)
-                        .map(it -> new LineRelation(it,  relation.equals(it)))
-                        .collect(Collectors.toList()))
-                        .orElseGet(() -> Arrays.asList(new LineRelation(relation, true)));
-                }
-
-                @Override
-                public Relation getCurrentRelation() {
-                    return relation;
-                }
-
-                @Override
-                public String getTabTitle() {
-                    return tr("Route");
-                }
-            });
-        } else if (isRouteMaster(relation)) {
-            return new PublicTransportLinePanel(new LineRelationsProvider() {
-                @Override
-                public Optional<Relation> getMasterRelation() {
-                    return Optional.of(relation);
-                }
-
-                @Override
-                public List<LineRelation> getRelations() {
-                    return getRouteRelations(relation)
-                        .map(it -> new LineRelation(it, true))
-                        .collect(Collectors.toList());
-                }
-
-                @Override
-                public Relation getCurrentRelation() {
-                    return relation;
-                }
-
-                @Override
-                public String getTabTitle() {
-                    return tr("Routes");
-                }
-            });
-        } else if (StopUtils.isStopArea(relation)) {
-            PublicTransportLinePanel panel = new PublicTransportLinePanel(new LineRelationsProvider() {
-                @Override
-                public Optional<Relation> getMasterRelation() {
-                    return Optional.empty();
-                }
-
-                @Override
-                public List<LineRelation> getRelations() {
-                    // All the trams / busses stopping on any of our stops.
-                    // TODO: Platforms?
-                    return getRouteRelations(relation.getMembers()
-                        .stream()
-                        .filter(it -> OSMTags.STOP_ROLE.equals(it.getRole()))
-                        .flatMap(it -> it.getMember().getReferrers().stream()))
-                        .map(it -> new LineRelationAroundStop(it, true, stop -> stop.getReferrers().contains(relation)))
-                        .collect(Collectors.toList());
-                }
-
-                @Override
-                public Relation getCurrentRelation() {
-                    return relation;
-                }
-
-                @Override
-                public String getTabTitle() {
-                    return tr("Routes");
-                }
-            });
-            return panel;
-        } else {
-            return null;
-        }
-    }
-
-    private static Stream<Relation> getRouteRelations(Relation master) {
-        return getRouteRelations(master.getMembers().stream().map(RelationMember::getMember));
-    }
-
-    private static Stream<Relation> getRouteRelations(Stream<OsmPrimitive> primitives) {
-        return primitives
-            .filter(it -> it.getType() == OsmPrimitiveType.RELATION)
-            .map(it -> (Relation) it)
-            .filter(RouteUtils::isVersionTwoPTRoute);
     }
 
     public static boolean isRouteMaster(OsmPrimitive relation) {
