@@ -99,6 +99,28 @@ public class LineGridCell extends JPanel {
         });
     }
 
+    public void addContinuityUp(int colIndex) {
+        addContinuity(colIndex, false);
+    }
+
+    public void addContinuityDown(int colIndex) {
+        addContinuity(colIndex, true);
+    }
+
+    private void addContinuity(int colIndex, boolean down) {
+        addToPaint(colIndex, false, (graphics2D, xMin, xMax, yMin, yMax) -> {
+            setLinePaint(graphics2D);
+            Path2D.Double path = new Path2D.Double();
+            int y = down ? yMin : yMax;
+            int cx = (xMax - xMin) / 2;
+            path.moveTo(cx - 5, y);
+            path.lineTo(cx + 5, y);
+            path.lineTo(cx, y + 8 * (down ? 1 : -1));
+            path.closePath();
+            graphics2D.fill(path);
+        });
+    }
+
     private void setLinePaint(Graphics2D graphics2D) {
         graphics2D.setStroke(new BasicStroke(4));
         graphics2D.setColor(color);

@@ -13,4 +13,8 @@ public interface LineRelationsProvider {
     Optional<Relation> getMasterRelation();
 
     List<LineRelation> getRelations();
+
+    Relation getCurrentRelation();
+
+    String getTabTitle();
 }

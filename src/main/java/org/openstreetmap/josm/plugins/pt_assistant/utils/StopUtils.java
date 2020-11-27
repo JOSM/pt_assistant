@@ -4,6 +4,7 @@ package org.openstreetmap.josm.plugins.pt_assistant.utils;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
+import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
 import org.openstreetmap.josm.tools.Utils;
 
 /**
@@ -21,7 +22,7 @@ public final class StopUtils {
      * @return true if the relation is a stop_area, false otherwise.
      */
     public static boolean isStopArea(final Relation r) {
-        return r != null && r.hasTag("public_transport", "stop_area");
+        return r != null && r.hasTag("public_transport", OSMTags.STOP_AREA_TAG_VALUE);
     }
 
     /**

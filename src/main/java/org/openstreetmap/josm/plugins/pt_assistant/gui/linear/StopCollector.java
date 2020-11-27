@@ -1,6 +1,5 @@
 package org.openstreetmap.josm.plugins.pt_assistant.gui.linear;
 
-import static org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags.STOP_AREA_TAG_VALUE;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.Color;
@@ -15,8 +14,8 @@ import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
-import org.openstreetmap.josm.plugins.pt_assistant.utils.ColorPalette;
-import org.openstreetmap.josm.tools.ColorHelper;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.LineRelation.StopPositionEvent;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 
 /**
  * Collects all stops that there are in several relations
@@ -104,7 +103,16 @@ public class StopCollector {
                 nextCell.addUpwardsStop(col, nextStop.entryExit);
             }
 
-            currentDrawingIndex = nextIndex;
+            if (currentlyDrawingDown ? nextStop.skippedBefore : nextStop.skippedAfter) {
+                forRelation.cells.get(nextIndex - 1).addContinuityUp(col);
+                nextCell.addUpwardsConnection(col);
+            }
+            if (currentlyDrawingDown ? nextStop.skippedAfter : nextStop.skippedBefore) {
+                forRelation.cells.get(nextIndex + 1).addContinuityDown(col);
+                nextCell.addDownwardsConnection(col);
+            }
+
+            currentDrawingIndex = nextStop.skippedAfter ? -1 : nextIndex;
         }
     }
 
@@ -124,8 +132,9 @@ public class StopCollector {
         int nextInsertPosition = 0;
         boolean isCollectingDownward = true;
         int lastIndex = -1;
-        List<FoundStopPosition> stopPositions = collectFor.findStopPositions();
-        for (FoundStopPosition stop : stopPositions) {
+        List<StopPositionEvent> stopEvents = collectFor.findStopPositions();
+        for (StopPositionEvent event : stopEvents) {
+            FoundStopPosition stop = new FoundStopPosition(event.getStop());
             Optional<FoundStop> alreadyFoundStop = findStop(stop);
             FoundStop actualStop;
             if (alreadyFoundStop.isPresent()) {
@@ -145,7 +154,10 @@ public class StopCollector {
                 if (lastIndex == -1) {
                     // This is the first node. Guess the best insert position for now.
                     // For this, we need to skip ahead and search the first stop that matches
-                    List<Integer> nextPositions = stopPositions.stream()
+                    // TODO: This code is not really efficcient
+                    List<Integer> nextPositions = stopEvents.stream()
+                        .map(StopPositionEvent::getStop)
+                        .map(FoundStopPosition::new)
                         .map(this::findStop)
                         .filter(Optional::isPresent)
                         .map(Optional::get)
@@ -167,7 +179,8 @@ public class StopCollector {
                     nextInsertPosition++;
                 }
             }
-            StopWithNotes stopFound = new StopWithNotes(actualStop, stop.entryExit(), stop.member.getMember().get("ref"));
+            StopWithNotes stopFound = new StopWithNotes(actualStop, stop.entryExit(),
+                stop.member.getMember().get("ref"), event.isSkippedBefore(), event.isSkippedAfter());
             collectFor.stops.add(stopFound);
             lastIndex = index(stopFound);
         }
@@ -202,12 +215,8 @@ public class StopCollector {
                 + (line.isPrimary() ? 1_000_000 : 0);
         }
 
-        public List<FoundStopPosition> findStopPositions() {
-            return line.getRelation().getMembers()
-                .stream()
-                .filter(it -> OSMTags.STOP_ROLES.contains(it.getRole()))
-                .map(FoundStopPosition::new)
-                .collect(Collectors.toList());
+        public List<StopPositionEvent> findStopPositions() {
+            return line.streamStops().collect(Collectors.toList());
         }
 
         public Color getColor() {
@@ -225,11 +234,15 @@ public class StopCollector {
         private final FoundStop stop;
         private final EntryExit entryExit;
         private final String notes;
+        private final boolean skippedBefore;
+        private final boolean skippedAfter;
 
-        public StopWithNotes(FoundStop stop, EntryExit entryExit, String notes) {
+        public StopWithNotes(FoundStop stop, EntryExit entryExit, String notes, boolean skippedBefore, boolean skippedAfter) {
             this.stop = stop;
             this.entryExit = entryExit;
             this.notes = notes;
+            this.skippedBefore = skippedBefore;
+            this.skippedAfter = skippedAfter;
         }
     }
 
@@ -256,7 +269,7 @@ public class StopCollector {
                 .stream()
                 .filter(it -> it.getType() == OsmPrimitiveType.RELATION
                     && it.hasTag(OSMTags.KEY_RELATION_TYPE, "public_transport")
-                    && it.hasTag(OSMTags.PUBLIC_TRANSPORT_TAG, STOP_AREA_TAG_VALUE)
+                    && StopUtils.isStopArea((Relation) it)
                 )
                 .map(it -> (Relation) it)
                 .findFirst();

@@ -49,7 +49,7 @@ public class LineRelationTabManager {
         if (shouldDisplayTab) {
             if (tabContent == null) {
                 tabContent = new JScrollPane();
-                tabPanel.add(tr("Transport line"), tabContent);
+                tabPanel.add(tr("route"), tabContent);
             }
 
             tabContent.getViewport().setView(linePanel);
