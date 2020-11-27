@@ -17,10 +17,15 @@ import org.openstreetmap.josm.data.osm.RelationMember;
  */
 public class LineRelationAroundStop extends LineRelation {
     private final Predicate<OsmPrimitive> isStop;
+    private final int aroundStop;
 
-    public LineRelationAroundStop(Relation relation, boolean primary, Predicate<OsmPrimitive> isStop) {
+    public LineRelationAroundStop(Relation relation, boolean primary, Predicate<OsmPrimitive> isStop, int aroundStop) {
         super(relation, primary);
         this.isStop = isStop;
+        this.aroundStop = aroundStop;
+        if (aroundStop < 0) {
+            throw new IllegalArgumentException("Must be at leas 0, but got " + aroundStop);
+        }
     }
 
     @Override
@@ -31,7 +36,7 @@ public class LineRelationAroundStop extends LineRelation {
             .boxed()
             .collect(Collectors.toList());
 
-        IntPredicate contains = index -> indexesAtWhichOurStopIs.stream().anyMatch(test -> Math.abs(index - test) <= 3);
+        IntPredicate contains = index -> indexesAtWhichOurStopIs.stream().anyMatch(test -> Math.abs(index - test) <= aroundStop);
 
         return IntStream.range(0, stops.size())
             .filter(contains)

@@ -3,6 +3,7 @@ package org.openstreetmap.josm.plugins.pt_assistant.gui.linear;
 
 import org.openstreetmap.josm.data.osm.Relation;
 
+import java.awt.Component;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,4 +16,6 @@ public interface LineRelationsProvider {
     List<LineRelation> getRelations();
 
     Relation getCurrentRelation();
+
+    Component createHeadlinePanel();
 }

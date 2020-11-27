@@ -8,7 +8,7 @@ canvas {
 way[highway],
 way[railway] {
     width: 4;
-    color: #b4b4b4;
+    color: #555555;
 }
 
 way[highway=footway],
@@ -18,49 +18,71 @@ way[highway=path] {
 }
 
 area[building] {
-    fill-color: #b4b4b4;
+    fill-color: #555555;
 }
-
 
 /* Highlighted PT geomentry */
 
-relation[type="route"] >[role="stop"],
-node[public_transport=stop_position] {
+relation[type="route"] >[role="stop"] node::icon_layer,
+relation[type="route"] >[role="stop_entry_only"] node::icon_layer,
+relation[type="route"] >[role="stop_exit_only"] node::icon_layer,
+node[public_transport=stop_position]::icon_layer {
     icon-image: "presets/transport/tram.svg";
+    object-z-index:1.0;
 }
 
-node[public_transport=platform] {
+node[public_transport=platform]::icon_layer {
     icon-image: "presets/transport/platform.svg";
+    object-z-index:1.0;
 }
 
-area[public_transport=platform]:closed {
+way[public_transport=platform] {
     width: 2;
-    color: #ffffff;
-    fill-color: #d4d4d4;
+    color: #dddddd;
+    fill-color: #afafaf;
     text: prop(ref, default);
     font-size: 12;
     font-weight: bold;
     text-color: #ffffff;
     text-anchor-horizontal: center;
     text-anchor-vertical: center;
+    z-index: 2;
+}
+
+way[public_transport=platform]:unclosed {
+    width: 5;
+}
+
+relation[type="route"] >[role!="platform"] way {
+    color: #dddddd;
+    z-index: 2;
+}
+
+relation[type="route"] >[role="stop"] node,
+relation[type="route"] >[role="stop_entry_only"] node,
+relation[type="route"] >[role="stop_exit_only"] node {
+    symbol-shape: circle;
+    symbol-fill-color: #dddddd;
+    symbol-size: 18;
 }
 
 /* Current relation is colored blue */
-relation:selected > node[public_transport=platform] {
+relation[activePtRelation] >[role="platform"] node {
     symbol-shape: circle;
     symbol-fill-color: #336ec1;
     symbol-size: 18;
 }
 
-relation:selected > area[public_transport="platform"]:closed,
-relation:selected >[role="platform"] way {
+relation[activePtRelation] > area[public_transport="platform"]:closed,
+relation[activePtRelation] >[role="platform"] way {
     color: #4d9bff;
     fill-color: #336ec1;
     text-color: #4d9bff;
 }
 
-relation:selected >[role="stop"] node {
+relation[activePtRelation] >[role="stop"] node {
     symbol-shape: circle;
     symbol-fill-color: #336ec1;
     symbol-size: 18;
 }
+

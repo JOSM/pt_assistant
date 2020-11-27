@@ -3,13 +3,10 @@ package org.openstreetmap.josm.plugins.pt_assistant.gui.stopvicinity;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.openstreetmap.josm.data.DataSource;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.DownloadPolicy;
 import org.openstreetmap.josm.data.osm.Node;
@@ -21,7 +18,6 @@ import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.event.AbstractDatasetChangedEvent;
 import org.openstreetmap.josm.data.osm.event.DataChangedEvent;
 import org.openstreetmap.josm.data.osm.event.DataSetListener;
-import org.openstreetmap.josm.data.osm.event.DataSourceAddedEvent;
 import org.openstreetmap.josm.data.osm.event.NodeMovedEvent;
 import org.openstreetmap.josm.data.osm.event.PrimitivesAddedEvent;
 import org.openstreetmap.josm.data.osm.event.PrimitivesRemovedEvent;
@@ -38,7 +34,6 @@ import org.openstreetmap.josm.data.osm.event.WayNodesChangedEvent;
  */
 public class DataSetClone {
     private final DataSet copyFrom;
-    private final Collection<OsmPrimitive> toSelect;
     private final DataSet clone = new DataSet();
     private final Map<OsmPrimitive, OsmPrimitive> originalToCopy = new HashMap<>();
 
@@ -89,9 +84,8 @@ public class DataSetClone {
         }
     };
 
-    public DataSetClone(DataSet copyFrom, Collection<OsmPrimitive> toSelect) {
+    public DataSetClone(DataSet copyFrom) {
         this.copyFrom = copyFrom;
-        this.toSelect = toSelect;
         copyFrom.addDataSetListener(dataSetListener);
         refreshAll();
         clone.setUploadPolicy(UploadPolicy.BLOCKED);
@@ -107,41 +101,45 @@ public class DataSetClone {
 
             for (Node n : copyFrom.getNodes()) {
                 Node newNode = new Node(n);
-                originalToCopy.put(n, newNode);
-                clone.addPrimitive(newNode);
+                addCopy(n, newNode);
             }
             for (Way w : copyFrom.getWays()) {
                 Way newWay = new Way(w, false, false);
-                originalToCopy.put(w, newWay);
+                addCopy(w, newWay);
+
                 List<Node> newNodes = w.getNodes().stream()
                     .map(n -> (Node) originalToCopy.get(n))
                     .collect(Collectors.toList());
                 newWay.setNodes(newNodes);
-                clone.addPrimitive(newWay);
             }
             // Because relations can have other relations as members we first clone all relations
             // and then get the cloned members
             Collection<Relation> relations = copyFrom.getRelations();
             for (Relation r : relations) {
                 Relation newRelation = new Relation(r, false, false);
-                originalToCopy.put(r, newRelation);
-                clone.addPrimitive(newRelation);
+                addCopy(r, newRelation);
             }
             for (Relation r : relations) {
-                ((Relation) originalToCopy.get(r)).setMembers(r.getMembers().stream()
-                    .map(rm -> new RelationMember(rm.getRole(), originalToCopy.get(rm.getMember())))
-                    .collect(Collectors.toList()));
+                ((Relation) originalToCopy.get(r)).setMembers(convertMembers(r.getMembers()));
             }
             // For now, ignore the part of the selection that got deleted/changed in parent
-            clone.setSelected(toSelect.stream()
-                .map(originalToCopy::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList()));
+            clone.setSelected(Collections.emptySet());
             // Ignore data source
             clone.setVersion(copyFrom.getVersion());
         } finally {
             copyFrom.getReadLock().unlock();
         }
+    }
+
+    public List<RelationMember> convertMembers(List<RelationMember> members) {
+        return members.stream()
+            .map(rm -> new RelationMember(rm.getRole(), originalToCopy.get(rm.getMember())))
+            .collect(Collectors.toList());
+    }
+
+    private <T extends OsmPrimitive> void addCopy(T old, T newPrimitive) {
+        originalToCopy.put(old, newPrimitive);
+        clone.addPrimitive(newPrimitive);
     }
 
     public DataSet getClone() {
