@@ -11,11 +11,7 @@ import java.util.Optional;
  * Provides the relations for createing a {@link PublicTransportLinePanel}
  */
 public interface LineRelationsProvider {
-    Optional<Relation> getMasterRelation();
-
     List<LineRelation> getRelations();
-
-    Relation getCurrentRelation();
 
     Component createHeadlinePanel();
 }

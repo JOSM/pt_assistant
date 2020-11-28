@@ -19,7 +19,7 @@ public class LineRelationAroundStop extends LineRelation {
     private final Predicate<OsmPrimitive> isStop;
     private final int aroundStop;
 
-    public LineRelationAroundStop(Relation relation, boolean primary, Predicate<OsmPrimitive> isStop, int aroundStop) {
+    public LineRelationAroundStop(RelationAccess relation, boolean primary, Predicate<OsmPrimitive> isStop, int aroundStop) {
         super(relation, primary);
         this.isStop = isStop;
         this.aroundStop = aroundStop;

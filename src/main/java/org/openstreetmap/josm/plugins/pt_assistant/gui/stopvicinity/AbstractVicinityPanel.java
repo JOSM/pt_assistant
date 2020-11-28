@@ -1,7 +1,6 @@
 package org.openstreetmap.josm.plugins.pt_assistant.gui.stopvicinity;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -15,7 +14,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
 
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.visitor.paint.StyledMapRenderer;
@@ -50,6 +48,7 @@ public abstract class AbstractVicinityPanel extends JPanel {
             boolean initial = true;
             @Override
             public boolean prepareToDraw() {
+                dataSetCopy.refreshIfRequired();
                 super.prepareToDraw();
                 if (initial) {
                     if (zoom.getLastZoom() != null) {
@@ -158,6 +157,10 @@ public abstract class AbstractVicinityPanel extends JPanel {
 
     protected void doAction(Point point) {
         // default nop
+    }
+
+    public void dispose() {
+        dataSetCopy.dispose();
     }
 
     private static class FixedStyleLayerPainter implements MapViewPaintable.LayerPainter {

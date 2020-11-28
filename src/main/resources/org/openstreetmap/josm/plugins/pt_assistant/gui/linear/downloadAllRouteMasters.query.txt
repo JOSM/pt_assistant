@@ -1,0 +1,20 @@
+// Downloads all route master relations that are useful for the current relation
+
+(
+  rel(id:##RELATIONID##);
+  >>;
+) -> .onlineRoute;
+
+(
+  node(id:##NODEIDS##);
+  way(id:##WAYIDS##);
+  .onlineRoute;
+) -> .routeArea;
+
+// We cannot search for route masters, since they have no primitives with position.
+rel[type=route][route="##PTTYPE##"](around.routeArea:1000) -> .routes;
+
+rel(br.routes)[type=route_master][route_master="##PTTYPE##"] -> .masters;
+
+(.masters; >;);
+out meta;

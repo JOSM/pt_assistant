@@ -1,31 +1,33 @@
 package org.openstreetmap.josm.plugins.pt_assistant.gui.linear;
 
+import java.awt.Component;
 import java.awt.Container;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Objects;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javax.swing.JDialog;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JViewport;
 import javax.swing.event.ChangeListener;
 
-import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 
 /**
  * Allows adding / removing a tab from the Relation window.
  */
-public abstract class AbstractTabManager {
+public abstract class AbstractTabManager<T extends Component> {
     private final JTabbedPane tabPanel;
-    private final Supplier<Relation> relationGetter;
+    private final IRelationEditorActionAccess editorAccess;
     private JScrollPane tabContent = null;
     private ChangeListener tabListener;
 
     public AbstractTabManager(IRelationEditorActionAccess editorAccess) {
-        Container editorComponent = ((JDialog) editorAccess.getEditor()).getContentPane();
+        JDialog dialog = (JDialog) editorAccess.getEditor();
+        Container editorComponent = dialog.getContentPane();
 
         this.tabPanel = Stream.of(editorComponent.getComponents())
             .filter(it -> it instanceof JTabbedPane)
@@ -33,17 +35,23 @@ public abstract class AbstractTabManager {
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("Relation editor did not have a tab panel"));
 
-        this.relationGetter = editorAccess.getEditor()::getRelation;
+        this.editorAccess = editorAccess;
 
         updateTab();
         editorComponent.addPropertyChangeListener(RelationEditor.RELATION_PROP, __ -> updateTab());
         editorAccess.getMemberTableModel().addTableModelListener(__ -> updateTab());
         editorAccess.getTagModel().addPropertyChangeListener(__ -> updateTab());
+        editorAccess.getTagModel().addTableModelListener(__ -> updateTab());
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                possiblyDispose();
+            }
+        });
     }
 
     private void updateTab() {
-        Relation relation = relationGetter.get();
-        TabAndDisplay toShow = getTabToShow(relation);
+        TabAndDisplay<T> toShow = getTabToShow(editorAccess);
 
         if (toShow.shouldDisplay()) {
             if (tabContent == null) {
@@ -66,20 +74,36 @@ public abstract class AbstractTabManager {
         }
     }
 
-    private void showIfVisible(TabAndDisplay toShow) {
+    private void showIfVisible(TabAndDisplay<T> toShow) {
+        possiblyDispose();
         if (tabPanel.getSelectedComponent() == tabContent
                 && this.tabContent.getViewport().getView() == null) {
-            JPanel newContent = toShow.getTabContent();
+            T newContent = toShow.getTabContent();
             Objects.requireNonNull(newContent, "newContent");
             this.tabContent.getViewport().setView(newContent);
         }
     }
 
-    protected abstract TabAndDisplay getTabToShow(Relation relation);
+    @SuppressWarnings("unchecked")
+    private void possiblyDispose() {
+        if (this.tabContent != null) {
+            JViewport viewport = this.tabContent.getViewport();
+            if (viewport.getView() != null) {
+                dispose((T) viewport.getView());
+                viewport.setView(null);
+            }
+        }
+    }
 
-    public interface TabAndDisplay {
+    protected void dispose(T view) {
+        // Nop
+    }
+
+    protected abstract TabAndDisplay<T> getTabToShow(IRelationEditorActionAccess editorAccess);
+
+    public interface TabAndDisplay<T extends Component> {
         boolean shouldDisplay();
-        JPanel getTabContent();
+        T getTabContent();
         String getTitle();
     }
 }

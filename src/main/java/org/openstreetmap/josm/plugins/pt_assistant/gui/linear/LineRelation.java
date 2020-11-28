@@ -12,15 +12,15 @@ import java.util.stream.Stream;
 
 public class LineRelation {
 
-    private final Relation relation;
+    private final RelationAccess relation;
     private final boolean primary;
 
-    public LineRelation(Relation relation, boolean primary) {
+    public LineRelation(RelationAccess relation, boolean primary) {
         this.relation = Objects.requireNonNull(relation, "relation");
         this.primary = primary;
     }
 
-    public Relation getRelation() {
+    public RelationAccess getRelation() {
         return relation;
     }
 

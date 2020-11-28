@@ -41,48 +41,56 @@ public class DataSetClone {
     private final DataSetListener dataSetListener = new DataSetListener() {
         @Override
         public void primitivesAdded(PrimitivesAddedEvent event) {
-            refreshAll();
+            markRefreshNeeded();
         }
 
         @Override
         public void primitivesRemoved(PrimitivesRemovedEvent event) {
-            refreshAll();
+            markRefreshNeeded();
         }
 
         @Override
         public void tagsChanged(TagsChangedEvent event) {
-            refreshAll();
+            markRefreshNeeded();
         }
 
         @Override
         public void nodeMoved(NodeMovedEvent event) {
-            Node myNode = (Node) originalToCopy.get(event.getNode());
-            if (myNode != null) {
-                myNode.setCoor(event.getNode().getCoor());
+            if (!refreshNeeded) {
+                Node myNode = (Node) originalToCopy.get(event.getNode());
+                if (myNode != null) {
+                    myNode.setCoor(event.getNode().getCoor());
+                } else {
+                    markRefreshNeeded();
+                }
             }
-            refreshAll();
         }
 
         @Override
         public void wayNodesChanged(WayNodesChangedEvent event) {
-            refreshAll();
+            markRefreshNeeded();
         }
 
         @Override
         public void relationMembersChanged(RelationMembersChangedEvent event) {
-            refreshAll();
+            markRefreshNeeded();
         }
 
         @Override
         public void otherDatasetChange(AbstractDatasetChangedEvent event) {
-            refreshAll();
+            markRefreshNeeded();
         }
 
         @Override
         public void dataChanged(DataChangedEvent event) {
-            refreshAll();
+            markRefreshNeeded();
         }
     };
+    private boolean refreshNeeded;
+
+    private void markRefreshNeeded() {
+        refreshNeeded = true;
+    }
 
     public DataSetClone(DataSet copyFrom) {
         this.copyFrom = copyFrom;
@@ -90,6 +98,16 @@ public class DataSetClone {
         refreshAll();
         clone.setUploadPolicy(UploadPolicy.BLOCKED);
         clone.setDownloadPolicy(DownloadPolicy.BLOCKED);
+    }
+
+    /**
+     * Should be called before every access => way more performant than
+     * keeping it up to date all the time, especially during downloads.
+     */
+    public void refreshIfRequired() {
+        if (refreshNeeded) {
+            refreshAll();
+        }
     }
 
     private void refreshAll() {
@@ -126,6 +144,7 @@ public class DataSetClone {
             clone.setSelected(Collections.emptySet());
             // Ignore data source
             clone.setVersion(copyFrom.getVersion());
+            refreshNeeded = false;
         } finally {
             copyFrom.getReadLock().unlock();
         }
@@ -143,6 +162,7 @@ public class DataSetClone {
     }
 
     public DataSet getClone() {
+        refreshIfRequired();
         return clone;
     }
 

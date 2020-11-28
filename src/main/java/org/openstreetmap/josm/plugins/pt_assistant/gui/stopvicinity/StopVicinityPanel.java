@@ -31,6 +31,7 @@ import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.visitor.BoundingXYVisitor;
+import org.openstreetmap.josm.data.osm.visitor.OsmPrimitiveVisitor;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.MapViewState;
 import org.openstreetmap.josm.gui.MapViewState.MapViewPoint;
@@ -38,7 +39,10 @@ import org.openstreetmap.josm.gui.MapViewState.MapViewRectangle;
 import org.openstreetmap.josm.gui.dialogs.relation.MemberTableModel;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.draw.MapViewPath;
+import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.RelationAccess;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.RelationEditorAccessUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.tools.Pair;
 
@@ -50,37 +54,30 @@ import org.openstreetmap.josm.tools.Pair;
  * - add / remove stop_position
  */
 public class StopVicinityPanel extends AbstractVicinityPanel {
-    private final PrimitiveId stopRelation;
     private final IRelationEditorActionAccess editorAccess;
 
-    public StopVicinityPanel(Relation stopRelation, IRelationEditorActionAccess editorAccess, ZoomSaver zoomSaver) {
-        super(createDataSetWithNewRelation(stopRelation, editorAccess), zoomSaver);
-        this.stopRelation = stopRelation;
+    public StopVicinityPanel(IRelationEditorActionAccess editorAccess, ZoomSaver zoomSaver) {
+        super(createDataSetWithNewRelation(editorAccess.getEditor().getLayer(), editorAccess.getEditor().getRelation(), editorAccess), zoomSaver);
         this.editorAccess = editorAccess;
 
         addActionButtons();
     }
 
-    private static DataSetClone createDataSetWithNewRelation(Relation stopRelation,
+    private static DataSetClone createDataSetWithNewRelation(OsmDataLayer layer, Relation stopRelation,
                                                              IRelationEditorActionAccess editorAccess) {
-        DataSetClone clone = new DataSetClone(stopRelation.getDataSet());
+        DataSetClone clone = new DataSetClone(layer.getDataSet());
 
         // Now apply the relation editor changes
         // Simulate org.openstreetmap.josm.gui.dialogs.relation.actions.SavingAction.applyChanges
         // We cannot use that method, since it uses global undo/redo queue
-        Relation relation = (Relation) clone.getClone().getPrimitiveById(stopRelation.getPrimitiveId());
+        Relation relation = stopRelation != null ? (Relation) clone.getClone().getPrimitiveById(stopRelation.getPrimitiveId()) : null;
         if (relation == null) {
             relation = new Relation();
             clone.getClone().addPrimitive(relation);
         }
         editorAccess.getTagModel().applyToPrimitive(relation);
 
-        // Same as getMemberTableModel().applyToRelation(relation);
-        MemberTableModel membersModel = editorAccess.getMemberTableModel();
-        List<RelationMember> members = IntStream.range(0, membersModel.getRowCount())
-            .mapToObj(membersModel::getValue)
-            .filter(rm -> !rm.getMember().isDeleted() && rm.getMember().getDataSet() != null)
-            .collect(Collectors.toList());
+        List<RelationMember> members = RelationEditorAccessUtils.getRelationMembers(editorAccess);
 
         relation.setMembers(clone.convertMembers(members));
         // This is a hack to tag our currently active relation.
@@ -88,6 +85,7 @@ public class StopVicinityPanel extends AbstractVicinityPanel {
         relation.put("activePtRelation", "1");
         return clone;
     }
+
 
     private void addActionButtons() {
         JButton zoomToButton = new JButton(new JosmAction(
@@ -123,12 +121,10 @@ public class StopVicinityPanel extends AbstractVicinityPanel {
 
     private void zoomToRelation() {
         BoundingXYVisitor v = new BoundingXYVisitor();
-        v.visit(getStopRelationClone());
+        RelationAccess.of(editorAccess).getMembers().forEach(
+            m -> m.getMember().accept((OsmPrimitiveVisitor) v));
         mapView.zoomTo(v.getBounds());
-    }
-
-    private Relation getStopRelationClone() {
-        return (Relation) dataSetCopy.getClone().getPrimitiveById(stopRelation);
+        mapView.zoomOut();
     }
 
     @Override
@@ -242,7 +238,7 @@ public class StopVicinityPanel extends AbstractVicinityPanel {
     }
 
     protected List<EStopVicinityAction> getAvailableActions(OsmPrimitive primitive) {
-        for (RelationMember m : getStopRelationClone().getMembers()) {
+        for (RelationMember m : RelationAccess.of(editorAccess).getMembers()) {
             if (m.getMember().equals(primitive)) {
                 return getAvailableActionsForMember(primitive, m.getRole());
             }

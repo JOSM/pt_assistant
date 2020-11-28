@@ -5,9 +5,12 @@ import static org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction.
 import static org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction.Mode.TO_LAYER;
 import static org.openstreetmap.josm.plugins.pt_assistant.data.PTStop.isPTPlatform;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.openstreetmap.josm.actions.relation.ExportRelationToGpxAction;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
@@ -47,8 +50,8 @@ public final class RouteUtils {
         return isPTRoute(r) && r.hasTag(PT_VERSION_TAG, "2") && !r.hasTag("bus", "on_demand");
     }
 
-    private static final String[] acceptedRouteTags = {"bus", "trolleybus", "share_taxi", "tram", "light_rail",
-            "subway", "train" };
+    public static final Set<String> acceptedRouteTags = new HashSet<>(Arrays.asList("bus", "trolleybus", "share_taxi", "tram", "light_rail",
+            "subway", "train" ));
 
     /**
      * Adds the version of the PT route schema to the given PT route.

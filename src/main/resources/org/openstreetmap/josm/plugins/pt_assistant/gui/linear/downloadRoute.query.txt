@@ -1,19 +1,26 @@
-// Overpass turbo query to get all related routes to a given route.
-relation(##ROUTERELATIONID##)->.route;
+// Overpass turbo query to get all related routes / elements to a given route.
+
+// The route itself + the master route
+relation(##RELATIONID##)->.route;
 rel(br.route)["type"="route_master"] -> .routeMaster;
 
-// Include route as well, if we have no master
+// If we have a master, all routes form it. Otherwise, just ust
 (.route; rel(r.routeMaster)["type"="route"];) -> .allRoutesOfRouteMaster;
 
 (
   node(r.allRoutesOfRouteMaster:"stop");
   node(r.allRoutesOfRouteMaster:"platform");
+  // e.g. for nodes not already saved/uploaded
+  node(id:##NODEIDS##);
 ) -> .stopFeaturesN;
 (
   way(r.allRoutesOfRouteMaster:"plaftorm");
+  way(id:##WAYIDS##);
 ) -> .stopFeaturesW;
 (
+  // Multipolygons :-(
   relation(r.allRoutesOfRouteMaster:"plaftorm");
+  way(id:##RELATIONIDS##);
 ) -> .stopFeaturesR;
 
 (
@@ -25,6 +32,9 @@ rel(br.route)["type"="route_master"] -> .routeMaster;
 (
   .routeMaster;
   .allRoutesOfRouteMaster;
+  .stopFeaturesN;
+  .stopFeaturesW;
+  .stopFeaturesR;
   .stopAreas;
 );
 

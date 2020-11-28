@@ -3,12 +3,19 @@ package org.openstreetmap.josm.plugins.pt_assistant.gui.linear;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.swing.JButton;
+
+import org.openstreetmap.josm.actions.AutoScaleAction;
+import org.openstreetmap.josm.actions.JosmAction;
+import org.openstreetmap.josm.actions.relation.EditRelationAction;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
@@ -16,6 +23,7 @@ import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.LineRelation.StopPositionEvent;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
+import org.openstreetmap.josm.tools.ImageProvider;
 
 /**
  * Collects all stops that there are in several relations
@@ -252,6 +260,10 @@ public class StopCollector {
         boolean matches(OsmPrimitive p);
 
         String getNameAndInfos();
+
+        default Component createActionButtons() {
+            return null;
+        }
     }
 
     private static class FoundStopPosition implements FoundStop {
@@ -294,6 +306,20 @@ public class StopCollector {
             String name = member.getMember().get("name");
             return (name == null ? tr("- Stop without name -") : name);
         }
+
+        @Override
+        public Component createActionButtons() {
+            return PublicTransportLinePanel.createActions(
+                PublicTransportLinePanel.createAction(
+                    tr("Zoom to stop position"),
+                    new ImageProvider("mapmode", "zoom"),
+                    () -> {
+                        member.getMember().getDataSet().setSelected(member.getMember());
+                        AutoScaleAction.autoScale(AutoScaleAction.AutoScaleMode.SELECTION);
+                    }
+                )
+            );
+        }
     }
 
     private static class FoundStopArea implements FoundStop {
@@ -303,7 +329,7 @@ public class StopCollector {
         FoundStopArea(Relation relation) {
             stops = relation.getMembers()
                 .stream()
-                .filter(m -> "stop".equals(m.getRole()))
+                .filter(m -> OSMTags.STOP_ROLE.equals(m.getRole()))
                 .collect(Collectors.toList());
             this.relation = relation;
         }
@@ -315,14 +341,31 @@ public class StopCollector {
 
         @Override
         public boolean matches(OsmPrimitive p) {
-            return this.stops.stream().anyMatch(s -> s.getMember().equals(p));
+            // Many are not marked as stop => we still want to get them.
+            return this.relation
+                .getMembers()
+                .stream().anyMatch(s -> s.getMember().equals(p));
         }
 
         @Override
         public String getNameAndInfos() {
             String name = relation.get("name");
-            return (name == null ? tr("- No name -") : name) + " (" + tr("area relation " + relation.getId()) + ")";
+            return (name == null ? tr("- No name -") : name) + " (" + tr("area relation {0}", relation.getId()) + ")";
         }
+
+        @Override
+        public Component createActionButtons() {
+            return PublicTransportLinePanel.createActions(
+                PublicTransportLinePanel.createAction(tr("Zoom to stop area relation"), new ImageProvider("mapmode", "zoom").setMaxSize(12),
+                    () -> {
+                        relation.getDataSet().setSelected(relation);
+                        AutoScaleAction.autoScale(AutoScaleAction.AutoScaleMode.SELECTION);
+                    }),
+                PublicTransportLinePanel.createAction(tr("Edit stop area"), new ImageProvider("dialogs", "edit"),
+                    () -> EditRelationAction.launchEditor(relation))
+            );
+        }
+
     }
 
     private static class NopStop implements FoundStop {
@@ -340,5 +383,14 @@ public class StopCollector {
         public String getNameAndInfos() {
             return "";
         }
+    }
+
+    private static JButton createActionButton(final String iconName, final String tool, final Runnable action) {
+        return new JButton(new JosmAction("", iconName, tool, null, false) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                action.run();
+            }
+        });
     }
 }

@@ -1,0 +1,34 @@
+// Overpass turbo query to get all related routes to a stop area
+node(id:##NODEIDS##) -> .allRelationMembersN;
+way(id:##WAYIDS##) -> .allRelationMembersW;
+
+(
+  rel(bn.allRelationMembersN)["type"="route"];
+  rel(bw.allRelationMembersW)["type"="route"];
+) -> .allRoutesOfArea;
+
+(
+  node(r.allRoutesOfArea:"stop");
+  node(r.allRoutesOfArea:"platform");
+) -> .stopFeaturesN;
+(
+  way(r.allRoutesOfArea:"plaftorm");
+) -> .stopFeaturesW;
+(
+  relation(r.allRoutesOfArea:"plaftorm");
+) -> .stopFeaturesR;
+
+(
+  rel(bn.stopFeaturesN)["public_transport"="stop_area"];
+  rel(bw.stopFeaturesW)["public_transport"="stop_area"];
+  rel(br.stopFeaturesR)["public_transport"="stop_area"];
+) -> .stopAreas;
+
+(
+  .routeMaster;
+  .allRoutesOfArea;
+  .stopAreas;
+);
+
+(._; >>;);
+out meta;

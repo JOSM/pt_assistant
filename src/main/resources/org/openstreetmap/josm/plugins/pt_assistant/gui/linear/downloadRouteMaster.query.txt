@@ -1,8 +1,14 @@
 // Overpass turbo query to get all related routes to a given route.
-relation(##ROUTEMASTERRELATIONID##) -> .routeMaster;
 
-// Include route as well, if we have no master
-(rel(r.routeMaster)["type"="route"];) -> .allRoutesOfRouteMaster;
+// When editing a child route, we know the master id but may not know all other children
+relation(##MASTERID##) -> .routeMaster;
+
+() -> .allRoutesOfRouteMaster;
+(
+  rel(r.routeMaster)["type"="route"];
+  // When editing a master, we know all route ids
+  rel(id:##ROUTEIDS##)["type"="route"];
+) -> .allRoutesOfRouteMaster;
 
 (
   node(r.allRoutesOfRouteMaster:"stop");

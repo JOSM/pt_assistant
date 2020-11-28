@@ -3,9 +3,11 @@ package org.openstreetmap.josm.plugins.pt_assistant.gui.linear;
 import static org.openstreetmap.josm.plugins.pt_assistant.gui.linear.UnBoldLabel.safeHtml;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
 import java.util.List;
@@ -35,7 +37,6 @@ import org.openstreetmap.josm.tools.ImageProvider;
 public class PublicTransportLinePanel extends JPanel {
 
     public PublicTransportLinePanel(LineRelationsProvider p) {
-        Optional<Relation> master = Objects.requireNonNull(p.getMasterRelation(), "p.getMasterRelation()");
         List<LineRelation> relations = Objects.requireNonNull(p.getRelations(), "p.getRelations()");
 
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -59,7 +60,7 @@ public class PublicTransportLinePanel extends JPanel {
         // HEADER LINES
         JPanel gridArea = new JPanel(new GridBagLayout());
         for (int i = 0; i < relations.size(); i++) {
-            Relation relation = relations.get(i).getRelation();
+            RelationAccess relation = relations.get(i).getRelation();
             gridArea.add(new LineGridHorizontalColumnArrow(), GBC.std(i, i).span(relations.size() - i).fill().weight(0, 0));
             String name = safeHtml(relation.get("name"));
             String path = Stream.of(relation.get("from"), relation.get("via"), relation.get("to")).filter(Objects::nonNull).collect(Collectors.joining(" → "));
@@ -69,7 +70,7 @@ public class PublicTransportLinePanel extends JPanel {
 
             gridArea.add(createActions(
                 createAction(tr("Open route relation"), new ImageProvider("dialogs", "edit"),
-                    relation.equals(p.getCurrentRelation()) ? null : () -> EditRelationAction.launchEditor(relation))
+                    relation.getRelation() == null ? null : () -> EditRelationAction.launchEditor(relation.getRelation()))
             ), GBC.std(actionColumn, i));
         }
 
@@ -83,6 +84,10 @@ public class PublicTransportLinePanel extends JPanel {
                 String incomplete = stop.isIncomplete() ? " <font color=\"red\">" + tr("Incomplete") + "</font>" : "";
                 UnBoldLabel label = new UnBoldLabel(MessageFormat.format("<html>{0}{1}</html>", safeHtml(stop.getNameAndInfos()), incomplete));
                 gridArea.add(label, GBC.std(labelColumn, stopGridOffset + i));
+            }
+            Component actions = stop.createActionButtons();
+            if (actions != null) {
+                gridArea.add(actions, GBC.std(actionColumn, stopGridOffset + i));
             }
         }
         List<List<LineGridCell>> gridColumns = collector.getLineGrid();
@@ -100,7 +105,7 @@ public class PublicTransportLinePanel extends JPanel {
         add(gridArea);
     }
 
-    private JPanel createActions(JButton... actions) {
+    public static JPanel createActions(JButton... actions) {
         JPanel panel = new JPanel();
         for (JButton action: actions) {
             panel.add(action);
@@ -108,8 +113,8 @@ public class PublicTransportLinePanel extends JPanel {
         return panel;
     }
 
-    private JButton createAction(String label, ImageProvider icon, Runnable action) {
-        return new JButton(new AbstractAction() {
+    public static JButton createAction(String label, ImageProvider icon, Runnable action) {
+        JButton button = new JButton(new AbstractAction() {
             {
                 // putValue(NAME, label);
                 putValue(SHORT_DESCRIPTION, label);
@@ -123,6 +128,8 @@ public class PublicTransportLinePanel extends JPanel {
                 action.run();
             }
         });
+        button.setMargin(new Insets(0, 0, 0, 0));
+        return button;
     }
 
     public static boolean isRouteMaster(OsmPrimitive relation) {
