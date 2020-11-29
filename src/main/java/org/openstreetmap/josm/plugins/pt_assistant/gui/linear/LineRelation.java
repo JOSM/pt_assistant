@@ -55,7 +55,7 @@ public class LineRelation {
     protected Stream<RelationMember> streamRawStops() {
         return getRelation().getMembers()
             .stream()
-            .filter(it -> OSMTags.STOP_ROLES.contains(it.getRole()));
+            .filter(it -> OSMTags.STOPS_AND_PLATFORMS_ROLES.contains(it.getRole()));
     }
 
     public static class StopPositionEvent {
