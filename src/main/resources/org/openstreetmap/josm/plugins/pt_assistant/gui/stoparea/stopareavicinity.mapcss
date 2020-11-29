@@ -65,7 +65,7 @@ way[public_transport=platform]:closed {
     fill-color: #afafaf;
 }
 
-way[public_transport=platform]:unclosed {
+way[public_transport=platform]!:unclosed {
     width: 5;
 }
 

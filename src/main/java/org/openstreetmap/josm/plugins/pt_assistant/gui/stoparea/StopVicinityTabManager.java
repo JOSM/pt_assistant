@@ -1,4 +1,4 @@
-package org.openstreetmap.josm.plugins.pt_assistant.gui.stopvicinity;
+package org.openstreetmap.josm.plugins.pt_assistant.gui.stoparea;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 

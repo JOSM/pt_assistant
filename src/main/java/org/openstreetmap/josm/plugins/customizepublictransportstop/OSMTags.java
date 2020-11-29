@@ -103,6 +103,7 @@ public final class OSMTags {
     public static final String KEY_ROUTE_MASTER = "route_master";
     /** See <a href="https://wiki.openstreetmap.org/wiki/Tag:type=route_master">Tag:type=route_master</a>. */
     public static final String VALUE_TYPE_ROUTE_MASTER = KEY_ROUTE_MASTER;
+    public static final String REF_TAG = "ref";
 
     private OSMTags() {
         // Hide default constructor

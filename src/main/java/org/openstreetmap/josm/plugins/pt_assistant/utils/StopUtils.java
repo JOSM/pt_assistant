@@ -74,4 +74,14 @@ public final class StopUtils {
             .anyMatch(StopUtils::isStopArea);
     }
 
+    /**
+     * @param primitive The primitive to test
+     * @return the area if that primitive is memberin any stop area relation, null if not.
+     */
+    public static Relation findContainingStopArea(OsmPrimitive primitive) {
+        return (Relation) primitive.getReferrers().stream()
+            .filter(it -> it instanceof Relation && isStopArea((Relation) it))
+            .findFirst()
+            .orElse(null);
+    }
 }

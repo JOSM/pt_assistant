@@ -39,11 +39,11 @@ import org.openstreetmap.josm.plugins.pt_assistant.actions.RoutingAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersMenuBar;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SplitRoundaboutAction;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.stoparea.AddStopAreaAction;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.LineRelationTabManager;
-import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.PublicTransportLinePanel;
-import org.openstreetmap.josm.plugins.pt_assistant.gui.stopvicinity.StopVicinityTabManager;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.stoparea.StopVicinityTabManager;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.BicycleFootRouteValidatorTest;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.PTAssistantValidatorTest;
 import org.openstreetmap.josm.plugins.ptl.DistanceBetweenStops;
@@ -78,9 +78,9 @@ public class PTAssistantPlugin extends Plugin {
         OsmValidator.addTest(BicycleFootRouteValidatorTest.class);
 
         // "Public Transport" menu
-        JMenu PublicTransportMenu = MainApplication.getMenu()
+        JMenu publicTransportMenu = MainApplication.getMenu()
             .addMenu("File", trc("menu", "Public Transport"), KeyEvent.VK_P, 5, ht("/Menu/Public Transport"));
-        addToMenu(PublicTransportMenu);
+        addToMenu(publicTransportMenu);
 
         SelectionEventManager.getInstance().addSelectionListener(PTAssistantLayerManager.PTLM);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(PTAssistantLayerManager.PTLM);
@@ -156,6 +156,7 @@ public class PTAssistantPlugin extends Plugin {
         MainMenu.add(menu, new DistanceBetweenStops());
         menu.addSeparator();
         MainMenu.add(menu, CustomizeStopAction.createCustomizeStopAction());
+        MainMenu.add(menu, new AddStopAreaAction());
     }
 
     private static void initialiseWizard() {

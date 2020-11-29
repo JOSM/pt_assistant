@@ -34,6 +34,7 @@ public class CustomizeStopAction extends JosmAction implements IStopAreaCustomiz
     protected CustomizeStopAction(String name, String iconName, String tooltip, Shortcut shortcut,
             boolean registerInToolbar) {
         super(name, iconName, tooltip, shortcut, registerInToolbar);
+        putValue("help", ht("/Action/CustomizeStopAction"));
     }
 
     /**
@@ -43,16 +44,14 @@ public class CustomizeStopAction extends JosmAction implements IStopAreaCustomiz
      */
     public static CustomizeStopAction createCustomizeStopAction() {
         // CHECKSTYLE.OFF: LineLength
-        CustomizeStopAction action = new CustomizeStopAction(
+        return new CustomizeStopAction(
             tr("Customize stop"),
             "bus.png",
             tr("Customize stop under osm public transit standard v2"),
             Shortcut.registerShortcut("tools:customizestop", tr("Public Transport: {0}", tr("Customize stop")), KeyEvent.VK_U, Shortcut.DIRECT),
             true
         );
-        action.putValue("help", ht("/Action/CustomizeStopAction"));
         // CHECKSTYLE.ON: LineLength
-        return action;
     }
 
     /**

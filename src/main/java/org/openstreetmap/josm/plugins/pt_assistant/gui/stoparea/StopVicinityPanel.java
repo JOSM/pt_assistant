@@ -1,11 +1,10 @@
-package org.openstreetmap.josm.plugins.pt_assistant.gui.stopvicinity;
+package org.openstreetmap.josm.plugins.pt_assistant.gui.stoparea;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
@@ -189,7 +188,7 @@ public class StopVicinityPanel extends AbstractVicinityPanel {
 
     @Override
     protected String getStylePath() {
-        return "org/openstreetmap/josm/plugins/pt_assistant/gui/stopvicinity/vicinitystyle.mapcss";
+        return "org/openstreetmap/josm/plugins/pt_assistant/gui/stoparea/stopareavicinity.mapcss";
     }
 
     @Override
