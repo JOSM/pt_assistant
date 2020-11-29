@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.UnBoldLabel;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.DownloadUtils;
 
 public class StopAreaHeadline extends JPanel {

@@ -1,4 +1,4 @@
-package org.openstreetmap.josm.plugins.pt_assistant.gui.linear;
+package org.openstreetmap.josm.plugins.pt_assistant.gui.utils;
 
 import java.awt.Component;
 import java.awt.Container;

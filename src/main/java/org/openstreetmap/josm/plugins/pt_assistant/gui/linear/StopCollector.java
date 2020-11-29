@@ -39,15 +39,9 @@ public class StopCollector {
             .map(CollectedStopsForRelation::new)
             .collect(Collectors.toList());
 
-        CollectedStopsForRelation mostImportantCollection = collectedStopsForRelation
-            .stream()
-            .min(Comparator.comparing(it -> it.priority))
-            .orElseThrow(() -> new IllegalArgumentException("Expected at least one relation"));
-
-        collectStops(mostImportantCollection);
         collectedStopsForRelation
             .stream()
-            .filter(it -> it != mostImportantCollection)
+            .sorted(Comparator.<CollectedStopsForRelation, Double>comparing(it -> it.priority).reversed())
             .forEach(this::collectStops);
 
         collectedStopsForRelation.forEach(this::drawLines);

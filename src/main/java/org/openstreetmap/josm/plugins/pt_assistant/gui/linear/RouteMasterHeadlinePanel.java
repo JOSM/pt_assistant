@@ -1,30 +1,19 @@
 package org.openstreetmap.josm.plugins.pt_assistant.gui.linear;
 
-import static org.openstreetmap.josm.plugins.pt_assistant.gui.linear.UnBoldLabel.safeHtml;
+import static org.openstreetmap.josm.plugins.pt_assistant.gui.utils.UnBoldLabel.safeHtml;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.openstreetmap.josm.actions.JosmAction;
-import org.openstreetmap.josm.actions.downloadtasks.DownloadOsmTask;
-import org.openstreetmap.josm.actions.downloadtasks.DownloadParams;
-import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
-import org.openstreetmap.josm.data.osm.RelationMember;
-import org.openstreetmap.josm.gui.download.OverpassDownloadSource;
-import org.openstreetmap.josm.io.OverpassDownloadReader;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.UnBoldLabel;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.DownloadUtils;
-import org.openstreetmap.josm.tools.Utils;
 
 public class RouteMasterHeadlinePanel extends JPanel {
     public RouteMasterHeadlinePanel(RelationAccess masterRelation) {

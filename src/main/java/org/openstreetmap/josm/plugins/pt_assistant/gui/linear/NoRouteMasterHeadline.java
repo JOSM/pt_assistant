@@ -1,23 +1,18 @@
 package org.openstreetmap.josm.plugins.pt_assistant.gui.linear;
 
-import static org.openstreetmap.josm.plugins.pt_assistant.gui.linear.UnBoldLabel.safeHtml;
+import static org.openstreetmap.josm.plugins.pt_assistant.gui.utils.UnBoldLabel.safeHtml;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -30,6 +25,7 @@ import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.gui.ExtendedDialog;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.UnBoldLabel;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.DownloadUtils;
 import org.openstreetmap.josm.tools.GBC;
 

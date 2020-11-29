@@ -4,8 +4,9 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
-import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.AbstractTabManager;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.AbstractTabManager;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.RelationAccess;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.ZoomSaver;
 
 public class StopVicinityTabManager extends AbstractTabManager<StopVicinityPanel> {
     // Used so that zoom gets not lost when re-creating the view due to changes in the relation.

@@ -11,14 +11,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.swing.JLabel;
-
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.AbstractTabManager;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 
 /**

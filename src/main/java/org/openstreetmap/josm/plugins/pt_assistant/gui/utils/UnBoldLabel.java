@@ -1,10 +1,10 @@
-package org.openstreetmap.josm.plugins.pt_assistant.gui.linear;
+package org.openstreetmap.josm.plugins.pt_assistant.gui.utils;
 
 import java.awt.Dimension;
 
 import javax.swing.JLabel;
 
-class UnBoldLabel extends JLabel {
+public class UnBoldLabel extends JLabel {
     public UnBoldLabel(String text) {
         super(text);
         setHorizontalAlignment(LEFT);

@@ -1,0 +1,20 @@
+// Download all the data around the members of the stop area
+
+(
+  node(id:##NODEIDS##);
+  way(id:##WAYIDS##);
+  relation(id:##RELATIONIDS##);
+) -> .members;
+
+// 200m should be enough for public transport stops
+// If objects are further apart, they don't belong to that stop area any more.
+(
+  node(around.members:200);
+  way(around.members:200);
+  relation(around.members:200);
+) -> .vicinity;
+
+(.members; .vicinity; >>;);
+out meta;
+
+

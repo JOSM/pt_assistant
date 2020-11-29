@@ -1,8 +1,10 @@
-package org.openstreetmap.josm.plugins.pt_assistant.gui.stopvicinity;
+package org.openstreetmap.josm.plugins.pt_assistant.gui.utils;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -11,11 +13,12 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.Set;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
+import org.openstreetmap.josm.data.osm.event.AbstractDatasetChangedEvent;
 import org.openstreetmap.josm.data.osm.visitor.paint.StyledMapRenderer;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.layer.MainLayerManager;
@@ -25,15 +28,16 @@ import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.gui.mappaint.ElemStyles;
 import org.openstreetmap.josm.gui.mappaint.StyleSource;
 import org.openstreetmap.josm.gui.mappaint.mapcss.MapCSSStyleSource;
+import org.openstreetmap.josm.plugins.pt_assistant.data.DerivedDataSet;
 import org.openstreetmap.josm.tools.Utils;
 
 public abstract class AbstractVicinityPanel extends JPanel {
     // TODO: On remove, clean up dataSetCopy
 
-    protected final DataSetClone dataSetCopy;
+    protected final DerivedDataSet dataSetCopy;
     protected final MapView mapView;
 
-    public AbstractVicinityPanel(DataSetClone dataSetCopy, ZoomSaver zoom) {
+    public AbstractVicinityPanel(DerivedDataSet dataSetCopy, ZoomSaver zoom) {
         super(new BorderLayout());
         this.dataSetCopy = dataSetCopy;
 
@@ -42,6 +46,12 @@ public abstract class AbstractVicinityPanel extends JPanel {
             @Override
             protected MapViewPaintable.LayerPainter createMapViewPainter(MapViewEvent event) {
                 return new FixedStyleLayerPainter(this, readStyle());
+            }
+
+            @Override
+            public void processDatasetEvent(AbstractDatasetChangedEvent event) {
+                // Parent checks for save requirements => we don't need that, it just might deadlock.
+                invalidate();
             }
         });
         mapView = new MapView(layerManager, null) {
@@ -52,13 +62,14 @@ public abstract class AbstractVicinityPanel extends JPanel {
                 super.prepareToDraw();
                 if (initial) {
                     if (zoom.getLastZoom() != null) {
-                        zoomTo(zoom.getLastZoom());
+                        zoomTo(zoom.getLastZoom().getCenter().getEastNorth(),
+                            zoom.getLastZoom().getScale());
                     } else {
                         doInitialZoom();
                     }
                     initial = false;
                 }
-                zoom.setLastZoom(getState().getViewArea().getProjectionBounds());
+                zoom.setLastZoom(getState());
                 return true;
             }
         };
@@ -70,6 +81,37 @@ public abstract class AbstractVicinityPanel extends JPanel {
         mapView.addMouseMotionListener(listener);
 
         add(mapView);
+
+        addActionButtons();
+    }
+
+    private void addActionButtons() {
+        JComponent actionButtons = generateActionButtons();
+        if (actionButtons == null) {
+            return;
+        }
+        actionButtons.setSize(actionButtons.getPreferredSize());
+        setLocationToTopRight(mapView, actionButtons);
+        mapView.add(actionButtons);
+        mapView.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                setLocationToTopRight(mapView, actionButtons);
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                setLocationToTopRight(mapView, actionButtons);
+            }
+        });
+    }
+
+    private void setLocationToTopRight(MapView mapView, JComponent actionButtons) {
+        actionButtons.setLocation(mapView.getWidth() - actionButtons.getWidth() - 10, 10);
+    }
+
+    protected JComponent generateActionButtons() {
+        return null;
     }
 
     protected abstract void doInitialZoom();
@@ -100,8 +142,6 @@ public abstract class AbstractVicinityPanel extends JPanel {
     }
 
     private class ClickAndHoverListener implements MouseListener, MouseMotionListener {
-
-        private Set<OsmPrimitive> lastHighlighted = Collections.emptySet();
 
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -145,13 +185,11 @@ public abstract class AbstractVicinityPanel extends JPanel {
          */
         private void updateMousePosition(Point point) {
             OsmPrimitive toHighlight = point == null ? null : getPrimitiveAt(point);
-            Set<OsmPrimitive> currentHighlight = toHighlight == null ? Collections.emptySet() : Collections.singleton(toHighlight);
-            if (!lastHighlighted.equals(currentHighlight)) {
-                lastHighlighted.forEach(it -> it.setHighlighted(false));
-                currentHighlight.forEach(it -> it.setHighlighted(true));
-                lastHighlighted = currentHighlight;
+            if (toHighlight == null) {
+                dataSetCopy.highlight(Collections.emptySet());
+            } else {
+                dataSetCopy.highlight(Collections.singleton(toHighlight));
             }
-
         }
     }
 
