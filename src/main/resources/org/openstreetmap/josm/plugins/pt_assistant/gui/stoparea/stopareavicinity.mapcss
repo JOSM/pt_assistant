@@ -40,12 +40,12 @@ area[building] {
 relation[type="route"] >[role="stop"] node::icon_layer,
 relation[type="route"] >[role="stop_entry_only"] node::icon_layer,
 relation[type="route"] >[role="stop_exit_only"] node::icon_layer,
-node[public_transport=stop_position]::icon_layer {
+node|z-17[public_transport=stop_position]::icon_layer {
     icon-image: "presets/transport/tram.svg";
     object-z-index:1.0;
 }
 
-node[public_transport=platform]::icon_layer {
+node|z-17[public_transport=platform]::icon_layer {
     icon-image: "presets/transport/platform.svg";
     object-z-index:1.0;
 }
@@ -65,7 +65,7 @@ way[public_transport=platform]:closed {
     fill-color: #afafaf;
 }
 
-way[public_transport=platform]!:unclosed {
+way[public_transport=platform]!:closed {
     width: 5;
 }
 
@@ -126,3 +126,25 @@ relation[activePtRelation] >[role="stop"] node {
     symbol-size: 18;
 }
 
+/* Relations in the same area group are colored light green */
+
+relation[siblingOfActive] >[role="platform"] node {
+    symbol-shape: circle;
+    symbol-fill-color: #33c194;
+    symbol-size: 18;
+}
+
+relation[siblingOfActive] >[role="platform"] way {
+    color: #78ffd4;
+    text-color: #78ffd4;
+}
+
+relation[siblingOfActive] >[role="platform"] way:closed {
+    fill-color: #33c194;
+}
+
+relation[siblingOfActive] >[role="stop"] node {
+    symbol-shape: circle;
+    symbol-fill-color: #33c194;
+    symbol-size: 18;
+}

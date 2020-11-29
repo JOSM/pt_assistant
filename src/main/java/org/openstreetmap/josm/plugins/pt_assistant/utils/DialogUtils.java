@@ -2,10 +2,12 @@
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
 import java.awt.Component;
+import java.awt.EventQueue;
 
 import javax.swing.JOptionPane;
 
 import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 
 public final class DialogUtils {
     private DialogUtils() {
@@ -38,5 +40,22 @@ public final class DialogUtils {
             JOptionPane.YES_NO_OPTION,
             JOptionPane.QUESTION_MESSAGE
         );
+    }
+
+    /**
+     * Show or focus that relation editor
+     * @param editor The editor
+     */
+    public static void showRelationEditor(RelationEditor editor) {
+        if (editor.isVisible()) {
+            EventQueue.invokeLater(() -> {
+                editor.setAlwaysOnTop(true);
+                editor.toFront();
+                editor.requestFocus();
+                editor.setAlwaysOnTop(false);
+            });
+        } else {
+            editor.setVisible(true);
+        }
     }
 }

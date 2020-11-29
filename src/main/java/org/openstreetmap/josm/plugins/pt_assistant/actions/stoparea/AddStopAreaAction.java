@@ -7,18 +7,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import jdk.internal.module.ModuleHashesBuilder;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
-import org.openstreetmap.josm.data.osm.Tag;
-import org.openstreetmap.josm.data.osm.TagMap;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.DialogUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 
 public class AddStopAreaAction extends JosmAction {
@@ -72,18 +69,15 @@ public class AddStopAreaAction extends JosmAction {
             .map(selected -> new RelationMember(suggestRole(selected), selected))
             .forEach(areaRelation::addMember);
 
-        RelationEditor editor = RelationEditor.getEditor(
+        DialogUtils.showRelationEditor(RelationEditor.getEditor(
             MainApplication.getLayerManager().getEditLayer(),
             areaRelation,
             null /* no selected members */
-        );
-        editor.setVisible(true);
+        ));
     }
 
     private String suggestRole(OsmPrimitive selected) {
-        if (selected.hasTag(OSMTags.RAILWAY_TAG, OSMTags.PLATFORM_TAG_VALUE)
-            || selected.hasTag(OSMTags.HIGHWAY_TAG, OSMTags.PLATFORM_TAG_VALUE)
-            || selected.hasTag(OSMTags.PUBLIC_TRANSPORT_TAG, OSMTags.PLATFORM_TAG_VALUE)) {
+        if (StopUtils.isPlatform(selected)) {
             return OSMTags.PLATFORM_ROLE;
         } else if (selected.hasTag(OSMTags.HIGHWAY_TAG, OSMTags.BUS_STOP_TAG_VALUE)
             || selected.hasTag(OSMTags.PUBLIC_TRANSPORT_TAG, OSMTags.STOP_POSITION_TAG_VALUE)) {

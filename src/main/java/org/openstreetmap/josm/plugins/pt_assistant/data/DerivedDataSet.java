@@ -33,11 +33,11 @@ import org.openstreetmap.josm.data.osm.event.WayNodesChangedEvent;
 
 /**
  * An OSM dataset may not be used for two renderers (global things like style cache)
- *
+ * <p>
  * So we need to do a read-only copy of it and sync it with the main data set.
- *
+ * <p>
  * Advantage for us: We have our own highlight flags, our own other stuff.
- *
+ * <p>
  * This data set allows for filtering the primitives (e.g. bounding box) and adding more primitives by subclassing it.
  */
 public class DerivedDataSet {
@@ -142,6 +142,7 @@ public class DerivedDataSet {
 
     /**
      * Test if a OSM primitive should be included in this data set
+     *
      * @return The original primitive.
      */
     protected boolean isIncluded(OsmPrimitive primitive) {
@@ -150,9 +151,11 @@ public class DerivedDataSet {
 
     /**
      * Adds additional geometry to the new data set. Do not access getClone() in this method!
-     * @param addTo The new data set.
+     * You can access geometry from the original data set by calling the addOrGetDerived* methods.
+     *
+     * @param addTo Accessor methods to add the new geometry.
      */
-    protected void addAdditionalGeometry(DataSet addTo) {
+    protected void addAdditionalGeometry(AdditionalGeometryAccess addTo) {
         // Nop
     }
 
@@ -172,6 +175,9 @@ public class DerivedDataSet {
 
         copyFrom.getReadLock().lock();
         try {
+            // Do this first => some allows the implementer to replace some geometry before we do.
+            addAdditionalGeometry(new AdditionalGeometryAccess());
+
             for (Node n : copyFrom.getNodes()) {
                 if (isIncluded(n)) {
                     addOrGetDerivedNode(n);
@@ -190,8 +196,6 @@ public class DerivedDataSet {
                 }
             }
 
-            addAdditionalGeometry(clone);
-
             // For now, ignore the part of the selection that got deleted/changed in parent
             clone.setSelected(Collections.emptySet());
             // Ignore data source
@@ -204,6 +208,7 @@ public class DerivedDataSet {
 
     /**
      * Find the representation of that original primitive in our data set. Adds it if not present.
+     *
      * @param original The primitive
      * @return The derived primitve
      */
@@ -271,10 +276,16 @@ public class DerivedDataSet {
             T newPrimitive = deriver.apply(original);
             newPrimitive.setHighlighted(primitivesToHighlight.contains(newPrimitive.getPrimitiveId()));
             clone.addPrimitive(newPrimitive);
-            originalToCopy.put(original, newPrimitive);
+            registerCopy(original, newPrimitive);
             return newPrimitive;
         } finally {
             primitivesCurrentlyDeriving.remove(original);
+        }
+    }
+
+    private <T extends OsmPrimitive> void registerCopy(T original, T newPrimitive) {
+        if (originalToCopy.putIfAbsent(original, newPrimitive) != null) {
+            throw new IllegalArgumentException("Attempted to register a copy twice for " + original);
         }
     }
 
@@ -315,5 +326,30 @@ public class DerivedDataSet {
                     p.setHighlighted(flag);
                 }
             });
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends OsmPrimitive> T findOriginal(T primitive) {
+        return (T) originalToCopy
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() == primitive)
+            .map(Map.Entry::getKey)
+            .findFirst()
+            .orElse(null);
+    }
+
+    public class AdditionalGeometryAccess {
+        public <T extends OsmPrimitive> void addAsCopy(T original, T newPrimitive) {
+            Objects.requireNonNull(original, "original");
+            Objects.requireNonNull(newPrimitive, "newPrimitive");
+            registerCopy(original, newPrimitive);
+            add(newPrimitive);
+        }
+
+        public void add(OsmPrimitive newPrimitive) {
+            Objects.requireNonNull(newPrimitive, "newPrimitive");
+            clone.addPrimitive(newPrimitive);
+        }
     }
 }

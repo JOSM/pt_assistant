@@ -22,7 +22,15 @@ public final class StopUtils {
      * @return true if the relation is a stop_area, false otherwise.
      */
     public static boolean isStopArea(final Relation r) {
-        return r != null && r.hasTag("public_transport", OSMTags.STOP_AREA_TAG_VALUE);
+        return r != null
+            && r.hasTag(OSMTags.KEY_RELATION_TYPE, OSMTags.PUBLIC_TRANSPORT_TAG)
+            && r.hasTag(OSMTags.PUBLIC_TRANSPORT_TAG, OSMTags.STOP_AREA_TAG_VALUE);
+    }
+
+    public static boolean isStopAreaGroup(final Relation r) {
+        return r != null
+            && r.hasTag(OSMTags.KEY_RELATION_TYPE, OSMTags.PUBLIC_TRANSPORT_TAG)
+            && r.hasTag(OSMTags.PUBLIC_TRANSPORT_TAG, OSMTags.STOP_AREA_GROUP_TAG_VALUE);
     }
 
     /**
@@ -81,6 +89,23 @@ public final class StopUtils {
     public static Relation findContainingStopArea(OsmPrimitive primitive) {
         return (Relation) primitive.getReferrers().stream()
             .filter(it -> it instanceof Relation && isStopArea((Relation) it))
+            .findFirst()
+            .orElse(null);
+    }
+
+    public static boolean isPlatform(OsmPrimitive primitive) {
+        return primitive.hasTag(OSMTags.RAILWAY_TAG, OSMTags.PLATFORM_TAG_VALUE)
+            || primitive.hasTag(OSMTags.HIGHWAY_TAG, OSMTags.PLATFORM_TAG_VALUE)
+            || primitive.hasTag(OSMTags.PUBLIC_TRANSPORT_TAG, OSMTags.PLATFORM_TAG_VALUE);
+    }
+
+    public static Relation findParentStopGroup(Relation stopAreaRelation) {
+        return stopAreaRelation == null
+        ? null
+        : (Relation) stopAreaRelation
+            .getReferrers()
+            .stream()
+            .filter(r -> r instanceof Relation && StopUtils.isStopAreaGroup((Relation) r))
             .findFirst()
             .orElse(null);
     }

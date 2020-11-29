@@ -14,6 +14,17 @@
   relation(around.members:200);
 ) -> .vicinity;
 
+// All PT route areas in for them
+(
+  rel(bn.vicinity)["public_transport"="stop_area"];
+  rel(bw.vicinity)["public_transport"="stop_area"];
+  rel(br.vicinity)["public_transport"="stop_area"];
+) -> .stopAreas;
+
+(
+  rel(br.stopAreas)["public_transport"="stop_area_group"];
+) -> .stopAreaGroups;
+
 (.members; .vicinity; >>;);
 out meta;
 
