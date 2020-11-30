@@ -47,6 +47,7 @@ public class PublicTransportLinePanel extends JPanel {
 
         if (relations.isEmpty()) {
             add(new UnBoldLabel(tr("No public transport v2 routes are currently used for this relation.")));
+            add(Box.createVerticalGlue());
         } else {
             renderRelationGrid(p, relations);
         }

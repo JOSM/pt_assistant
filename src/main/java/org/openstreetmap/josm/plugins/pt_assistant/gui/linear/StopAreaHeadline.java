@@ -3,6 +3,7 @@ package org.openstreetmap.josm.plugins.pt_assistant.gui.linear;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JButton;
@@ -32,4 +33,8 @@ public class StopAreaHeadline extends JPanel {
         }), BorderLayout.EAST);
     }
 
+    @Override
+    public Dimension getMaximumSize() {
+        return new Dimension(super.getMaximumSize().width, super.getPreferredSize().height);
+    }
 }
