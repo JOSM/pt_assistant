@@ -5,6 +5,7 @@ import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.RelationAccess;
 import org.openstreetmap.josm.tools.Utils;
 
 /**
@@ -22,14 +23,20 @@ public final class StopUtils {
      * @return true if the relation is a stop_area, false otherwise.
      */
     public static boolean isStopArea(final Relation r) {
-        return r != null
-            && r.hasTag(OSMTags.KEY_RELATION_TYPE, OSMTags.PUBLIC_TRANSPORT_TAG)
+        return r != null && isStopArea(RelationAccess.of(r));
+    }
+
+    public static boolean isStopArea(RelationAccess r) {
+        return r.hasTag(OSMTags.KEY_RELATION_TYPE, OSMTags.PUBLIC_TRANSPORT_TAG)
             && r.hasTag(OSMTags.PUBLIC_TRANSPORT_TAG, OSMTags.STOP_AREA_TAG_VALUE);
     }
 
     public static boolean isStopAreaGroup(final Relation r) {
-        return r != null
-            && r.hasTag(OSMTags.KEY_RELATION_TYPE, OSMTags.PUBLIC_TRANSPORT_TAG)
+        return r != null && isStopAreaGroup(RelationAccess.of(r));
+    }
+
+    public static boolean isStopAreaGroup(final RelationAccess r) {
+        return r.hasTag(OSMTags.KEY_RELATION_TYPE, OSMTags.PUBLIC_TRANSPORT_TAG)
             && r.hasTag(OSMTags.PUBLIC_TRANSPORT_TAG, OSMTags.STOP_AREA_GROUP_TAG_VALUE);
     }
 

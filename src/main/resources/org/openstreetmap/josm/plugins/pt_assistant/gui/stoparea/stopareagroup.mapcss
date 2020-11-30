@@ -1,0 +1,38 @@
+
+/* Selectable */
+
+relation[public_transport="stop_area"] > node {
+    symbol-fill-color: white;
+    set point;
+}
+
+relation[public_transport="stop_area"] > way {
+    width: 2;
+    color: white;
+    text-color: white;
+}
+
+relation[public_transport="stop_area"] > way:closed {
+    fill-color: #dbdbdb;
+}
+
+/* Active */
+
+relation[childOfActiveAreaGroup] > node {
+    symbol-fill-color: #33c194;
+    set point;
+}
+
+relation[childOfActiveAreaGroup] > way {
+    color: #78ffd4;
+    text-color: #78ffd4;
+}
+
+relation[childOfActiveAreaGroup] > way:closed {
+    fill-color: #33c194;
+}
+
+node.point {
+    symbol-shape: circle;
+    symbol-size: 18;
+}

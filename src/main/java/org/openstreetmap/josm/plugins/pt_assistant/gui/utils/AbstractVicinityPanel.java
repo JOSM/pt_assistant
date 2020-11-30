@@ -3,46 +3,71 @@ package org.openstreetmap.josm.plugins.pt_assistant.gui.utils;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import org.openstreetmap.josm.actions.JosmAction;
+import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.IPrimitive;
+import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
+import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.event.AbstractDatasetChangedEvent;
+import org.openstreetmap.josm.data.osm.visitor.BoundingXYVisitor;
+import org.openstreetmap.josm.data.osm.visitor.OsmPrimitiveVisitor;
 import org.openstreetmap.josm.data.osm.visitor.paint.StyledMapRenderer;
 import org.openstreetmap.josm.gui.MapView;
+import org.openstreetmap.josm.gui.MapViewState;
+import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
+import org.openstreetmap.josm.gui.draw.MapViewPath;
 import org.openstreetmap.josm.gui.layer.MainLayerManager;
 import org.openstreetmap.josm.gui.layer.MapViewGraphics;
 import org.openstreetmap.josm.gui.layer.MapViewPaintable;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
+import org.openstreetmap.josm.gui.mappaint.Cascade;
 import org.openstreetmap.josm.gui.mappaint.ElemStyles;
 import org.openstreetmap.josm.gui.mappaint.MultiCascade;
 import org.openstreetmap.josm.gui.mappaint.StyleSource;
 import org.openstreetmap.josm.gui.mappaint.mapcss.MapCSSStyleSource;
 import org.openstreetmap.josm.plugins.pt_assistant.data.DerivedDataSet;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.RelationAccess;
+import org.openstreetmap.josm.tools.Pair;
 import org.openstreetmap.josm.tools.Utils;
 
 public abstract class AbstractVicinityPanel extends JPanel {
     // TODO: On remove, clean up dataSetCopy
 
     protected final DerivedDataSet dataSetCopy;
+    protected final IRelationEditorActionAccess editorAccess;
     protected final MapView mapView;
-    private final MapCSSStyleSource style = readStyle();
+    private final List<MapCSSStyleSource> style = Collections.unmodifiableList(readStyles());
 
-    public AbstractVicinityPanel(DerivedDataSet dataSetCopy, ZoomSaver zoom) {
+    public AbstractVicinityPanel(DerivedDataSet dataSetCopy,
+                                 IRelationEditorActionAccess editorAccess,
+                                 ZoomSaver zoom) {
         super(new BorderLayout());
-        this.dataSetCopy = dataSetCopy;
+        this.dataSetCopy = Objects.requireNonNull(dataSetCopy, "dataSetCopy");
+        this.editorAccess = Objects.requireNonNull(editorAccess, "editorAccess");
 
         MainLayerManager layerManager = new MainLayerManager();
         layerManager.addLayer(new OsmDataLayer(dataSetCopy.getClone(), "", null) {
@@ -117,25 +142,51 @@ public abstract class AbstractVicinityPanel extends JPanel {
         return null;
     }
 
-    protected abstract void doInitialZoom();
-
-    protected MapCSSStyleSource readStyle() {
-        return new MapCSSStyleSource("") {
+    protected JButton generateZoomToButton(final String name, final String tooltip) {
+        return new JButton(new JosmAction(
+            name,
+            "dialogs/autoscale/data",
+            tooltip,
+            null,
+            false
+        ) {
             @Override
-            public InputStream getSourceInputStream() throws IOException {
-                InputStream resource = Utils.getResourceAsStream(getClass(),
-                    getStylePath());
-                if (resource == null) {
-                    throw new IllegalStateException("Could not open bundled mapcss file");
-                }
-                return resource;
+            public void actionPerformed(ActionEvent e) {
+                doInitialZoom();
             }
-        };
+        });
     }
 
-    protected abstract String getStylePath();
+    protected abstract void doInitialZoom();
 
-    protected MapCSSStyleSource getStyle() {
+    protected List<MapCSSStyleSource> readStyles() {
+        return getStylePath()
+            .stream()
+            .map(stylePath -> new MapCSSStyleSource(stylePath) {
+                @Override
+                public InputStream getSourceInputStream() {
+                    InputStream resource = Utils.getResourceAsStream(getClass(), stylePath);
+                    if (resource == null) {
+                        throw new IllegalStateException("Could not open bundled mapcss file");
+                    }
+                    return resource;
+                }
+            })
+            .collect(Collectors.toList());
+    }
+
+    protected void zoomToEditorRelation() {
+        BoundingXYVisitor v = new BoundingXYVisitor();
+        RelationAccess.of(editorAccess).getMembers()
+            .forEach(
+            m -> m.getMember().accept((OsmPrimitiveVisitor) v));
+        mapView.zoomTo(v.getBounds());
+        mapView.zoomOut();
+    }
+
+    protected abstract List<String> getStylePath();
+
+    protected List<MapCSSStyleSource> getStyles() {
         return style;
     }
 
@@ -146,6 +197,26 @@ public abstract class AbstractVicinityPanel extends JPanel {
      */
     protected OsmPrimitive getPrimitiveAt(Point point) {
         return null;
+    }
+
+    protected Cascade getCascade(OsmPrimitive primitive) {
+        MultiCascade mc = new MultiCascade();
+        getStyles().forEach(style -> style.apply(mc, primitive, 1, false));
+        return mc.getOrCreateCascade("default");
+    }
+
+    protected void doAction(Point point) {
+        OsmPrimitive primitive = getPrimitiveAt(point);
+        if (primitive != null) {
+            OsmPrimitive originalPrimitive = dataSetCopy.findOriginal(primitive);
+            if (originalPrimitive != null) {
+                doAction(point, originalPrimitive);
+            }
+        }
+    }
+
+    protected void doAction(Point point, OsmPrimitive originalPrimitive) {
+        // nop
     }
 
     private class ClickAndHoverListener implements MouseListener, MouseMotionListener {
@@ -200,8 +271,71 @@ public abstract class AbstractVicinityPanel extends JPanel {
         }
     }
 
-    protected void doAction(Point point) {
-        // default nop
+    protected OsmPrimitive getOsmPrimitiveAt(Point point, Predicate<OsmPrimitive> matches) {
+        // Cannot use the mapView methods - they use a global ref to the active layer
+        MapViewState state = mapView.getState();
+        MapViewState.MapViewPoint center = state.getForView(point.getX(), point.getY());
+        BBox bbox = getBoundsAroundMouse(point, state);
+        List<Node> nodes = dataSetCopy.getClone().searchNodes(bbox);
+        Optional<Node> nearest = nodes.stream()
+            .filter(matches)
+            .min(Comparator.comparing(node -> state.getPointFor(node).distanceToInViewSq(center)));
+        if (nearest.isPresent()) {
+            return nearest.get();
+        } else {
+            // No nearest node => search way
+            List<Way> ways = dataSetCopy.getClone().searchWays(bbox)
+                .stream()
+                .filter(matches)
+                .collect(Collectors.toList());
+
+            Integer snapDistance = MapView.PROP_SNAP_DISTANCE.get();
+            return ways.stream()
+                .filter(way -> wayAreaContains(way, point))
+                .findFirst()
+                .orElseGet(() -> ways.stream()
+                    .map(way -> new Pair<>(way, distanceSq(way, point)))
+                    // Acutally, it is snap way distance, but we don't have that as prop
+                    .filter(wd -> wd.b < snapDistance * snapDistance)
+                    .min(Comparator.comparing(wd -> wd.b))
+                    .map(wd -> wd.a)
+                    .orElse(null));
+        }
+    }
+
+    private double distanceSq(Way way, Point point) {
+        double minDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < way.getNodesCount() - 1; i++) {
+            Point2D pA = mapView.getState().getPointFor(way.getNode(i)).getInView();
+            Point2D pB = mapView.getState().getPointFor(way.getNode(i + 1)).getInView();
+            double c = pA.distanceSq(pB);
+            if (c < 1) {
+                continue;
+            }
+
+            double a = point.distanceSq(pB);
+            double b = point.distanceSq(pA);
+            if (a > c || b > c) {
+                continue;
+            }
+
+            double perDistSq = a - (a - b + c) * (a - b + c) / 4 / c;
+            minDistance = Math.min(perDistSq, minDistance);
+        }
+        return minDistance;
+    }
+
+    private boolean wayAreaContains(Way way, Point point) {
+        MapViewPath path = new MapViewPath(mapView.getState());
+        path.appendClosed(way.getNodes(), false);
+        return path.contains(point);
+    }
+
+    private BBox getBoundsAroundMouse(Point point, MapViewState state) {
+        Integer snapDistance = MapView.PROP_SNAP_DISTANCE.get();
+        MapViewState.MapViewRectangle rect = state.getForView(point.getX() - snapDistance, point.getY() - snapDistance)
+            .rectTo(state.getForView(point.getX() + snapDistance, point.getY() + snapDistance));
+        return rect.getLatLonBoundsBox().toBBox();
     }
 
     public void dispose() {
@@ -210,14 +344,16 @@ public abstract class AbstractVicinityPanel extends JPanel {
 
     private static class FixedStyleLayerPainter implements MapViewPaintable.LayerPainter {
         private final OsmDataLayer layer;
-        private final ElemStyles styles;
+        private final ElemStyles elemStyles;
 
-        FixedStyleLayerPainter(OsmDataLayer layer, MapCSSStyleSource style) {
+        FixedStyleLayerPainter(OsmDataLayer layer, List<MapCSSStyleSource> styles) {
             this.layer = layer;
-            styles = new ElemStyles();
+            elemStyles = new ElemStyles();
             // Ugly hack
-            addStyle(styles, style);
-            style.loadStyleSource(); // < we need to do this, JOSM won't do it.
+            styles.forEach(style -> {
+                addStyle(elemStyles, style);
+                style.loadStyleSource(); // < we need to do this, JOSM won't do it.
+            });
         }
 
         @Override
@@ -225,7 +361,7 @@ public abstract class AbstractVicinityPanel extends JPanel {
             StyledMapRenderer renderer = new StyledMapRenderer(graphics.getDefaultGraphics(),
                 graphics.getMapView(),
                 false);
-            renderer.setStyles(styles);
+            renderer.setStyles(elemStyles);
             renderer.render(layer.getDataSet(), false, graphics.getClipBounds().getLatLonBoundsBox());
         }
 

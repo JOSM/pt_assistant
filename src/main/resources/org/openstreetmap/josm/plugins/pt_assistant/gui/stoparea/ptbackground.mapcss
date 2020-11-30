@@ -1,0 +1,76 @@
+canvas {
+    fill-color: black;
+    default-points: false;
+    default-lines: false;
+}
+
+/* Background geometry */
+way[highway] {
+    width: 4;
+    color: #555555;
+}
+
+way[railway="funicular"],
+way[railway="light_rail"],
+way[railway="monorail"],
+way[railway="narrow_gauge"],
+way[railway="preserved"],
+way[railway="rail"],
+way[railway="subway"],
+way[railway="tram"] {
+    width: 2;
+    color: #000000;
+    dashes: 12,12;
+    casing-color: #555555;
+    casing-width: 1;
+}
+
+way[highway=footway],
+way[highway=cycleway],
+way[highway=path] {
+    width: 2;
+}
+
+area[building] {
+    fill-color: #555555;
+}
+
+node[amenity] {
+    symbol-fill-color: #555555;
+    set point;
+    set emptymember;
+}
+
+node[railway=station],
+node[public_transport=station] {
+    symbol-fill-color: #555555;
+    set emptymember;
+}
+
+
+relation[type="route"][route="train"] >[role=""] way,
+relation[type="route"][route="train"] >[role="hail_and_ride"] way,
+relation[type="route"][route="subway"] >[role=""] way,
+relation[type="route"][route="subway"] >[role="hail_and_ride"] way,
+relation[type="route"][route="monorail"] >[role=""] way,
+relation[type="route"][route="monorail"] >[role="hail_and_ride"] way,
+relation[type="route"][route="tram"] >[role=""] way,
+relation[type="route"][route="tram"] >[role="hail_and_ride"] way {
+    width: 2;
+    color: #000000;
+    dashes: 12,12;
+    casing-color: #dddddd;
+    casing-width: 1;
+    z-index: 2;
+}
+
+relation[type="route"][route="bus"] >[role=""] way,
+relation[type="route"][route="bus"] >[role="hail_and_ride"] way,
+relation[type="route"][route="trolleybus"] >[role=""] way,
+relation[type="route"][route="trolleybus"] >[role="hail_and_ride"] way,
+relation[type="route"][route="ferry"] >[role=""] way,
+relation[type="route"][route="ferry"] >[role="hail_and_ride"] way {
+    width: 4;
+    color: #dddddd;
+    z-index: 2;
+}

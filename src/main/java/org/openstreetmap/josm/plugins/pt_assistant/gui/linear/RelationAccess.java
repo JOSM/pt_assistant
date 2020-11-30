@@ -68,4 +68,8 @@ public interface RelationAccess {
     default long getRelationId() {
         return -1;
     }
+
+    default boolean hasTag(String key, String value) {
+        return value.equals(get(key));
+    }
 }
