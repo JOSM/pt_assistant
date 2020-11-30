@@ -38,6 +38,7 @@ public abstract class AbstractVicinityPanel extends JPanel {
 
     protected final DerivedDataSet dataSetCopy;
     protected final MapView mapView;
+    private final MapCSSStyleSource style = readStyle();
 
     public AbstractVicinityPanel(DerivedDataSet dataSetCopy, ZoomSaver zoom) {
         super(new BorderLayout());
@@ -47,7 +48,7 @@ public abstract class AbstractVicinityPanel extends JPanel {
         layerManager.addLayer(new OsmDataLayer(dataSetCopy.getClone(), "", null) {
             @Override
             protected MapViewPaintable.LayerPainter createMapViewPainter(MapViewEvent event) {
-                return new FixedStyleLayerPainter(this, readStyle());
+                return new FixedStyleLayerPainter(this, style);
             }
 
             @Override
@@ -118,7 +119,7 @@ public abstract class AbstractVicinityPanel extends JPanel {
 
     protected abstract void doInitialZoom();
 
-    private MapCSSStyleSource readStyle() {
+    protected MapCSSStyleSource readStyle() {
         return new MapCSSStyleSource("") {
             @Override
             public InputStream getSourceInputStream() throws IOException {
@@ -133,6 +134,10 @@ public abstract class AbstractVicinityPanel extends JPanel {
     }
 
     protected abstract String getStylePath();
+
+    protected MapCSSStyleSource getStyle() {
+        return style;
+    }
 
     /**
      * Get the primitive to select for the given point

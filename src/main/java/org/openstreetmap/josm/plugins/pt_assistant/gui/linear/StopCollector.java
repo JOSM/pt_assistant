@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -131,20 +132,28 @@ public class StopCollector {
     }
 
     private void collectStops(CollectedStopsForRelation collectFor) {
-        int nextInsertPosition = 0;
+        int nextIndex = 0;
         boolean isCollectingDownward = true;
-        int lastIndex = -1;
+        StopWithNotes lastStopFound = null;
         List<StopPositionEvent> stopEvents = collectFor.findStopPositions();
         for (StopPositionEvent event : stopEvents) {
             FoundStopPosition stop = new FoundStopPosition(event.getStop());
             Optional<FoundStop> alreadyFoundStop = findStop(stop);
             FoundStop actualStop;
             if (alreadyFoundStop.isPresent()) {
-                nextInsertPosition = allStops.indexOf(alreadyFoundStop.get());
-                isCollectingDownward = nextInsertPosition > lastIndex;
+                if (lastStopFound != null && lastStopFound.stop.equals(alreadyFoundStop.get())) {
+                    // We found a stop twice
+                    // This may happen e.g. if the train stops there twice or if platform + stop is added for a stop area.
+                    lastStopFound.skippedAfter = event.isSkippedAfter();
+                    lastStopFound.addMeta(stop);
+                    continue;
+                }
+                nextIndex = allStops.indexOf(alreadyFoundStop.get());
+                int lastIndex = lastStopFound == null ? -1 : index(lastStopFound);
+                isCollectingDownward = nextIndex > lastIndex;
                 actualStop = alreadyFoundStop.get();
                 if (isCollectingDownward) {
-                    nextInsertPosition++;
+                    nextIndex++;
                 }
             } else {
                 Optional<Relation> stopArea = stop.findStopArea();
@@ -153,7 +162,7 @@ public class StopCollector {
                 } else {
                     actualStop = stop;
                 }
-                if (lastIndex == -1) {
+                if (lastStopFound == null) {
                     // This is the first node. Guess the best insert position for now.
                     // For this, we need to skip ahead and search the first stop that matches
                     // TODO: This code is not really efficcient
@@ -163,28 +172,29 @@ public class StopCollector {
                         .map(this::findStop)
                         .filter(Optional::isPresent)
                         .map(Optional::get)
+                        .distinct()
                         .map(this::index)
                         .limit(2)
                         .collect(Collectors.toList());
                     if (nextPositions.size() > 1) {
                         isCollectingDownward = nextPositions.get(0) < nextPositions.get(1);
-                        nextInsertPosition = nextPositions.get(0) + (isCollectingDownward ? 0 : 1);
+                        nextIndex = nextPositions.get(0) + (isCollectingDownward ? 0 : 1);
                     } else if (nextPositions.size() == 1) {
-                        nextInsertPosition = nextPositions.get(0);
+                        nextIndex = nextPositions.get(0);
                     } else {
                         // No connection to any previous route. May also happen for first route
-                        nextInsertPosition = allStops.size();
+                        nextIndex = allStops.size();
                     }
                 }
-                allStops.add(nextInsertPosition, actualStop);
+                allStops.add(nextIndex, actualStop);
                 if (isCollectingDownward) {
-                    nextInsertPosition++;
+                    nextIndex++;
                 }
             }
-            StopWithNotes stopFound = new StopWithNotes(actualStop, stop.entryExit(),
-                stop.member.getMember().get("ref"), event.isSkippedBefore(), event.isSkippedAfter());
+            StopWithNotes stopFound = new StopWithNotes(actualStop, event.isSkippedBefore(), event.isSkippedAfter());
+            stopFound.addMeta(stop);
             collectFor.stops.add(stopFound);
-            lastIndex = index(stopFound);
+            lastStopFound = stopFound;
         }
 
         // Now we add two NOP stops to top + button. We need them for drawing U turns.
@@ -234,17 +244,26 @@ public class StopCollector {
 
     private static class StopWithNotes {
         private final FoundStop stop;
-        private final EntryExit entryExit;
-        private final String notes;
+        private EntryExit entryExit;
+        private String notes;
         private final boolean skippedBefore;
-        private final boolean skippedAfter;
+        private boolean skippedAfter;
 
-        public StopWithNotes(FoundStop stop, EntryExit entryExit, String notes, boolean skippedBefore, boolean skippedAfter) {
+        public StopWithNotes(FoundStop stop, boolean skippedBefore, boolean skippedAfter) {
             this.stop = stop;
-            this.entryExit = entryExit;
-            this.notes = notes;
+            this.notes = "";
             this.skippedBefore = skippedBefore;
             this.skippedAfter = skippedAfter;
+        }
+
+        public void addMeta(FoundStopPosition stop) {
+            EntryExit entryExit = stop.entryExit();
+            Objects.requireNonNull(entryExit, "entryExit");
+            if (this.entryExit == null) {
+                this.entryExit = entryExit;
+            }
+
+            // TODO: Add to notes: stop.member.getMember().get("ref")
         }
     }
 

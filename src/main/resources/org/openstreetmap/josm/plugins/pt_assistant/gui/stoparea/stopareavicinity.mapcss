@@ -1,3 +1,5 @@
+/* The classes (stop, emptymember, platform) are used to determine the actions to take. */
+
 canvas {
     fill-color: black;
     default-points: false;
@@ -35,19 +37,25 @@ area[building] {
     fill-color: #555555;
 }
 
+node[amenity] {
+    symbol-fill-color: #555555;
+    set point;
+    set emptymember;
+}
+
+node[railway=station],
+node[public_transport=station] {
+    symbol-fill-color: #555555;
+    set emptymember;
+}
+
 /* Highlighted PT geomentry */
 
-relation[type="route"] >[role="stop"] node::icon_layer,
-relation[type="route"] >[role="stop_entry_only"] node::icon_layer,
-relation[type="route"] >[role="stop_exit_only"] node::icon_layer,
-node|z-17[public_transport=stop_position]::icon_layer {
-    icon-image: "presets/transport/tram.svg";
-    object-z-index:1.0;
-}
 
 node|z-17[public_transport=platform]::icon_layer {
     icon-image: "presets/transport/platform.svg";
     object-z-index:1.0;
+    set platform;
 }
 
 way[public_transport=platform] {
@@ -60,6 +68,7 @@ way[public_transport=platform] {
     text-anchor-horizontal: center;
     text-anchor-vertical: center;
     z-index: 2;
+    set platform;
 }
 way[public_transport=platform]:closed {
     fill-color: #afafaf;
@@ -96,37 +105,55 @@ relation[type="route"][route="ferry"] >[role="hail_and_ride"] way {
     z-index: 2;
 }
 
+node[public_transport="stop_position"],
 relation[type="route"] >[role="stop"] node,
 relation[type="route"] >[role="stop_entry_only"] node,
 relation[type="route"] >[role="stop_exit_only"] node {
-    symbol-shape: circle;
     symbol-fill-color: #dddddd;
-    symbol-size: 18;
+    set point;
+    set stop_position;
 }
 
-/* Current relation is colored blue */
-relation[activePtRelation] >[role="platform"] node {
-    symbol-shape: circle;
+/* Current relation is colored blue. Invalid members are colored red */
+relation[activePtRelation] > node {
+    symbol-fill-color: #e83333;
+    set point;
+}
+
+relation[activePtRelation] > way {
+    width: 2;
+    color: #e83333;
+}
+
+relation[activePtRelation] > way:closed {
+    fill-color: #921515;
+}
+
+
+relation[activePtRelation] >[role="platform"] node.platform {
     symbol-fill-color: #336ec1;
-    symbol-size: 18;
+    set .point;
 }
 
-relation[activePtRelation] >[role="platform"] way {
+relation[activePtRelation] >[role="platform"] way.platform {
     color: #4d9bff;
     text-color: #4d9bff;
 }
 
-relation[activePtRelation] >[role="platform"] way:closed {
+relation[activePtRelation] >[role="platform"] way:closed.platform {
     fill-color: #336ec1;
 }
 
-relation[activePtRelation] >[role="stop"] node {
-    symbol-shape: circle;
+relation[activePtRelation] >[role="stop"] node.stop_position {
     symbol-fill-color: #336ec1;
-    symbol-size: 18;
+    set .point;
 }
 
-/* Relations in the same area group are colored light green */
+relation[activePtRelation] >[role=""] node.emptymember {
+    symbol-fill-color: #336ec1;
+}
+
+/* (valid) relations in the same area group are colored light green */
 
 relation[siblingOfActive] >[role="platform"] node {
     symbol-shape: circle;
@@ -144,7 +171,11 @@ relation[siblingOfActive] >[role="platform"] way:closed {
 }
 
 relation[siblingOfActive] >[role="stop"] node {
-    symbol-shape: circle;
     symbol-fill-color: #33c194;
+    set point;
+}
+
+node.point {
+    symbol-shape: circle;
     symbol-size: 18;
 }
