@@ -55,7 +55,12 @@ node[public_transport=station] {
 node|z-17[public_transport=platform]::icon_layer {
     icon-image: "presets/transport/platform.svg";
     object-z-index:1.0;
+}
+
+node[public_transport=platform] {
+    symbol-fill-color: #dddddd;
     set platform;
+    set point;
 }
 
 way[public_transport=platform] {
@@ -77,6 +82,7 @@ way[public_transport=platform]:closed {
 way[public_transport=platform]!:closed {
     width: 5;
 }
+
 
 relation[type="route"][route="train"] >[role=""] way,
 relation[type="route"][route="train"] >[role="hail_and_ride"] way,
