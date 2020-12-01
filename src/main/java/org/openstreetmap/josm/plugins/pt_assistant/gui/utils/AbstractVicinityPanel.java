@@ -14,11 +14,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -55,8 +57,6 @@ import org.openstreetmap.josm.tools.Pair;
 import org.openstreetmap.josm.tools.Utils;
 
 public abstract class AbstractVicinityPanel extends JPanel {
-    // TODO: On remove, clean up dataSetCopy
-
     protected final DerivedDataSet dataSetCopy;
     protected final IRelationEditorActionAccess editorAccess;
     protected final MapView mapView;
@@ -262,12 +262,17 @@ public abstract class AbstractVicinityPanel extends JPanel {
          * @param point The point, may be null.
          */
         private void updateMousePosition(Point point) {
-            OsmPrimitive toHighlight = point == null ? null : getPrimitiveAt(point);
-            if (toHighlight == null) {
-                dataSetCopy.highlight(Collections.emptySet());
-            } else {
-                dataSetCopy.highlight(Collections.singleton(toHighlight));
-            }
+            Set<OsmPrimitive> toHighlight = point == null ? Collections.emptySet() : getToHighlightFor(point);
+            dataSetCopy.highlight(toHighlight);
+        }
+    }
+
+    protected Set<OsmPrimitive> getToHighlightFor(Point point) {
+        OsmPrimitive toHighlight = getPrimitiveAt(point);
+        if (toHighlight == null) {
+            return Collections.emptySet();
+        } else {
+            return Collections.singleton(toHighlight);
         }
     }
 

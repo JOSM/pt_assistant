@@ -63,24 +63,29 @@ relation[activePtRelation] > way:closed {
 relation[activePtRelation] >[role="platform"] node.platform {
     symbol-fill-color: #336ec1;
     set .point;
+    set .validInCurrentRelation;
 }
 
 relation[activePtRelation] >[role="platform"] way.platform {
     color: #4d9bff;
     text-color: #4d9bff;
+    set .validInCurrentRelation;
 }
 
 relation[activePtRelation] >[role="platform"] way:closed.platform {
     fill-color: #336ec1;
+    set .validInCurrentRelation;
 }
 
 relation[activePtRelation] >[role="stop"] node.stop_position {
     symbol-fill-color: #336ec1;
     set .point;
+    set .validInCurrentRelation;
 }
 
 relation[activePtRelation] >[role=""] node.emptymember {
     symbol-fill-color: #336ec1;
+    set .validInCurrentRelation;
 }
 
 /* (valid) relations in the same area group are colored light green */
@@ -103,6 +108,18 @@ relation[siblingOfActive] >[role="platform"] way:closed {
 relation[siblingOfActive] >[role="stop"] node {
     symbol-fill-color: #33c194;
     set point;
+}
+
+/* Everything orange is member in two PT area relations */
+
+relation[!activePtRelation][public_transport="stop_area"] > node.validInCurrentRelation {
+    symbol-fill-color: #fcbd75;
+}
+
+relation[!activePtRelation][public_transport="stop_area"] > way.validInCurrentRelation {
+    color: #fcbd75;
+    fill-color: #ff7500;
+    text-color: #fcbd75;
 }
 
 node.point {

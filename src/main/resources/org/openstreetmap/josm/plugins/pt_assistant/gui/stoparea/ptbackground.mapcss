@@ -42,8 +42,10 @@ node[amenity] {
 }
 
 node[railway=station],
+node[railway=tram_stop],
 node[public_transport=station] {
     symbol-fill-color: #555555;
+    set point;
     set emptymember;
 }
 
