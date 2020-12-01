@@ -29,6 +29,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.openstreetmap.josm.actions.JosmAction;
+import org.openstreetmap.josm.data.ProjectionBounds;
 import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.IPrimitive;
 import org.openstreetmap.josm.data.osm.Node;
@@ -150,6 +151,9 @@ public abstract class AbstractVicinityPanel extends JPanel {
             null,
             false
         ) {
+            {
+                setEnabled(getZoomToBounds() != null);
+            }
             @Override
             public void actionPerformed(ActionEvent e) {
                 doInitialZoom();
@@ -175,13 +179,19 @@ public abstract class AbstractVicinityPanel extends JPanel {
             .collect(Collectors.toList());
     }
 
-    protected void zoomToEditorRelation() {
+    protected final void zoomToEditorRelation() {
+        ProjectionBounds bounds = getZoomToBounds();
+        if (bounds != null) {
+            mapView.zoomTo(bounds);
+            mapView.zoomOut();
+        }
+    }
+
+    protected ProjectionBounds getZoomToBounds() {
         BoundingXYVisitor v = new BoundingXYVisitor();
         RelationAccess.of(editorAccess).getMembers()
-            .forEach(
-            m -> m.getMember().accept((OsmPrimitiveVisitor) v));
-        mapView.zoomTo(v.getBounds());
-        mapView.zoomOut();
+            .forEach(m -> m.getMember().accept((OsmPrimitiveVisitor) v));
+        return v.getBounds();
     }
 
     protected abstract List<String> getStylePath();
