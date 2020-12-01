@@ -13,16 +13,20 @@ import javax.swing.JPanel;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.UnBoldLabel;
+import org.openstreetmap.josm.plugins.pt_assistant.utils.ColorPalette;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.DownloadUtils;
+import org.openstreetmap.josm.tools.ColorHelper;
 
 public class RouteMasterHeadlinePanel extends JPanel {
     public RouteMasterHeadlinePanel(RelationAccess masterRelation) {
         setLayout(new BorderLayout());
         String color = masterRelation.get("colour");
-            if (color == null) {
-                color = "#888888";
-            }
-        String headline = MessageFormat.format("<font bgcolor=\"{0}\">{1}</font> {2}", safeHtml(color),
+        if (color == null) {
+            color = "#666666";
+        }
+        String font = ColorHelper.color2html(ColorPalette.fontColor(ColorHelper.html2color(color)));
+        String headline = MessageFormat.format("<font bgcolor=\"{0}\" color=\"{1}\">{2}</font> {3}",
+            safeHtml(color), font,
             safeHtml(masterRelation.get("ref")), safeHtml(masterRelation.get("name")));
         String infos = safeHtml(masterRelation.get("operator")) + " " + safeHtml(masterRelation.get("network"));
         String routeMasterText = MessageFormat.format("<html><h2>{0}</h2><div>{1}</div></html>", headline, infos);

@@ -20,4 +20,12 @@ public final class ColorPalette {
     public static final Color REF_LABEL_COLOR = new Color(0x80FFFFFF, true);
 
     public static Color[] FIVE_COLORS = { GREEN, RED, BLUE, YELLOW, CYAN };
+
+    public static Color fontColor(Color color) {
+        if ((color.getRed() + color.getGreen() + color.getBlue()) / 3 < 128) {
+            return Color.WHITE;
+        } else {
+            return Color.BLACK;
+        }
+    }
 }

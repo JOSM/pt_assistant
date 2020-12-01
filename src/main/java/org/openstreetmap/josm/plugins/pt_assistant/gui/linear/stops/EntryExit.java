@@ -1,8 +1,8 @@
-package org.openstreetmap.josm.plugins.pt_assistant.gui.linear;
+package org.openstreetmap.josm.plugins.pt_assistant.gui.linear.stops;
 
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
 
-enum EntryExit {
+public enum EntryExit {
     ENTRY,
     EXIT,
     BOTH;

@@ -1,9 +1,10 @@
-package org.openstreetmap.josm.plugins.pt_assistant.gui.linear;
+package org.openstreetmap.josm.plugins.pt_assistant.gui.linear.lines;
 
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.RelationAccess;
 import org.openstreetmap.josm.tools.ColorHelper;
 
 import java.awt.Color;
@@ -56,6 +57,10 @@ public class LineRelation {
         return getRelation().getMembers()
             .stream()
             .filter(it -> OSMTags.STOPS_AND_PLATFORMS_ROLES.contains(it.getRole()));
+    }
+
+    public LineRefKey getLineRefKey() {
+        return new LineRefKeyEmpty();
     }
 
     public static class StopPositionEvent {

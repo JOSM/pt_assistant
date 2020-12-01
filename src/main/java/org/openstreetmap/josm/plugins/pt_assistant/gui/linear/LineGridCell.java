@@ -12,6 +12,8 @@ import java.util.function.Consumer;
 
 import javax.swing.JPanel;
 
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.stops.EntryExit;
+
 /**
  * A cell in the line grid.
  * Displays a stop, one or multiple lines and other symbols
@@ -112,7 +114,7 @@ public class LineGridCell extends JPanel {
             setLinePaint(graphics2D);
             Path2D.Double path = new Path2D.Double();
             int y = down ? yMin : yMax;
-            int cx = (xMax - xMin) / 2;
+            int cx = (xMax + xMin) / 2;
             path.moveTo(cx - 5, y);
             path.lineTo(cx + 5, y);
             path.lineTo(cx, y + 8 * (down ? 1 : -1));
@@ -138,6 +140,8 @@ public class LineGridCell extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
+        g.setColor(getBackground());
+        g.fillRect(0, 0, getWidth(), getHeight());
         toPaint.forEach(it -> it.accept((Graphics2D) g));
     }
 

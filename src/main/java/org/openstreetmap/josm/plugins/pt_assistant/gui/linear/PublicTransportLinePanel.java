@@ -3,6 +3,7 @@ package org.openstreetmap.josm.plugins.pt_assistant.gui.linear;
 import static org.openstreetmap.josm.plugins.pt_assistant.gui.utils.UnBoldLabel.safeHtml;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -10,10 +11,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
+import java.util.BitSet;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -22,10 +24,15 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import org.openstreetmap.josm.actions.relation.EditRelationAction;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.lines.LineRefKey;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.lines.LineRefKeyEmpty;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.lines.LineRelation;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.lines.LineRelationsProvider;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.stops.FoundStop;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.stops.StopCollector;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.UnBoldLabel;
 import org.openstreetmap.josm.tools.GBC;
 import org.openstreetmap.josm.tools.ImageProvider;
@@ -34,6 +41,8 @@ import org.openstreetmap.josm.tools.ImageProvider;
  * This panel displays a public transport line and it's stops
  */
 public class PublicTransportLinePanel extends JPanel {
+
+    public static final Color HIGHLIGHT = new Color(0x6989FF);
 
     public PublicTransportLinePanel(LineRelationsProvider p) {
         List<LineRelation> relations = Objects.requireNonNull(p.getRelations(), "p.getRelations()");
@@ -49,52 +58,105 @@ public class PublicTransportLinePanel extends JPanel {
             add(new UnBoldLabel(tr("No public transport v2 routes are currently used for this relation.")));
             add(Box.createVerticalGlue());
         } else {
-            renderRelationGrid(p, relations);
+            renderRelationGrid(p, sortByRefKeys(relations));
         }
+    }
+
+    private List<LineRelation> sortByRefKeys(List<LineRelation> relations) {
+        // Don't just use the ref. This compares to LineRefKey, since we may have multiple with same ref.
+        List<LineRefKey> allRefs = relations
+            .stream()
+            .map(LineRelation::getLineRefKey)
+            .sorted(Comparator.comparing(LineRefKey::getRef))
+            .distinct()
+            .collect(Collectors.toList());
+
+        Comparator<LineRelation> byRefKey = Comparator.comparing(it -> allRefs.indexOf(it.getLineRefKey()));
+        return relations
+            .stream()
+            .sorted(byRefKey.thenComparing(it -> it.getRelation().get("ref")))
+            .collect(Collectors.toList());
     }
 
     private void renderRelationGrid(LineRelationsProvider p, List<LineRelation> relations) {
         int actionColumn = relations.size();
         int labelColumn = relations.size() + 1;
+        JPanel gridArea = new JPanel(new GridBagLayout());
+        int stopGridOffset;
+        BitSet stopsToHighlight = new BitSet();
+
+        StopCollector collector = new StopCollector(relations);
+        List<FoundStop> stops = collector.getAllStops();
 
         // HEADER LINES
-        JPanel gridArea = new JPanel(new GridBagLayout());
-        for (int i = 0; i < relations.size(); i++) {
-            RelationAccess relation = relations.get(i).getRelation();
-            gridArea.add(new LineGridHorizontalColumnArrow(), GBC.std(i, i).span(relations.size() - i).fill().weight(0, 0));
-            String name = safeHtml(relation.get("name"));
-            String path = Stream.of(relation.get("from"), relation.get("via"), relation.get("to")).filter(Objects::nonNull).collect(Collectors.joining(" → "));
-            UnBoldLabel label = new UnBoldLabel(MessageFormat.format("<html><div><font color=\"{2}\">{0}</font></div><div>" + "<font color=\"{2}\">{1}</font></div></html>",
-                name, safeHtml(path), relations.get(i).isPrimary() ? "black" : "#888888"));
-            gridArea.add(label, GBC.std(labelColumn, i).fill(GridBagConstraints.HORIZONTAL).weight(1, 0));
+        if (relations.size() <= 6 || stops.isEmpty()) {
+            // Horizontal headers to the right of all columns
+            stopGridOffset = relations.size();
+            for (int i = 0; i < relations.size(); i++) {
+                gridArea.add(new LineGridHorizontalColumnArrow(),
+                    GBC.std(i, i).span(relations.size() - i).fill().weight(0, 0));
+                gridArea.add(new LineGridRouteActions(p.getLayer(), relations.get(i)),
+                    GBC.std(actionColumn, i));
+                gridArea.add(new LineGridRouteHeader(relations.get(i)),
+                    GBC.std(labelColumn, i).fill(GridBagConstraints.HORIZONTAL).weight(1, 0));
+            }
+        } else {
+            // Diagonal headers above each column
+            stopGridOffset = 2;
+            for (int i = 0; i < relations.size(); i++) {
+                gridArea.add(new Rotate90DegreesPanel(new LineGridRouteHeader(relations.get(i))),
+                    GBC.std(i, 0).fill(GridBagConstraints.VERTICAL).weight(0, 0));
+                gridArea.add(new LineGridRouteActions(p.getLayer(), relations.get(i)),
+                    GBC.std(i, 1));
+            }
+        }
 
-            gridArea.add(createActions(
-                createAction(tr("Open route relation"), new ImageProvider("dialogs", "edit"),
-                    relation.getRelation() == null ? null : () -> EditRelationAction.launchEditor(relation.getRelation()))
-            ), GBC.std(actionColumn, i));
+        // Line ref keys (e.g. for stop areas it indicates which platform the train stops at)
+        if (!relations.stream().allMatch(it -> it.getLineRefKey().equals(new LineRefKeyEmpty()))) {
+            // We have line refs => add them to the top of each line(s)
+            for (int i = 0; i < relations.size(); i++) {
+                LineRefKey lineRefKey = relations.get(i).getLineRefKey();
+                int start = i;
+                while (i + 1 < relations.size()
+                    && relations.get(i + 1).getLineRefKey().equals(lineRefKey)) {
+                    i++;
+                }
+                gridArea.add(new LineRefKeyPanel(lineRefKey),
+                    GBC.std(start, stopGridOffset).span(i - start + 1).fill(GridBagConstraints.HORIZONTAL).weight(0, 0));
+            }
+            stopGridOffset++;
         }
 
         // CONTENT LINES
-        StopCollector collector = new StopCollector(relations);
-        List<StopCollector.FoundStop> stops = collector.getAllStops();
-        int stopGridOffset = relations.size();
         for (int i = 0; i < stops.size(); i++) {
-            StopCollector.FoundStop stop = stops.get(i);
+            FoundStop stop = stops.get(i);
+            boolean shouldHighlightStop = p.shouldHighlightStop(stop);
             if (stop.isIncomplete() || !stop.getNameAndInfos().isEmpty()) {
                 String incomplete = stop.isIncomplete() ? " <font color=\"red\">" + tr("Incomplete") + "</font>" : "";
                 UnBoldLabel label = new UnBoldLabel(MessageFormat.format("<html>{0}{1}</html>", safeHtml(stop.getNameAndInfos()), incomplete));
+                if (shouldHighlightStop) {
+                    label.setBackground(HIGHLIGHT);
+                }
                 gridArea.add(label, GBC.std(labelColumn, stopGridOffset + i));
             }
             Component actions = stop.createActionButtons();
+            if (shouldHighlightStop) {
+                actions.setBackground(HIGHLIGHT);
+            }
             if (actions != null) {
                 gridArea.add(actions, GBC.std(actionColumn, stopGridOffset + i));
             }
+            stopsToHighlight.set(i, shouldHighlightStop);
         }
         List<List<LineGridCell>> gridColumns = collector.getLineGrid();
         for (int column = 0; column < gridColumns.size(); column++) {
             List<LineGridCell> lineCells = gridColumns.get(column);
             for (int row = 0; row < lineCells.size(); row++) {
-                gridArea.add(lineCells.get(row), GBC.std(column, stopGridOffset + row).fill().weight(0, 0));
+                LineGridCell comp = lineCells.get(row);
+                if (stopsToHighlight.get(row)) {
+                    comp.setBackground(HIGHLIGHT);
+                }
+                gridArea.add(comp, GBC.std(column, stopGridOffset + row).fill().weight(0, 0));
             }
         }
         // SPACING LINES (below all others, make sure that each column has a min width and remaining space is filled)
@@ -118,8 +180,7 @@ public class PublicTransportLinePanel extends JPanel {
             {
                 // putValue(NAME, label);
                 putValue(SHORT_DESCRIPTION, label);
-                icon.getResource()
-                    .attachImageIcon(this, true);
+                icon.getResource().attachImageIcon(this, true);
                 setEnabled(action != null);
             }
 

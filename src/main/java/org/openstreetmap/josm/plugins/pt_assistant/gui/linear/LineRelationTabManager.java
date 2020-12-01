@@ -6,7 +6,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 import java.awt.Component;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,7 +15,12 @@ import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
+import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.lines.LineRelation;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.lines.LineRelationAroundStop;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.lines.LineRelationsProvider;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.stops.FoundStop;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.AbstractTabManager;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 
@@ -30,9 +34,9 @@ public class LineRelationTabManager extends AbstractTabManager<PublicTransportLi
 
     @Override
     protected TabAndDisplay<PublicTransportLinePanel> getTabToShow(IRelationEditorActionAccess editorAccess) {
-        Map<String, String> tags = editorAccess.getTagModel().getTags();
-        if (OSMTags.KEY_ROUTE.equals(tags.get(OSMTags.KEY_RELATION_TYPE))
-            && acceptedRouteTags.contains(tags.get(OSMTags.KEY_ROUTE))) {
+        RelationAccess relation = RelationAccess.of(editorAccess);
+        if (relation.hasTag(OSMTags.KEY_RELATION_TYPE, OSMTags.KEY_ROUTE)
+            && acceptedRouteTags.contains(relation.get(OSMTags.KEY_ROUTE))) {
             Relation snapshot = editorAccess.getEditor().getRelation();
             Optional<Relation> master = Optional.ofNullable(snapshot)
                 .flatMap(r -> r.getReferrers().stream().filter(PublicTransportLinePanel::isRouteMaster).map(it -> (Relation) it).findFirst());
@@ -62,6 +66,11 @@ public class LineRelationTabManager extends AbstractTabManager<PublicTransportLi
                                 .<Component>map(RouteMasterHeadlinePanel::new)
                                 .orElseGet(() -> new NoRouteMasterHeadline(RelationAccess.of(editorAccess), editorAccess.getEditor().getLayer()));
                         }
+
+                        @Override
+                        public OsmDataLayer getLayer() {
+                            return editorAccess.getEditor().getLayer();
+                        }
                     });
                 }
 
@@ -71,7 +80,7 @@ public class LineRelationTabManager extends AbstractTabManager<PublicTransportLi
                 }
             };
 
-        } else if (OSMTags.VALUE_TYPE_ROUTE_MASTER.equals(tags.get(OSMTags.KEY_RELATION_TYPE))) {
+        } else if (OSMTags.VALUE_TYPE_ROUTE_MASTER.equals(relation.get(OSMTags.KEY_RELATION_TYPE))) {
             return new TabAndDisplay<PublicTransportLinePanel>() {
                 @Override
                 public boolean shouldDisplay() {
@@ -88,7 +97,7 @@ public class LineRelationTabManager extends AbstractTabManager<PublicTransportLi
                     return tr("Routes");
                 }
             };
-        } else if (OSMTags.STOP_AREA_TAG_VALUE.equals(tags.get(OSMTags.PUBLIC_TRANSPORT_TAG))) {
+        } else if (OSMTags.STOP_AREA_TAG_VALUE.equals(relation.get(OSMTags.PUBLIC_TRANSPORT_TAG))) {
             return new TabAndDisplay<PublicTransportLinePanel>() {
                 @Override
                 public boolean shouldDisplay() {
@@ -121,8 +130,21 @@ public class LineRelationTabManager extends AbstractTabManager<PublicTransportLi
                         }
 
                         @Override
+                        public boolean shouldHighlightStop(FoundStop foundStop) {
+                            // Cannot use current relation, because it may have been modified
+                            return relation.getMembers()
+                                .stream()
+                                .anyMatch(it -> foundStop.matches(it.getMember()));
+                        }
+
+                        @Override
                         public Component createHeadlinePanel() {
                             return new StopAreaHeadline(RelationAccess.of(editorAccess));
+                        }
+
+                        @Override
+                        public OsmDataLayer getLayer() {
+                            return editorAccess.getEditor().getLayer();
                         }
                     });
                 }
@@ -170,6 +192,11 @@ public class LineRelationTabManager extends AbstractTabManager<PublicTransportLi
             @Override
             public Component createHeadlinePanel() {
                 return new RouteMasterHeadlinePanel(master);
+            }
+
+            @Override
+            public OsmDataLayer getLayer() {
+                return editorAccess.getEditor().getLayer();
             }
         };
     }
