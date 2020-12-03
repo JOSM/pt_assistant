@@ -12,6 +12,7 @@ node[public_transport=platform] {
     symbol-fill-color: #dddddd;
     set platform;
     set point;
+    z-index: 11;
 }
 
 way[public_transport=platform] {
@@ -25,13 +26,16 @@ way[public_transport=platform] {
     text-anchor-vertical: center;
     z-index: 2;
     set platform;
+    z-index: 10;
 }
 way[public_transport=platform]:closed {
     fill-color: #afafaf;
+    z-index: 10;
 }
 
 way[public_transport=platform]!:closed {
     width: 5;
+    z-index: 10;
 }
 
 
@@ -42,21 +46,25 @@ relation[type="route"] >[role="stop_exit_only"] node {
     symbol-fill-color: #dddddd;
     set point;
     set stop_position;
+    z-index: 11;
 }
 
 /* Current relation is colored blue. Invalid members are colored red */
 relation[activePtRelation] > node {
     symbol-fill-color: #e83333;
     set point;
+    z-index: 22;
 }
 
 relation[activePtRelation] > way {
     width: 2;
     color: #e83333;
+    z-index: 22;
 }
 
 relation[activePtRelation] > way:closed {
     fill-color: #921515;
+    z-index: 22;
 }
 
 
@@ -64,28 +72,33 @@ relation[activePtRelation] >[role="platform"] node.platform {
     symbol-fill-color: #336ec1;
     set .point;
     set .validInCurrentRelation;
+    z-index: 21;
 }
 
 relation[activePtRelation] >[role="platform"] way.platform {
     color: #4d9bff;
     text-color: #4d9bff;
     set .validInCurrentRelation;
+    z-index: 21;
 }
 
 relation[activePtRelation] >[role="platform"] way:closed.platform {
     fill-color: #336ec1;
     set .validInCurrentRelation;
+    z-index: 21;
 }
 
 relation[activePtRelation] >[role="stop"] node.stop_position {
     symbol-fill-color: #336ec1;
     set .point;
     set .validInCurrentRelation;
+    z-index: 21;
 }
 
 relation[activePtRelation] >[role=""] node.emptymember {
     symbol-fill-color: #336ec1;
     set .validInCurrentRelation;
+    z-index: 21;
 }
 
 /* (valid) relations in the same area group are colored light green */
@@ -94,32 +107,38 @@ relation[siblingOfActive] >[role="platform"] node {
     symbol-shape: circle;
     symbol-fill-color: #33c194;
     symbol-size: 18;
+    z-index: 20;
 }
 
 relation[siblingOfActive] >[role="platform"] way {
     color: #78ffd4;
     text-color: #78ffd4;
+    z-index: 20;
 }
 
 relation[siblingOfActive] >[role="platform"] way:closed {
     fill-color: #33c194;
+    z-index: 20;
 }
 
 relation[siblingOfActive] >[role="stop"] node {
     symbol-fill-color: #33c194;
     set point;
+    z-index: 20;
 }
 
 /* Everything orange is member in two PT area relations */
 
 relation[!activePtRelation][public_transport="stop_area"] > node.validInCurrentRelation {
     symbol-fill-color: #fcbd75;
+    z-index: 22;
 }
 
 relation[!activePtRelation][public_transport="stop_area"] > way.validInCurrentRelation {
     color: #fcbd75;
     fill-color: #ff7500;
     text-color: #fcbd75;
+    z-index: 22;
 }
 
 node.point {

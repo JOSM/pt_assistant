@@ -1,0 +1,99 @@
+canvas {
+    fill-color: black;
+    default-points: false;
+    default-lines: false;
+}
+
+way[railway] {
+    width: 3;
+    color: #555555;
+}
+
+way[highway] {
+    width: 3;
+    color: #555555;
+}
+
+way[memberOfActiveRelation=platform]!:closed {
+    width: 4;
+    color: black;
+    casing-width: 2;
+    casing-color: #4d9bff;
+}
+
+area[memberOfActiveRelation=platform] {
+    width: 2;
+    color: #4d9bff;
+}
+
+/* Route traversal */
+way[partOfActiveRoute] {
+    width: 2;
+    color: #4d9bff;
+}
+
+way[partOfActiveRoute=forward] {
+    repeat-image: "pt_assistant/mapcss/directionArrowForward.svg";
+    repeat-image-width: 10;
+    repeat-image-spacing: 50;
+    repeat-image-phase: 25;
+}
+
+way[partOfActiveRoute=backward] {
+    repeat-image: "pt_assistant/mapcss/directionArrowBackward.svg";
+    repeat-image-width: 10;
+    repeat-image-spacing: 50;
+    repeat-image-phase: 25;
+}
+
+
+node[activeRelationStopIndex] {
+    symbol-shape: circle;
+    symbol-size: 10;
+    symbol-fill-color: #4d9bff;
+}
+
+node[activeRelationStopIndex]::stopindex,
+way[activeRelationStopIndex]::stopindex {
+    text: eval(tag("activeRelationStopIndex"));
+    text-color: #c7dfff;
+    text-offset-x: 10;
+    text-offset-y: -10;
+    font-size: 20;
+    text-position: center;
+}
+
+node[activeRelationStopMisordered]::stopindex {
+    text-color: #ff8a8a;
+}
+
+node[activeRelationSegmentStarts],
+node[activeRelationSegmentEnds] {
+    symbol-shape: square;
+    symbol-size: 10;
+    symbol-stroke-width: 2;
+    symbol-fill-color: #ff3636;
+    symbol-stroke-color: #c90000;
+}
+
+node[activeRelationSegmentStarts="normal"],
+node[activeRelationSegmentEnds="normal"] {
+    symbol-fill-color: #4d9bff;
+    symbol-stroke-color: #aad0ff;
+}
+
+node[activeRelationStopTooFar],
+node[activeRelationStopMisordered] {
+    symbol-shape: circle;
+    symbol-size: 10;
+    symbol-stroke-width: 2;
+    symbol-fill-color: #ff3636;
+    symbol-stroke-color: #c90000;
+}
+
+way[activeRelationStopTooFar],
+way[activeRelationStopMisordered] {
+    color: #c90000;
+    stroke-width: 2;
+    fill-color: #ff3636;
+}

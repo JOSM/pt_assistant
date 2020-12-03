@@ -4,7 +4,6 @@ package org.openstreetmap.josm.plugins.customizepublictransportstop;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -86,6 +85,9 @@ public final class OSMTags {
     public static final Collection<String> PLATFORM_ROLES = Arrays.asList(PLATFORM_ROLE, PLATFORM_ENTRY_ROLE, PLATFORM_EXIT_ROLE);
     public static final Collection<String> STOPS_AND_PLATFORMS_ROLES = Stream.of(STOP_ROLES, PLATFORM_ROLES)
         .flatMap(Collection::stream).collect(Collectors.toList());
+    public static final Collection<String> ROUTE_SEGMENT_PT_ROLES = Arrays.asList("", "hail_and_ride");
+    public static final Collection<String> ROUTE_SEGMENT_WALK_ROLES = Arrays.asList("", "hail_and_ride");
+
     public static final String PLATFORM_TAG_VALUE = "platform";
     public static final String SERVICE_TAG = "service";
 
@@ -105,6 +107,8 @@ public final class OSMTags {
     /** See <a href="https://wiki.openstreetmap.org/wiki/Tag:type=route_master">Tag:type=route_master</a>. */
     public static final String VALUE_TYPE_ROUTE_MASTER = KEY_ROUTE_MASTER;
     public static final String REF_TAG = "ref";
+
+    public static final String RELATION_TYPE_TURN_RESTRICTION = "restriction";
 
     private OSMTags() {
         // Hide default constructor

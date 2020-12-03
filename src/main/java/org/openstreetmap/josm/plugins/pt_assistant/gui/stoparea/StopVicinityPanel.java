@@ -9,8 +9,8 @@ import java.awt.event.ActionEvent;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -29,6 +29,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import org.openstreetmap.josm.actions.AutoScaleAction;
+import org.openstreetmap.josm.actions.AutoScaleAction.AutoScaleMode;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -72,20 +74,7 @@ public class StopVicinityPanel extends AbstractVicinityPanel {
                 .getMembers()
                 .stream()
                 .anyMatch(it -> it.getMember().isIncomplete())) {
-            UnBoldLabel warnPanel = new UnBoldLabel(MessageFormat.format(
-                "<html><p>{0}</p><p>{1}</p></html>",
-                tr("This relation contains incomplete (not downloaded) members!"),
-                tr("Some features may not be visible on this map.")));
-            warnPanel.setForeground(new Color(0xAA0000));
-            warnPanel.setBorder(new CompoundBorder(
-                new LineBorder(warnPanel.getForeground(), 2),
-                new EmptyBorder(5, 10, 5, 10)
-            ));
-            warnPanel.setBackground(new Color(0xFFBABA));
-            warnPanel.setOpaque(true);
-            //warnPanel.setSize(warnPanel.getMinimumSize());
-            //warnPanel.setLocation(10, 40);
-            add(warnPanel, BorderLayout.NORTH);
+            add(new IncompleteMembersWarningPanel(), BorderLayout.NORTH);
         }
 
         UnBoldLabel legend = new UnBoldLabel(
@@ -206,10 +195,6 @@ public class StopVicinityPanel extends AbstractVicinityPanel {
         return panel;
     }
 
-    @Override
-    protected void doInitialZoom() {
-        zoomToEditorRelation();
-    }
 
     @Override
     protected List<String> getStylePath() {
@@ -224,7 +209,7 @@ public class StopVicinityPanel extends AbstractVicinityPanel {
     }
 
     @Override
-    protected void doAction(Point point, OsmPrimitive originalPrimitive) {
+    protected void doAction(Point point, OsmPrimitive derivedPrimitive, OsmPrimitive originalPrimitive) {
         List<EStopVicinityAction> actions = getAvailableActions(originalPrimitive);
         if (!actions.isEmpty()) {
             showActionsMenu(point, originalPrimitive, actions);
@@ -458,10 +443,16 @@ public class StopVicinityPanel extends AbstractVicinityPanel {
             for (EStopVicinityAction action : actions) {
                 action.addActionButtons(this, forPrimitive, editorAccess);
             }
-            add(EStopVicinityAction.createActionButton(tr("Select in main window"), () -> {
-                MainApplication.getLayerManager().getActiveDataSet()
-                    .setSelected(forPrimitive);
-            }));
+            add(getSelectInMainWindow(Collections.singleton(forPrimitive)));
         }
+
+    }
+
+    public static JMenuItem getSelectInMainWindow(Collection<OsmPrimitive> forPrimitive) {
+        return EStopVicinityAction.createActionButton(tr("Select in main window"), () -> {
+            MainApplication.getLayerManager().getActiveDataSet()
+                .setSelected(forPrimitive);
+            AutoScaleAction.autoScale(AutoScaleMode.SELECTION);
+        });
     }
 }

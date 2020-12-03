@@ -4,7 +4,8 @@ package org.openstreetmap.josm.plugins.pt_assistant;
 import static org.openstreetmap.josm.gui.help.HelpUtil.ht;
 import static org.openstreetmap.josm.tools.I18n.trc;
 
-import java.awt.*;
+import java.awt.EventQueue;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +44,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.actions.stoparea.AddStopAreaA
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.LineRelationTabManager;
-import org.openstreetmap.josm.plugins.pt_assistant.gui.stoparea.StopAreaGroupPanel;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.routing.RoutingTabManager;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.stoparea.StopAreaTabManager;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.stoparea.StopVicinityTabManager;
 import org.openstreetmap.josm.plugins.pt_assistant.validation.BicycleFootRouteValidatorTest;
@@ -207,6 +208,7 @@ public class PTAssistantPlugin extends Plugin {
                 new LineRelationTabManager(editorAccess);
                 new StopVicinityTabManager(editorAccess);
                 new StopAreaTabManager(editorAccess);
+                new RoutingTabManager(editorAccess);
             });
             // Don't add actions.
             return Arrays.asList();

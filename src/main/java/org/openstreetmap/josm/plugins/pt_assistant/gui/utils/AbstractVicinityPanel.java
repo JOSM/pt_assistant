@@ -10,11 +10,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -31,7 +29,6 @@ import javax.swing.JPanel;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.ProjectionBounds;
 import org.openstreetmap.josm.data.osm.BBox;
-import org.openstreetmap.josm.data.osm.IPrimitive;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
@@ -161,7 +158,9 @@ public abstract class AbstractVicinityPanel extends JPanel {
         });
     }
 
-    protected abstract void doInitialZoom();
+    protected void doInitialZoom() {
+        zoomToEditorRelation();
+    }
 
     protected List<MapCSSStyleSource> readStyles() {
         return getStylePath()
@@ -219,13 +218,15 @@ public abstract class AbstractVicinityPanel extends JPanel {
         OsmPrimitive primitive = getPrimitiveAt(point);
         if (primitive != null) {
             OsmPrimitive originalPrimitive = dataSetCopy.findOriginal(primitive);
+            // Sometimes, we may have an old/faked copy. Get the real one then.
+            originalPrimitive = editorAccess.getEditor().getLayer().getDataSet().getPrimitiveById(originalPrimitive);
             if (originalPrimitive != null) {
-                doAction(point, originalPrimitive);
+                doAction(point, primitive, originalPrimitive);
             }
         }
     }
 
-    protected void doAction(Point point, OsmPrimitive originalPrimitive) {
+    protected void doAction(Point point, OsmPrimitive derivedPrimitive, OsmPrimitive originalPrimitive) {
         // nop
     }
 

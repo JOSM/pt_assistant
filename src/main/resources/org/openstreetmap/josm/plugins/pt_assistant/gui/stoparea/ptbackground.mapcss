@@ -4,10 +4,15 @@ canvas {
     default-lines: false;
 }
 
+node {
+    major-z-index: 3;
+}
+
 /* Background geometry */
 way[highway] {
     width: 4;
     color: #555555;
+    z-index: 0;
 }
 
 way[railway="funicular"],
@@ -18,27 +23,43 @@ way[railway="preserved"],
 way[railway="rail"],
 way[railway="subway"],
 way[railway="tram"] {
-    width: 2;
+    z-index: 1;
+    color: #555555;
+    width: 4;
+}
+
+way[railway="funicular"]::dashes,
+way[railway="light_rail"]::dashes,
+way[railway="monorail"]::dashes,
+way[railway="narrow_gauge"]::dashes,
+way[railway="preserved"]::dashes,
+way[railway="rail"]::dashes,
+way[railway="subway"]::dashes,
+way[railway="tram"]::dashes {
+    z-index: 1;
+    object-z-index: 1;
     color: #000000;
     dashes: 12,12;
-    casing-color: #555555;
-    casing-width: 1;
+    width: 2;
 }
 
 way[highway=footway],
 way[highway=cycleway],
 way[highway=path] {
     width: 2;
+    z-index: 0;
 }
 
 area[building] {
     fill-color: #555555;
+    z-index: -1;
 }
 
 node[amenity] {
     symbol-fill-color: #555555;
     set point;
     set emptymember;
+    z-index: 2;
 }
 
 node[railway=station],
@@ -47,6 +68,7 @@ node[public_transport=station] {
     symbol-fill-color: #555555;
     set point;
     set emptymember;
+    z-index: 2;
 }
 
 
@@ -58,12 +80,24 @@ relation[type="route"][route="monorail"] >[role=""] way,
 relation[type="route"][route="monorail"] >[role="hail_and_ride"] way,
 relation[type="route"][route="tram"] >[role=""] way,
 relation[type="route"][route="tram"] >[role="hail_and_ride"] way {
-    width: 2;
+    z-index: 6;
+    color: #dddddd;
+    width: 4;
+}
+
+relation[type="route"][route="train"] >[role=""] way::dashes,
+relation[type="route"][route="train"] >[role="hail_and_ride"] way::dashes,
+relation[type="route"][route="subway"] >[role=""] way::dashes,
+relation[type="route"][route="subway"] >[role="hail_and_ride"] way::dashes,
+relation[type="route"][route="monorail"] >[role=""] way::dashes,
+relation[type="route"][route="monorail"] >[role="hail_and_ride"] way::dashes,
+relation[type="route"][route="tram"] >[role=""] way::dashes,
+relation[type="route"][route="tram"] >[role="hail_and_ride"] way::dashes {
+    z-index: 6;
+    object-z-index: 1;
     color: #000000;
     dashes: 12,12;
-    casing-color: #dddddd;
-    casing-width: 1;
-    z-index: 2;
+    width: 2;
 }
 
 relation[type="route"][route="bus"] >[role=""] way,
@@ -74,5 +108,5 @@ relation[type="route"][route="ferry"] >[role=""] way,
 relation[type="route"][route="ferry"] >[role="hail_and_ride"] way {
     width: 4;
     color: #dddddd;
-    z-index: 2;
+    z-index: 5;
 }

@@ -1,10 +1,13 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
+import static org.openstreetmap.josm.data.projection.Ellipsoid.WGS84;
+
 import java.util.Collection;
 import java.util.Optional;
 
 import org.openstreetmap.josm.data.Bounds;
+import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.Way;
 
@@ -52,5 +55,28 @@ public final class BoundsUtils {
                 it.getBottomRightLon() + xPadding
             );
         });
+    }
+
+    /**
+     * Increases the size by approx. meters → only for small bboxes.
+     * @param bbox The bbox
+     * @param meters How many meters to add
+     * @return A bigger bbox
+     */
+    public static BBox increaseSize(BBox bbox, double meters) {
+        LatLon center = bbox.getCenter();
+        if (center == null || !center.isValid()) {
+            return bbox;
+        } else {
+            double dLat = meters / (WGS84.a * Math.PI * 2) * 360;
+            double radius = WGS84.a * Math.cos(center.lat());
+            double dLon = meters / (radius * Math.PI * 2) * 360;
+            return new BBox(
+                bbox.getTopLeftLon() - dLon,
+                bbox.getTopLeftLat() - dLat,
+                bbox.getBottomRightLon() + dLon,
+                bbox.getBottomRightLat() + dLon
+            );
+        }
     }
 }
