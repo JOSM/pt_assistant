@@ -54,13 +54,13 @@ import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.RelationAccess;
 import org.openstreetmap.josm.tools.Pair;
 import org.openstreetmap.josm.tools.Utils;
 
-public abstract class AbstractVicinityPanel extends JPanel {
-    protected final DerivedDataSet dataSetCopy;
+public abstract class AbstractVicinityPanel<D extends DerivedDataSet> extends JPanel {
+    protected final D dataSetCopy;
     protected final IRelationEditorActionAccess editorAccess;
     protected final MapView mapView;
     private final List<MapCSSStyleSource> style = Collections.unmodifiableList(readStyles());
 
-    public AbstractVicinityPanel(DerivedDataSet dataSetCopy,
+    public AbstractVicinityPanel(D dataSetCopy,
                                  IRelationEditorActionAccess editorAccess,
                                  ZoomSaver zoom) {
         super(new BorderLayout());

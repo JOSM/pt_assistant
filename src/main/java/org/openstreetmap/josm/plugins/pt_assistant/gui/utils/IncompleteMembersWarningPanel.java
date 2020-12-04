@@ -1,4 +1,4 @@
-package org.openstreetmap.josm.plugins.pt_assistant.gui.stoparea;
+package org.openstreetmap.josm.plugins.pt_assistant.gui.utils;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 

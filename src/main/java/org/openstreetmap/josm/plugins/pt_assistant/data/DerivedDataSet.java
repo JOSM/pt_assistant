@@ -126,7 +126,7 @@ public class DerivedDataSet {
             markRefreshNeeded();
         }
     };
-    private boolean refreshNeeded;
+    private boolean refreshNeeded = true;
 
     private void markRefreshNeeded() {
         refreshNeeded = true;
@@ -135,7 +135,6 @@ public class DerivedDataSet {
     public DerivedDataSet(DataSet copyFrom) {
         this.copyFrom = copyFrom;
         copyFrom.addDataSetListener(dataSetListener);
-        refreshAll();
         clone.setUploadPolicy(UploadPolicy.BLOCKED);
         clone.setDownloadPolicy(DownloadPolicy.BLOCKED);
     }

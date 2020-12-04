@@ -2,8 +2,6 @@ package org.openstreetmap.josm.plugins.pt_assistant.gui.routing.transportmode;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-import java.util.List;
-
 public class UnknownRouteType implements RouteType {
     @Override
     public String getName() {
@@ -15,8 +13,4 @@ public class UnknownRouteType implements RouteType {
         return "";
     }
 
-    @Override
-    public String getOverpassSelectorForPossibleWays() {
-        return "";
-    }
 }

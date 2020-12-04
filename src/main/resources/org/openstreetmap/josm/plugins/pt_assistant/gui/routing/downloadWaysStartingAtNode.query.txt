@@ -1,0 +1,19 @@
+
+node(id:##STARTNODEID##) -> .n1;
+way(bn.n1)##SELECTOR## -> .w1;
+node(w.w1) -> .n2;
+way(bn.n2)##SELECTOR## -> .w2;
+node(w.w2) -> .n3;
+way(bn.n3)##SELECTOR## -> .w3;
+node(w.w3) -> .n4;
+way(bn.n4)##SELECTOR## -> .w4;
+node(w.w4) -> .n5;
+way(bn.n5)##SELECTOR## -> .w5;
+node(w.w5) -> .n6;
+way(bn.n6)##SELECTOR## -> .w6;
+
+(.w1; .w2; .w3; .w4; .w5; .w6;) -> .ways;
+
+(.ways; >>;);
+
+out meta;

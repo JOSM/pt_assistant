@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.openstreetmap.josm.data.osm.Way;
-
 /**
  * A "drivable"/walkable part of the route. A list of conclusive lines
  */

@@ -25,4 +25,9 @@ public class BusRouteType implements RouteType {
     public List<String> getAccessTags() {
         return Arrays.asList("bus", "psv", "motor_vehicle", "vehicle", "access");
     }
+
+    @Override
+    public String getOverpassFilterForPossibleWays() {
+        return "[highway]";
+    }
 }

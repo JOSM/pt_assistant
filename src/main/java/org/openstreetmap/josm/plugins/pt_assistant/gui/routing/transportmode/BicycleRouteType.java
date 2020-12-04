@@ -30,10 +30,18 @@ public class BicycleRouteType implements RouteType {
 
     @Override
     public AccessDirection mayDriveOn(Map<String, String> tags) {
-        if (!tags.containsKey("highway")) {
-            return AccessDirection.NONE;
-        } else {
-            return RouteType.super.mayDriveOn(tags);
+        if (!tags.containsKey("bicycle")) {
+            String highway = tags.get("highway");
+            // Those highways won't allow cycelists
+            if (highway == null || Arrays.asList("motorway", "trunk", "footway", "pedestrian").contains(highway)) {
+                return AccessDirection.NONE;
+            }
         }
+        return RouteType.super.mayDriveOn(tags);
+    }
+
+    @Override
+    public String getOverpassFilterForPossibleWays() {
+        return "(if: is_tag(\"highway\") || is_tag(\"bicycle\"))";
     }
 }

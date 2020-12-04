@@ -53,12 +53,22 @@ node[activeRelationStopIndex] {
     symbol-fill-color: #4d9bff;
 }
 
+node[activeRelationStopIndex]::name,
+area[activeRelationStopIndex]::name {
+    text-color: #c7dfff;
+    text-offset-x: 10;
+    text-offset-y: -8;
+    font-size: 12;
+    text-position: center;
+    text: has_tag_key("activeRelationStop_name") ? tag("activeRelationStop_name") : tag("name")
+}
+
 node[activeRelationStopIndex]::stopindex,
 way[activeRelationStopIndex]::stopindex {
     text: eval(tag("activeRelationStopIndex"));
     text-color: #c7dfff;
     text-offset-x: 10;
-    text-offset-y: -10;
+    text-offset-y: 8;
     font-size: 20;
     text-position: center;
 }

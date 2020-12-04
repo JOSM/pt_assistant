@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.openstreetmap.josm.data.osm.OsmUtils;
 import org.openstreetmap.josm.data.osm.Relation;
-import org.openstreetmap.josm.data.osm.Way;
 
 /**
  * Type of the route relation
@@ -33,7 +32,7 @@ public interface RouteType {
         return Arrays.asList("yes", "permissive", "designated", "official");
     }
 
-    default String getOverpassSelectorForPossibleWays() {
+    default String getOverpassFilterForPossibleWays() {
         return "";
     }
 
@@ -58,6 +57,7 @@ public interface RouteType {
                 return AccessDirection.FORWARD_ONLY;
             }
         }
+        // TODO: "junction" = "roundabout"
 
         if (Arrays.asList("motorway", "motorway_link").contains(tags.get("highway"))) {
             return AccessDirection.FORWARD_ONLY;

@@ -22,44 +22,17 @@ import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.gui.dialogs.relation.RelationEditor;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
-import org.openstreetmap.josm.plugins.pt_assistant.data.DerivedDataSet;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.RelationAccess;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.AbstractVicinityPanel;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.IncompleteMembersWarningPanel;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.UnBoldLabel;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.ZoomSaver;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.DialogUtils;
-import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
 
-public class StopAreaGroupPanel extends AbstractVicinityPanel {
+public class StopAreaGroupPanel extends AbstractVicinityPanel<AreaGroupDerivedDataSet> {
     public StopAreaGroupPanel(IRelationEditorActionAccess editorAccess, ZoomSaver zoomSaver) {
-        super(new DerivedDataSet(editorAccess.getEditor().getLayer().getDataSet()) {
-            @Override
-            protected void addAdditionalGeometry(AdditionalGeometryAccess addTo) {
-                // We need to add all members of the current relation and flag them with a special tag
-                // This is because JOSM cannot handle super relations in MapCSS
-                RelationAccess.of(editorAccess)
-                    .getMembers()
-                    .stream()
-                    .map(RelationMember::getMember)
-                    .forEach(child -> {
-                        if (child instanceof Relation) {
-                            Relation copy = new Relation((Relation) child);
-                            copy.put("childOfActiveAreaGroup", "1");
-                            addOrGetDerived(copy);
-                        }
-                    });
-                // No need to add our parent relation => we flagged all children, that should be enough
-            }
-
-            @Override
-            protected boolean isIncluded(OsmPrimitive primitive) {
-                // Members are automatically included recursively
-                return primitive instanceof Relation
-                    && !primitive.getPrimitiveId().equals(editorAccess.getEditor().getRelation())
-                    && (StopUtils.isStopArea((Relation) primitive) || RouteUtils.isPTRoute((Relation) primitive));
-            }
-        }, editorAccess, zoomSaver);
+        super(new AreaGroupDerivedDataSet(editorAccess), editorAccess, zoomSaver);
 
         if (RelationAccess.of(editorAccess)
             .getMembers()
@@ -155,4 +128,5 @@ public class StopAreaGroupPanel extends AbstractVicinityPanel {
         panel.add(generateZoomToButton(tr("Zoom to"), tr("Zoom to all areas contained in this group.")));
         return panel;
     }
+
 }
