@@ -315,6 +315,10 @@ public class DerivedDataSet {
         primitivesToHighlight.addAll(toHighlightIds);
     }
 
+    public Set<PrimitiveId> getHighlightedPrimitives() {
+        return Collections.unmodifiableSet(primitivesToHighlight);
+    }
+
     private void setHighlightFlag(Set<PrimitiveId> including, Set<PrimitiveId> excluding, boolean flag) {
         including
             .stream()

@@ -7,9 +7,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.openstreetmap.josm.data.coor.LatLon;
@@ -160,27 +159,27 @@ public class RouteTraverser {
     }
 
     private List<RouteSegment> findSegments() {
-        List<Way> ways = getSegmentMembers()
-            .filter(rm -> OSMTags.ROUTE_SEGMENT_PT_ROLES.contains(rm.getRole()))
-            .filter(RelationMember::isWay)
-            .map(RelationMember::getWay)
-            .filter(way -> !way.isIncomplete())
+        List<IndexedRelationMember> ways = getSegmentMembers()
+            .filter(rm -> OSMTags.ROUTE_SEGMENT_PT_ROLES.contains(rm.getMember().getRole()))
+            .filter(it -> it.getMember().isWay())
+            .filter(it -> !it.getMember().getWay().isIncomplete())
             .collect(Collectors.toList());
 
         List<RouteSegment> segments = new ArrayList<>();
-        List<Way> currentSegment = new ArrayList<>();
+        List<IndexedRelationMember> currentSegment = new ArrayList<>();
         Collection<Node> lastNodes = Collections.emptySet();
-        for (Way way : ways) {
+        for (IndexedRelationMember wayWithIndex : ways) {
+            Way way = wayWithIndex.getMember().getWay();
             List<Node> wayEnds = getWayEnds(way);
             if (lastNodes.isEmpty()) {
-                currentSegment.add(way);
+                currentSegment.add(wayWithIndex);
             } else {
                 if (lastNodes.stream().noneMatch(wayEnds::contains)) {
                     // Not connected => commit current segment
                     segments.add(createRouteSegment(currentSegment));
                     currentSegment.clear();
                 }
-                currentSegment.add(way);
+                currentSegment.add(wayWithIndex);
             }
 
             Collection<Node> lastNodes1 = lastNodes;
@@ -194,109 +193,26 @@ public class RouteTraverser {
         return segments;
     }
 
-    private RouteSegment createRouteSegment(List<Way> rawWays) {
+    private RouteSegment createRouteSegment(List<IndexedRelationMember> rawWays) {
         List<RouteSegmentWay> ways = new ArrayList<>();
         if (rawWays.isEmpty()) {
             throw new IllegalArgumentException("RawWays may not be empty.");
         } else if (rawWays.size() == 1) {
             // We don't know the direction. Let's just assume forward.
-            ways.add(createRouteSegmentWay(rawWays.get(0), true, ways));
+            ways.add(type.createRouteSegmentWay(rawWays.get(0), true, ways));
         } else {
-            ways.add(createRouteSegmentWay(rawWays.get(0),
-                rawWays.get(1).isFirstLastNode(rawWays.get(0).lastNode()), ways));
+            // Determine direction by next segment
+            ways.add(type.createRouteSegmentWay(rawWays.get(0),
+                rawWays.get(1).getMember().getWay().isFirstLastNode(rawWays.get(0).getMember().getWay().lastNode()), ways));
             for (int i = 1; i < rawWays.size(); i++) {
-                ways.add(createRouteSegmentWay(rawWays.get(i),
-                    rawWays.get(i - 1).isFirstLastNode(rawWays.get(i).firstNode()), ways));
+                // Determine direction by previous segment
+                ways.add(type.createRouteSegmentWay(rawWays.get(i),
+                    rawWays.get(i - 1).getMember().getWay().isFirstLastNode(rawWays.get(i).getMember().getWay().firstNode()), ways));
             }
         }
         return new RouteSegment(ways);
     }
 
-    private RouteSegmentWay createRouteSegmentWay(Way way, boolean forward, List<RouteSegmentWay> previous) {
-        // Check way is suited
-        RouteType.AccessDirection mayDriveOn = type.mayDriveOn(way.getKeys());
-        WaySuitability suitability;
-        if ((mayDriveOn == RouteType.AccessDirection.FORWARD_ONLY && !forward)
-         || mayDriveOn == RouteType.AccessDirection.BACKWARD_ONLY && forward) {
-            suitability = WaySuitability.WRONG_DIRECTION;
-        } else if (mayDriveOn == RouteType.AccessDirection.NONE) {
-            suitability = WaySuitability.WRONG_TYPE;
-        } else {
-            // Negative turn restricitons (preventing us from turning into this way)
-            // Single via node matches
-            Optional<Relation> wrongTurnRestriction = findTurnRestrictions(way, "no_")
-                .filter(r -> r.findRelationMembers("to").contains(way))
-                .filter(r -> {
-                    Set<Way> fromPath = findFromPath(r);
-                    if (fromPath.size() < previous.size()) {
-                        return false;
-                    } else {
-                        Set<Way> whereWeComeFrom = previous.subList(previous.size() - fromPath.size(), previous.size())
-                            .stream().map(RouteSegmentWay::getWay).collect(Collectors.toSet());
-                        return fromPath.equals(whereWeComeFrom)
-                            && (fromPath.size() > 1
-                            // Single via node matches
-                            || getViaNode(r).map(via -> previous.get(previous.size() - 1).lastNode().equals(via)).orElse(true));
-                    }
-                })
-                .findFirst();
-            if (wrongTurnRestriction.isPresent()) {
-                suitability = WaySuitability.CANNOT_TURN_INTO;
-            } else {
-                if (previous.size() > 0 && findTurnRestrictions(previous.get(previous.size() - 1).getWay(), "only_")
-                    // Only relations starting at previous way
-                    .filter(restriction -> restriction.getMembers()
-                            .stream()
-                            .filter(RelationMember::isWay)
-                            .filter(member -> "from".equals(member.getRole()))
-                            .map(RelationMember::getWay)
-                            .anyMatch(previous.get(previous.size() - 1).getWay()::equals))
-                    // Only restrictions continuing in our direction
-                    .anyMatch(restriction -> getViaNode(restriction)
-                        .map(viaNode -> previous.get(previous.size() - 1).lastNode().equals(viaNode))
-                        .orElseGet(() -> restriction.getMembers()
-                        .stream()
-                        .filter(RelationMember::isWay)
-                        .map(RelationMember::getWay)
-                        .anyMatch(way::equals)))) {
-                    suitability = WaySuitability.INVALID_TURN_FROM;
-                } else {
-                    suitability = WaySuitability.GOOD;
-                }
-            }
-        }
-
-        return new RouteSegmentWay(way, forward, suitability);
-    }
-
-    private Stream<Relation> findTurnRestrictions(Way way, String prefix) {
-        return way.referrers(Relation.class)
-            .filter(r -> r.hasTag(OSMTags.KEY_RELATION_TYPE, OSMTags.RELATION_TYPE_TURN_RESTRICTION))
-            .filter(r -> {
-                String restrictionValue = type.getRestrictionValue(r);
-                return restrictionValue != null && restrictionValue.startsWith(prefix);
-            });
-    }
-
-    private Optional<Node> getViaNode(Relation restriction) {
-        return relation
-            .getMembers()
-            .stream()
-            .filter(RelationMember::isNode)
-            .filter(it -> "via".equals(it.getRole()))
-            .map(RelationMember::getNode)
-            .findFirst();
-    }
-
-    private Set<Way> findFromPath(Relation restriction) {
-        return restriction
-            .getMembers()
-            .stream()
-            .filter(RelationMember::isWay)
-            .filter(it -> "via".equals(it.getRole()) || "from".equals(it.getRole()))
-            .map(RelationMember::getWay)
-            .collect(Collectors.toSet());
-    }
 
     public List<RouteSegment> getSegments() {
         return segments;
@@ -308,20 +224,25 @@ public class RouteTraverser {
             way.lastNode());
     }
 
-    private Stream<RelationMember> getSegmentMembers() {
+    private Stream<IndexedRelationMember> getSegmentMembers() {
         if (relation.hasTag(OSMTags.KEY_RELATION_TYPE, OSMTags.KEY_ROUTE)) {
-            return relation.getMembers()
-                .stream();
+            return streamMembersIndexed(relation);
         } else if (relation.hasTag(OSMTags.KEY_RELATION_TYPE, "superroute")) {
             return relation
                 .getMembers()
                 .stream()
                 .filter(RelationMember::isRelation)
                 .map(RelationMember::getRelation)
-                .flatMap(r -> r.getMembers().stream());
+                .map(RelationAccess::of)
+                .flatMap(this::streamMembersIndexed);
         } else {
             return Stream.of(); // < None
         }
+    }
+
+    private Stream<IndexedRelationMember> streamMembersIndexed(RelationAccess relation) {
+        return IntStream.range(0, relation.getMembers().size())
+            .mapToObj(index -> new IndexedRelationMember(relation.getMembers().get(index), index, relation));
     }
 
 }

@@ -10,12 +10,14 @@ public class RouteSegmentWay {
     private final boolean forward;
     // We need it so often …
     private final double length;
+    private final int indexInMembers;
     private final WaySuitability suitability;
 
-    public RouteSegmentWay(Way way, boolean forward, WaySuitability suitability) {
+    public RouteSegmentWay(Way way, boolean forward, int indexInMembers, WaySuitability suitability) {
         this.way = Objects.requireNonNull(way, "way");
         this.forward = forward;
         this.length = way.getLength();
+        this.indexInMembers = indexInMembers;
         this.suitability = Objects.requireNonNull(suitability, "suitability");
     }
 
@@ -35,8 +37,16 @@ public class RouteSegmentWay {
         return forward ? way.lastNode() : way.firstNode();
     }
 
+    public int getIndexInMembers() {
+        return indexInMembers;
+    }
+
     public double getLength() {
         return length;
+    }
+
+    public WaySuitability getSuitability() {
+        return suitability;
     }
 
     @Override
@@ -45,6 +55,7 @@ public class RouteSegmentWay {
             "way=" + way +
             ", forward=" + forward +
             ", length=" + length +
+            ", indexInMembers=" + indexInMembers +
             ", suitability=" + suitability +
             '}';
     }
