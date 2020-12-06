@@ -189,7 +189,10 @@ public class RouteTraverser {
                 .collect(Collectors.toList());
 
         }
-        segments.add(createRouteSegment(currentSegment));
+        // May be empty if we have no valid ways in our relation.
+        if (!currentSegment.isEmpty()) {
+            segments.add(createRouteSegment(currentSegment));
+        }
         return segments;
     }
 

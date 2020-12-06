@@ -5,19 +5,24 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Ellipse2D;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
@@ -25,18 +30,29 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 import org.openstreetmap.josm.actions.JosmAction;
+import org.openstreetmap.josm.actions.SplitWayAction;
+import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.PrimitiveId;
 import org.openstreetmap.josm.data.osm.Relation;
-import org.openstreetmap.josm.gui.MapViewState;
+import org.openstreetmap.josm.data.osm.RelationMember;
+import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.gui.ExtendedDialog;
+import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.MapViewState.MapViewPoint;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
 import org.openstreetmap.josm.gui.draw.MapViewPath;
 import org.openstreetmap.josm.gui.layer.MapViewPaintable;
+import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.RelationAccess;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.routing.router.AbstractRouter;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.routing.router.FromNodeRouter;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.routing.router.RouteSplitSuggestion;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.routing.router.FromSegmentRouter;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.stoparea.StopVicinityPanel;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.AbstractVicinityPanel;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.IncompleteMembersWarningPanel;
@@ -44,6 +60,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.UnBoldLabel;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.utils.ZoomSaver;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.DownloadUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
+import org.openstreetmap.josm.tools.ImageProvider;
 
 public class RoutingPanel extends AbstractVicinityPanel<RoutingDerivedDataSet> {
 
@@ -66,9 +83,12 @@ public class RoutingPanel extends AbstractVicinityPanel<RoutingDerivedDataSet> {
     public static final String ACTIVE_RELATION_STOP_OFFSET = "activeRelationStopOffset";
     private static final int MIN_ROUTING_DISTANCE = 1000;
     private static final int MIN_ROUTING_SEGMENTS = 5;
+    private static final Color ROUTER_HIGHLIGHT_ROUTE = new Color(0xFF1A1A);
+    private static final Color ROUTER_HIGHLIGHT_ROUTE_SPLIT = new Color(0xEC8181);
+    private final static ImageIcon SPLIT_ICON = ImageProvider.get("splitway.svg");
 
-    private RoutingPanelSpecialMode mode = new NormalMode();
-    private JPanel actionButtonsPanel = new JPanel();
+    private RoutingPanelSpecialMode mode;
+    private JPanel actionButtonsPanel;
 
     public RoutingPanel(IRelationEditorActionAccess editorAccess, ZoomSaver zoom) {
         super(new RoutingDerivedDataSet(editorAccess), editorAccess, zoom);
@@ -81,19 +101,31 @@ public class RoutingPanel extends AbstractVicinityPanel<RoutingDerivedDataSet> {
             add(new IncompleteMembersWarningPanel(), BorderLayout.NORTH);
         }
 
-        mode.enterMode();
+        setMode(defaultMode());
+    }
+
+    private RoutingPanelSpecialMode defaultMode() {
+        return dataSetCopy.getRouteTraverser().getSegments().isEmpty()
+            ? new SelectStartPointMode() : new NormalMode();
     }
 
     @Override
     protected JComponent generateActionButtons() {
+        if (actionButtonsPanel == null) {
+            // Cannot set in constructor => super calls this to early.
+            actionButtonsPanel = new JPanel();
+            actionButtonsPanel.setOpaque(false);
+        }
         return actionButtonsPanel;
     }
 
     private void setMode(RoutingPanelSpecialMode newMode) {
-        this.mode.exitMode();
-        actionButtonsPanel.removeAll();
+        if (this.mode != null) {
+            this.mode.exitMode();
+            actionButtonsPanel.removeAll();
+        }
         this.mode = newMode;
-        newMode.createActionButtons().forEach(actionButtonsPanel::add);
+        newMode.createActionButtons().forEach(generateActionButtons()::add);
         newMode.enterMode();
     }
 
@@ -167,16 +199,20 @@ public class RoutingPanel extends AbstractVicinityPanel<RoutingDerivedDataSet> {
                     List<RouteSegmentWay> previousRoute = dataSetCopy.getRouteTraverser()
                         .getSegments()
                         .stream()
-                        .flatMap(seg -> seg.getWays().stream())
+                        // We should only continue the last way in a segment
+                        // (user should delete part of the route first to replace it)
+                        .map(seg -> seg.getWays().get(seg.getWays().size() - 1))
                         .filter(it -> it.lastNode() == originalPrimitive)
                         .collect(Collectors.toList());
                     if (previousRoute.size() == 1) {
                         menu.add(new JMenuItem(new JosmAction(tr("Add next ways (interactive)"), null, null, null, false) {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                setMode(new RoutingMode(new Router(previousRoute.get(0), dataSetCopy.getRouteTraverser().getType())));
+                                setMode(new RoutingMode(new FromSegmentRouter(previousRoute.get(0), dataSetCopy.getRouteTraverser().getType())));
                             }
                         }));
+                    } else if (previousRoute.size() > 1) {
+                        menu.add(new UnBoldLabel(tr("Multiple route segments end at this point")));
                     }
                 }
 
@@ -247,16 +283,97 @@ public class RoutingPanel extends AbstractVicinityPanel<RoutingDerivedDataSet> {
         }
     }
 
+    private class SelectStartPointMode implements RoutingPanelSpecialMode {
+
+        private final MapViewPaintable highlightHoveredNode = (g, mv, bbox) -> {
+            // Normal map highlighting won't highlight the nodes, since they are not neccessarely painted.
+            // We mark it with a red dot.
+            g.setColor(ROUTER_HIGHLIGHT_ROUTE);
+            dataSetCopy.getHighlightedPrimitives()
+                .stream()
+                .map(id -> editorAccess.getEditor().getLayer().getDataSet().getPrimitiveById(id))
+                .filter(it -> it instanceof Node)
+                .forEach(node -> g.fill(circleArountPoint(mv.getState().getPointFor((Node) node))));
+        };
+
+        @Override
+        public void enterMode() {
+            mapView.addTemporaryLayer(highlightHoveredNode);
+        }
+
+        @Override
+        public void exitMode() {
+            mapView.removeTemporaryLayer(highlightHoveredNode);
+        }
+
+        @Override
+        public void doAction(Point point, OsmPrimitive derivedPrimitive, OsmPrimitive originalPrimitive) {
+            if (originalPrimitive instanceof Node) {
+                // Index at which we should start adding our new primitives.
+                // Normally, this is after stops/platforms but before the first way.
+                // Since we cannot be sure that the relation is ordered propertly, we just search the first way.
+                // May be -1 to start at beginning of relation
+                List<RelationMember> members = RelationAccess.of(editorAccess).getMembers();
+                int startAfterIndex = members
+                    .stream()
+                    .filter(m -> !OSMTags.STOPS_AND_PLATFORMS_ROLES.contains(m.getRole()))
+                    .findFirst()
+                    .map(it -> members.indexOf(it) - 1)
+                    .orElse(-1);
+                setMode(new RoutingMode(new FromNodeRouter((Node) originalPrimitive,
+                    startAfterIndex, dataSetCopy.getRouteTraverser().getType())));
+            }
+        }
+
+        @Override
+        public Predicate<OsmPrimitive> primitiveFilter() {
+            return p -> p instanceof Node
+                // TODO: Only return a node, if those ways are acutally suited for this type of relation.
+                && (p.referrers(Way.class).count() > 1
+                || p.hasTag(OSMTags.PUBLIC_TRANSPORT_TAG, OSMTags.STOP_POSITION_TAG_VALUE));
+        }
+
+        @Override
+        public Iterable<JComponent> createActionButtons() {
+            if (dataSetCopy.getRouteTraverser().getSegments().isEmpty()) {
+                // No segments => we can only select the start point, do not show cancel button
+                return Arrays.asList(
+                    createHint(tr("Your relation does not contain any ways. Please select the start node."))
+                );
+            } else {
+                return Arrays.asList(
+                    createHint(tr("Please select the start node.")),
+                    new JButton(new JosmAction(tr("Cancel"), null, null, null, false) {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            setMode(new NormalMode());
+                        }
+                    })
+                );
+            }
+        }
+
+        private UnBoldLabel createHint(String hint) {
+            UnBoldLabel label = new UnBoldLabel(hint);
+            label.setForeground(Color.BLACK);
+            label.setBackground(Color.WHITE);
+            label.setBorder(new LineBorder(Color.WHITE, 3));
+            return label;
+        }
+    }
+
     private class RoutingMode implements RoutingPanelSpecialMode {
 
         private final List<RouteTarget> targets;
-        private final Router router;
+        private final AbstractRouter router;
         private final Set<OsmPrimitive> targetEnds;
         private final MapViewPaintable hoverLayer;
+        private final List<RouteSplitSuggestion> splitSuggestions;
 
-        private RoutingMode(Router router) {
+        private RoutingMode(AbstractRouter router) {
             this.router = router;
             this.targets = router.findRouteTargets(MIN_ROUTING_DISTANCE, MIN_ROUTING_SEGMENTS);
+            this.splitSuggestions = router.findRouteSplits();
             this.targetEnds = targets
                 .stream()
                 .map(RouteTarget::getEnd)
@@ -265,42 +382,101 @@ public class RoutingPanel extends AbstractVicinityPanel<RoutingDerivedDataSet> {
             this.hoverLayer = (g, mv, bbox) -> {
                 Set<Node> activeNodes = new HashSet<>();
                 Set<PrimitiveId> hoveredSet = dataSetCopy.getHighlightedPrimitives();
+                Optional<RouteSplitSuggestion> foundSplit = Optional.empty();
                 if (hoveredSet.size() == 1) {
+                    g.setStroke(new BasicStroke(3));
                     PrimitiveId hovered = hoveredSet.iterator().next();
+                    foundSplit = findSplit(hovered);
+                    foundSplit.ifPresent(split -> {
+                        // Parts of the way that won't be used after split.
+                        MapViewPath line = new MapViewPath(mapView);
+                        line.append(split.getSegmentBefore(), false);
+                        line.append(split.getSegmentAfter(), false);
+                        g.setColor(ROUTER_HIGHLIGHT_ROUTE_SPLIT);
+                        g.draw(line);
+
+                        // This is the segment used after split
+                        MapViewPath lineActive = new MapViewPath(mapView);
+                        lineActive.append(split.getSegment(), false);
+                        g.setColor(ROUTER_HIGHLIGHT_ROUTE);
+                        g.draw(lineActive);
+
+                        activeNodes.add(split.getEndAtNode());
+                    });
+
                     findTrace(hovered).ifPresent(target -> {
                         // Paint a line
                         MapViewPath line = new MapViewPath(mapView);
                         target.getTrace()
                             .stream()
-                            .filter(it -> it != router.getStartAfter())
                             .peek(it -> activeNodes.add(it.lastNode()))
                             .forEach(toDraw -> line.append(toDraw.getWay().getNodes(), false));
 
-                        g.setColor(Color.RED);
-                        g.setStroke(new BasicStroke(3));
+                        g.setColor(ROUTER_HIGHLIGHT_ROUTE);
                         g.draw(line);
                     });
                 }
 
-                // Highlight all possible targets
-                g.setColor(Color.RED);
                 g.setStroke(new BasicStroke(2));
-                for (OsmPrimitive it : targetEnds) {
-                    MapViewPoint pos = mapView.getState().getPointFor((Node) it);
-                    Ellipse2D.Double circle = new Ellipse2D.Double(pos.getInViewX() - 3, pos.getInViewY() - 3, 7, 7);
-                    if (activeNodes.contains(it)) {
-                        g.fill(circle);
-                    } else {
-                        g.draw(circle);
-                    }
+                // Highlight split targets
+                g.setColor(ROUTER_HIGHLIGHT_ROUTE_SPLIT);
+                for (RouteSplitSuggestion it : splitSuggestions) {
+                    drawHighlightCircle(mv, g, activeNodes, it.getEndAtNode());
                 }
+
+                // Highlight all possible routing targets
+                g.setColor(ROUTER_HIGHLIGHT_ROUTE);
+                for (OsmPrimitive it : targetEnds) {
+                    drawHighlightCircle(mv, g, activeNodes, it);
+                }
+
+                // Paint split icons over everything else
+                foundSplit.ifPresent(split -> {
+                    // Split indicators
+                    Node splitStart = split.getStartAtNode();
+                    if (!split.getWay().isFirstLastNode(splitStart)) {
+                        drawSplitIcon(mv, g, splitStart);
+                    }
+                    Node splitEnd = split.getEndAtNode();
+                    if (!split.getWay().isFirstLastNode(splitEnd)) {
+                        drawSplitIcon(mv, g, splitEnd);
+                    }
+                });
             };
+        }
+
+        private void drawSplitIcon(MapView mv, Graphics2D g, Node node) {
+            MapViewPoint pos = mv.getState().getPointFor(node);
+            g.setColor(new Color(0x79FFFFFF, true));
+            g.fillRect((int) pos.getInViewX() - 8, (int) pos.getInViewY() - 8,
+                16, 16);
+            g.drawImage(SPLIT_ICON.getImage(),
+                (int) pos.getInViewX() - 8, (int) pos.getInViewY() - 8,
+                16, 16, null);
+        }
+
+        private void drawHighlightCircle(MapView mv, Graphics2D g, Set<Node> activeNodes, OsmPrimitive it) {
+            MapViewPoint pos = mv.getState().getPointFor((Node) it);
+            Ellipse2D.Double circle = circleArountPoint(pos);
+            if (activeNodes.contains(it)) {
+                g.fill(circle);
+            } else {
+                g.draw(circle);
+            }
         }
 
         private Optional<RouteTarget> findTrace(PrimitiveId target) {
             return targets
                 .stream()
                 .filter(it -> it.getEnd().getPrimitiveId().equals(target))
+                .findFirst();
+        }
+
+
+        private Optional<RouteSplitSuggestion> findSplit(PrimitiveId target) {
+            return splitSuggestions
+                .stream()
+                .filter(it -> it.getEndAtNode().getPrimitiveId().equals(target))
                 .findFirst();
         }
 
@@ -316,19 +492,58 @@ public class RoutingPanel extends AbstractVicinityPanel<RoutingDerivedDataSet> {
 
         @Override
         public Predicate<OsmPrimitive> primitiveFilter() {
-            return targetEnds::contains;
+            return primitive -> targetEnds.contains(primitive)
+                || splitSuggestions.stream().anyMatch(split -> split.getEndAtNode().equals(primitive));
         }
 
         @Override
         public void doAction(Point point, OsmPrimitive derivedPrimitive, OsmPrimitive originalPrimitive) {
-            findTrace(originalPrimitive.getPrimitiveId()).ifPresent(trace -> {
+            Optional<RouteTarget> foundTrace = findTrace(originalPrimitive.getPrimitiveId());
+            foundTrace.ifPresent(trace -> {
                 editorAccess.getMemberTableModel().addMembersAfterIdx(
                     trace.getTrace()
                         .stream()
-                        .filter(it -> it != router.getStartAfter())
                         .map(RouteSegmentWay::getWay)
-                    .collect(Collectors.toList()), router.getStartAfter().getIndexInMembers());
+                    .collect(Collectors.toList()), router.getIndexInMembersToAddAfter());
             });
+            if (!foundTrace.isPresent()) {
+                Optional<RouteSplitSuggestion> foundSplit = findSplit(originalPrimitive.getPrimitiveId());
+                foundSplit.ifPresent(split -> {
+                    if (1 == new AskAboutSplitDialog(split).showDialog().getValue()) {
+                        HashSet<Node> segment = new HashSet<>(split.getSegment());
+                        DataSet ds = split.getWay().getDataSet();
+                        Objects.requireNonNull(ds, "ds");
+                        Collection<OsmPrimitive> oldSelection = new ArrayList<>(ds.getSelected());
+
+                        // There is no split way method that does not depend on context.
+                        // We need to set selection, the action will then use the selected ways.
+                        ds.setSelected(Stream.concat(
+                            Stream.of(split.getWay()),
+                            split.streamSplitNodes()
+                        ).collect(Collectors.toList()));
+                        SplitWayAction.runOn(ds);
+
+                        // No return value. But all the new split result ways are selected.
+                        // We try to find the way that was a result of our split.
+                        // Comparing start/end nodes is not enough, since we might have loops
+                        List<Way> result = ds.getSelectedWays()
+                            .stream()
+                            // We try to find the way that was a result of our split.
+                            // Comparing start/end nodes is not enough, since we might have loops
+                            .filter(it -> new HashSet<>(it.getNodes()).equals(segment))
+                            .collect(Collectors.toList());
+                        // silently ignore if not found => user is presented with normal route selection and can retry.
+                        if (result.size() == 1) {
+                            editorAccess.getMemberTableModel().addMembersAfterIdx(
+                                Arrays.asList(result.get(0)),
+                                router.getIndexInMembersToAddAfter());
+                        }
+
+                        // Restore selection
+                        ds.setSelected(oldSelection);
+                    }
+                });
+            }
         }
 
         @Override
@@ -336,9 +551,25 @@ public class RoutingPanel extends AbstractVicinityPanel<RoutingDerivedDataSet> {
             return Arrays.asList(new JButton(new JosmAction(tr("Done"), null, null, null, false) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    setMode(new NormalMode());
+                    setMode(defaultMode());
                 }
             }));
+        }
+    }
+
+    private static Ellipse2D.Double circleArountPoint(MapViewPoint pos) {
+        return new Ellipse2D.Double(pos.getInViewX() - 3, pos.getInViewY() - 3, 7, 7);
+    }
+
+    private class AskAboutSplitDialog extends ExtendedDialog {
+
+        public AskAboutSplitDialog(RouteSplitSuggestion split) {
+            super(mapView, tr("Split way in main dataset?"),
+                tr("Split way"), tr("Abort"));
+            setContent(tr("Do you really want to split this way?\nIt will be split in the main dataset. Closing this relation editor will not undo the split."));
+            setButtonIcons("splitway", "cancel");
+            setCancelButton(2);
+            toggleEnable("pt_split_way_ask");
         }
     }
 }
