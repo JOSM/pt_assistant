@@ -19,25 +19,15 @@ public class BicycleRouteType implements RouteType {
     }
 
     @Override
-    public List<String> getOneWayTags() {
-        return Arrays.asList("oneway:bicycle", "oneway");
-    }
-
-    @Override
     public List<String> getAccessTags() {
         return Arrays.asList("bicycle", "vehicle", "access");
     }
 
     @Override
-    public AccessDirection mayDriveOn(Map<String, String> tags) {
-        if (!tags.containsKey("bicycle")) {
-            String highway = tags.get("highway");
-            // Those highways won't allow cycelists
-            if (highway == null || Arrays.asList("motorway", "trunk", "footway", "pedestrian").contains(highway)) {
-                return AccessDirection.NONE;
-            }
-        }
-        return RouteType.super.mayDriveOn(tags);
+    public boolean mayDefaultAccess(Map<String, String> tags) {
+        String highway = tags.get("highway");
+        // Those highways won't allow cycelists
+        return highway != null && !Arrays.asList("motorway", "motorway_link", "trunk", "footway", "pedestrian").contains(highway);
     }
 
     @Override

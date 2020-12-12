@@ -6,7 +6,6 @@ import java.util.stream.Stream;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.routing.RouteSegmentWay;
-import org.openstreetmap.josm.plugins.pt_assistant.gui.routing.RouteTarget;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.routing.transportmode.RouteType;
 import org.openstreetmap.josm.tools.Pair;
 
@@ -67,5 +66,13 @@ public class FromSegmentRouter extends AbstractRouter {
         return super.findWaysThatCanBeSplit()
             // Don't go back to previous way
             .filter(it -> it != startAfter.getWay());
+    }
+
+    @Override
+    public String toString() {
+        return "FromSegmentRouter{" +
+            "type=" + type +
+            ", startAfter=" + startAfter +
+            '}';
     }
 }

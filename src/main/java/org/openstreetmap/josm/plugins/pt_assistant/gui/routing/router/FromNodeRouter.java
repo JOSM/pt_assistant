@@ -28,8 +28,10 @@ public class FromNodeRouter extends AbstractRouter {
         return node
             .referrers(Way.class)
             .filter(way -> way.isFirstLastNode(node))
-            .map(way -> new Pair<>(type.createRouteSegmentWay(way, way.firstNode().equals(node),
-                insertionIndexInRelation, Collections.emptyList()), 0.0));
+            .map(way -> type.createRouteSegmentWay(way, way.firstNode().equals(node),
+                insertionIndexInRelation, Collections.emptyList()))
+            .filter(this::isWaySuitable)
+            .map(segment -> new Pair<>(segment, 0.0));
     }
 
     @Override
@@ -40,5 +42,15 @@ public class FromNodeRouter extends AbstractRouter {
     @Override
     public int getIndexInMembersToAddAfter() {
         return insertionIndexInRelation;
+    }
+
+
+    @Override
+    public String toString() {
+        return "FromNodeRouter{" +
+            "type=" + type +
+            ", node=" + node +
+            ", insertionIndexInRelation=" + insertionIndexInRelation +
+            '}';
     }
 }

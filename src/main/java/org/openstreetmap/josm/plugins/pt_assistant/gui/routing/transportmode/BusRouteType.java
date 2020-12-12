@@ -4,6 +4,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class BusRouteType implements RouteType {
     @Override
@@ -17,11 +18,6 @@ public class BusRouteType implements RouteType {
     }
 
     @Override
-    public List<String> getOneWayTags() {
-        return Arrays.asList("oneway");
-    }
-
-    @Override
     public List<String> getAccessTags() {
         return Arrays.asList("bus", "psv", "motor_vehicle", "vehicle", "access");
     }
@@ -29,5 +25,12 @@ public class BusRouteType implements RouteType {
     @Override
     public String getOverpassFilterForPossibleWays() {
         return "[highway]";
+    }
+
+    @Override
+    public boolean mayDefaultAccess(Map<String, String> tags) {
+        String highway = tags.get("highway");
+        // Those highways won't allow busses
+        return highway != null && !Arrays.asList("cycleway", "trunk", "footway", "pedestrian").contains(highway);
     }
 }

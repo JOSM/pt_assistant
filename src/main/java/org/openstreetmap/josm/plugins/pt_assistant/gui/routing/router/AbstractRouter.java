@@ -17,7 +17,6 @@ import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.plugins.customizepublictransportstop.OSMTags;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.routing.RouteSegmentWay;
-import org.openstreetmap.josm.plugins.pt_assistant.gui.routing.RouteTarget;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.routing.WaySuitability;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.routing.transportmode.RouteType;
 import org.openstreetmap.josm.tools.Pair;
@@ -49,7 +48,7 @@ public abstract class AbstractRouter {
      * @param waySegmentCount The mininum way segment count. Good for urban areas where there are not many way splits.
      * @return The possible route targets, ordered by distance.
      */
-    public List<org.openstreetmap.josm.plugins.pt_assistant.gui.routing.RouteTarget> findRouteTargets(int distance, int waySegmentCount) {
+    public List<RouteTarget> findRouteTargets(int distance, int waySegmentCount) {
         if (distance <= 0) {
             throw new IllegalArgumentException("Distance needs to be at least 1");
         }
@@ -61,7 +60,7 @@ public abstract class AbstractRouter {
         Set<Node> visited = new HashSet<>();
         Map<Node, Double> distances = new HashMap<>();
         HashSet<RouteSegmentWay> toSearchAfterNext = new HashSet<>();
-        List<org.openstreetmap.josm.plugins.pt_assistant.gui.routing.RouteTarget> targets = new ArrayList<>();
+        List<RouteTarget> targets = new ArrayList<>();
 
         getRouterStartSegments().forEach(startPair -> {
             RouteSegmentWay segment = startPair.a;
@@ -121,7 +120,7 @@ public abstract class AbstractRouter {
                 })
                 .filter(Objects::nonNull)
                 // Exclude the ones that we cannot go on.
-                .filter(it -> it.getSuitability() == WaySuitability.GOOD)
+                .filter(this::isWaySuitable)
                 // Handle the way segments => schedule them and mark their parent
                 .forEach(it -> {
                     parents.put(it, next);
@@ -129,6 +128,10 @@ public abstract class AbstractRouter {
                 });
         }
         return targets;
+    }
+
+    protected boolean isWaySuitable(RouteSegmentWay it) {
+        return it.getSuitability() == WaySuitability.GOOD;
     }
 
     protected RouteTarget createRouteTarget(LinkedList<RouteSegmentWay> trace) {

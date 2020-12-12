@@ -31,4 +31,12 @@ public class RouteTarget {
     public Node getEnd() {
         return trace.get(trace.size() - 1).lastNode();
     }
+
+
+    @Override
+    public String toString() {
+        return "RouteTarget{" +
+            "trace=" + trace +
+            '}';
+    }
 }

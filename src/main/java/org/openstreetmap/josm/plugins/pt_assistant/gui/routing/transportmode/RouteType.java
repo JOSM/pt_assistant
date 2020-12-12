@@ -32,7 +32,10 @@ public interface RouteType {
      * @return The tags in the order in which they should be searched.
      */
     default List<String> getOneWayTags() {
-        return Collections.emptyList();
+        return getAccessTags()
+            .stream()
+            .map(tag -> tag.equals("access") ? "oneway" : "oneway:" + tag)
+            .collect(Collectors.toList());
     }
 
     default List<String> getAccessTags() {
@@ -49,14 +52,20 @@ public interface RouteType {
 
     default AccessDirection mayDriveOn(Map<String, String> tags) {
         // OSM can be complicated …
-        for (String accessTag : getAccessTags()) {
-            String value = tags.get(accessTag);
-            if (value != null) {
-                if (!getAccessValues().contains(value)) {
-                    return AccessDirection.NONE;
-                } else {
-                    break;
+        ACCESS:
+        {
+            for (String accessTag : getAccessTags()) {
+                String value = tags.get(accessTag);
+                if (value != null) {
+                    if (!getAccessValues().contains(value)) {
+                        return AccessDirection.NONE;
+                    } else {
+                        break ACCESS;
+                    }
                 }
+            }
+            if (!mayDefaultAccess(tags)) {
+                return AccessDirection.NONE;
             }
         }
 
@@ -64,7 +73,7 @@ public interface RouteType {
             String value = tags.get(oneWayTag);
             if ("-1".equals(value)) {
                 return AccessDirection.BACKWARD_ONLY;
-            } else if (OsmUtils.getOsmBoolean(value)) {
+            } else if (Boolean.TRUE.equals(OsmUtils.getOsmBoolean(value))) {
                 return AccessDirection.FORWARD_ONLY;
             }
         }
@@ -75,6 +84,10 @@ public interface RouteType {
         }
 
         return AccessDirection.BOTH;
+    }
+
+    default boolean mayDefaultAccess(Map<String, String> tags) {
+        return true;
     }
 
     default String getRestrictionValue(Relation r) {

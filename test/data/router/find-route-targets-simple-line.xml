@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-102020' action='modify' visible='true' lat='49.45020568635' lon='7.7632405057' />
+  <node id='-102021' action='modify' visible='true' lat='49.46457004371' lon='7.77294231077' />
+  <node id='-102022' action='modify' visible='true' lat='49.47122526956' lon='7.7882136706' />
+  <node id='-102023' action='modify' visible='true' lat='49.47367696698' lon='7.80564098711' />
+  <node id='-102024' action='modify' visible='true' lat='49.47379371141' lon='7.82252931445'>
+    <tag k='start' v='true' />
+  </node>
+  <node id='-102025' action='modify' visible='true' lat='49.47344347727' lon='7.84570584878' />
+  <node id='-102026' action='modify' visible='true' lat='49.48675061411' lon='7.82252931445' />
+  <node id='-102027' action='modify' visible='true' lat='49.45966561455' lon='7.81947504248' />
+  <node id='-102028' action='modify' visible='true' lat='49.44237942769' lon='7.81588178135'>
+    <tag k='targetNode2' v='true' />
+  </node>
+  <node id='-102029' action='modify' visible='true' lat='49.43420140506' lon='7.8094139113' />
+  <node id='-102030' action='modify' visible='true' lat='49.45826425892' lon='7.84067528319' />
+  <node id='-102031' action='modify' visible='true' lat='49.44167850775' lon='7.84732281629'>
+    <tag k='targetNode1' v='true' />
+  </node>
+  <way id='-107486' action='modify' visible='true'>
+    <nd ref='-102020' />
+    <nd ref='-102021' />
+    <nd ref='-102022' />
+    <nd ref='-102023' />
+    <nd ref='-102024' />
+    <nd ref='-102025' />
+    <tag k='highway' v='residential' />
+  </way>
+  <way id='-107487' action='modify' visible='true'>
+    <nd ref='-102026' />
+    <nd ref='-102024' />
+    <nd ref='-102027' />
+    <nd ref='-102028' />
+    <nd ref='-102029' />
+    <tag k='highway' v='residential' />
+  </way>
+  <way id='-107488' action='modify' visible='true'>
+    <nd ref='-102024' />
+    <nd ref='-102030' />
+    <nd ref='-102031' />
+    <tag k='highway' v='residential' />
+    <tag k='trace1' v='true' />
+  </way>
+  <way id='-107489' action='modify' visible='true'>
+    <nd ref='-102028' />
+    <nd ref='-102031' />
+    <tag k='highway' v='residential' />
+    <tag k='trace2' v='true' />
+  </way>
+</osm>
