@@ -60,7 +60,8 @@ public class NoRouteMasterHeadline extends JPanel {
                     + tr("Please ensure that you have downloaded possible master relations before doing this step.")
                     + "</html>"), GBC.std(0, 1).fill(GBC.HORIZONTAL));
 
-                content.add(new JButton(new JosmAction(tr("Download possible relations"), "download", null, null, false) {
+                content.add(new JButton(new JosmAction(tr("Download possible relations"),
+                    "download", null, null, false) {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         dialog.setVisible(false);

@@ -162,6 +162,8 @@ public abstract class AbstractRouter {
             findWaysThatCanBeSplit()
                 .filter(way -> way.isFirstLastNode(getRoutingStartNode()))
                 .flatMap(way -> Stream.of(way.firstNode(), way.lastNode()))
+
+            // TODO: Access restrictions
         ).collect(Collectors.toSet());
         return findWaysThatCanBeSplit()
             // Find the split points

@@ -1,6 +1,7 @@
 package org.openstreetmap.josm.plugins.pt_assistant.gui.linear;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -13,15 +14,20 @@ import org.openstreetmap.josm.gui.tagging.TagModel;
  * Allows reading from an existing relation or the relation editor.
  */
 public interface RelationAccess {
-    String get(String key);
+
+    Map<String, String> getTags();
+
+    default String get(String key) {
+        return getTags().get(key);
+    }
 
     List<RelationMember> getMembers();
 
     static RelationAccess of(Relation relation) {
         return new RelationAccess() {
             @Override
-            public String get(String key) {
-                return relation.get(key);
+            public Map<String, String> getTags() {
+                return relation.getKeys();
             }
 
             @Override
@@ -49,6 +55,11 @@ public interface RelationAccess {
             }
 
             @Override
+            public Map<String, String> getTags() {
+                return editor.getTagModel().getTags();
+            }
+
+            @Override
             public List<RelationMember> getMembers() {
                 return RelationEditorAccessUtils.streamMembers(editor)
                     .collect(Collectors.toList());
@@ -71,5 +82,9 @@ public interface RelationAccess {
 
     default boolean hasTag(String key, String value) {
         return value.equals(get(key));
+    }
+
+    default boolean isMultipolygon() {
+        return hasTag("type", "multipolygon");
     }
 }

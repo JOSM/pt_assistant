@@ -44,6 +44,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.actions.stoparea.AddStopAreaA
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.LineRelationTabManager;
+import org.openstreetmap.josm.plugins.pt_assistant.gui.members.MembersTableEnhancer;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.routing.RoutingTabManager;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.stoparea.StopAreaTabManager;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.stoparea.StopVicinityTabManager;
@@ -209,6 +210,7 @@ public class PTAssistantPlugin extends Plugin {
                 new StopVicinityTabManager(editorAccess);
                 new StopAreaTabManager(editorAccess);
                 new RoutingTabManager(editorAccess);
+                new MembersTableEnhancer(editorAccess);
             });
             // Don't add actions.
             return Arrays.asList();
