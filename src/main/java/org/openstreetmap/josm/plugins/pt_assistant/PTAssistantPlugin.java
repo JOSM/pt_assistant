@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.swing.JMenu;
 
+import org.openstreetmap.josm.actions.ExtensionFileFilter;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.event.SelectionEventManager;
 import org.openstreetmap.josm.data.validation.OsmValidator;
@@ -20,6 +21,7 @@ import org.openstreetmap.josm.gui.IconToggleButton;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MainMenu;
 import org.openstreetmap.josm.gui.MapFrame;
+import org.openstreetmap.josm.gui.dialogs.LayerListDialog;
 import org.openstreetmap.josm.gui.dialogs.relation.RelationEditorHooks;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.AbstractRelationEditorAction;
 import org.openstreetmap.josm.gui.dialogs.relation.actions.IRelationEditorActionAccess;
@@ -42,6 +44,8 @@ import org.openstreetmap.josm.plugins.pt_assistant.actions.SortPTRouteMembersMen
 import org.openstreetmap.josm.plugins.pt_assistant.actions.SplitRoundaboutAction;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.stoparea.AddStopAreaAction;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
+import org.openstreetmap.josm.plugins.pt_assistant.gtfs.GtfsImporter;
+import org.openstreetmap.josm.plugins.pt_assistant.gtfs.gui.GtfsLayerSettingsPanel;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.PTAssistantLayerManager;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.linear.LineRelationTabManager;
 import org.openstreetmap.josm.plugins.pt_assistant.gui.members.MembersTableEnhancer;
@@ -91,6 +95,8 @@ public class PTAssistantPlugin extends Plugin {
         initialiseWizard();
         initialiseShortcutsForCreatePlatformNode();
         addButtonsToRelationEditor();
+
+        ExtensionFileFilter.addImporter(new GtfsImporter());
     }
 
     /**
@@ -99,9 +105,11 @@ public class PTAssistantPlugin extends Plugin {
     @Override
     public void mapFrameInitialized(MapFrame oldFrame, MapFrame newFrame) {
         if (oldFrame == null && newFrame != null) {
-            MainApplication.getMap().addMapMode(new IconToggleButton(new AddStopPositionAction()));
-            MainApplication.getMap().addMapMode(new IconToggleButton(new EdgeSelectionAction()));
-            MainApplication.getMap().addMapMode(new IconToggleButton(new DoubleSplitAction()));
+            newFrame.addMapMode(new IconToggleButton(new AddStopPositionAction()));
+            newFrame.addMapMode(new IconToggleButton(new EdgeSelectionAction()));
+            newFrame.addMapMode(new IconToggleButton(new DoubleSplitAction()));
+
+            GtfsLayerSettingsPanel.hackInto(newFrame);
         }
     }
 

@@ -24,6 +24,8 @@ dependencies {
   testImplementation("org.junit.vintage:junit-vintage-engine:${Versions.junit}")
   testImplementation("com.github.tomakehurst:wiremock:${Versions.wiremock}")
   testImplementation("org.awaitility:awaitility:${Versions.awaitility}")
+  // For parsing gtfs files
+  implementation("com.opencsv:opencsv:5.3")
 }
 
 tasks.withType(JavaCompile::class) {
