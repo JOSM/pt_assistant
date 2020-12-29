@@ -35,7 +35,7 @@ import org.openstreetmap.josm.plugins.pt_assistant.data.PTWay;
 public final class StopToWayAssigner {
 
     /* contains assigned stops */
-    public static Map<PTStop, List<Way>> stopToWay = new HashMap<>();
+    private final Map<PTStop, List<Way>> stopToWay = new HashMap<>();
 
     /*
      * contains all PTWays of the route relation for which this assigner was created
