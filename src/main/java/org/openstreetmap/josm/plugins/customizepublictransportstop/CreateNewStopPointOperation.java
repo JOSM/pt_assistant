@@ -18,9 +18,10 @@ import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.osm.INode;
+import org.openstreetmap.josm.data.osm.IWaySegment;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.data.osm.WaySegment;
 import org.openstreetmap.josm.data.projection.ProjectionRegistry;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
@@ -154,8 +155,8 @@ public class CreateNewStopPointOperation extends StopAreaOperationBase {
      * @return a sorted map with the keys representing the perpendicular distance of
      *         their associated way segments to point p.
      */
-    private Map<Double, List<WaySegment>> getNearestWaySegmentsImpl(Point p) {
-        Map<Double, List<WaySegment>> nearestMap = new TreeMap<>();
+    private Map<Double, List<IWaySegment<Node, Way>>> getNearestWaySegmentsImpl(Point p) {
+        Map<Double, List<IWaySegment<Node, Way>>> nearestMap = new TreeMap<>();
         DataSet ds = getCurrentDataSet();
 
         if (ds != null) {
@@ -192,14 +193,14 @@ public class CreateNewStopPointOperation extends StopAreaOperationBase {
                             Double.doubleToLongBits(a - (a - b + c) * (a - b + c) / 4 / c) >> 32 << 32);
 
                     if (perDistSq < snapDistanceSq && a < c + snapDistanceSq && b < c + snapDistanceSq) {
-                        List<WaySegment> wslist;
+                        List<IWaySegment<Node, Way>> wslist;
                         if (nearestMap.containsKey(perDistSq)) {
                             wslist = nearestMap.get(perDistSq);
                         } else {
                             wslist = new LinkedList<>();
                             nearestMap.put(perDistSq, wslist);
                         }
-                        wslist.add(new WaySegment(w, i));
+                        wslist.add(new IWaySegment<>(w, i));
                     }
 
                     lastN = n;
@@ -220,12 +221,12 @@ public class CreateNewStopPointOperation extends StopAreaOperationBase {
     protected NearestWaySegment getNearestWaySegment(LatLon platformCoord, StopArea stopArea) {
         MapView mapView = MainApplication.getMap().mapView;
         Point p = mapView.getPoint(platformCoord);
-        Map<Double, List<WaySegment>> dist_waySegments = getNearestWaySegmentsImpl(p);
-        for (Map.Entry<Double, List<WaySegment>> entry : dist_waySegments.entrySet()) {
-            for (WaySegment waySegment : entry.getValue()) {
-                if (testWay(waySegment.way, stopArea)) {
-                    Node n = waySegment.getFirstNode();
-                    Node lastN = waySegment.getSecondNode();
+        Map<Double, List<IWaySegment<Node, Way>>> dist_waySegments = getNearestWaySegmentsImpl(p);
+        for (Map.Entry<Double, List<IWaySegment<Node, Way>>> entry : dist_waySegments.entrySet()) {
+            for (IWaySegment<Node, Way> waySegment : entry.getValue()) {
+                if (testWay(waySegment.getWay(), stopArea)) {
+                    INode n = waySegment.getFirstNode();
+                    INode lastN = waySegment.getSecondNode();
 
                     EastNorth newPosition = Geometry.closestPointToSegment(n.getEastNorth(), lastN.getEastNorth(),
                             ProjectionRegistry.getProjection().latlon2eastNorth(platformCoord));
@@ -251,13 +252,13 @@ public class CreateNewStopPointOperation extends StopAreaOperationBase {
      * @param waySegment Way segment including stop position node
      * @return Stop position node
      */
-    protected Node createNodeOnWay(Node newStopNode, WaySegment waySegment) {
+    protected Node createNodeOnWay(Node newStopNode, IWaySegment<?, Way> waySegment) {
         UndoRedoHandler.getInstance().add(new AddCommand(MainApplication.getLayerManager().getEditDataSet(), newStopNode));
-        List<Node> wayNodes = waySegment.way.getNodes();
-        wayNodes.add(waySegment.lowerIndex + 1, newStopNode);
-        Way newWay = new Way(waySegment.way);
+        List<Node> wayNodes = waySegment.getWay().getNodes();
+        wayNodes.add(waySegment.getUpperIndex(), newStopNode);
+        Way newWay = new Way(waySegment.getWay());
         newWay.setNodes(wayNodes);
-        UndoRedoHandler.getInstance().add(new ChangeCommand(waySegment.way, newWay));
+        UndoRedoHandler.getInstance().add(new ChangeCommand(waySegment.getWay(), newWay));
         return newStopNode;
     }
 
