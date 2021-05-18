@@ -41,6 +41,7 @@ import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.coor.ILatLon;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.osm.IWaySegment;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
@@ -636,8 +637,8 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
                     OsmPrimitive::isSelectable);
 
             if (!wss.isEmpty()) {
-                for (WaySegment ws : wss) {
-                    newHighlights.add(ws.way);
+                for (IWaySegment<?, Way> ws : wss) {
+                    newHighlights.add(ws.getWay());
                 }
                 newCurs = cursorJoinWay;
             }

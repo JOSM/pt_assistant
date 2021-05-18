@@ -1,8 +1,9 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.customizepublictransportstop;
 
+import org.openstreetmap.josm.data.osm.IWaySegment;
 import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.WaySegment;
+import org.openstreetmap.josm.data.osm.Way;
 
 /**
  * Distance from platform to ways
@@ -17,7 +18,7 @@ public class NearestWaySegment {
     /**
      * Way segment
      */
-    public WaySegment waySegment;
+    public IWaySegment<Node, Way> waySegment;
     /**
      * Node
      */
@@ -30,7 +31,7 @@ public class NearestWaySegment {
      * @param waySegment Way segment
      * @param newNode Node
      */
-    public NearestWaySegment(Double distanceSq, WaySegment waySegment, Node newNode) {
+    public NearestWaySegment(Double distanceSq, IWaySegment<Node, Way> waySegment, Node newNode) {
         this.distanceSq = distanceSq;
         this.waySegment = waySegment;
         this.newNode = newNode;

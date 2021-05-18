@@ -24,6 +24,7 @@ import org.openstreetmap.josm.command.Command;
 import org.openstreetmap.josm.command.SequenceCommand;
 import org.openstreetmap.josm.command.SplitWayCommand;
 import org.openstreetmap.josm.data.UndoRedoHandler;
+import org.openstreetmap.josm.data.osm.IWaySegment;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
@@ -103,8 +104,8 @@ public class AddStopPositionAction extends MapMode {
                 MainApplication.getMap().mapView.getNearestWaySegments(e.getPoint(), OsmPrimitive::isSelectable);
 
             if (!wss.isEmpty()) {
-                for (WaySegment ws : wss) {
-                    newHighlights.add(ws.way);
+                for (IWaySegment<?, Way> ws : wss) {
+                    newHighlights.add(ws.getWay());
                 }
                 newCurs = CURSOR_JOIN_WAY;
             }
