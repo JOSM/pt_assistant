@@ -17,6 +17,7 @@ public final class OSMTags {
     public static final String TRUNK_LINK_TAG_VALUE = "trunk_link";
     public static final String ROAD_TAG_VALUE = "road";
     public static final String BUS_GUIDEWAY_TAG_VALUE = "bus_guideway";
+    public static final String BUSWAY_TAG_VALUE = "busway";
     public static final String SERVICE_TAG_VALUE = "service";
     public static final String RESIDENTIAL_TAG_VALUE = "residential";
     public static final String UNCLASSIFIED_TAG_VALUE = "unclassified";
@@ -34,6 +35,7 @@ public final class OSMTags {
         RESIDENTIAL_TAG_VALUE,
         SERVICE_TAG_VALUE,
         BUS_GUIDEWAY_TAG_VALUE,
+        BUSWAY_TAG_VALUE,
         ROAD_TAG_VALUE,
         TRUNK_LINK_TAG_VALUE,
         PRIMARY_LINK_TAG_VALUE,
