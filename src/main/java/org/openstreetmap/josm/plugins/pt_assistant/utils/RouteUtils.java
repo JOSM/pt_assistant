@@ -232,7 +232,7 @@ public final class RouteUtils {
 
         String[] acceptedHighwayTags = new String[] {"motorway", "trunk", "primary", "secondary", "tertiary",
                 "unclassified", "road", "residential", "service", "motorway_link", "trunk_link", "primary_link",
-                "secondary_link", "tertiary_link", "living_street", "bus_guideway", "road" };
+                "secondary_link", "tertiary_link", "living_street", "busway", "bus_guideway", "road" };
 
         if (way.hasTag("highway", acceptedHighwayTags) || way.hasTag("cycleway", "share_busway")
                 || way.hasTag("cycleway", "shared_lane")) {
