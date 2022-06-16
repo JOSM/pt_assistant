@@ -1,9 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (el)
 # Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# FIRST AUTHOR, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
@@ -71,7 +70,6 @@ msgstr ""
 "Μην συγκρίνετε το όνομα της τελευταίας στάσης με την ετικέτα στη σχέση της "
 "διαδρομής"
 
-#, java-format
 msgid "Download finished: {0}"
 msgstr "Η λήψη ολοκληρώθηκε: {0}"
 
@@ -79,7 +77,6 @@ msgstr "Η λήψη ολοκληρώθηκε: {0}"
 msgid "Download incomplete route relation members"
 msgstr "Λήψη ημιτελών μελών σχέσης διαδρομής"
 
-#, java-format
 msgid "Download started: {0}"
 msgstr "Η λήψη ξεκίνησε: {0}"
 
@@ -105,7 +102,6 @@ msgstr "Εξαγωγή κόμβου πλατφόρμας από έναν κόμ�
 msgid "Fix error"
 msgstr "Επίλυση σφάλματος"
 
-#, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Διόρθωση ({0}/{1}): ''{2}''"
 
@@ -129,7 +125,6 @@ msgstr "Ημιτελείς σχέσεις"
 msgid "Invalid selection"
 msgstr "Μη έγκυρη επιλογή"
 
-#, java-format
 msgid ""
 "Mode of Travel -> {0} \n"
 " total ways selected -> {1}"
@@ -137,7 +132,6 @@ msgstr ""
 "Τρόπος ταξιδιού -> {0}\n"
 "επιλεγμένες συνολικές διαδρομές -> {1}"
 
-#, java-format
 msgid "Mode: {0}"
 msgstr "Κατάσταση: {0}"
 
@@ -257,7 +251,6 @@ msgstr ""
 "PT: Το όνομα της πρώτης στάσης δεν αντιστοιχεί στην ετικέτα \"προς\" της "
 "σχέσης διαδρομής"
 
-#, java-format
 msgid "PT: There is a gap in the {0} route"
 msgstr "PT: Υπάρχει ένα κενό στην {0} διαδρομή"
 
@@ -274,7 +267,6 @@ msgstr "PT Μήνυμα Βοηθού"
 msgid "PT_Assistant Proceed Request"
 msgstr "PT Μετάβαση Αιτήματος Βοηθού"
 
-#, java-format
 msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr ""
 "PT Ο Βοηθός πρόσθετων διαπίστωσε ότι αυτή η σχέση (id = {0}) έχει σφάλματα:"
@@ -339,7 +331,6 @@ msgstr "Ο επιλεγμένος κόμβος δεν είναι στάση γι
 msgid "This action requires single node to be selected."
 msgstr "Αυτή η ενέργεια απαιτεί την επιλογή ενός κόμβου."
 
-#, java-format
 msgid "Tool: {0}"
 msgstr "Εργαλείο: {0}"
 
@@ -351,7 +342,6 @@ msgstr ""
 "Πληκτρολογήστε γράμμα για να επιλέξετε την παραλλαγή επιδιόρθωσης ή πατήστε "
 "Escape για την μη διόρθωση"
 
-#, java-format
 msgid "Unable to connect to {0}"
 msgstr "Αδύνατη η σύνδεση στο {0}"
 

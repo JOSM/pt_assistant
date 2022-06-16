@@ -1,9 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (de)
 # Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# FIRST AUTHOR, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
@@ -84,7 +83,6 @@ msgstr ""
 "Nicht den Namen der letzten Haltestelle mit dem to-Tag der Routenrelation "
 "vergleichen"
 
-#, java-format
 msgid "Download finished: {0}"
 msgstr "Herunterladen abgeschlossen: {0}"
 
@@ -92,7 +90,6 @@ msgstr "Herunterladen abgeschlossen: {0}"
 msgid "Download incomplete route relation members"
 msgstr "Unvollständige Routenrelationselemente herunterladen"
 
-#, java-format
 msgid "Download started: {0}"
 msgstr "Herunterladen gestartet: {0}"
 
@@ -115,7 +112,6 @@ msgstr "Extrahieren Haltestellen-Punkt"
 msgid "Fix error"
 msgstr "Fehler beheben"
 
-#, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Berichtigung ({0}/{1}): ''{2}''"
 
@@ -139,7 +135,6 @@ msgstr "Unvollständige Relationen"
 msgid "Invalid selection"
 msgstr "Ungültige Auswahl"
 
-#, java-format
 msgid "Mode: {0}"
 msgstr "Modus: {0}"
 
@@ -263,7 +258,6 @@ msgstr ""
 "ÖV: Der Name der Endhaltestelle stimmt nicht mit dem \"nach\"-Merkmal der "
 "Routenrelation überein"
 
-#, java-format
 msgid "PT: There is a gap in the {0} route"
 msgstr "ÖV: Es gibt eine Lücke in der Route {0}"
 
@@ -283,7 +277,6 @@ msgstr "PT_Assistant Meldung"
 msgid "PT_Assistant Proceed Request"
 msgstr "PT_Assistant Fahranforderung"
 
-#, java-format
 msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr ""
 "PT_Assistant-Erweiterungen hat Fehler in dieser Relation (id={0}) gefunden:"
@@ -359,7 +352,6 @@ msgstr "Richtungspfeile umschalten"
 msgid "Toggle reference labels"
 msgstr "Referenzbeschriftung umschalten"
 
-#, java-format
 msgid "Tool: {0}"
 msgstr "Werkzeug: {0}"
 
@@ -374,7 +366,6 @@ msgstr ""
 "Tippen Sie einen Buchstaben zum Auswählen einer Korrekturvariante ein oder "
 "drücken Sie Esc für keine Korrektur"
 
-#, java-format
 msgid "Unable to connect to {0}"
 msgstr "Konnte nicht mit {0} verbinden"
 
@@ -403,13 +394,11 @@ msgstr "Ja"
 msgid "suggested value : "
 msgstr "vorgeschlagener Wert"
 
-#, java-format
 msgid "{0} direction error"
 msgid_plural "{0} direction errors"
 msgstr[0] "{0} Richtungsfehler"
 msgstr[1] "{0} Richtungsfehler"
 
-#, java-format
 msgid "{0} road type error"
 msgid_plural "{0} road type errors"
 msgstr[0] "{0} Straßentypfehler"

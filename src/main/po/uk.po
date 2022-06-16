@@ -1,9 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (uk)
 # Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# FIRST AUTHOR, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
@@ -55,7 +54,6 @@ msgstr "Завантажити відсутніх членів звʼязку м
 msgid "Fix error"
 msgstr "Виправити помилку"
 
-#, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Виправлення ({0}/{1}): ''{2}''"
 
@@ -71,7 +69,6 @@ msgstr "Незавантажені члени"
 msgid "Invalid selection"
 msgstr "Неправильне виділення"
 
-#, java-format
 msgid "Mode: {0}"
 msgstr "Режим {0}"
 
@@ -186,7 +183,6 @@ msgstr "ГТ_Помічник Повідомлення"
 msgid "PT_Assistant Proceed Request"
 msgstr "ГТ_Помічник Продовжити запит"
 
-#, java-format
 msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr "ГТ_Помічник втулок визначив, що цей звʼязок (id={0}) містить помилки:"
 
@@ -230,7 +226,6 @@ msgstr "Показувати стрілки напрямку"
 msgid "Toggle reference labels"
 msgstr "Показувати таблички маршрутів"
 
-#, java-format
 msgid "Tool: {0}"
 msgstr "Інструмент: {0}"
 
@@ -256,7 +251,6 @@ msgstr "Чим повинен бути цей відрізок?"
 msgid "Yes"
 msgstr "Так"
 
-#, java-format
 msgid "{0} direction error"
 msgid_plural "{0} direction errors"
 msgstr[0] "{0} помилка напрямку"
@@ -264,7 +258,6 @@ msgstr[1] "{0} помилки напрямку"
 msgstr[2] "{0} помилок напрямку"
 msgstr[3] "{0} помилок напрямку"
 
-#, java-format
 msgid "{0} road type error"
 msgid_plural "{0} road type errors"
 msgstr[0] "{0} помилка типу дороги"

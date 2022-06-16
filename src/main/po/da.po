@@ -1,9 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (da)
 # Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# FIRST AUTHOR, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
@@ -62,7 +61,6 @@ msgstr "Download ufuldstændige rute relations medlemmer"
 msgid "Fix error"
 msgstr "Ret fejl"
 
-#, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Retter ({0}/{1}): ''{2}''"
 
@@ -78,7 +76,6 @@ msgstr "Ufuldstændige medlemmer"
 msgid "Invalid selection"
 msgstr "Ugyldigt valg"
 
-#, java-format
 msgid "Mode: {0}"
 msgstr "Tilstand: {0}"
 
@@ -200,7 +197,6 @@ msgstr "OT_Assistent besked"
 msgid "PT_Assistant Proceed Request"
 msgstr "OT_Assistent fortsæt anmodning"
 
-#, java-format
 msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr "OT_Assistent udvidelse fandt at denne relation (id={0}) har fejl:"
 
@@ -257,7 +253,6 @@ msgstr "Skift retningspile"
 msgid "Toggle reference labels"
 msgstr "Skift reference etiketter"
 
-#, java-format
 msgid "Tool: {0}"
 msgstr "Værktøj: {0}"
 
@@ -289,13 +284,11 @@ msgstr "Hvad vil du have at segmentet skal være?"
 msgid "Yes"
 msgstr "Ja"
 
-#, java-format
 msgid "{0} direction error"
 msgid_plural "{0} direction errors"
 msgstr[0] "{0} retningsfejl"
 msgstr[1] "{0} retningsfejl"
 
-#, java-format
 msgid "{0} road type error"
 msgid_plural "{0} road type errors"
 msgstr[0] "{0} vejtypefejl"

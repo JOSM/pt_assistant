@@ -1,9 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (hu)
 # Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# FIRST AUTHOR, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
@@ -72,7 +71,6 @@ msgstr "Platform pont kinyerése egy pontból"
 msgid "Fix error"
 msgstr "Hiba javítása"
 
-#, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Javítás ({0}/{1}): „{2}”"
 
@@ -88,7 +86,6 @@ msgstr "Hiányos tagok"
 msgid "Invalid selection"
 msgstr "Érvénytelen kijelölés"
 
-#, java-format
 msgid "Mode: {0}"
 msgstr "Mód: {0}"
 
@@ -169,7 +166,6 @@ msgstr "PT_Assistant Üzenet"
 msgid "PT_Assistant Proceed Request"
 msgstr "PT_Assistant Folytatás Kérés"
 
-#, java-format
 msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr ""
 "A PT_Assistant bővítmény szerint ez a kapcsolat  (id={0}) hibákat tartalmaz:"
@@ -214,7 +210,6 @@ msgstr "Irány nyilak átkapcsolása"
 msgid "Toggle reference labels"
 msgstr "Azonosító címkék átkapcsolása"
 
-#, java-format
 msgid "Tool: {0}"
 msgstr "Eszköz: {0}"
 
@@ -246,13 +241,11 @@ msgstr "Igen"
 msgid "suggested value : "
 msgstr "javasolt érték :"
 
-#, java-format
 msgid "{0} direction error"
 msgid_plural "{0} direction errors"
 msgstr[0] "{0} irány hiba"
 msgstr[1] "{0} irány hiba"
 
-#, java-format
 msgid "{0} road type error"
 msgid_plural "{0} road type errors"
 msgstr[0] "{0} úttípus hiba"

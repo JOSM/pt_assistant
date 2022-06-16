@@ -1,9 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (fr)
 # Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# FIRST AUTHOR, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
@@ -68,7 +67,6 @@ msgstr "Extraire un nœud de la ligne"
 msgid "Fix error"
 msgstr "Correction d’erreur"
 
-#, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Corrige ({0}/{1}): ''{2}''"
 
@@ -84,7 +82,6 @@ msgstr "Membres incomplets"
 msgid "Invalid selection"
 msgstr "La sélection n’est pas valide"
 
-#, java-format
 msgid "Mode: {0}"
 msgstr "Mode : {0}"
 
@@ -211,7 +208,6 @@ msgstr "Message de PT_Assistant"
 msgid "PT_Assistant Proceed Request"
 msgstr "PT_Assistant traite la requête"
 
-#, java-format
 msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr ""
 "Le greffon PT_Assistant trouve que la relation (id={0}) a des erreurs:"
@@ -269,7 +265,6 @@ msgstr "Inverser les flèches de direction"
 msgid "Toggle reference labels"
 msgstr "Inverser les étiquettes de référence"
 
-#, java-format
 msgid "Tool: {0}"
 msgstr "Outil : {0}"
 
@@ -301,13 +296,11 @@ msgstr "Que voulez-vous que ce segment soit ?"
 msgid "Yes"
 msgstr "Oui"
 
-#, java-format
 msgid "{0} direction error"
 msgid_plural "{0} direction errors"
 msgstr[0] "{0} erreur de direction"
 msgstr[1] "{0} erreurs de direction"
 
-#, java-format
 msgid "{0} road type error"
 msgid_plural "{0} road type errors"
 msgstr[0] "{0} erreur de type de route"

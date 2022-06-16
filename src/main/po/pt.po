@@ -1,9 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (pt)
 # Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# FIRST AUTHOR, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
@@ -17,7 +16,6 @@ msgstr ""
 "Language: pt\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#, java-format
 msgid ""
 "''from'' tag not set. Set it to\n"
 "{0} ?"
@@ -25,7 +23,6 @@ msgstr ""
 "etiqueta ''from'' não usada. Usar com\n"
 "{0} ?"
 
-#, java-format
 msgid ""
 "''from''={0}.\n"
 "Change it to\n"
@@ -37,7 +34,6 @@ msgstr ""
 "alterá-la para\n"
 "''{1}'' ?"
 
-#, java-format
 msgid ""
 "''to'' tag not set. Set it to\n"
 "{0} ?"
@@ -45,7 +41,6 @@ msgstr ""
 "etiqueta ''to'' não usada Usar com\n"
 "{0} ?"
 
-#, java-format
 msgid ""
 "''to''={0}.\n"
 "Change it to\n"
@@ -106,7 +101,6 @@ msgstr "Distância entre paragens"
 msgid "Do you want to make the roundabout round?"
 msgstr "Quer tornar a rotunda circular?"
 
-#, java-format
 msgid "Download finished: {0}"
 msgstr "Descarregamento terminado: {0}"
 
@@ -114,7 +108,6 @@ msgstr "Descarregamento terminado: {0}"
 msgid "Download incomplete route relation members"
 msgstr "Descarregar membros incompletos da relação de rota"
 
-#, java-format
 msgid "Download started: {0}"
 msgstr "Descarregamento iniciado: {0}"
 
@@ -127,7 +120,6 @@ msgstr "Extrair nó de uma linha"
 msgid "Fix error"
 msgstr "Corrigir erro"
 
-#, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Corrigindo ({0}/{1}): ''{2}''"
 
@@ -143,7 +135,6 @@ msgstr "Membros Incompletos"
 msgid "Invalid selection"
 msgstr "Seleção incorreta"
 
-#, java-format
 msgid "Mode: {0}"
 msgstr "Modo: {0}"
 
@@ -258,7 +249,6 @@ msgstr ""
 "TP: O nome da última paragem não corresponde à etiqueta \"to\" (para) da "
 "relação de rota"
 
-#, java-format
 msgid "PT: There is a gap in the {0} route"
 msgstr "TP: Há um intervalo na rota {0}"
 
@@ -278,7 +268,6 @@ msgstr "Mensagem do Assistente_TP"
 msgid "PT_Assistant Proceed Request"
 msgstr "Pedido de Continuação do Assistente_TP"
 
-#, java-format
 msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr "O módulo Assistente_TP descobriu que esta relação (id={0}) tem erros:"
 
@@ -328,7 +317,6 @@ msgstr "Separar linha"
 msgid "Toggle direction arrows"
 msgstr "Inverter setas de direção"
 
-#, java-format
 msgid "Tool: {0}"
 msgstr "Ferramenta: {0}"
 
@@ -360,13 +348,11 @@ msgstr "Sim"
 msgid "suggested value : "
 msgstr "valor sugerido : "
 
-#, java-format
 msgid "{0} direction error"
 msgid_plural "{0} direction errors"
 msgstr[0] "{0} erro de direção"
 msgstr[1] "{0} erros de direção"
 
-#, java-format
 msgid "{0} road type error"
 msgid_plural "{0} road type errors"
 msgstr[0] "{0} erro de tipo de estrada"

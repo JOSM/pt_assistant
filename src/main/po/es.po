@@ -1,9 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (es)
 # Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# FIRST AUTHOR, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
@@ -96,7 +95,6 @@ msgstr ""
 "No compare el nombre de la primera parada con la etiqueta A en la relación "
 "de ruta"
 
-#, java-format
 msgid "Download finished: {0}"
 msgstr "Descarga finalizada: {0}"
 
@@ -104,7 +102,6 @@ msgstr "Descarga finalizada: {0}"
 msgid "Download incomplete route relation members"
 msgstr "Descarga miembros de la relación de ruta incompletos"
 
-#, java-format
 msgid "Download started: {0}"
 msgstr "Descarga iniciada: {0}"
 
@@ -130,7 +127,6 @@ msgstr "Extraer nodo de plataforma de un nodo"
 msgid "Fix error"
 msgstr "Arreglar error"
 
-#, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Corrigiendo ({0}/{1}): ''{2}''"
 
@@ -154,7 +150,6 @@ msgstr "Relaciones incompletas"
 msgid "Invalid selection"
 msgstr "Selección no válida"
 
-#, java-format
 msgid ""
 "Mode of Travel -> {0} \n"
 " total ways selected -> {1}"
@@ -162,7 +157,6 @@ msgstr ""
 "Modo de Viaje -> {0}\n"
 " total de vías seleccionadas -> {1}"
 
-#, java-format
 msgid "Mode: {0}"
 msgstr "Modo: {0}"
 
@@ -289,7 +283,6 @@ msgstr ""
 "PT: el nombre de la última parada no concuerda con la etiqueta \"to\" de la "
 "relación de ruta"
 
-#, java-format
 msgid "PT: There is a gap in the {0} route"
 msgstr "PT: Hay una interrupción en la ruta {0}"
 
@@ -309,7 +302,6 @@ msgstr "Mensaje de PT_Assistant"
 msgid "PT_Assistant Proceed Request"
 msgstr "PT_Assistant procedió a la solicitud"
 
-#, java-format
 msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr ""
 "El complemento PT_Assistant encontró que esta relación (ID = {0}) tiene "
@@ -401,7 +393,6 @@ msgstr "Cambiar la dirección de las flechas"
 msgid "Toggle reference labels"
 msgstr "Cambiar las etiquetas de referencia"
 
-#, java-format
 msgid "Tool: {0}"
 msgstr "Herramienta: {0}"
 
@@ -429,7 +420,6 @@ msgstr ""
 "Introduzca el tipo de letra para seleccionar la variante de solución de "
 "problemas o pulse la tecla Esc para no elegir ninguna solución"
 
-#, java-format
 msgid "Unable to connect to {0}"
 msgstr "No se ha podido conectar a {0}"
 
@@ -456,13 +446,11 @@ msgstr "Si"
 msgid "suggested value : "
 msgstr "Valor sugerido :"
 
-#, java-format
 msgid "{0} direction error"
 msgid_plural "{0} direction errors"
 msgstr[0] "{0} error de dirección"
 msgstr[1] "{0} errores de dirección"
 
-#, java-format
 msgid "{0} road type error"
 msgid_plural "{0} road type errors"
 msgstr[0] "{0} error en el tipo de carretera"

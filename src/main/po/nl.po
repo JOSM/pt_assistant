@@ -1,9 +1,8 @@
 # Translations for the JOSM plugin 'pt_assistant' (nl)
 # Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# FIRST AUTHOR, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
@@ -66,7 +65,6 @@ msgstr "Knoop uit lijn weghalen"
 msgid "Fix error"
 msgstr "Fout oplossen"
 
-#, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "({0}/{1}): ''{2}'' worden hersteld"
 
@@ -82,7 +80,6 @@ msgstr "Incomplete leden"
 msgid "Invalid selection"
 msgstr "Ongeldige selectie"
 
-#, java-format
 msgid "Mode: {0}"
 msgstr "Modus: {0}"
 
@@ -206,7 +203,6 @@ msgstr "PT_Assistant bericht"
 msgid "PT_Assistant Proceed Request"
 msgstr "Verzoek door te gaan met PT_Assistant"
 
-#, java-format
 msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
 msgstr "Plug-in PT_Assistant vindt dat deze relatie (id={0}) fouten heeft:"
 
@@ -263,7 +259,6 @@ msgstr "Richtingpijlen schakelen"
 msgid "Toggle reference labels"
 msgstr "Verwijzingslabels schakelen"
 
-#, java-format
 msgid "Tool: {0}"
 msgstr "Gereedschap: {0}"
 
@@ -295,13 +290,11 @@ msgstr "Wat wilt u dat het segment is?"
 msgid "Yes"
 msgstr "Ja"
 
-#, java-format
 msgid "{0} direction error"
 msgid_plural "{0} direction errors"
 msgstr[0] "{0} fout in rechting"
 msgstr[1] "{0} fouten in richting"
 
-#, java-format
 msgid "{0} road type error"
 msgid_plural "{0} road type errors"
 msgstr[0] "{0} fout in type weg"

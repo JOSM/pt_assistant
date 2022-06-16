@@ -1,14 +1,19 @@
 # Translations for the JOSM plugin 'pt_assistant' (pl)
-# Copyright (C) 2018
+# Copyright (C) 2022
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# FIRST AUTHOR, YEAR.
 #
-#, fuzzy
+# Translators:
+# Florian Schäfer, 2018
+# Right Path, 2019
+# Simon Legner, 2019
+# Piotr Strębski, 2021
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
+"Project-Id-Version: josm-plugin_pt_assistant 2.1.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Polish (https://www.transifex.com/josm/teams/2544/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -17,9 +22,60 @@ msgstr ""
 "Language: pl\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
+msgid " "
+msgstr " "
+
+msgid ""
+"''from'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+"znacznik ''z'' nieustawiony. Ustawić go na\n"
+"{0} ?"
+
+msgid ""
+"''from''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+"''z''={0}.\n"
+"Zamienić go na\n"
+"''{1}''\n"
+"?"
+
+msgid ""
+"''to'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+"znacznik ''do'' nieustawiony. Ustawić go na\n"
+"{0} ?"
+
+msgid ""
+"''to''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+"''do''={0}.\n"
+"Zamienić go na\n"
+"''{1}''\n"
+"?"
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Poprawna trasa public_transport:version=2 jest wymagana"
+
+msgid "Add oneway:bicycle=no to way"
+msgstr ""
+
+msgid "Add oneway:bus=no to way"
+msgstr "Dodaj oneway:bus=no do linii"
+
 msgid "Add public_transport=stop_position + mode of transport on these nodes"
 msgstr ""
 "Dodaj public_transport=stop_position oraz środek transportu dla tych węzłów"
+
+msgid "Add stop position"
+msgstr "Dodaj miejsce zatrzymania"
 
 msgid "Always split ways, even if they are not at the end of the itinerary"
 msgstr "Zawsze rozdzielaj drogi, nawet jeżeli nie są na końcu trasy."
@@ -33,6 +89,9 @@ msgstr "Obszar wokół drogi"
 msgid "Area before removal"
 msgstr "Obszar przed usunięciem"
 
+msgid "Assign transport type to platform"
+msgstr "Przypisz środek transportu do przystanku"
+
 msgid "Bench"
 msgstr "Bank"
 
@@ -42,8 +101,29 @@ msgstr "Testy tras rowerowych i pieszych"
 msgid "Bus"
 msgstr "Autobus"
 
+msgid "Bus station"
+msgstr "Dworzec autobusowy"
+
 msgid "Cancel"
 msgstr "Anuluj"
+
+msgid "Change from tag?"
+msgstr "Zamienić ze znacznika?"
+
+msgid "Change name tag?"
+msgstr "Zamienić znacznik nazwy?"
+
+msgid ""
+"Change name to\n"
+"''{0}''\n"
+"?"
+msgstr ""
+"Zmienić nazwę na\n"
+"''{0}''\n"
+"?"
+
+msgid "Change to tag?"
+msgstr "Zamienić na znacznik?"
 
 msgid ""
 "Check if route relations are compatible with public transport version 2"
@@ -51,14 +131,44 @@ msgstr ""
 "Sprawdź, czy relacje tras są kompatybilne z transportem publicznym w wersji "
 "2"
 
+msgid "City transport"
+msgstr "Transport miejski"
+
 msgid "Close"
 msgstr "Zamknij"
+
+msgid "Close the options"
+msgstr "Zamknij opcje"
+
+msgid "Commuter"
+msgstr "Z biletem okresowym"
+
+msgid "Cover"
+msgstr "Dach"
+
+msgid "Create ''route'' relation for opposite direction of travel?"
+msgstr "Utworzyć relację ''route'' dla odwrotnego kierunku podróży?"
+
+msgid "Create ''route_master'' relation and add these route relations to it?"
+msgstr ""
+
+msgid "Create a route_master?"
+msgstr "Utworzyć route_master?"
+
+msgid "Customize stop"
+msgstr "Dostosuj przystanek"
+
+msgid "Customize stop under osm public transit standard v2"
+msgstr "Dostosuj przystanek do standardu transportu publicznego osm v2"
 
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Wyświetla przystanki wybranych tras transportu publicznego jako graf"
 
-msgid "Do you want to download referrers of platforms and stop positions?"
-msgstr "Czy chcesz pobrać odniesienia dla przystanków i miejsc zatrzymania?"
+msgid "Distance between stops"
+msgstr "Odległość pomiędzy przystankami"
+
+msgid "Do not remove ways"
+msgstr "Nie usuwaj linii"
 
 msgid "Do you want to make the roundabout round?"
 msgstr "Czy chcesz zaokrąglić rondo?"
@@ -82,7 +192,9 @@ msgstr "Nie porównuj nazwy pierwszego przystanku ze znacznikiem \"z\" trasy"
 msgid "Don’t compare name of last stop with to tag in route relation"
 msgstr "Nie porównuj nazwy ostatniego przystanku ze znacznikiem \"do\" trasy"
 
-#, java-format
+msgid "Double Split"
+msgstr "Podwójny podział"
+
 msgid "Download finished: {0}"
 msgstr "Pobieranie ukończone: {0}"
 
@@ -90,7 +202,6 @@ msgstr "Pobieranie ukończone: {0}"
 msgid "Download incomplete route relation members"
 msgstr "Pobierz niekompletnych członków relacji tras"
 
-#, java-format
 msgid "Download started: {0}"
 msgstr "Pobieranie rozpoczęte: {0}"
 
@@ -101,8 +212,22 @@ msgstr ""
 "Pobieranie niekompletnych relacji członków. Cierpliwie poczekaj, aż "
 "pobieranie się skończy."
 
+msgid "Edge Selection"
+msgstr "Wybór krawędzi"
+
 msgid "Entire area"
 msgstr "Cały obszar"
+
+msgid "Error in roundabout"
+msgstr "Błąd na rondzie"
+
+msgid ""
+"Error: The paths connecting the roundabout in the relation do not allow "
+"bicycles."
+msgstr "Błąd: ścieżki łączące rondo w relacji nie zezwalają na ruch rowerów."
+
+msgid "Esc"
+msgstr ""
 
 msgid "Extract node from line"
 msgstr "Wydziel węzeł z drogi"
@@ -110,21 +235,29 @@ msgstr "Wydziel węzeł z drogi"
 msgid "Extract platform node"
 msgstr "Wydziel węzeł przystanku"
 
+msgid "ExtractPlatformNodeAction"
+msgstr ""
+
 msgid "Extracts platform node from a node"
 msgstr "Wydziel węzeł przystanku z węzła"
 
 msgid "Fix error"
 msgstr "Napraw błąd"
 
-#, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Naprawianie ({0}/{1}): „{2}''"
+
+msgid "Fixing errors …"
+msgstr "Naprawianie błędów…"
 
 msgid "Here you can change some preferences of PTAssistant functions"
 msgstr "Tutaj możesz zmienić trochę ustawień funkcji PTAssistant"
 
-msgid "How do you want to proceed?"
-msgstr "Co chcesz przeprowadzić?"
+msgid "High speed"
+msgstr "Duża prędkość"
+
+msgid "How would you want the download to take place?"
+msgstr "Jak ma zostać przeprowadzone pobieranie?"
 
 msgid "Include stop_area tests"
 msgstr "Dołącz testy obszarów_zatrzymań"
@@ -138,7 +271,9 @@ msgstr "Niekompletne relacje"
 msgid "Invalid selection"
 msgstr "Złe zaznaczenie"
 
-#, java-format
+msgid "Long distance"
+msgstr "Duża odległość"
+
 msgid ""
 "Mode of Travel -> {0} \n"
 " total ways selected -> {1}"
@@ -146,7 +281,13 @@ msgstr ""
 "Tryb podróży -> {0} \n"
 " suma wybranych dróg -> {1}"
 
-#, java-format
+msgid ""
+"Mode of Travel: {0} \n"
+" total ways selected: {1}"
+msgstr ""
+"Tryb podróży: {0} \n"
+" suma wybranych dróg: {1}"
+
 msgid "Mode: {0}"
 msgstr "Tryb: {0}"
 
@@ -157,17 +298,30 @@ msgstr "nd."
 msgid "Name"
 msgstr "Nazwa"
 
+#. i18n: label for the tag name:en=*
+msgid "Name (en.)"
+msgstr "Nazwa (en.)"
+
 msgid "Network"
 msgstr "Sieć"
 
+msgid "Network level"
+msgstr "Poziom sieci"
+
 msgid "No"
 msgstr "Nie"
+
+msgid "Not all members are downloaded"
+msgstr "Nie pobrano wszystkich członków"
 
 msgid "Ok"
 msgstr "Zatwierdź"
 
 msgid "Operator"
 msgstr "Operator"
+
+msgid "Opposite itinerary?"
+msgstr "Odwrotny plan podróży?"
 
 msgid "PT Wizard"
 msgstr "Czarodziej TP"
@@ -266,7 +420,6 @@ msgstr ""
 "TP: Nazwa ostatniego przystanku nie odpowiada znacznikowi \"do\" w relacji "
 "trasy"
 
-#, java-format
 msgid "PT: There is a gap in the {0} route"
 msgstr "TP: W trasie {0} jest przerwa"
 
@@ -276,19 +429,8 @@ msgstr "TP: ćwiczebne ostrzeżenie testowe"
 msgid "PTAssistantPlugin settings"
 msgstr "Ustawienia PTAssistantPlugin"
 
-msgid "PT_Assistant Fetch Request"
-msgstr "PT_Assistant - żądanie pobierania"
-
 msgid "PT_Assistant Message"
 msgstr "PT_Assistant - wiadomość"
-
-#. showDialog(); FIXME
-msgid "PT_Assistant Proceed Request"
-msgstr "PT_Assistant - prześlij zapytanie"
-
-#, java-format
-msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
-msgstr "Wtyczka PT_Assistant znalazła błędy w tej relacji (id={0}):"
 
 msgctxt "menu"
 msgid "Public Transport"
@@ -297,21 +439,49 @@ msgstr "Transport publiczny"
 msgid "Public Transport Assistant tests"
 msgstr "Testy asystenta transportu publicznego"
 
+msgid "Public Transport: {0}"
+msgstr ""
+
 msgid "Public transport routes"
 msgstr "Trasy pojazdów transportu publicznego"
+
+msgid "Railway station"
+msgstr "Stacja kolejowa"
+
+msgid "Railway stop"
+msgstr "Przystanek kolejowy"
 
 msgid ""
 "Refs of the routes do not match with the route_ref tag of the primitive"
 msgstr "Odniesienia trasy nie odpowiadają tagowi route_ref elementu"
 
-msgid "Remember my choice and do not ask me again in this session"
-msgstr "Zapamiętaj mój wybór i nie pytaj ponownie w tej sesji"
+msgid "Regional"
+msgstr "Regionalny"
+
+msgid "Remove current edge (white)"
+msgstr "Usuń obecną krawędź (biała)"
+
+msgid "Remove oneway and split roundabout ways?"
+msgstr ""
+
+msgid ""
+"Remove public_transport=platform from platform WAYS when transferring "
+"details to platform NODE."
+msgstr ""
+"Usuń public_transport=platform z ODCINKÓW przystanków przy przenoszeniu "
+"szczegółów do WĘZŁA przystanku."
 
 msgid "Remove public_transport=platform from platform ways"
 msgstr "Usuń public_transport=platform z odcinków przystanków."
 
-msgid "Repeat last fix"
-msgstr "Powtórz ostatnią korektę"
+msgid "Remove roundabout from relations"
+msgstr "Usuń rondo z relacji"
+
+msgid "Remove ways"
+msgstr "Usuń linie"
+
+msgid "Remove ways along with previous way"
+msgstr "Usuń linie wraz z poprzednią linią"
 
 msgid "Replace Membership"
 msgstr "Zastąp członkostwo"
@@ -324,26 +494,60 @@ msgstr ""
 msgid "Roundabout round"
 msgstr "Okrągłe rondo"
 
-msgid ""
-"Route relations have incomplete members.\n"
-"They need to be downloaded to proceed with validation.\n"
-"Do you want to download them?"
-msgstr ""
-"Relacje trasy mają niekompletnych członków.\n"
-"Trzeba pobrać brakujące informacje, aby kontynuować weryfikację.\n"
-"Czy chcesz pobrać brakujące dane?"
-
 msgid "Routing Helper"
 msgstr "Pomoc w wyznaczaniu trasy"
 
 msgid "Save"
 msgstr "Zapisz"
 
+msgid "Set from tag?"
+msgstr "Ustawić ze znacznika?"
+
+msgid "Set to tag?"
+msgstr "Ustawić do znacznika?"
+
 msgid "Set up PT Assistant for more convenient use"
 msgstr "Ustaw Asystenta TP dla wygodniejszej obsługi"
 
+msgid "Share taxi"
+msgstr "Współdzielona taksówka"
+
 msgid "Shelter"
 msgstr "Schronienie"
+
+msgid "Shortcut action to Transfer details of stop to platform node"
+msgstr "Skrót na Przenoszenie szczegółów z przystanku do węzła przystanku"
+
+msgid "Skip"
+msgstr "Pomiń"
+
+msgid "Sort PT Route Members"
+msgstr "Sortuj członków trasy PT"
+
+msgid "Sort PT Route Members Relation Editor"
+msgstr "Edytor relacji sortowania członków trasy PT"
+
+msgid "Split Roundabout"
+msgstr "Podziel rondo"
+
+msgid "Split way"
+msgstr "Podziel linię"
+
+msgid "Split white edge"
+msgstr ""
+
+msgid "Stop area tag assign"
+msgstr "Przypisywanie znaczników obszaru zatrzymania"
+
+msgid "Stop customizing"
+msgstr "Dostosowywanie przystanku"
+
+msgid ""
+"The relation has incomplete members.\n"
+"Do you want to download them and continue with the sorting?"
+msgstr ""
+"Relacja ma niekompletnych członków.\n"
+"Czy chcesz ich pobrać i kontynuować sortowanie?"
 
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
@@ -352,15 +556,59 @@ msgstr ""
 "Relacja ma niekompletnych członków. Czy chcesz ich pobrać i kontynuować "
 "sortowanie?"
 
+msgid ""
+"The roundabout is not directly connected to either of the previous or next "
+"way in the relation"
+msgstr ""
+"Rondo nie jest połączone bezpośrednio z poprzednią lub następną linią w "
+"relacji."
+
 msgid "The selected node is not a stop position for public transport!"
 msgstr "Wybrany węzeł nie jest miejscem zatrzymania transportu publicznego!"
+
+msgid ""
+"This action can only be performed if exactly one stop position node is "
+"selected."
+msgstr ""
 
 msgid "This action requires single node to be selected."
 msgstr "Ta akcja wymaga wybrania pojedynczego węzła."
 
-#, java-format
-msgid "Tool: {0}"
-msgstr "Narzędzie: {0}"
+msgid "This is not a PT v2 relation"
+msgstr "To nie jest relacja PT v2"
+
+msgid ""
+"This relation is not PT version 2. Sorting its stops wouldn't make sense.\n"
+"\n"
+"Would you like to set ''public_transport:version=2''?\n"
+"\n"
+"There will still be some extra work needed,\n"
+"\n"
+"but PT_Assistant can help prepare the \n"
+"''route'' and ''route_master'' relations."
+msgstr ""
+
+msgid "This stop has been removed"
+msgstr "To miejsce zatrzymania zostało usunięte"
+
+msgid ""
+"To prepare for conversion to PT v2\n"
+"\n"
+"it may help to remove oneway and split roundabout ways?\n"
+"\n"
+"Would you like to do this automatically?\n"
+"\n"
+"When asked to remove stops that cannot be served,\n"
+"answer ''no'' and use the button to sort the stops\n"
+"once more after adding the ways once again\n"
+"by using the routing helper"
+msgstr ""
+
+msgid "Toggle direction arrows"
+msgstr "Odwróć strzałki kierunkowe"
+
+msgid "Toggle reference labels"
+msgstr "Odwróć etykiety referencyjne"
 
 msgid "Tram"
 msgstr "Tramwaj"
@@ -377,6 +625,12 @@ msgid ""
 msgstr ""
 "Przenieś szczegóły z stop_position do węzła reprezentującego przystanek"
 
+msgid "Transfer details of stop to platform node"
+msgstr "Przenoszenie szczegółów z przystanku do węzła przystanku"
+
+msgid "Transferring details to platform NODE."
+msgstr "Przenoszenie szczegółów do WĘZŁA przystanku."
+
 msgid "Trolleybus"
 msgstr "Trolejbus"
 
@@ -385,7 +639,6 @@ msgstr ""
 "Wpisz literę, aby wybrać wariant naprawy lub naciśnij Escape, żeby nie "
 "naprawiać."
 
-#, java-format
 msgid "Unable to connect to {0}"
 msgstr "Nie można połączyć się z {0}"
 
@@ -409,26 +662,16 @@ msgstr "Czym ma być ten segment?"
 msgid "Yes"
 msgstr "Tak"
 
-msgid "suggested value : "
-msgstr "sugerowana wartość : "
+msgid "pt_assistant layer"
+msgstr "warstwa pt_assistant"
 
-#, java-format
-msgid "{0} direction error"
-msgid_plural "{0} direction errors"
-msgstr[0] "{0} błąd kierunku"
-msgstr[1] "{0} błędy kierunku"
-msgstr[2] "{0} błędów kierunku"
-msgstr[3] "{0} błędów kierunku"
+msgid "solutions based on other route relations"
+msgstr "rozwiązania oparte na innych relacjach tras"
 
-#, java-format
-msgid "{0} road type error"
-msgid_plural "{0} road type errors"
-msgstr[0] "{0} błąd rodzaju drogi"
-msgstr[1] "{0} błędy rodzaju drogi"
-msgstr[2] "{0} błędów rodzaju drogi"
-msgstr[3] "{0} błędów rodzaju drogi"
+msgid "turn-by-turn at next intersection"
+msgstr "zakręt-po-zakręcie na następnym skrzyżowaniu"
 
-#. Plugin description for pt_assistant
+#. Plugin description for project ':pt_assistant'.name
 msgid ""
 "Provides validation and fixing for public transport route according to "
 "version 2 of the public transport schema"

@@ -1,14 +1,13 @@
 # Translations for the JOSM plugin 'pt_assistant' (ast)
 # Copyright (C) 2018
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# FIRST AUTHOR, YEAR.
 #
 # Translators:
 # Florian Schäfer, 2018
-# Xuacu Saturio <xuacusk8@gmail.com>, 2018
-# Simon Legner <simon.legner@gmail.com>, 2018
+# Xuacu Saturio, 2018
+# Simon Legner, 2018
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
@@ -79,7 +78,6 @@ msgstr "Descargar los miembros de la rellación incompleta de ruta"
 msgid "Fix error"
 msgstr "Iguar error"
 
-#, java-format
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Iguando ({0}/{1}): ''{2}''"
 
@@ -101,7 +99,6 @@ msgstr "Rellaciones incompletes"
 msgid "Invalid selection"
 msgstr "Escoyeta non válida"
 
-#, java-format
 msgid "Mode: {0}"
 msgstr "Mou: {0}"
 
@@ -187,7 +184,6 @@ msgstr "Taxi compartíu"
 msgid "Shelter"
 msgstr "Abelugu"
 
-#, java-format
 msgid "Tool: {0}"
 msgstr "Ferramienta: {0}"
 
@@ -203,13 +199,11 @@ msgstr "Actualizando mapa..."
 msgid "Yes"
 msgstr "Si"
 
-#, java-format
 msgid "{0} direction error"
 msgid_plural "{0} direction errors"
 msgstr[0] "{0} error de direición"
 msgstr[1] "{0} errores de direición"
 
-#, java-format
 msgid "{0} road type error"
 msgid_plural "{0} road type errors"
 msgstr[0] "{0} error de tipu de vía"
