@@ -4,14 +4,14 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 plugins {
   java
   jacoco
-  id("org.openstreetmap.josm") version "0.7.1"
+  id("org.openstreetmap.josm") version "0.8.2"
 }
 
 object Versions {
-  const val awaitility = "4.0.3"
-  const val jacoco = "0.8.6"
-  const val junit = "5.7.0"
-  const val wiremock = "2.27.2"
+  const val awaitility = "4.2.0"
+  const val jacoco = "0.8.8"
+  const val junit = "5.8.2"
+  const val wiremock = "2.33.2"
 }
 
 repositories {
@@ -22,7 +22,7 @@ dependencies {
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${Versions.junit}")
   testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.junit}")
   testImplementation("org.junit.vintage:junit-vintage-engine:${Versions.junit}")
-  testImplementation("com.github.tomakehurst:wiremock:${Versions.wiremock}")
+  testImplementation("com.github.tomakehurst:wiremock-jre8:${Versions.wiremock}")
   testImplementation("org.awaitility:awaitility:${Versions.awaitility}")
 }
 
