@@ -4,7 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -83,7 +83,7 @@ public class WayUtilsTest {
                 final Node newNode = new Node(nodeId);
                 newNode.setChangesetId((int) nodeId);
                 newNode.setUser(User.createOsmUser(nodeId, "User" + nodeId));
-                newNode.setTimestamp(new Date());
+                newNode.setInstant(Instant.now());
                 newNode.setCoor(new LatLon(nodeId, nodeId));
                 NODES.put(nodeId, newNode);
                 return newNode;

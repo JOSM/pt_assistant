@@ -118,12 +118,8 @@ public class DistanceBetweenStops extends JosmAction {
         double length = 0;
         Node lastN = null;
         for (Node n : nodes) {
-            if (lastN != null) {
-                final LatLon lastNcoor = lastN.getCoor();
-                final LatLon coor = n.getCoor();
-                if (lastNcoor != null && coor != null) {
-                    length += coor.greatCircleDistance(lastNcoor);
-                }
+            if (lastN != null && lastN.isLatLonKnown() && n.isLatLonKnown()) {
+                length += n.greatCircleDistance(lastN);
             }
             lastN = n;
         }

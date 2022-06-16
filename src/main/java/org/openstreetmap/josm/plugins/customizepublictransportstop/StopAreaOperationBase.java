@@ -114,14 +114,12 @@ public abstract class StopAreaOperationBase implements IStopAreaCustomizer {
     public static LatLon getCenterOfWay(OsmPrimitive platform) {
         if (platform instanceof Way) {
             // p = mapView.getPoint((Node) stopArea.selectedObject);
-            Double sumLat = 0.0;
-            Double sumLon = 0.0;
-            Integer countNode = 0;
+            double sumLat = 0.0;
+            double sumLon = 0.0;
+            int countNode = ((Way) platform).getNodesCount();
             for (Node node : ((Way) platform).getNodes()) {
-                LatLon coord = node.getCoor();
-                sumLat += coord.getX();
-                sumLon += coord.getY();
-                countNode++;
+                sumLat += node.lon();
+                sumLon += node.lat();
             }
             return new LatLon(sumLon / countNode, sumLat / countNode);
         }
