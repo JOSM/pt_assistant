@@ -1,16 +1,24 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.openstreetmap.josm.TestUtils;
 import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Relation;
+import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.SimplePrimitiveId;
+import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.io.IllegalDataException;
 import org.openstreetmap.josm.io.OsmReader;
 import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
@@ -22,21 +30,20 @@ import org.openstreetmap.josm.testutils.JOSMTestRules;
  * @author giack
  *
  */
-public class SortPTRouteMembersActionTest {
+class SortPTRouteMembersActionTest {
 
-    @Rule
-    public JOSMTestRules rules = new JOSMTestRules().projection();
+    @RegisterExtension
+    public static JOSMTestRules rules = new JOSMTestRules().projection();
 
     private DataSet ds;
 
-    @Before
+    @BeforeEach
     public void init() throws IllegalDataException {
         ds = OsmReader.parseDataSet(TestFiles.SORT_PT_STOPS(), null);
-
     }
 
     @Test
-    public void test1() {
+    void test1() {
         Relation rel = (Relation) ds.getPrimitiveById(
                 new SimplePrimitiveId(7367762L, OsmPrimitiveType.RELATION));
         SortPTRouteMembersAction.zooming=false;
@@ -52,7 +59,8 @@ public class SortPTRouteMembersActionTest {
         assertEquals("Bernini - Solimene", rel.getMember(6).getNode().getName());
         assertEquals("Bernini-Fanzago - Centro Diagnostico Basile", rel.getMember(7).getNode().getName());
         assertEquals("Fiore-Santobono - Centro Diagnostico Basile", rel.getMember(8).getNode().getName());
-        assertEquals("Niutta Medaglie d'Oro - Analisi Cliniche Pasteur", rel.getMember(9).getNode().getName());
+        assertEquals("Niutta Medaglie d'Oro - Analisi Cliniche Pasteur",
+            rel.getMember(9).getNode().getName());
         assertEquals("Niutta Muzii - Analisi Cliche Pasteur", rel.getMember(10).getNode().getName());
         assertEquals("Arenella Muzii - La Padella Rosticceria", rel.getMember(11).getNode().getName());
         assertEquals("Gigante - Orsi", rel.getMember(12).getNode().getName());
@@ -64,12 +72,13 @@ public class SortPTRouteMembersActionTest {
         assertEquals("Grimaldi - Procura", rel.getMember(18).getNode().getName());
         assertEquals("Biscradi", rel.getMember(19).getNode().getName());
         assertEquals("Nuova Poggioreale 160", rel.getMember(20).getNode().getName());
-        assertEquals("Nuova Poggioreale Caramanico - Medicina Futura", rel.getMember(21).getNode().getName());
+        assertEquals("Nuova Poggioreale Caramanico - Medicina Futura",
+            rel.getMember(21).getNode().getName());
         assertEquals("Emiciclo Poggoreale", rel.getMember(22).getNode().getName());
     }
 
      @Test
-     public void test2() {
+     void test2() {
          Relation rel = (Relation) ds.getPrimitives(p -> p.getType() == OsmPrimitiveType.RELATION &&
                  "150 Piazza Garibaldi → Osp. Monaldi".equals(p.getName())).iterator().next();
          SortPTRouteMembersAction.sortPTRouteMembers(rel);
@@ -95,7 +104,8 @@ public class SortPTRouteMembersActionTest {
          assertEquals("Cavallino - Parco Ice Snei", rel.getMember(18).getNode().getName());
          assertEquals("Cavallino - Scuola Materna", rel.getMember(19).getNode().getName());
          assertEquals("Cavallino 77", rel.getMember(20).getNode().getName());
-         assertEquals("Bernardo Cavallino - Pronto Soccorso Cardarelli", rel.getMember(21).getNode().getName());
+         assertEquals("Bernardo Cavallino - Pronto Soccorso Cardarelli",
+             rel.getMember(21).getNode().getName());
          assertNull(rel.getMember(22).getNode().getName());
          assertEquals("Cardarelli - Ospedale", rel.getMember(23).getNode().getName());
          assertEquals("Pietravalle - Gatto", rel.getMember(24).getNode().getName());
@@ -109,14 +119,15 @@ public class SortPTRouteMembersActionTest {
          assertNull(rel.getMember(32).getNode().getName());
      }
     @Test
-    public void test3() throws IllegalDataException{
+    void test3() throws IllegalDataException{
         ds = OsmReader.parseDataSet(TestFiles.SORT_PT_STOPS_WITH_REPEATED_STOPS(), null);
         Relation rel = (Relation) ds.getPrimitiveById(
                 new SimplePrimitiveId(18601L, OsmPrimitiveType.RELATION));
         SortPTRouteMembersAction.sortPTRouteMembers(rel);
         System.out.println(rel.getUniqueId());
         System.out.println(rel.getMember(1).getNode().getName());
-        assertEquals("Franklin Rooseveltplaats Perron 45;Franklin Rooseveltplaats Perron 46", rel.getMember(0).getNode().getName());
+        assertEquals("Franklin Rooseveltplaats Perron 45;Franklin Rooseveltplaats Perron 46",
+            rel.getMember(0).getNode().getName());
         assertEquals("Centraal Station perron 11", rel.getMember(1).getNode().getName());
         assertEquals("Lange Kievitstraat", rel.getMember(2).getNode().getName());
         assertEquals("Mercatorstraat", rel.getMember(3).getNode().getName());
@@ -148,5 +159,59 @@ public class SortPTRouteMembersActionTest {
         assertEquals("Edegem J. Notestraat", rel.getMember(29).getNode().getName());
         assertEquals("Edegem Elsbos", rel.getMember(30).getNode().getName());
         assertEquals("Edegem Sint-Goriksplein", rel.getMember(31).getNode().getName());
+    }
+
+    private static Relation createMalformedRelation() {
+        DataSet ds = new DataSet();
+        Node nodeStop1 = TestUtils.newNode("name=nodeStop1");
+        Node nodeStop2 = TestUtils.newNode("name=nodeStop2");
+        Way wayPlatform = TestUtils.newWay("name=wayPlatform1", nodeStop1, nodeStop2);
+        ds.addPrimitiveRecursive(wayPlatform);
+        Relation relation = TestUtils.newRelation("type=route public_transport:version=2 route=bus",
+            new RelationMember("", nodeStop1),
+            new RelationMember("stop", nodeStop2),
+            new RelationMember("platform", wayPlatform));
+        ds.addPrimitive(relation);
+        return relation;
+    }
+
+    @Test
+    void testSingleWayRelation() {
+        Relation relation = createMalformedRelation();
+        assertDoesNotThrow(() -> SortPTRouteMembersAction.sortPTRouteMembers(relation));
+    }
+
+    /**
+     * See #19480: {@link ClassCastException}: {@link Node} cannot be cast to {@link Way}
+     */
+    @Test
+    void testNonRegression19480() {
+        Relation relation = createMalformedRelation();
+        Way way2 = TestUtils.newWay("name=wayPlatform2", TestUtils.newNode(""), TestUtils.newNode(""));
+        relation.getDataSet().addPrimitiveRecursive(way2);
+        relation.addMember(new RelationMember("platform", way2));
+        assertDoesNotThrow(() -> SortPTRouteMembersAction.sortPTRouteMembers(relation));
+    }
+
+    /**
+     * See #19640: {@link ClassCastException}: {@link Way} cannot be cast to {@link Node}
+     */
+    @Test
+    void testNonRegression19640() {
+        Relation relation = createMalformedRelation();
+        Way way2 = TestUtils.newWay("name=wayPlatform1 highway=platform",
+            TestUtils.newNode("name=wayPlatform2 highway=platform"), TestUtils.newNode(""));
+        Way way3 = new Way();
+        way3.setNodes(way2.getNodes());
+        relation.getDataSet().addPrimitiveRecursive(way2);
+        relation.getDataSet().addPrimitive(way3);
+        relation.addMember(new RelationMember("stop", way2));
+        relation.addMember(new RelationMember("stop", way2.firstNode()));
+        relation.addMember(new RelationMember("", way3));
+        final List<RelationMember> membersList = relation.getMembers().stream()
+            .map(member -> "".equals(member.getRole()) && member.getMember() instanceof Node
+            ? new RelationMember("platform", member.getMember()) : member).collect(Collectors.toList());
+        relation.setMembers(membersList);
+        assertDoesNotThrow(() -> SortPTRouteMembersAction.sortPTRouteMembers(relation));
     }
 }

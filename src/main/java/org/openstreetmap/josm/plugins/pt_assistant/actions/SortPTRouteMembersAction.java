@@ -391,11 +391,16 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             if (PTStop.isPTPlatform(rm) || PTStop.isPTStopPosition(rm))
                 stops.add(rm);
             else {
-                wayMembers.add(rm);
                 if (rm.getType() == OsmPrimitiveType.WAY) {
+                    // Some code depends upon all of these being ways
+                    wayMembers.add(rm);
                     ways.add(rm.getWay());
                 }
             }
+        }
+        // If there are no ways/one way, we cannot really sort them.
+        if (ways.size() <= 1) {
+            return;
         }
         // couple together stop positions and platforms that are part of the same
         // stop. the only way used to determine whether they are part of the same
@@ -481,8 +486,13 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
             }
             if (wayStop.containsKey(w)) {
                 for (PTStop pts : wayStop.get(w)) {
-                    Node node3 = pts.getNode();
-                    Pair<Node, Node> segment = GeometryUtils.findNearestSegment(w.getNodePairs(false), node3).map(GeometryUtils.NearestSegment::getSegment).orElse(null);
+                    Node centroidNode;
+                    if (pts.isNode()) {
+                        centroidNode = pts.getNode();
+                    } else {
+                        centroidNode = new Node(pts.getMember().getBBox().getCenter());
+                    }
+                    Pair<Node, Node> segment = GeometryUtils.findNearestSegment(w.getNodePairs(false), centroidNode).map(GeometryUtils.NearestSegment::getSegment).orElse(null);
                     Node node1 = segment.a;
                     Node node2 = segment.b;
                     //if the end (it is not a link at this point) is the starting point of the way nodes
