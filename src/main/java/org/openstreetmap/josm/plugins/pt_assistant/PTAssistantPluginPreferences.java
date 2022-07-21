@@ -47,6 +47,7 @@ public class PTAssistantPluginPreferences extends DefaultTabPreferenceSetting {
 
         // CHECKSTYLE.OFF: LineLength
         downloadIncompleteMembers = new JCheckBox(tr("Download incomplete route relation members"));
+        downloadIncompleteMembers.setToolTipText(tr("Incomplete route relations will be downloaded on validation start, but may not be available for validation until the next validation run."));
         stopArea = new JCheckBox(tr("Include stop_area tests"));
         transferDetails = new JCheckBox(tr("Remove public_transport=platform from platform ways"));
         optionsForMendAction = new JCheckBox(tr("Use 1/2/3/4 instead of A/B/C/D for selecting which way to follow"));

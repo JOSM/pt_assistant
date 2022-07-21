@@ -1,9 +1,9 @@
 [main]
 host = https://www.transifex.com
 
-[josm.josm-plugin_pt_assistant]
+[o:josm:p:josm:r:josm-plugin_pt_assistant]
 file_filter = src/main/po/<lang>.po
-lang_map = ca@valencia: ca-valencia
+lang_map = ca@valencia: ca-valencia, sr@latin: sr-latin
 minimum_perc=40
 source_file = build/i18n/pot/josm-plugin_pt_assistant.pot
 source_lang = en

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -25,11 +26,12 @@ import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.validation.Severity;
 import org.openstreetmap.josm.data.validation.Test;
 import org.openstreetmap.josm.data.validation.TestError;
+import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
 import org.openstreetmap.josm.gui.util.GuiHelper;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPlugin;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.FixTask;
-import org.openstreetmap.josm.plugins.pt_assistant.actions.IncompleteMembersDownloadThread;
+import org.openstreetmap.josm.plugins.pt_assistant.actions.IncompleteMembersDownloadRunnable;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteDataManager;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteSegment;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
@@ -189,33 +191,23 @@ public class PTAssistantValidatorTest extends Test {
 
             } else {
 
-                SwingUtilities.invokeAndWait(() -> {
-                    try {
-                        userSelection[0] = showIncompleteMembersDownloadDialog();
-                    } catch (InterruptedException e) {
-                        Logging.error(e);
-                    }
-
-                });
+                SwingUtilities.invokeAndWait(() -> userSelection[0] = showIncompleteMembersDownloadDialog());
 
             }
 
-        } catch (InterruptedException | InvocationTargetException e) {
+        } catch (InterruptedException e) {
+            Logging.error(e);
+            Thread.currentThread().interrupt();
+            return false;
+        } catch(InvocationTargetException e) {
+            Logging.error(e);
             return false;
         }
 
         if (userSelection[0] == JOptionPane.YES_OPTION) {
 
-            Thread t = new IncompleteMembersDownloadThread();
-            t.start();
-            synchronized (t) {
-                try {
-                    t.wait();
-                } catch (InterruptedException e) {
-                    return false;
-                }
-            }
-
+            IncompleteMembersDownloadRunnable runnable = new IncompleteMembersDownloadRunnable();
+            runnable.run();
         }
 
         return true;
@@ -226,10 +218,8 @@ public class PTAssistantValidatorTest extends Test {
      * Shows the dialog asking the user about an incomplete member download
      *
      * @return user's selection
-     * @throws InterruptedException
-     *             if interrupted
      */
-    private int showIncompleteMembersDownloadDialog() throws InterruptedException {
+    private static int showIncompleteMembersDownloadDialog() {
         return PTProperties.DOWNLOAD_INCOMPLETE.get() ? JOptionPane.YES_OPTION : JOptionPane.NO_OPTION;
     }
 
