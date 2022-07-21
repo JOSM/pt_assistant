@@ -49,26 +49,26 @@ import org.openstreetmap.josm.tools.Logging;
  */
 public class PTAssistantValidatorTest extends Test {
 
-    public static final int ERROR_CODE_FROM_TO_ROUTE_TAG = 3701;
-    public static final int ERROR_CODE_FIRST_LAST_STOP_WAY_TAG = 3702;
-    public static final int ERROR_CODE_TRIVIAL_FIX = 3710;
-    public static final int ERROR_CODE_SORTING = 3711;
-    public static final int ERROR_CODE_PARTIAL_SORTING = 3712;
-    public static final int ERROR_CODE_ROAD_TYPE = 3721;
-    public static final int ERROR_CODE_CONSTRUCTION = 3722;
-    public static final int ERROR_CODE_DIRECTION = 3731;
-    public static final int ERROR_CODE_END_STOP = 3741;
-    public static final int ERROR_CODE_SPLIT_WAY = 3742;
-    public static final int ERROR_CODE_RELATION_MEMBER_ROLES = 3743;
-    public static final int ERROR_CODE_SOLITARY_STOP_POSITION = 3751;
-    public static final int ERROR_CODE_PLATFORM_PART_OF_HIGHWAY = 3752;
-    public static final int ERROR_CODE_STOP_NOT_SERVED = 3753;
-    public static final int ERROR_CODE_STOP_BY_STOP = 3754;
-    public static final int ERROR_CODE_NOT_PART_OF_STOP_AREA = 3761;
-    public static final int ERROR_CODE_STOP_AREA_NO_STOPS = 3762;
-    public static final int ERROR_CODE_STOP_AREA_NO_PLATFORM = 3763;
-    public static final int ERROR_CODE_STOP_AREA_COMPARE_RELATIONS = 3764;
-    public static final int ERROR_CODE_ROUTE_REF = 3765;
+    public static final int ERROR_CODE_FROM_TO_ROUTE_TAG = 37_001;
+    public static final int ERROR_CODE_FIRST_LAST_STOP_WAY_TAG = 37_002;
+    public static final int ERROR_CODE_TRIVIAL_FIX = 37_010;
+    public static final int ERROR_CODE_SORTING = 37_011;
+    public static final int ERROR_CODE_PARTIAL_SORTING = 37_012;
+    public static final int ERROR_CODE_ROAD_TYPE = 37_021;
+    public static final int ERROR_CODE_CONSTRUCTION = 37_022;
+    public static final int ERROR_CODE_DIRECTION = 37_031;
+    public static final int ERROR_CODE_END_STOP = 37_041;
+    public static final int ERROR_CODE_SPLIT_WAY = 37_042;
+    public static final int ERROR_CODE_RELATION_MEMBER_ROLES = 37_043;
+    public static final int ERROR_CODE_SOLITARY_STOP_POSITION = 37_051;
+    public static final int ERROR_CODE_PLATFORM_PART_OF_HIGHWAY = 37_052;
+    public static final int ERROR_CODE_STOP_NOT_SERVED = 37_053;
+    public static final int ERROR_CODE_STOP_BY_STOP = 37_054;
+    public static final int ERROR_CODE_NOT_PART_OF_STOP_AREA = 37_061;
+    public static final int ERROR_CODE_STOP_AREA_NO_STOPS = 37_062;
+    public static final int ERROR_CODE_STOP_AREA_NO_PLATFORM = 37_063;
+    public static final int ERROR_CODE_STOP_AREA_COMPARE_RELATIONS = 37_064;
+    public static final int ERROR_CODE_ROUTE_REF = 37_065;
 
     public PTAssistantValidatorTest() {
         super(tr("Public Transport Assistant tests"),
