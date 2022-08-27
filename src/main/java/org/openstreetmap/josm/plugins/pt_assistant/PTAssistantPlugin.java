@@ -76,7 +76,7 @@ public class PTAssistantPlugin extends Plugin {
 
         // "Public Transport" menu
         JMenu PublicTransportMenu = MainApplication.getMenu()
-            .addMenu("File", trc("menu", "Public Transport"), KeyEvent.VK_P, 5, ht("/Menu/Public Transport"));
+            .addMenu("Public Transport", trc("menu", "Public Transport"), KeyEvent.VK_P, 5, ht("/Menu/Public Transport"));
         addToMenu(PublicTransportMenu);
 
         SelectionEventManager.getInstance().addSelectionListener(PTAssistantLayerManager.PTLM);
