@@ -433,7 +433,7 @@ public class PTStop extends RelationMember implements ILatLon {
     public static boolean isPTPlatform(RelationMember rm) {
         return rm.getMember().hasTag("highway", "bus_stop") || rm.getMember().hasTag("public_transport", "platform")
                 || rm.getMember().hasTag("highway", "platform") || rm.getMember().hasTag("railway", "platform")
-                || rm.getMember().hasTag("amenity", "bus_station") || rm.getMember().hasTag("highway", "tram_stop");
+                || rm.getMember().hasTag("amenity", "bus_station");
     }
 
     public RelationMember getPlatformRM() {
