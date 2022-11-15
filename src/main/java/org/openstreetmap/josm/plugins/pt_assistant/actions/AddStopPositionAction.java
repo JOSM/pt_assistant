@@ -32,6 +32,7 @@ import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.WaySegment;
+import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPluginPreferences;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTStop;
@@ -74,7 +75,19 @@ public class AddStopPositionAction extends MapMode {
     }
 
     @Override
+    public boolean layerIsSupported(Layer l) {
+        return isEditableDataLayer(l);
+    }
+
+    @Override
+    protected void updateEnabledState() {
+        setEnabled(getLayerManager().getEditLayer() != null);
+    }
+
+    @Override
     public void enterMode() {
+        if (!isEnabled())
+            return;
         super.enterMode();
         MainApplication.getMap().mapView.addMouseListener(this);
         MainApplication.getMap().mapView.addMouseMotionListener(this);

@@ -54,6 +54,7 @@ import org.openstreetmap.josm.gui.ExtendedDialog;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.layer.AbstractMapViewPaintable;
+import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.NodeUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.PrimitiveUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.WayUtils;
@@ -103,7 +104,19 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
     }
 
     @Override
+    public boolean layerIsSupported(Layer l) {
+        return isEditableDataLayer(l);
+    }
+
+    @Override
+    protected void updateEnabledState() {
+        setEnabled(getLayerManager().getEditLayer() != null);
+    }
+
+    @Override
     public void enterMode() {
+        if (!isEnabled())
+            return;
         super.enterMode();
         MainApplication.getMap().mapView.addMouseListener(this);
         MainApplication.getMap().mapView.addMouseMotionListener(this);
