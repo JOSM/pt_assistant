@@ -1,0 +1,27 @@
+name: Java CI
+
+on:
+  push:
+    branches:
+      - master
+      - $default-branch
+      - $protected-branches
+  pull_request:
+    branches:
+      - master
+      - $default-branch
+  schedule:
+  - cron: "6 9 * * 0"
+  workflow_dispatch:
+
+jobs:
+  call-workflow:
+    strategy:
+      matrix:
+        josm-revision: ["", "r17903"]
+    uses: JOSM/JOSMPluginAction/.github/workflows/ant.yml@v1
+    with:
+      josm-revision: ${{ matrix.josm-revision }}
+      perform-revision-tagging: ${{ github.repository == 'JOSM/pt_assistant' && github.ref_type == 'branch' && github.ref_name == 'master' && github.event_name != 'schedule' && github.event_name != 'pull_request' && matrix.josm-revision == 'r17903' }}
+    secrets: inherit
+
