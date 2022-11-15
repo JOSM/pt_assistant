@@ -249,7 +249,8 @@ public final class RouteUtils {
      * @return {@code true} if this way is suitable for public transport
      */
     public static boolean isWaySuitableForPublicTransport(Way way) {
-        String[] acceptedRailwayTags = new String[] {"tram", "subway", "light_rail", "rail" };
+        String[] acceptedRailwayTags = new String[] {"tram", "subway", "light_rail", "rail", "narrow_gauge",
+                "monorail", "funicular" };
 
         return isWaySuitableForBuses(way) || way.hasTag("railway", acceptedRailwayTags);
     }
