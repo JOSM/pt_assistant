@@ -378,6 +378,10 @@ public class RouteChecker extends Checker {
         return new ChangeCommand(originalRelation, fixedRelation);
     }
 
+    /**
+     * Fix a first/last way error. This should be run on the EDT.
+     * @param testError The test error
+     */
     protected static void fixFirstLastWayError(TestError testError) {
             List<? extends OsmPrimitive> primitiveList = new ArrayList<>(testError.getPrimitives());
             List<OsmPrimitive> ways = new ArrayList<>();

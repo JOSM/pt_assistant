@@ -26,6 +26,7 @@ import org.openstreetmap.josm.data.validation.Severity;
 import org.openstreetmap.josm.data.validation.Test;
 import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
+import org.openstreetmap.josm.gui.util.GuiHelper;
 import org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPlugin;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.FixTask;
 import org.openstreetmap.josm.plugins.pt_assistant.actions.IncompleteMembersDownloadThread;
@@ -479,7 +480,7 @@ public class PTAssistantValidatorTest extends Test {
         }
 
         if (testError.getCode() == ERROR_CODE_FIRST_LAST_STOP_WAY_TAG) {
-            RouteChecker.fixFirstLastWayError(testError);
+            GuiHelper.runInEDTAndWait(() -> RouteChecker.fixFirstLastWayError(testError));
         }
 
         if (testError.getCode() == ERROR_CODE_SOLITARY_STOP_POSITION
