@@ -8,10 +8,8 @@ plugins {
 }
 
 object Versions {
-  const val awaitility = "4.2.0"
   const val jacoco = "0.8.8"
-  const val junit = "5.8.2"
-  const val wiremock = "2.33.2"
+  const val junit = "5.9.2"
 }
 
 repositories {
@@ -21,9 +19,6 @@ dependencies {
   testImplementation("org.openstreetmap.josm:josm-unittest:SNAPSHOT"){isChanging=true}
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${Versions.junit}")
   testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.junit}")
-  testImplementation("org.junit.vintage:junit-vintage-engine:${Versions.junit}")
-  testImplementation("com.github.tomakehurst:wiremock-jre8:${Versions.wiremock}")
-  testImplementation("org.awaitility:awaitility:${Versions.awaitility}")
 }
 
 tasks.withType(JavaCompile::class) {
@@ -41,6 +36,7 @@ java {
 
 josm {
   manifest {
+    oldVersionDownloadLink(17903, "2.1.15", URL("https://github.com/JOSM/pt_assistant/releases/download/v2.1.15/pt_assistant.jar"))
     oldVersionDownloadLink(14149, "2.1.6", URL("https://github.com/JOSM/pt_assistant/releases/download/v2.1.6/pt_assistant.jar"))
     oldVersionDownloadLink(14027, "v2.1.4", URL("https://github.com/JOSM/pt_assistant/releases/download/v2.1.4/pt_assistant.jar"))
     oldVersionDownloadLink(13957, "v2.0.0", URL("https://github.com/JOSM/pt_assistant/releases/download/v2.0.0/pt_assistant.jar"))

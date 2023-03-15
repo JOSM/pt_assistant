@@ -1,9 +1,9 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -30,20 +30,21 @@ public final class TestUtil {
    * @param c the class under test
    */
   public static void testUtilityClass(final Class<?> c) {
+    // JOSM core uses net.trajano.commons.testing.UtilityClassTestUtil, but that is not available from the test jar (gradle)
     try {
       // class must be final
-      assertTrue("Class " + c.getName() + " should be final!", Modifier.isFinal(c.getModifiers()));
+      assertTrue(Modifier.isFinal(c.getModifiers()), "Class " + c.getName() + " should be final!");
       // with exactly one constructor
-      assertEquals("Class " + c.getName() + " should have exactly one constructor!", 1, c.getDeclaredConstructors().length);
+      assertEquals(1, c.getDeclaredConstructors().length, "Class " + c.getName() + " should have exactly one constructor!");
       final Constructor<?> constructor = c.getDeclaredConstructors()[0];
       // constructor has to be private
-      assertTrue("The constructor of " + c.getName() + " should be private!", Modifier.isPrivate(constructor.getModifiers()));
+      assertTrue(Modifier.isPrivate(constructor.getModifiers()), "The constructor of " + c.getName() + " should be private!");
       constructor.setAccessible(true);
       // Call private constructor for code coverage
       constructor.newInstance();
       for (Method m : c.getMethods()) {
         // Check if all methods are static
-        assertTrue("All methods of " + c.getName() + " should be static (" + m.getName() + " isn't)!", m.getDeclaringClass() != c || Modifier.isStatic(m.getModifiers()));
+        assertTrue(m.getDeclaringClass() != c || Modifier.isStatic(m.getModifiers()), "All methods of " + c.getName() + " should be static (" + m.getName() + " isn't)!");
       }
     } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       fail(e.getLocalizedMessage());

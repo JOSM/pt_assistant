@@ -1,12 +1,12 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.data;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
@@ -20,13 +20,13 @@ import org.openstreetmap.josm.testutils.JOSMTestRules;
  * @author darya
  *
  */
-public class RouteRepresentationTest {
+class RouteRepresentationTest {
 
-    @Rule
-    public JOSMTestRules rules = new JOSMTestRules();
+    @RegisterExtension
+    static JOSMTestRules rules = new JOSMTestRules();
 
     @Test
-    public void correctRouteTest() {
+    void testCorrectRoute() {
 
         /*-
          * Create a [correct] route which has:
@@ -108,7 +108,7 @@ public class RouteRepresentationTest {
     }
 
     @Test
-    public void nestedRelationTest() {
+    void testNestedRelation() {
 
         // Same as above, but the nested Relation has a Node (only ways are allowed)
 

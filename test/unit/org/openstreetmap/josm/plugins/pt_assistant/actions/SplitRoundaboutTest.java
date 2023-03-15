@@ -1,8 +1,8 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.FileNotFoundException;
 import java.util.Collection;
@@ -10,9 +10,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.command.SplitWayCommand;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
@@ -31,17 +31,17 @@ import org.openstreetmap.josm.testutils.JOSMTestRules;
 /**
  * Unit tests of {@link SplitRoundaboutAction}.
  */
-public class SplitRoundaboutTest {
+class SplitRoundaboutTest {
 
-    @Rule
-    public JOSMTestRules rules = new JOSMTestRules();
+    @RegisterExtension
+    static JOSMTestRules rules = new JOSMTestRules();
 
     private DataSet ds, ds1, ds2;
     private OsmDataLayer layer;
     private SplitRoundaboutAction action;
     private Way r1, r2, r3, r4, r5;
 
-    @Before
+    @BeforeEach
     public void beforeEach() {
         PTProperties.ROUNDABOUT_SPLITTER_ALIGN_ALWAYS.put(true);
     }
@@ -80,7 +80,7 @@ public class SplitRoundaboutTest {
     }
 
     @Test
-    public void test1() throws FileNotFoundException, IllegalDataException {
+    void testSplitWay1() throws IllegalDataException {
     		init();
         Collection<Way> sw1 = splitWay(r1);
         assertEquals(4, sw1.size());
@@ -99,7 +99,7 @@ public class SplitRoundaboutTest {
     }
 
     @Test
-    public void test2() throws FileNotFoundException, IllegalDataException {
+    void testSplitWay2() throws IllegalDataException {
     		init();
         Collection<Way> sw2 = splitWay(r2);
         assertEquals(4, sw2.size());
@@ -118,7 +118,7 @@ public class SplitRoundaboutTest {
     }
 
     @Test
-    public void test3() throws FileNotFoundException, IllegalDataException {
+    void testSplitWay3() throws IllegalDataException {
     		init();
         Collection<Way> sw3 = splitWay(r3);
         assertEquals(4, sw3.size());
@@ -137,7 +137,7 @@ public class SplitRoundaboutTest {
     }
 
     @Test
-    public void test4() throws FileNotFoundException, IllegalDataException {
+    void testSplitWay4() throws IllegalDataException {
     		init();
         Collection<Way> sw4 = splitWay(r4);
         assertEquals(10, sw4.size());
@@ -179,7 +179,7 @@ public class SplitRoundaboutTest {
     }
 
     @Test
-    public void test5() throws FileNotFoundException, IllegalDataException {
+    void testRoundabout1After() throws IllegalDataException {
     		init1();
     		Collection<Way> sw5 = splitWay(r5);
         ds2 = OsmReader.parseDataSet(TestFiles.ROUNDABOUT1_AFTER(), null);

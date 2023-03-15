@@ -1,26 +1,27 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.validation;
 
-import static org.junit.Assert.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
 import org.openstreetmap.josm.testutils.JOSMTestRules;
 
-public class SortingTestTest {
+class SortingTestTest {
 
-    @Rule
-    public JOSMTestRules rules = new JOSMTestRules();
+    @RegisterExtension
+    static JOSMTestRules rules = new JOSMTestRules();
 
     @Test
-    public void sortingTestBeforeFile() {
+    void testSortingBeforeFile() {
         DataSet ds = TestFiles.importOsmFile(TestFiles.DL131_BEFORE(), "testLayer");
 
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
@@ -40,7 +41,7 @@ public class SortingTestTest {
     }
 
     @Test
-    public void sortingTestAfterFile() {
+    void testSortingAfterFile() {
         DataSet ds = TestFiles.importOsmFile(TestFiles.DL131_AFTER(), "testLayer");
 
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
@@ -78,7 +79,7 @@ public class SortingTestTest {
 //    }
 
     @Test
-    public void overshootTestAfterFile() {
+    void testOvershootAfterFile() {
         DataSet ds = TestFiles.importOsmFile(TestFiles.DL286_AFTER(), "testLayer");
 
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();

@@ -1,15 +1,16 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.data;
 
-import static org.junit.Assert.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -27,14 +28,14 @@ import org.openstreetmap.josm.testutils.JOSMTestRules;
 /**
 * Unit tests of {@link StopToWayAssigner}.
 */
-public class PTStopTest {
+class PTStopTest {
 
-    @Rule
-    public JOSMTestRules rules = new JOSMTestRules();
+    @RegisterExtension
+    static JOSMTestRules rules = new JOSMTestRules();
 
     private DataSet ds;
 
-    @Before
+    @BeforeEach
     public void init() throws IllegalDataException {
         ds = OsmReader.parseDataSet(TestFiles.SORT_PT_STOPS(), null);
     }
@@ -83,7 +84,7 @@ public class PTStopTest {
     }
 
     @Test
-    public void test() {
+    void testServingWays() {
         List<PTStop> pts = findAllStops();
         List<Way> associatedWay = new ArrayList<>();
         System.out.println(pts.size());

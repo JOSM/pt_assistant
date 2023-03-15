@@ -1,16 +1,17 @@
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
+import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openstreetmap.josm.data.coor.ILatLon;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.tools.Pair;
 
-public final class GeometryUtilsTest {
+final class GeometryUtilsTest {
 
     private static final ILatLon P_0_0 = new LatLon(0, 0);
     private static final ILatLon P_2_0 = new LatLon(2, 0);
@@ -22,7 +23,7 @@ public final class GeometryUtilsTest {
     private static final ILatLon P_10_173_7_924 = new LatLon(10.173, 7.924);
 
     @Test
-    public void testDirection() {
+    void testDirection() {
         assertEquals(0, GeometryUtils.direction(Pair.create(P_0_0, P_0_0), P_0_0), 1e-12);
         assertEquals(0, GeometryUtils.direction(Pair.create(P_M4_M2, P_M4_M2), P_3_5), 1e-12); // special case, line has no direction → 0
 
@@ -32,7 +33,7 @@ public final class GeometryUtilsTest {
         );
         assertPointsOnSidesOfLine(
             Pair.create(P_M4_M2, P_3_5),
-            Arrays.asList(P_M2_3), Arrays.asList(P_M4_M2, P_0_2, P_3_5), Arrays.asList(P_0_0, P_2_0, P_10_173_7_924, P_7_M3)
+            Collections.singletonList(P_M2_3), Arrays.asList(P_M4_M2, P_0_2, P_3_5), Arrays.asList(P_0_0, P_2_0, P_10_173_7_924, P_7_M3)
         );
         assertPointsOnSidesOfLine(
             Pair.create(P_10_173_7_924, P_M4_M2),
@@ -72,7 +73,7 @@ public final class GeometryUtilsTest {
     }
 
     @Test
-    public void testDistancePointToLineSegment() {
+    void testDistancePointToLineSegment() {
         assertDistancePointToLineSegment(0, Pair.create(P_0_0, P_0_0), P_0_0);
         assertDistancePointToLineSegment(0, Pair.create(P_M4_M2, P_3_5), P_0_2);
         assertDistancePointToLineSegment(0, Pair.create(P_M4_M2, P_3_5), P_M4_M2);

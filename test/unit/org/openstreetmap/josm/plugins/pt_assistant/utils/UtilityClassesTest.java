@@ -1,17 +1,17 @@
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.plugins.pt_assistant.TestUtil;
 import org.openstreetmap.josm.testutils.JOSMTestRules;
 
-public class UtilityClassesTest {
+class UtilityClassesTest {
 
-    @Rule
-    public JOSMTestRules rules = new JOSMTestRules();
+    @RegisterExtension
+    static JOSMTestRules rules = new JOSMTestRules();
 
     @Test
-    public void testAllUtilityClasses() {
+    void testAllUtilityClasses() {
         TestUtil.testUtilityClass(BoundsUtils.class);
         TestUtil.testUtilityClass(ColorPalette.class);
         TestUtil.testUtilityClass(DialogUtils.class);

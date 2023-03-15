@@ -1,7 +1,7 @@
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -20,16 +20,16 @@ import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.plugins.pt_assistant.TestUtil;
 import org.openstreetmap.josm.testutils.JOSMTestRules;
 
-public class WayUtilsTest {
+class WayUtilsTest {
 
-    @Rule
-    public JOSMTestRules rules = new JOSMTestRules();
+    @RegisterExtension
+    static JOSMTestRules rules = new JOSMTestRules();
 
     private final Map<Long, Node> NODES = new HashMap<>();
 
 
     @Test
-    public void testIsTouchingOtherWay() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    void testIsTouchingOtherWay() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         final Way WAY1 = createWay(1, 1, 2, 3, 4);
         final Way WAY2 = createWay(2, 4, 5, 6, 1);
         final Way WAY3 = createWay(3, 1, 7, 8, 9);
