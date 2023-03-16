@@ -1,18 +1,18 @@
 # Translations for the JOSM plugin 'pt_assistant' (ast)
-# Copyright (C) 2018
+# Copyright (C) 2022
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR, YEAR.
 #
 # Translators:
 # Florian Schäfer, 2018
-# Xuacu Saturio, 2018
 # Simon Legner, 2018
+# Xuacu Saturio, 2020
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
+"Project-Id-Version: josm-plugin_pt_assistant 2.1.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Asturian (https://www.transifex.com/josm/teams/2544/ast/)\n"
 "MIME-Version: 1.0\n"
@@ -21,9 +21,60 @@ msgstr ""
 "Language: ast\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid " "
+msgstr " "
+
+msgid ""
+"''from'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+"La etiqueta ''from'' nun ta definida. ¿Definila como\n"
+"{0} ?"
+
+msgid ""
+"''from''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+"''from''={0}.\n"
+"¿Cambiar a\n"
+"''{1}''\n"
+" n'arrou?"
+
+msgid ""
+"''to'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+"La etiqueta ''to'' nun ta definida. ¿Definila como\n"
+"{0} ?"
+
+msgid ""
+"''to''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+"''to''={0}.\n"
+"¿Cambiar a\n"
+"''{1}''\n"
+"n'arrou?"
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Ríquese una ruta public_transport:version=2 válida"
+
+msgid "Add oneway:bicycle=no to way"
+msgstr "Añadir oneway:bicycle=no a la vía"
+
+msgid "Add oneway:bus=no to way"
+msgstr "Añadir oneway:bus=no a la vía"
+
 msgid "Add public_transport=stop_position + mode of transport on these nodes"
 msgstr ""
 "Amestar public_transport=stop_position + mou de tresporte nesos nodios"
+
+msgid "Add stop position"
+msgstr "Añadir posición de parada"
 
 msgid "Always split ways, even if they are not at the end of the itinerary"
 msgstr "Dividir siempre les víes, anque nun tean al final del itinerariu"
@@ -37,6 +88,9 @@ msgstr "Área alredor de la vía"
 msgid "Area before removal"
 msgstr "Área antes del desaniciu"
 
+msgid "Assign transport type to platform"
+msgstr "Axudicar tipu de tresporte al andén"
+
 msgid "Bench"
 msgstr "Bancu"
 
@@ -46,8 +100,29 @@ msgstr "Pruebes pa rutes en bicicleta y a pie"
 msgid "Bus"
 msgstr "Autobús"
 
+msgid "Bus station"
+msgstr "Estación d'autobuses"
+
 msgid "Cancel"
 msgstr "Encaboxar"
+
+msgid "Change from tag?"
+msgstr "¿Cambiar dende etiqueta?"
+
+msgid "Change name tag?"
+msgstr "¿Cambiar la etiqueta nome?"
+
+msgid ""
+"Change name to\n"
+"''{0}''\n"
+"?"
+msgstr ""
+"¿Cambiar el nome a\n"
+"''{0}''\n"
+"?"
+
+msgid "Change to tag?"
+msgstr "¿Cambiar a etiqueta?"
 
 msgid ""
 "Check if route relations are compatible with public transport version 2"
@@ -55,11 +130,29 @@ msgstr ""
 "Comprobar si les rellaciones de ruta son compatibles cola versión 2 de "
 "tresporte públicu"
 
+msgid "City transport"
+msgstr "Tresporte urbanu"
+
 msgid "Close"
 msgstr "Zarrar"
 
-msgid "Do you want to download referrers of platforms and stop positions?"
-msgstr "¿Quiés descargar referencies d''andenes y posiciones de parada?"
+msgid "Close the options"
+msgstr "Zarrar les opciones"
+
+msgid "Commuter"
+msgstr "Intercambiador"
+
+msgid "Create ''route'' relation for opposite direction of travel?"
+msgstr "¿Crear rellación ''route'' pa la direición de viaxe opuesta?"
+
+msgid "Create a route_master?"
+msgstr "¿Crear una route_master?"
+
+msgid "Customize stop"
+msgstr "Personalizar parada"
+
+msgid "Customize stop under osm public transit standard v2"
+msgstr "Personalizar parada baxo l'estandar osm public transit v2"
 
 msgid "Do you want to make the roundabout round?"
 msgstr "¿Quiés convertir la rotonda en círculu?"
@@ -83,9 +176,6 @@ msgstr "Iguando ({0}/{1}): ''{2}''"
 
 msgid "Here you can change some preferences of PTAssistant functions"
 msgstr "Equí puedes cambiar delles preferencies de funciones de PTAssistant"
-
-msgid "How do you want to proceed?"
-msgstr "¿Cómo quiés siguir?"
 
 msgid "Include stop_area tests"
 msgstr "Incluir pruebes de stop_area"
@@ -175,6 +265,9 @@ msgstr "Tresporte públicu"
 msgid "Public Transport Assistant tests"
 msgstr "Pruebes del Asistente de Tresporte Públicu"
 
+msgid "Regional"
+msgstr "Rexonal"
+
 msgid "Save"
 msgstr "Guardar"
 
@@ -183,9 +276,6 @@ msgstr "Taxi compartíu"
 
 msgid "Shelter"
 msgstr "Abelugu"
-
-msgid "Tool: {0}"
-msgstr "Ferramienta: {0}"
 
 msgid "Tram"
 msgstr "Tranvía"
@@ -199,17 +289,7 @@ msgstr "Actualizando mapa..."
 msgid "Yes"
 msgstr "Si"
 
-msgid "{0} direction error"
-msgid_plural "{0} direction errors"
-msgstr[0] "{0} error de direición"
-msgstr[1] "{0} errores de direición"
-
-msgid "{0} road type error"
-msgid_plural "{0} road type errors"
-msgstr[0] "{0} error de tipu de vía"
-msgstr[1] "{0} errores de tipu de vía"
-
-#. Plugin description for pt_assistant
+#. Plugin description for project ':pt_assistant'.name
 msgid ""
 "Provides validation and fixing for public transport route according to "
 "version 2 of the public transport schema"

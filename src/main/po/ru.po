@@ -9,7 +9,7 @@
 # Aleksey Kabanov, 2018
 # Nikolay Parukhin, 2019
 # yetanothernickname, 2021
-# Aliaksandr Karnijenka, 2022
+# Aliaksandr Karnijenka, 2023
 #
 msgid ""
 msgstr ""
@@ -23,9 +23,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
-
-msgid " "
-msgstr ""
 
 msgid ""
 "''from'' tag not set. Set it to\n"
@@ -241,7 +238,7 @@ msgstr ""
 "движение велосипедов."
 
 msgid "Esc"
-msgstr ""
+msgstr "Esc"
 
 msgid "Extract node from line"
 msgstr "Извлечь точку из линии"
@@ -250,7 +247,7 @@ msgid "Extract platform node"
 msgstr "Извлечь точку платформы"
 
 msgid "ExtractPlatformNodeAction"
-msgstr ""
+msgstr "Общественный транспорт: Извлечь точку платформы"
 
 msgid "Extracts platform node from a node"
 msgstr "Извлекает точку платформы из точки"
@@ -354,7 +351,7 @@ msgstr "ОТ: Проблема в сегменте маршрута с одни�
 
 msgid ""
 "PT: Refs of the routes do not match with the route_ref tag of the primitive"
-msgstr "ОТ: Номера маршрутов не совпадают с тегом \"route_ref\" примитива"
+msgstr "ОТ: Номера маршрутов не совпадают с тегом «route_ref» примитива"
 
 msgid "PT: Relation member roles do not match tags"
 msgstr "ОТ: Роли участника отношения не соответствуют тегам"
@@ -440,7 +437,7 @@ msgid "PT: dummy test warning"
 msgstr "PT: тестовое предупреждение"
 
 msgid "PTAssistantPlugin settings"
-msgstr "Настройки PTAssistantPlugin"
+msgstr "Настройки PT Assistant"
 
 msgid "PT_Assistant Message"
 msgstr "Сообщение PT_Assistant"
@@ -532,7 +529,7 @@ msgid "Shelter"
 msgstr "Укрытие"
 
 msgid "Shortcut action to Transfer details of stop to platform node"
-msgstr ""
+msgstr "Горячая клавиша для переноса свойств остановки на точку платформы"
 
 msgid "Skip"
 msgstr "Пропустить"
@@ -563,7 +560,7 @@ msgid ""
 "Do you want to download them and continue with the sorting?"
 msgstr ""
 "В отношении есть неполные участники.\n"
-"Вы хотите скачать их и продолжить сортировку? "
+"Вы хотите скачать их и продолжить сортировку?"
 
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
@@ -705,7 +702,7 @@ msgid "solutions based on other route relations"
 msgstr "решения основаны на других отношениях маршрутов"
 
 msgid "turn-by-turn at next intersection"
-msgstr ""
+msgstr "разворот на следующем перекрёстке"
 
 #. Plugin description for project ':pt_assistant'.name
 msgid ""

@@ -1,13 +1,17 @@
 # Translations for the JOSM plugin 'pt_assistant' (el)
-# Copyright (C) 2018
+# Copyright (C) 2022
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR, YEAR.
 #
+# Translators:
+# Gerasimos Maris, 2018
+# Simon Legner, 2018
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
+"Project-Id-Version: josm-plugin_pt_assistant 2.1.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Greek (https://www.transifex.com/josm/teams/2544/el/)\n"
 "MIME-Version: 1.0\n"
@@ -47,9 +51,6 @@ msgstr ""
 
 msgid "Close"
 msgstr "Κλείσιμο"
-
-msgid "Do you want to download referrers of platforms and stop positions?"
-msgstr "Θέλετε να κατεβάσετε παραπομπές για πλατφόρμες και θέσεις στάσεων;"
 
 msgid "Do you want to make the roundabout round?"
 msgstr "Θέλετε να κάνετε την κυκλική διαδρομή;"
@@ -109,9 +110,6 @@ msgid "Here you can change some preferences of PTAssistant functions"
 msgstr ""
 "Εδώ μπορείτε να αλλάξετε μερικές προτιμήσεις των λειτουργιών βοηθού "
 "PTAssistant"
-
-msgid "How do you want to proceed?"
-msgstr "Πώς θέλετε να προχωρήσετε;"
 
 msgid "Include stop_area tests"
 msgstr "Συμπεριλάβετε δοκιμές περιοχής στάσης"
@@ -257,19 +255,8 @@ msgstr "PT: Υπάρχει ένα κενό στην {0} διαδρομή"
 msgid "PT: dummy test warning"
 msgstr "PT: προειδοποίηση εικονικής δοκιμής"
 
-msgid "PT_Assistant Fetch Request"
-msgstr "PT Αίτημα λήψης βοηθού"
-
 msgid "PT_Assistant Message"
 msgstr "PT Μήνυμα Βοηθού"
-
-#. showDialog(); FIXME
-msgid "PT_Assistant Proceed Request"
-msgstr "PT Μετάβαση Αιτήματος Βοηθού"
-
-msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
-msgstr ""
-"PT Ο Βοηθός πρόσθετων διαπίστωσε ότι αυτή η σχέση (id = {0}) έχει σφάλματα:"
 
 msgctxt "menu"
 msgid "Public Transport"
@@ -284,27 +271,11 @@ msgstr ""
 "Οι αναφορές των δρομολογίων δεν ταιριάζουν με την ετικέτα route_ref του "
 "πρωτότυπου"
 
-msgid "Remember my choice and do not ask me again in this session"
-msgstr ""
-"Θυμηθείτε την επιλογή μου και μην με ρωτήσετε ξανά σε αυτή τη συνεδρία"
-
-msgid "Repeat last fix"
-msgstr "Επανάληψη της τελευταίας διόρθωσης"
-
 msgid "Replace Membership"
 msgstr "Αντικατάσταση της ιδιότητας μέλους"
 
 msgid "Roundabout round"
 msgstr "Κυκλική διαδρομή"
-
-msgid ""
-"Route relations have incomplete members.\n"
-"They need to be downloaded to proceed with validation.\n"
-"Do you want to download them?"
-msgstr ""
-"Οι σχέσεις διαδρομής έχουν ελλιπή μέλη. \n"
-"Πρέπει να γίνει λήψη για να συνεχίσετε με την επικύρωση.\n"
-"Θέλετε να τα κατεβάσετε;"
 
 msgid "Routing Helper"
 msgstr "Βοηθός δρομολόγησης"
@@ -330,9 +301,6 @@ msgstr "Ο επιλεγμένος κόμβος δεν είναι στάση γι
 
 msgid "This action requires single node to be selected."
 msgstr "Αυτή η ενέργεια απαιτεί την επιλογή ενός κόμβου."
-
-msgid "Tool: {0}"
-msgstr "Εργαλείο: {0}"
 
 msgid "Tram"
 msgstr "Τραμ"
@@ -364,10 +332,7 @@ msgstr "Τι θέλετε να είναι το τμήμα;"
 msgid "Yes"
 msgstr "Ναι"
 
-msgid "suggested value : "
-msgstr "προτεινόμενη τιμή:"
-
-#. Plugin description for pt_assistant
+#. Plugin description for project ':pt_assistant'.name
 msgid ""
 "Provides validation and fixing for public transport route according to "
 "version 2 of the public transport schema"

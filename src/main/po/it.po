@@ -8,8 +8,8 @@
 # Marco, 2019
 # Lorenzo Beltrami, 2019
 # Simon Legner, 2019
-# demetrio, 2021
 # Manuel Tassi, 2021
+# demetrio, 2022
 #
 msgid ""
 msgstr ""
@@ -144,17 +144,8 @@ msgstr "Chiudi"
 msgid "Close the options"
 msgstr "Scegli le opzioni"
 
-msgid "Commuter"
-msgstr ""
-
-msgid "Cover"
-msgstr ""
-
 msgid "Create ''route'' relation for opposite direction of travel?"
 msgstr "Creare una relazione \"route\" per il viaggio nel senso opposto?"
-
-msgid "Create ''route_master'' relation and add these route relations to it?"
-msgstr ""
 
 msgid "Create a route_master?"
 msgstr "Creare una route_master?"
@@ -204,9 +195,6 @@ msgstr ""
 "Non confrontare il nome dell’ultima fermata con l’etichetta \"to\" della "
 "relazione dell'itinerario"
 
-msgid "Double Split"
-msgstr ""
-
 msgid "Download finished: {0}"
 msgstr "Scaricamento completato: {0}"
 
@@ -223,9 +211,6 @@ msgid ""
 msgstr ""
 "Scaricamento dei membri incompleti della relazione. Attendi che lo "
 "scaricamento finisca."
-
-msgid "Edge Selection"
-msgstr ""
 
 msgid "Entire area"
 msgstr "Intera area"
@@ -249,9 +234,6 @@ msgstr "Estrai nodo dalla linea"
 msgid "Extract platform node"
 msgstr "Estrai nodo della banchina"
 
-msgid "ExtractPlatformNodeAction"
-msgstr ""
-
 msgid "Extracts platform node from a node"
 msgstr "Estrai nodo della banchina da un nodo"
 
@@ -270,9 +252,6 @@ msgstr ""
 
 msgid "High speed"
 msgstr "Alta velocità"
-
-msgid "How would you want the download to take place?"
-msgstr ""
 
 msgid "Include stop_area tests"
 msgstr "Includere i test delle stop_area"
@@ -319,9 +298,6 @@ msgstr "Nome (en.)"
 
 msgid "Network"
 msgstr "Rete"
-
-msgid "Network level"
-msgstr ""
 
 msgid "No"
 msgstr "No"
@@ -486,28 +462,14 @@ msgstr ""
 msgid "Regional"
 msgstr "Regionale"
 
-msgid "Remove current edge (white)"
-msgstr ""
-
-msgid "Remove oneway and split roundabout ways?"
-msgstr ""
-
-msgid ""
-"Remove public_transport=platform from platform WAYS when transferring "
-"details to platform NODE."
-msgstr ""
-
 msgid "Remove public_transport=platform from platform ways"
 msgstr "Rimuovere public_transport=platform dai percorsi delle banchine"
 
 msgid "Remove roundabout from relations"
-msgstr ""
+msgstr "Rimuove le rotonde dalle relazioni"
 
 msgid "Remove ways"
 msgstr "Rimuove le ways"
-
-msgid "Remove ways along with previous way"
-msgstr ""
 
 msgid "Replace Membership"
 msgstr "Sostituisci appartenenza"
@@ -542,17 +504,11 @@ msgstr "Taxi condiviso"
 msgid "Shelter"
 msgstr "Rifugio"
 
-msgid "Shortcut action to Transfer details of stop to platform node"
-msgstr ""
-
 msgid "Skip"
 msgstr "Salta"
 
 msgid "Sort PT Route Members"
 msgstr "Ordina i membri dell’itinerario"
-
-msgid "Sort PT Route Members Relation Editor"
-msgstr ""
 
 msgid "Split Roundabout"
 msgstr "Dividi rotatoria"
@@ -560,19 +516,8 @@ msgstr "Dividi rotatoria"
 msgid "Split way"
 msgstr "Dividi percorso"
 
-msgid "Split white edge"
-msgstr ""
-
-msgid "Stop area tag assign"
-msgstr ""
-
 msgid "Stop customizing"
 msgstr "Interrompi la personalizzazione"
-
-msgid ""
-"The relation has incomplete members.\n"
-"Do you want to download them and continue with the sorting?"
-msgstr ""
 
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
@@ -581,18 +526,8 @@ msgstr ""
 "La relazione ha dei membri incompleti. Vuoi scaricarli e continuare "
 "l’ordinamento?"
 
-msgid ""
-"The roundabout is not directly connected to either of the previous or next "
-"way in the relation"
-msgstr ""
-
 msgid "The selected node is not a stop position for public transport!"
 msgstr "Il nodo selezionato non è una fermata del trasporto pubblico!"
-
-msgid ""
-"This action can only be performed if exactly one stop position node is "
-"selected."
-msgstr ""
 
 msgid "This action requires single node to be selected."
 msgstr "Questa azione richiede che sia selezionato un singolo nodo."
@@ -600,38 +535,11 @@ msgstr "Questa azione richiede che sia selezionato un singolo nodo."
 msgid "This is not a PT v2 relation"
 msgstr "Questa non è una relazione PT v2"
 
-msgid ""
-"This relation is not PT version 2. Sorting its stops wouldn't make sense.\n"
-"\n"
-"Would you like to set ''public_transport:version=2''?\n"
-"\n"
-"There will still be some extra work needed,\n"
-"\n"
-"but PT_Assistant can help prepare the \n"
-"''route'' and ''route_master'' relations."
-msgstr ""
-
 msgid "This stop has been removed"
 msgstr "Questo stop è stato rimosso."
 
-msgid ""
-"To prepare for conversion to PT v2\n"
-"\n"
-"it may help to remove oneway and split roundabout ways?\n"
-"\n"
-"Would you like to do this automatically?\n"
-"\n"
-"When asked to remove stops that cannot be served,\n"
-"answer ''no'' and use the button to sort the stops\n"
-"once more after adding the ways once again\n"
-"by using the routing helper"
-msgstr ""
-
 msgid "Toggle direction arrows"
 msgstr "Passa alle frecce di direzione"
-
-msgid "Toggle reference labels"
-msgstr ""
 
 msgid "Tram"
 msgstr "Tramvia"
@@ -648,9 +556,6 @@ msgid ""
 msgstr ""
 "Trasferire i dettagli dai nodi stop_position ai nodi che rappresentano la "
 "fermata"
-
-msgid "Transfer details of stop to platform node"
-msgstr ""
 
 msgid "Transferring details to platform NODE."
 msgstr "Trasferimento dei dettagli sul NODO della banchina."
@@ -689,12 +594,6 @@ msgstr "Si"
 
 msgid "pt_assistant layer"
 msgstr "Livello pt_assistant"
-
-msgid "solutions based on other route relations"
-msgstr ""
-
-msgid "turn-by-turn at next intersection"
-msgstr ""
 
 #. Plugin description for project ':pt_assistant'.name
 msgid ""

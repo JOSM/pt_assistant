@@ -1,13 +1,21 @@
 # Translations for the JOSM plugin 'pt_assistant' (hu)
-# Copyright (C) 2018
+# Copyright (C) 2022
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR, YEAR.
 #
+# Translators:
+# Florian Schäfer, 2018
+# Simon Legner, 2018
+# Gábor Babos, 2019
+# misibacsi, 2019
+# Buggi, 2020
+# Balázs Meskó, 2020
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
+"Project-Id-Version: josm-plugin_pt_assistant 2.1.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Hungarian (https://www.transifex.com/josm/teams/2544/hu/)\n"
 "MIME-Version: 1.0\n"
@@ -16,11 +24,72 @@ msgstr ""
 "Language: hu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid ""
+"''from'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+"„from” címke nincs beállítva. Beállítsuk erre:\n"
+"{0}?"
+
+msgid ""
+"''from''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+"„from”={0}.\n"
+"Megváltoztassuk inkább erre:\n"
+"„{1}”?"
+
+msgid ""
+"''to'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+"„to” címke nincs beállítva. Beállítsuk erre:\n"
+"{0}?"
+
+msgid ""
+"''to''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+"„to”={0}.\n"
+"Megváltoztassuk inkább erre:\n"
+"„{1}”?"
+
 msgid "A valid public_transport:version=2 route is required"
 msgstr "Érvényes, public_transport:version=2 típusú útvonal szükséges"
 
+msgid "Add oneway:bicycle=no to way"
+msgstr "oneway:bicycle=no hozzáadása a vonalhoz"
+
+msgid "Add oneway:bus=no to way"
+msgstr "oneway:bus=no hozzáadása a vonalhoz"
+
+msgid "Add public_transport=stop_position + mode of transport on these nodes"
+msgstr ""
+"public_transport=stop_position + közlekedési mód hozzáadása ezekhez a "
+"pontokhoz"
+
+msgid "Add stop position"
+msgstr "Megállási hely (stop position) hozzáadása"
+
+msgid "Always split ways, even if they are not at the end of the itinerary"
+msgstr ""
+"Mindig vágja szét a vonalakat, akkor is, ha nem az útvonal végén vannak"
+
 msgid "Area"
 msgstr "Terület"
+
+msgid "Area around way"
+msgstr "Terület a vonal körül"
+
+msgid "Area before removal"
+msgstr "Eltávolítás előtti terület"
+
+msgid "Assign transport type to platform"
+msgstr "Közlekedési típus hozzárendelése a peronhoz"
 
 msgid "Bench"
 msgstr "Pad"
@@ -31,8 +100,29 @@ msgstr "Kerékpáros és gyalogos utak vizsgálata"
 msgid "Bus"
 msgstr "Busz"
 
+msgid "Bus station"
+msgstr "Buszállomás"
+
 msgid "Cancel"
 msgstr "Mégse"
+
+msgid "Change from tag?"
+msgstr "Módosítsuk a from címkét?"
+
+msgid "Change name tag?"
+msgstr "Módosítsuk a name címkét?"
+
+msgid ""
+"Change name to\n"
+"''{0}''\n"
+"?"
+msgstr ""
+"Megváltoztassuk a name-et erre:\n"
+"„{0}”\n"
+"?"
+
+msgid "Change to tag?"
+msgstr "Módosítsuk a to címkét?"
 
 msgid ""
 "Check if route relations are compatible with public transport version 2"
@@ -40,8 +130,17 @@ msgstr ""
 "Annak ellenőrzése, hogy az útvonalkapcsolat kompatibilis-e a public "
 "transport séma 2-es verziójával"
 
+msgid "City transport"
+msgstr "Városi közlekedés"
+
 msgid "Close"
 msgstr "Bezárás"
+
+msgid "Close the options"
+msgstr "Opciók bezárása"
+
+msgid "Cover"
+msgstr "Fedél"
 
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "A kijelölt tömegközlekedési útvonalak megállóit ábrázolja gráfként"
@@ -49,21 +148,43 @@ msgstr "A kijelölt tömegközlekedési útvonalak megállóit ábrázolja gráf
 msgid "Distance between stops"
 msgstr "Megállók közti távolság"
 
-msgid "Do you want to download referrers of platforms and stop positions?"
-msgstr "Szeretnéd letölteni a platformok és megállóhelyek azonosítóit?"
-
 msgid "Do you want to make the roundabout round?"
 msgstr "Szeretné-e kör alakúvá formálni a körforgalmat?"
+
+msgid "Double Split"
+msgstr "Kettős vágás"
+
+msgid "Download finished: {0}"
+msgstr "A letöltés befejeződött: {0}"
 
 #. CHECKSTYLE.OFF: LineLength
 msgid "Download incomplete route relation members"
 msgstr "Fékész útvonalkapcsolat tagok letöltése"
+
+msgid "Download started: {0}"
+msgstr "A letöltés megkezdődött: {0}"
+
+msgid "Entire area"
+msgstr "Teljes terület"
+
+msgid "Error in roundabout"
+msgstr "Hiba a körforgalomban"
+
+msgid ""
+"Error: The paths connecting the roundabout in the relation do not allow "
+"bicycles."
+msgstr ""
+"Hiba: A kapcsolatban szereplő körfogalomhoz csatlakozó utak nem engedélyezik"
+" a kerékpáros közlekedést."
 
 msgid "Extract node from line"
 msgstr "Pont kinyerése egy vonalból"
 
 msgid "Extract platform node"
 msgstr "Platform pont kinyerése"
+
+msgid "ExtractPlatformNodeAction"
+msgstr "ExtractPlatformNodeAction"
 
 msgid "Extracts platform node from a node"
 msgstr "Platform pont kinyerése egy pontból"
@@ -74,8 +195,14 @@ msgstr "Hiba javítása"
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Javítás ({0}/{1}): „{2}”"
 
-msgid "How do you want to proceed?"
-msgstr "Hogyan szeretnéd folytatni?"
+msgid "Fixing errors …"
+msgstr "Hibák javítása..."
+
+msgid "Here you can change some preferences of PTAssistant functions"
+msgstr "A  PTAssistant egyes funkciói itt beállíthatók"
+
+msgid "High speed"
+msgstr "Nagysebességű"
 
 msgid "Include stop_area tests"
 msgstr "Vegye bele a stop_area teszteket"
@@ -83,8 +210,14 @@ msgstr "Vegye bele a stop_area teszteket"
 msgid "Incomplete Members"
 msgstr "Hiányos tagok"
 
+msgid "Incomplete relations"
+msgstr "Hiányos kapcsolatok"
+
 msgid "Invalid selection"
 msgstr "Érvénytelen kijelölés"
+
+msgid "Long distance"
+msgstr "Nagytávolságú"
 
 msgid "Mode: {0}"
 msgstr "Mód: {0}"
@@ -96,14 +229,23 @@ msgstr "Név"
 msgid "Network"
 msgstr "Hálózat"
 
+msgid "Network level"
+msgstr "Hálózat szintje"
+
 msgid "No"
 msgstr "Nem"
+
+msgid "Not all members are downloaded"
+msgstr "Nem minden tag töltődött le"
 
 msgid "Ok"
 msgstr "OK"
 
 msgid "Operator"
 msgstr "Üzemeltető"
+
+msgid "Opposite itinerary?"
+msgstr "Fordított útvonal?"
 
 msgid "PT Wizard"
 msgstr "Tömegközlekedési varázsló"
@@ -127,7 +269,7 @@ msgid "PT: Road is under construction"
 msgstr "PT: az út építés alatt áll"
 
 msgid "PT: Route contains a gap that can be fixed by sorting"
-msgstr "PT: az útvonal szakadást tartalmaz, ami javítható sorbarendezéssel"
+msgstr "PT: az útvonal szakadást tartalmaz, ami sorbarendezéssel javítható"
 
 msgid "PT: Route gap can be closed by adding a single way"
 msgstr "PT: az útvonalon találhat rés bezárható egyetlen vonal hozzáadásával"
@@ -156,19 +298,17 @@ msgstr "PT: a megállóhely vagy platform nem része stop_area kapcsolatnak"
 msgid "PT: Stop_position is not part of a way"
 msgstr "PT: a stop_position nem része vonalnak"
 
+msgid "PT: There is a gap in the {0} route"
+msgstr "PT: Kihagyás van az útvonalban {0}"
+
 msgid "PT: dummy test warning"
-msgstr "PT: színlelt tesz figyelmeztetés"
+msgstr "PT: színlelt teszt figyelmeztetés"
+
+msgid "PTAssistantPlugin settings"
+msgstr "PTAssistantPlugin beállítások"
 
 msgid "PT_Assistant Message"
 msgstr "PT_Assistant Üzenet"
-
-#. showDialog(); FIXME
-msgid "PT_Assistant Proceed Request"
-msgstr "PT_Assistant Folytatás Kérés"
-
-msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
-msgstr ""
-"A PT_Assistant bővítmény szerint ez a kapcsolat  (id={0}) hibákat tartalmaz:"
 
 msgctxt "menu"
 msgid "Public Transport"
@@ -180,20 +320,20 @@ msgstr "Tömegközlekedés Asszisztens tesztek"
 msgid "Public transport routes"
 msgstr "Tömegközlekedési útvonalak"
 
-msgid "Remember my choice and do not ask me again in this session"
-msgstr "Emlékezzen a választásomra és ne kérdezze meg újra a munkamenet során"
+msgid "Railway station"
+msgstr "Vasútállomás"
 
-msgid "Repeat last fix"
-msgstr "Előző javítás ismétlése"
+msgid "Railway stop"
+msgstr "Vasúti megállóhely"
 
-msgid ""
-"Route relations have incomplete members.\n"
-"They need to be downloaded to proceed with validation.\n"
-"Do you want to download them?"
-msgstr ""
-"Az útvonalkapcsolatok félkész tagokat tartalmaznak.\n"
-"A validáció folytatásához le kell tölteni őket.\n"
-"Szeretnéd letölteni?"
+msgid "Regional"
+msgstr "Regionális"
+
+msgid "Remove roundabout from relations"
+msgstr "Körforgalom eltávolítása a kapcsolatból"
+
+msgid "Remove ways"
+msgstr "Vonalak eltávolítása"
 
 msgid "Save"
 msgstr "Mentés"
@@ -204,14 +344,26 @@ msgstr "Iránytaxi"
 msgid "Shelter"
 msgstr "Átmeneti szálló"
 
+msgid "Skip"
+msgstr "Kihagy"
+
+msgid "Sort PT Route Members"
+msgstr "PT Route kapcsolattagok rendezése"
+
+msgid "Split Roundabout"
+msgstr "Körforgalom darabolása"
+
+msgid "Split way"
+msgstr "Vonal kettévágása"
+
+msgid "This is not a PT v2 relation"
+msgstr "Ez nem PT v2 kapcsolat"
+
 msgid "Toggle direction arrows"
 msgstr "Irány nyilak átkapcsolása"
 
 msgid "Toggle reference labels"
 msgstr "Azonosító címkék átkapcsolása"
-
-msgid "Tool: {0}"
-msgstr "Eszköz: {0}"
 
 msgid "Tram"
 msgstr "Villamos"
@@ -238,20 +390,10 @@ msgstr ""
 msgid "Yes"
 msgstr "Igen"
 
-msgid "suggested value : "
-msgstr "javasolt érték :"
+msgid "pt_assistant layer"
+msgstr "pt_assistant réteg"
 
-msgid "{0} direction error"
-msgid_plural "{0} direction errors"
-msgstr[0] "{0} irány hiba"
-msgstr[1] "{0} irány hiba"
-
-msgid "{0} road type error"
-msgid_plural "{0} road type errors"
-msgstr[0] "{0} úttípus hiba"
-msgstr[1] "{0} úttípus hiba"
-
-#. Plugin description for pt_assistant
+#. Plugin description for project ':pt_assistant'.name
 msgid ""
 "Provides validation and fixing for public transport route according to "
 "version 2 of the public transport schema"

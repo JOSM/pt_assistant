@@ -1,0 +1,417 @@
+# Translations for the JOSM plugin 'pt_assistant' (de_DE)
+# Copyright (C) 2022
+# This file is distributed under the same license as the josm-plugin_pt_assistant package.
+# FIRST AUTHOR, YEAR.
+#
+# Translators:
+# Simon Legner, 2018
+# Schlagi123, 2022
+# Robert B, 2023
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: josm-plugin_pt_assistant 2.1.15\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-02-17 01:42+0100\n"
+"PO-Revision-Date: 2018-05-10 08:41+0000\n"
+"Language-Team: German (Germany) (https://www.transifex.com/josm/teams/2544/de_DE/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de_DE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid " "
+msgstr " "
+
+msgid ""
+"''from'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+"''from''-Merkmal nicht gesetzt. Setzen auf\n"
+"{0} ?"
+
+msgid ""
+"''from''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+"''from''={0}.\n"
+"Stattdessen zu\n"
+"''{1}''\n"
+" ändern?"
+
+msgid ""
+"''to'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+"''to''-Merkmal nicht gesetzt. Setzen auf\n"
+"{0} ?"
+
+msgid ""
+"''to''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+"''to''={0}.\n"
+"Stattdessen zu\n"
+"''{1}''\n"
+" ändern?"
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr "Eine gültige public_transport:version=2 Route ist erforderlich"
+
+msgid "Add oneway:bicycle=no to way"
+msgstr "Füge oneway:bicycle=no zum Weg hinzu"
+
+msgid "Add oneway:bus=no to way"
+msgstr "Füge oneway:bus=no zum Weg hinzu"
+
+msgid "Add public_transport=stop_position + mode of transport on these nodes"
+msgstr ""
+"Füge public_transport=stop_position + Transportart zu diesen Knoten hinzu"
+
+msgid "Add stop position"
+msgstr "Haltepunkt hinzufügen"
+
+msgid "Always split ways, even if they are not at the end of the itinerary"
+msgstr "Linien immer auftrennen, sogar wenn sie nicht am Ende der Route sind"
+
+msgid "Area"
+msgstr "Fläche"
+
+msgid "Area around way"
+msgstr "Fläche um Linie herum"
+
+msgid "Area before removal"
+msgstr "Fläche vor Entfernen"
+
+msgid "Assign transport type to platform"
+msgstr "Transportart zu Bahn-/Bussteig zuordnen"
+
+msgid "Bench"
+msgstr "Sitzbank"
+
+msgid "Bicycle and foot routes Tests"
+msgstr "Fahrrad- und Fußgängerrouten-Tests"
+
+msgid "Bus"
+msgstr "Bus"
+
+msgid "Bus station"
+msgstr "Busbahnhof"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Change from tag?"
+msgstr "From-Merkmal ändern?"
+
+msgid "Change name tag?"
+msgstr "Name-Merkmal ändern?"
+
+msgid ""
+"Change name to\n"
+"''{0}''\n"
+"?"
+msgstr ""
+"Name in\n"
+"''{0}''\n"
+"ändern?"
+
+msgid "Change to tag?"
+msgstr "To-Merkmal ändern?"
+
+msgid ""
+"Check if route relations are compatible with public transport version 2"
+msgstr ""
+"Prüfe, ob die Routen-Relationen kompatibel mit dem Schema des öffentlichen "
+"Verkehrs Version 2 sind"
+
+msgid "City transport"
+msgstr "Stadtverkehr"
+
+msgid "Close"
+msgstr "Schließen"
+
+msgid "Close the options"
+msgstr "Optionen schließen"
+
+msgid "Commuter"
+msgstr "Pendler"
+
+msgid "Cover"
+msgstr "Abdeckung"
+
+msgid "Create ''route'' relation for opposite direction of travel?"
+msgstr "\"Route\"-Relation für die Gegenrichtung erstellen?"
+
+msgid "Create ''route_master'' relation and add these route relations to it?"
+msgstr ""
+"Neue Routenmaster-Relation erstellen und diese Routen-Relationen hinzufügen?"
+
+msgid "Create a route_master?"
+msgstr "route_master erstellen?"
+
+msgid "Customize stop"
+msgstr "Haltestelle anpassen"
+
+msgid "Customize stop under osm public transit standard v2"
+msgstr "Beschreibe den Halt nach dem OSM ÖPNV-Standard v2"
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr ""
+"Haltestellen der gewählten Routen des öffentlichen Verkehrs als Graph "
+"anzeigen"
+
+msgid "Distance between stops"
+msgstr "Entfernung zwischen Haltestellen"
+
+msgid "Do not remove ways"
+msgstr "Linien nicht entfernen"
+
+msgid "Do you want to make the roundabout round?"
+msgstr "Möchten Sie den Kreisverkehr rund machen?"
+
+msgid ""
+"Don’t add public_transport=platform and mode of transport to node "
+"representing the stop (suffice with highway=bus_stop or railway=tram_stop)"
+msgstr ""
+"Fügen Sie nicht 'public_transport=plattform' und das Verkehrsmittel zu dem "
+"Punkt hinzu, der die Haltestelle repräsentiert (es genügt highway=bus_stop "
+"oder railway=tram_stop)"
+
+msgid ""
+"Don’t check whether route relation starts and ends on stop_position node"
+msgstr ""
+"Nicht prüfen, ob die Routen-Relation an einem Punkt \"stop_position\" "
+"beginnt und endet"
+
+msgid "Don’t compare name of first stop with from tag in route relation"
+msgstr ""
+"Nicht den Namen der ersten Haltestelle mit dem from-Merkmal der "
+"Routenrelation vergleichen"
+
+msgid "Don’t compare name of last stop with to tag in route relation"
+msgstr ""
+"Nicht den Namen der letzten Haltestelle mit dem to-Merkmal der "
+"Routenrelation vergleichen"
+
+msgid "Double Split"
+msgstr "Doppelt Aufspalten"
+
+msgid "Download finished: {0}"
+msgstr "Herunterladen abgeschlossen: {0}"
+
+#. CHECKSTYLE.OFF: LineLength
+msgid "Download incomplete route relation members"
+msgstr "Unvollständige Routenrelationsmitglieder herunterladen"
+
+msgid "Download started: {0}"
+msgstr "Herunterladen begonnen: {0}"
+
+msgid ""
+"Downloading incomplete relation members. Kindly wait till download gets "
+"over."
+msgstr ""
+"Unvollständige Relationsmitglieder werden heruntergeladen. Bitte warte, bis "
+"das Herunterladen abgeschlossen ist."
+
+msgid "Edge Selection"
+msgstr "Kantenauswahl"
+
+msgid "Entire area"
+msgstr "Komplette Fläche"
+
+msgid "Error in roundabout"
+msgstr "Fehler im Kreisverkehr"
+
+msgid ""
+"Error: The paths connecting the roundabout in the relation do not allow "
+"bicycles."
+msgstr ""
+"Fehler: Die Wege, welche den Kreisel in der Relation verbinden, erlauben "
+"keine Fahrräder"
+
+msgid "Esc"
+msgstr "Esc"
+
+msgid "Extract node from line"
+msgstr "Punkt aus Linie extrahieren"
+
+msgid "Extract platform node"
+msgstr "Extrahiere Bahn-/Bussteig-Punkt"
+
+msgid "ExtractPlatformNodeAction"
+msgstr "Extrahiere-Bahn-/Bussteig-Punkt-Aktion"
+
+msgid "Extracts platform node from a node"
+msgstr "Extrahiert Bahn-/Bussteig-Knoten von einem Knoten"
+
+msgid "Fix error"
+msgstr "Fehler beheben"
+
+msgid "Fixing ({0}/{1}): ''{2}''"
+msgstr "Berichtigung ({0}/{1}): ''{2}''"
+
+msgid "Fixing errors …"
+msgstr "Fehler werden behoben …"
+
+msgid "Here you can change some preferences of PTAssistant functions"
+msgstr ""
+"Hier können ein paar Einstellungen der Funktionen des ÖV-Assistenten "
+"geändert werden"
+
+msgid "High speed"
+msgstr "Hochgeschwindigkeit"
+
+msgid "How would you want the download to take place?"
+msgstr "Wie soll das Herunterladen durchgeführt werden?"
+
+msgid "Include stop_area tests"
+msgstr "Haltebereichprüfungen einschließen"
+
+msgid "Incomplete Members"
+msgstr "Unvollständige Mitglieder"
+
+msgid "Incomplete relations"
+msgstr "Unvollständige Relationen"
+
+msgid "Invalid selection"
+msgstr "Ungültige Auswahl"
+
+msgid "Long distance"
+msgstr "Lange Strecke"
+
+msgid ""
+"Mode of Travel -> {0} \n"
+" total ways selected -> {1}"
+msgstr ""
+"Verkehrsmittel -> {0} \n"
+" Insgesamt ausgewählte Linien -> {1}"
+
+msgid ""
+"Mode of Travel: {0} \n"
+" total ways selected: {1}"
+msgstr ""
+"Verkehrsmittel: {0} \n"
+" Insgesamt ausgewählte Linien: {1}"
+
+msgid "Mode: {0}"
+msgstr "Modus: {0}"
+
+msgid "NA"
+msgstr "n.v."
+
+#. i18n: label for the tag name=*
+msgid "Name"
+msgstr "Name"
+
+#. i18n: label for the tag name:en=*
+msgid "Name (en.)"
+msgstr "Name (engl.)"
+
+msgid "Network"
+msgstr "Netzwerk"
+
+msgid "Network level"
+msgstr "Netzwerkstufe"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Not all members are downloaded"
+msgstr "Nicht alle Mitglieder wurden heruntergeladen"
+
+msgid "Ok"
+msgstr "Ok"
+
+msgid "Operator"
+msgstr "Betreiber"
+
+msgid "Opposite itinerary?"
+msgstr "Umgekehrte Fahrtrichtung?"
+
+msgid "PT Wizard"
+msgstr "ÖV-Einrichtungsassistent"
+
+msgid "PT: First or last way needs to be split"
+msgstr "ÖV: Erster oder letzter Weg muss aufgeteilt werden"
+
+msgid "PT: Platform should not be part of a way"
+msgstr "ÖV: Plattform sollte nicht Teil einers Wegs sein"
+
+msgid "PT: Problem in the route segment with no automatic fix"
+msgstr "ÖV: Problem im Routenabschnitt ohne automatischer Korrektur"
+
+msgid "PT: Problem in the route segment with one automatic fix"
+msgstr "ÖV: Problem im Routenabschnitt mit automatischer Korrektur"
+
+msgid ""
+"PT: Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
+"ÖV: Refs-Merkmale der Routen stimmen nicht mit dem route_ref-Merkmal des "
+"Objekts überein"
+
+msgid "PT: Relation member roles do not match tags"
+msgstr "ÖV: Relationsmitgliederrollen passen nicht zu den Merkmalen"
+
+msgid "PT: Road is under construction"
+msgstr "ÖV: Straße ist im Bau"
+
+msgid "PT: Route contains a gap that can be fixed by sorting"
+msgstr "ÖV: Route enthält eine Lücke, die durch sortieren behoben werden kann"
+
+msgid "PT: Route gap can be closed by adding a single way"
+msgstr ""
+"PT: Die Lücke in der Route kann durch das Hinzufügen eines Weges geschlossen"
+" werden"
+
+msgid ""
+"PT: Route gaps can decrease by sorting members. Further validations will be "
+"required"
+msgstr ""
+"ÖV: Lücken in der Route können durch Sortierung der Mitglieder verringert "
+"werden. Weitere Prüfungen sind erforderlich"
+
+msgid "PT: Route needs to be sorted, found tag fixme:relation=order members"
+msgstr ""
+"PT: Das Tag \"fixme:relation=order\" wurde gefunden. Die Route sollte "
+"sortiert werden."
+
+msgid "PT: Route passes a oneway road in the wrong direction"
+msgstr "ÖV: Route führt in falscher Richtung über eine Einbahnstraße"
+
+msgid ""
+"PT: Route relations of stop position(s) and platform(s) of stop area members"
+" diverge"
+msgstr ""
+"ÖV: Routenrelationen von Haltepunkt(en) und Plattform(en) der "
+"Haltebereichsmitglieder weichen voneinander ab"
+
+msgid "PT: Route should start and end with a stop_position"
+msgstr "ÖV: Route sollte mit einem Halteplatz beginnen und enden"
+
+msgid "PT: Route type does not match the type of the road it passes on"
+msgstr "ÖV: Routentyp passt nicht zum Typ der Straße, auf der sie verläuft"
+
+msgid "PT: Stop area relation has no platform"
+msgstr "ÖV: Haltebereichrelation hat keine Plattform"
+
+msgid "PT: Stop area relation has no stop position"
+msgstr "ÖV: Haltebereichrelation hat keine Haltestelle"
+
+msgid "PT: Stop not served"
+msgstr "ÖV: Haltestelle nicht bedient"
+
+msgid "PT: Stop position or platform is not part of a stop area relation"
+msgstr ""
+"ÖV: Haltstelle oder Plattform ist nicht Teil einer Haltebereichrelation"
+
+msgid "Split way"
+msgstr "Linie aufspalten"
+
+msgid "Tram"
+msgstr "Straßenbahn"

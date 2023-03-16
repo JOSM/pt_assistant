@@ -1,13 +1,19 @@
 # Translations for the JOSM plugin 'pt_assistant' (nl)
-# Copyright (C) 2018
+# Copyright (C) 2022
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR, YEAR.
 #
+# Translators:
+# Florian Schäfer, 2018
+# DiGro, 2018
+# Simon Legner, 2019
+# K v Hoof, 2020
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
+"Project-Id-Version: josm-plugin_pt_assistant 2.1.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Dutch (https://www.transifex.com/josm/teams/2544/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -16,8 +22,24 @@ msgstr ""
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid " "
+msgstr " "
+
 msgid "A valid public_transport:version=2 route is required"
 msgstr "Een geldige route public_transport:version=2 is vereist"
+
+msgid "Add oneway:bicycle=no to way"
+msgstr "Voeg oneway:bicycle=no aan weg toe"
+
+msgid "Add oneway:bus=no to way"
+msgstr "Voeg oneway:bus=no aan weg toe"
+
+msgid "Add public_transport=stop_position + mode of transport on these nodes"
+msgstr ""
+"Voeg public_transport=stop_position + vervoerstype toe aan deze knopen"
+
+msgid "Add stop position"
+msgstr "Voeg stop-positie toe"
 
 msgid "Area"
 msgstr "Gebied"
@@ -30,6 +52,9 @@ msgstr "Testen voor fiets- en wandelroutes"
 
 msgid "Bus"
 msgstr "Bus"
+
+msgid "Bus station"
+msgstr "Busstation"
 
 msgid "Cancel"
 msgstr "Annuleren"
@@ -49,15 +74,18 @@ msgstr ""
 msgid "Distance between stops"
 msgstr "Afstand tussen haltes"
 
-msgid "Do you want to download referrers of platforms and stop positions?"
-msgstr "Wilt u verwijzingen naar platformen halteposities downloaden?"
-
 msgid "Do you want to make the roundabout round?"
 msgstr "Wilt u de rotonde rond maken?"
 
 #. CHECKSTYLE.OFF: LineLength
 msgid "Download incomplete route relation members"
 msgstr "Niet volledige leden van routrelatie downloaden"
+
+msgid "Entire area"
+msgstr "Volledig gebied"
+
+msgid "Error in roundabout"
+msgstr "Fout in rotonde"
 
 msgid "Extract node from line"
 msgstr "Knoop uit lijn weghalen"
@@ -68,8 +96,11 @@ msgstr "Fout oplossen"
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "({0}/{1}): ''{2}'' worden hersteld"
 
-msgid "How do you want to proceed?"
-msgstr "Hoe wilt u verder gaan?"
+msgid "Fixing errors …"
+msgstr "Fouten oplossen..."
+
+msgid "High speed"
+msgstr "Hogesnelheids"
 
 msgid "Include stop_area tests"
 msgstr "Testen stop_area opnemen"
@@ -77,27 +108,49 @@ msgstr "Testen stop_area opnemen"
 msgid "Incomplete Members"
 msgstr "Incomplete leden"
 
+msgid "Incomplete relations"
+msgstr "Incomplete relaties"
+
 msgid "Invalid selection"
 msgstr "Ongeldige selectie"
 
 msgid "Mode: {0}"
 msgstr "Modus: {0}"
 
+msgid "NA"
+msgstr "n.v.t."
+
 #. i18n: label for the tag name=*
 msgid "Name"
 msgstr "Naam"
 
+#. i18n: label for the tag name:en=*
+msgid "Name (en.)"
+msgstr "Naam (Engels)"
+
 msgid "Network"
 msgstr "Netwerk"
 
+msgid "Network level"
+msgstr "Netwerkniveau"
+
 msgid "No"
-msgstr "Neen"
+msgstr "Nee"
+
+msgid "Not all members are downloaded"
+msgstr "Niet alle leden zijn gedownload"
 
 msgid "Ok"
 msgstr "OK"
 
 msgid "Operator"
 msgstr "Bedrijf"
+
+msgid "Opposite itinerary?"
+msgstr "Tegenovergestelde route?"
+
+msgid "PT Wizard"
+msgstr "PT-wizard"
 
 msgid "PT: First or last way needs to be split"
 msgstr "PT: Eerste of laatste weg zou moeten worden gesplitst"
@@ -112,6 +165,12 @@ msgid "PT: Problem in the route segment with one automatic fix"
 msgstr ""
 "PT: Probleem in het segment van de route segment met één automatische "
 "reparatie"
+
+msgid ""
+"PT: Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
+"PT: Referenties van de routes komen niet overeen met de route_ref-tag van de"
+" voorgaande"
 
 msgid "PT: Relation member roles do not match tags"
 msgstr "PT: Rol van het lid van de relatie komt niet overene met de tags"
@@ -190,21 +249,17 @@ msgstr ""
 "PT: De naam van de laatste stop komt niet overeen met de tag \"to\" van de "
 "relatie van de route"
 
+msgid "PT: There is a gap in the {0} route"
+msgstr "PT: Er is een gat in de {0}-route"
+
 msgid "PT: dummy test warning"
 msgstr "PT: dummy testwaarschuwing"
 
-msgid "PT_Assistant Fetch Request"
-msgstr "Verzoek om op te halen PT_Assistant"
+msgid "PTAssistantPlugin settings"
+msgstr "PTAssistantPlugin-instellingen"
 
 msgid "PT_Assistant Message"
-msgstr "PT_Assistant bericht"
-
-#. showDialog(); FIXME
-msgid "PT_Assistant Proceed Request"
-msgstr "Verzoek door te gaan met PT_Assistant"
-
-msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
-msgstr "Plug-in PT_Assistant vindt dat deze relatie (id={0}) fouten heeft:"
+msgstr "PT_Assistant-bericht"
 
 msgctxt "menu"
 msgid "Public Transport"
@@ -216,23 +271,26 @@ msgstr "Testen Assistent openbaar vervoer"
 msgid "Public transport routes"
 msgstr "Routes openbaar vervoer"
 
-msgid "Remember my choice and do not ask me again in this session"
-msgstr "Onthoud mijn keuze en vraag me dat in deze sessie niet meer"
+msgid "Railway station"
+msgstr "Treinstation"
 
-msgid "Repeat last fix"
-msgstr "Laatste reparatie herhalen"
+msgid "Railway stop"
+msgstr "Treinhalte"
+
+msgid "Regional"
+msgstr "Regionaal"
+
+msgid "Remove public_transport=platform from platform ways"
+msgstr "Verwijder public_transport=platform van perron-lijnen"
+
+msgid "Remove roundabout from relations"
+msgstr "Verwijder rotonde uit relaties"
+
+msgid "Remove ways"
+msgstr "Verwijder wegen"
 
 msgid "Roundabout round"
 msgstr "Ronde rotonde"
-
-msgid ""
-"Route relations have incomplete members.\n"
-"They need to be downloaded to proceed with validation.\n"
-"Do you want to download them?"
-msgstr ""
-"Routerelaties hebben niet complete leden.\n"
-"Zij moeten worden gedownload om door te kunnen gaan met valideren.\n"
-"Wilt u ze downloaden?"
 
 msgid "Save"
 msgstr "Opslaan"
@@ -242,6 +300,12 @@ msgstr "Deeltaxi"
 
 msgid "Shelter"
 msgstr "Schuilplaats"
+
+msgid "Skip"
+msgstr "Overslaan"
+
+msgid "Split Roundabout"
+msgstr "Splits Rotonde"
 
 msgid "Split way"
 msgstr "Weg splitsen"
@@ -253,14 +317,14 @@ msgstr ""
 "De relatie heeft incomplete leden. Wilt u ze downloaden en doorgaan met "
 "sorteren?"
 
+msgid "This is not a PT v2 relation"
+msgstr "Dit is geen PTv2-relatie"
+
 msgid "Toggle direction arrows"
 msgstr "Richtingpijlen schakelen"
 
 msgid "Toggle reference labels"
 msgstr "Verwijzingslabels schakelen"
-
-msgid "Tool: {0}"
-msgstr "Gereedschap: {0}"
 
 msgid "Tram"
 msgstr "Tram"
@@ -290,17 +354,13 @@ msgstr "Wat wilt u dat het segment is?"
 msgid "Yes"
 msgstr "Ja"
 
-msgid "{0} direction error"
-msgid_plural "{0} direction errors"
-msgstr[0] "{0} fout in rechting"
-msgstr[1] "{0} fouten in richting"
+msgid "pt_assistant layer"
+msgstr "pt_assitant-laag"
 
-msgid "{0} road type error"
-msgid_plural "{0} road type errors"
-msgstr[0] "{0} fout in type weg"
-msgstr[1] "{0} fouten in type weg"
+msgid "solutions based on other route relations"
+msgstr "oplossingen gebaseerd op andere routerelaties"
 
-#. Plugin description for pt_assistant
+#. Plugin description for project ':pt_assistant'.name
 msgid ""
 "Provides validation and fixing for public transport route according to "
 "version 2 of the public transport schema"

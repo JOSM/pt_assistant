@@ -1,13 +1,18 @@
 # Translations for the JOSM plugin 'pt_assistant' (da)
-# Copyright (C) 2018
+# Copyright (C) 2022
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR, YEAR.
 #
+# Translators:
+# Jurbo Lator, 2018
+# Florian Schäfer, 2018
+# Simon Legner, 2019
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
+"Project-Id-Version: josm-plugin_pt_assistant 2.1.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Danish (https://www.transifex.com/josm/teams/2544/da/)\n"
 "MIME-Version: 1.0\n"
@@ -15,6 +20,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: da\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid " "
+msgstr " "
 
 msgid "A valid public_transport:version=2 route is required"
 msgstr "En gyldig public_transport:version=2 rute kræves"
@@ -48,9 +56,6 @@ msgstr "Viser stop fra udvalgte offentlige transportruter som graf"
 msgid "Distance between stops"
 msgstr "Afstand mellem stop"
 
-msgid "Do you want to download referrers of platforms and stop positions?"
-msgstr "Vil du at downloade refererende platforme og stoppositioner?"
-
 msgid "Do you want to make the roundabout round?"
 msgstr "Vil du lave rundkørslen rund?"
 
@@ -63,9 +68,6 @@ msgstr "Ret fejl"
 
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Retter ({0}/{1}): ''{2}''"
-
-msgid "How do you want to proceed?"
-msgstr "Hvordan vil du fortsætte?"
 
 msgid "Include stop_area tests"
 msgstr "Medtag stopområde tests"
@@ -187,18 +189,8 @@ msgstr ""
 msgid "PT: dummy test warning"
 msgstr "OT: dummy test advarsel"
 
-msgid "PT_Assistant Fetch Request"
-msgstr "OT_Assistent hent anmodning"
-
 msgid "PT_Assistant Message"
 msgstr "OT_Assistent besked"
-
-#. showDialog(); FIXME
-msgid "PT_Assistant Proceed Request"
-msgstr "OT_Assistent fortsæt anmodning"
-
-msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
-msgstr "OT_Assistent udvidelse fandt at denne relation (id={0}) har fejl:"
 
 msgctxt "menu"
 msgid "Public Transport"
@@ -210,23 +202,8 @@ msgstr "Offentlig transport assistent tests"
 msgid "Public transport routes"
 msgstr "Offentlig transportrute"
 
-msgid "Remember my choice and do not ask me again in this session"
-msgstr "Husk mit valg og spørg mig ikke igen i denne session"
-
-msgid "Repeat last fix"
-msgstr "Gentag seneste rettelse"
-
 msgid "Roundabout round"
 msgstr "Rundkørsel afrunde"
-
-msgid ""
-"Route relations have incomplete members.\n"
-"They need to be downloaded to proceed with validation.\n"
-"Do you want to download them?"
-msgstr ""
-"Rute relationer har ufuldstændige medlemmer.\n"
-"Der er brug for at de bliver hentet for at fortsætte med validering.\n"
-"Vil du downloade dem?"
 
 msgid "Save"
 msgstr "Gem"
@@ -252,9 +229,6 @@ msgstr "Skift retningspile"
 
 msgid "Toggle reference labels"
 msgstr "Skift reference etiketter"
-
-msgid "Tool: {0}"
-msgstr "Værktøj: {0}"
 
 msgid "Tram"
 msgstr "Sporvogn"
@@ -284,17 +258,7 @@ msgstr "Hvad vil du have at segmentet skal være?"
 msgid "Yes"
 msgstr "Ja"
 
-msgid "{0} direction error"
-msgid_plural "{0} direction errors"
-msgstr[0] "{0} retningsfejl"
-msgstr[1] "{0} retningsfejl"
-
-msgid "{0} road type error"
-msgid_plural "{0} road type errors"
-msgstr[0] "{0} vejtypefejl"
-msgstr[1] "{0} vejtypefejl"
-
-#. Plugin description for pt_assistant
+#. Plugin description for project ':pt_assistant'.name
 msgid ""
 "Provides validation and fixing for public transport route according to "
 "version 2 of the public transport schema"

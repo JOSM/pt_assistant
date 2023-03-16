@@ -1,4 +1,4 @@
-image: registry.gitlab.com/josm/docker-library/openjdk-8-josmplugin:latest
+image: registry.gitlab.com/josm/docker-library/openjdk:8
 
 include:
     - template: Dependency-Scanning.gitlab-ci.yml
@@ -26,7 +26,7 @@ assemble:
 
 java 11 assemble:
     stage: build
-    image: registry.gitlab.com/josm/docker-library/openjdk-11-josmplugin:latest
+    image: registry.gitlab.com/josm/docker-library/openjdk:11
     script:
         - ./gradlew assemble --stacktrace
     artifacts:
@@ -35,21 +35,9 @@ java 11 assemble:
     except:
         - schedules
 
-java 12 assemble:
+java 17 assemble:
     stage: build
-    image: registry.gitlab.com/josm/docker-library/openjdk-12-josmplugin:latest
-    script:
-        - ./gradlew assemble --stacktrace
-    artifacts:
-        paths:
-            - build/
-    allow_failure: true
-    except:
-        - schedules
-
-java 13 assemble:
-    stage: build
-    image: registry.gitlab.com/josm/docker-library/openjdk-13-josmplugin:latest
+    image: registry.gitlab.com/josm/docker-library/openjdk:17
     script:
         - ./gradlew assemble --stacktrace
     artifacts:
@@ -99,7 +87,7 @@ latest JOSM compile:
 
 java 11 build:
     stage: test
-    image: registry.gitlab.com/josm/docker-library/openjdk-11-josmplugin:latest
+    image: registry.gitlab.com/josm/docker-library/openjdk:11
     script:
         - ./gradlew build --stacktrace
     needs:
@@ -107,24 +95,13 @@ java 11 build:
     except:
         - schedules
 
-java 12 build:
+java 17 build:
     stage: test
-    image: registry.gitlab.com/josm/docker-library/openjdk-12-josmplugin:latest
+    image: registry.gitlab.com/josm/docker-library/openjdk:17
     script:
         - ./gradlew build --stacktrace
     needs:
-        - java 12 assemble
-    allow_failure: true
-    except:
-        - schedules
-
-java 13 build:
-    stage: test
-    image: registry.gitlab.com/josm/docker-library/openjdk-13-josmplugin:latest
-    script:
-        - ./gradlew build --stacktrace
-    needs:
-        - java 13 assemble
+        - java 17 assemble
     allow_failure: true
     except:
         - schedules
@@ -156,7 +133,7 @@ GitLab Maven repo:
         url: https://gitlab.com/JOSM/plugin/pt_assistant/-/packages
     script:
         - ./gradlew publishAllPublicationsToGitlabRepository
-    needs: [ "build", "min JOSM compile", "java 11 build", "java 12 build", "java 13 build" ]
+    needs: [ "build", "min JOSM compile", "java 11 build", "java 17 build" ]
     only:
         - tags@JOSM/plugin/pt_assistant
     except:
@@ -188,7 +165,7 @@ push pages branch:
             git stage .
             git commit -a -m "$commitMessage"
             git push origin pages
-    needs: [ "build", "min JOSM compile", "java 11 build", "java 12 build", "java 13 build" ]
+    needs: [ "build", "min JOSM compile", "java 11 build", "java 17 build" ]
     only:
         - tags@JOSM/plugin/pt_assistant
     except:

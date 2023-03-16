@@ -1,23 +1,42 @@
 # Translations for the JOSM plugin 'pt_assistant' (fr)
-# Copyright (C) 2018
+# Copyright (C) 2022
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR, YEAR.
 #
+# Translators:
+# Florian Schäfer, 2018
+# Noémie, 2019
+# Simon Legner, 2019
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
+"Project-Id-Version: josm-plugin_pt_assistant 2.1.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: French (https://www.transifex.com/josm/teams/2544/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fr\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+
+msgid " "
+msgstr " "
+
+msgid ""
+"''from'' tag not set. Set it to\n"
+"{0} ?"
+msgstr "Le tag \"from\" n'est pas renseigné. Voulez-vous le renseigner avec {0} ?"
+
+msgid ""
+"''to'' tag not set. Set it to\n"
+"{0} ?"
+msgstr "Le tag \"to\" n'est pas renseigné. Voulez-vous le renseigner avec {0} ?"
 
 msgid "A valid public_transport:version=2 route is required"
-msgstr "Un tag public_transport:version=2 route est requis"
+msgstr ""
+"Une relation route avec un tag public_transport:version=2 est nécessaire."
 
 msgid "Area"
 msgstr "Surface"
@@ -30,6 +49,9 @@ msgstr "Tests des véloroutes et des itinéraires pédestres"
 
 msgid "Bus"
 msgstr "Bus"
+
+msgid "Bus station"
+msgstr "Gare routière"
 
 msgid "Cancel"
 msgstr "Annuler"
@@ -51,9 +73,6 @@ msgstr ""
 msgid "Distance between stops"
 msgstr "Distance entre les arrêts"
 
-msgid "Do you want to download referrers of platforms and stop positions?"
-msgstr "Voulez-vous télécharger les références de plateformes et des arrêts?"
-
 msgid "Do you want to make the roundabout round?"
 msgstr "Voulez-vous arrondir le rond-point?"
 
@@ -69,9 +88,6 @@ msgstr "Correction d’erreur"
 
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Corrige ({0}/{1}): ''{2}''"
-
-msgid "How do you want to proceed?"
-msgstr "Comment voulez vous procéder?"
 
 msgid "Include stop_area tests"
 msgstr "Inclure les tests stop_area"
@@ -99,45 +115,45 @@ msgid "Ok"
 msgstr "Valider"
 
 msgid "Operator"
-msgstr "Société"
+msgstr "Transporteur"
 
 msgid "PT: First or last way needs to be split"
-msgstr "PT: Le premier ou la dernier chemin doit être divisé"
+msgstr "PT: Le premier ou le dernier chemin doit être divisé"
 
 msgid "PT: Platform should not be part of a way"
-msgstr "PT: La plate-forme ne devrait pas faire partie d’un chemin"
+msgstr "PT: L'arrêt (platform) ne doit pas faire partie d’un chemin"
 
 msgid "PT: Problem in the route segment with no automatic fix"
-msgstr "PT: Problème dans le segment d’itinéraire sans correction automatique"
+msgstr "PT: Problème dans le trajet sans correction automatique"
 
 msgid "PT: Problem in the route segment with one automatic fix"
-msgstr ""
-"PT: problème dans le segment d’itinéraire avec une correction automatique"
+msgstr "PT: problème dans le trajet avec une correction automatique"
 
 msgid "PT: Relation member roles do not match tags"
 msgstr ""
 "PT: Les rôles des membres de la relations ne correspondent pas aux tags"
 
 msgid "PT: Road is under construction"
-msgstr "PT: la route est en construction"
+msgstr "PT: La route est en construction"
 
 msgid "PT: Route contains a gap that can be fixed by sorting"
-msgstr "PT: L’itinéraire contient un trou qui peut être corrigé par un tri"
+msgstr "PT: Le trajet contient un trou qui peut être corrigé par un tri"
 
 msgid "PT: Route gap can be closed by adding a single way"
-msgstr "PT: L’écart d’itinéraire peut être fermé en ajoutant un seul chemin"
+msgstr ""
+"PT: Le trou dans le trajet peut être corrigé en ajoutant un seul chemin"
 
 msgid ""
 "PT: Route gaps can decrease by sorting members. Further validations will be "
 "required"
 msgstr ""
-"PT: Les interruptions de la route peuvent être réduites en triant les "
-"membres. D autres validations seront requises"
+"PT: Le nombre de trous de le trajet peut être réduit en triant les membres. "
+"D'autres validations seront requises"
 
 msgid "PT: Route needs to be sorted, found tag fixme:relation=order members"
 msgstr ""
-"PT: les routes ont besoin d être triées, attribut fixme:relation=order "
-"members trouvé:"
+"PT: Les chemins ont besoin d'être triés, l'attribut fixme:relation=order "
+"members a été trouvé:"
 
 msgid "PT: Route passes a oneway road in the wrong direction"
 msgstr ""
@@ -195,22 +211,14 @@ msgstr ""
 "PT: le nom du dernier arrêt ne correspond pas à l attribut \"to\" de la "
 "relation route"
 
+msgid "PT: There is a gap in the {0} route"
+msgstr "PT: Il y a un trou dans le trajet {0}"
+
 msgid "PT: dummy test warning"
 msgstr "PT: avertissement du test dummy"
 
-msgid "PT_Assistant Fetch Request"
-msgstr "Requête de récupération de PT_Assistant"
-
 msgid "PT_Assistant Message"
 msgstr "Message de PT_Assistant"
-
-#. showDialog(); FIXME
-msgid "PT_Assistant Proceed Request"
-msgstr "PT_Assistant traite la requête"
-
-msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
-msgstr ""
-"Le greffon PT_Assistant trouve que la relation (id={0}) a des erreurs:"
 
 msgctxt "menu"
 msgid "Public Transport"
@@ -222,23 +230,8 @@ msgstr "Tests de Public Transport Assistant"
 msgid "Public transport routes"
 msgstr "Lignes de transport public"
 
-msgid "Remember my choice and do not ask me again in this session"
-msgstr "Se souvenir de mon choix et ne plus me demandez pour cette session"
-
-msgid "Repeat last fix"
-msgstr "Répéter la dernière correction"
-
 msgid "Roundabout round"
 msgstr "Rond-point arrondi."
-
-msgid ""
-"Route relations have incomplete members.\n"
-"They need to be downloaded to proceed with validation.\n"
-"Do you want to download them?"
-msgstr ""
-"Les relations d’itinéraire ont des membres incomplets.\n"
-"Ils doivent être téléchargés pour procéder à la validation.\n"
-"Voulez-vous les télécharger?"
 
 msgid "Save"
 msgstr "Enregistrer"
@@ -247,10 +240,16 @@ msgid "Share taxi"
 msgstr "Taxi partagé"
 
 msgid "Shelter"
-msgstr "Abris"
+msgstr "Abri"
+
+msgid "Sort PT Route Members"
+msgstr "Trier les membres de la relation route"
+
+msgid "Split Roundabout"
+msgstr "Découper le rond-point"
 
 msgid "Split way"
-msgstr "Diviser le chemin"
+msgstr "Découper le chemin"
 
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
@@ -264,9 +263,6 @@ msgstr "Inverser les flèches de direction"
 
 msgid "Toggle reference labels"
 msgstr "Inverser les étiquettes de référence"
-
-msgid "Tool: {0}"
-msgstr "Outil : {0}"
 
 msgid "Tram"
 msgstr "Tramway"
@@ -296,17 +292,7 @@ msgstr "Que voulez-vous que ce segment soit ?"
 msgid "Yes"
 msgstr "Oui"
 
-msgid "{0} direction error"
-msgid_plural "{0} direction errors"
-msgstr[0] "{0} erreur de direction"
-msgstr[1] "{0} erreurs de direction"
-
-msgid "{0} road type error"
-msgid_plural "{0} road type errors"
-msgstr[0] "{0} erreur de type de route"
-msgstr[1] "{0} erreurs de type de route"
-
-#. Plugin description for pt_assistant
+#. Plugin description for project ':pt_assistant'.name
 msgid ""
 "Provides validation and fixing for public transport route according to "
 "version 2 of the public transport schema"

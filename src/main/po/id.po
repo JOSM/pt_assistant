@@ -1,13 +1,18 @@
 # Translations for the JOSM plugin 'pt_assistant' (id)
-# Copyright (C) 2018
+# Copyright (C) 2022
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR, YEAR.
 #
+# Translators:
+# Florian Schäfer, 2018
+# Simon Legner, 2019
+# Ahmad Nurrohim, 2020
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
+"Project-Id-Version: josm-plugin_pt_assistant 2.1.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Indonesian (https://www.transifex.com/josm/teams/2544/id/)\n"
 "MIME-Version: 1.0\n"
@@ -15,6 +20,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid " "
+msgstr " "
 
 msgid "A valid public_transport:version=2 route is required"
 msgstr "Rute public_trasnport:version=2 yang valid dibutuhkan"
@@ -48,11 +56,14 @@ msgstr ""
 msgid "Distance between stops"
 msgstr "Jarak antar pemberhentian"
 
-msgid "Do you want to download referrers of platforms and stop positions?"
-msgstr "Apakah Anda mau mengunduh perujuk dari platform dan posisi henti?"
-
 msgid "Do you want to make the roundabout round?"
 msgstr "Apakah Anda mau membuat bundaran lalu lintas?"
+
+msgid "Double Split"
+msgstr "Split Ganda"
+
+msgid "Download finished: {0}"
+msgstr "Unduhan selesai: {0}"
 
 #. CHECKSTYLE.OFF: LineLength
 msgid "Download incomplete route relation members"
@@ -66,9 +77,6 @@ msgstr "Betulkan kesalahan"
 
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Memperbaiki ({0}/{1}):\"{2}\""
-
-msgid "How do you want to proceed?"
-msgstr "Bagaimana cara anda untuk memprosesnya?"
 
 msgid "Include stop_area tests"
 msgstr "Masukkan uji coba stop_area"
@@ -189,19 +197,8 @@ msgstr ""
 msgid "PT: dummy test warning"
 msgstr "PT: peringatan tes palsu"
 
-msgid "PT_Assistant Fetch Request"
-msgstr "PT_Assistant Mengambil Permintaan"
-
 msgid "PT_Assistant Message"
 msgstr "Pesan PT_Assistant"
-
-#. showDialog(); FIXME
-msgid "PT_Assistant Proceed Request"
-msgstr "PT_Assistant Melanjutkan Permintaan"
-
-msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
-msgstr ""
-"Plugin PT_Assistant menemukan bahwa relasi ini (id={0}) memiliki kesalahan:"
 
 msgctxt "menu"
 msgid "Public Transport"
@@ -213,23 +210,8 @@ msgstr "Uji coba Public Transport Assistant"
 msgid "Public transport routes"
 msgstr "Rute transportasi umum"
 
-msgid "Remember my choice and do not ask me again in this session"
-msgstr "Ingat pilihan saya dan jangan tanya saya lagi pada sesi ini"
-
-msgid "Repeat last fix"
-msgstr "Ulangi perbaikan terakhir"
-
 msgid "Roundabout round"
 msgstr "Bundaran lalu lintas"
-
-msgid ""
-"Route relations have incomplete members.\n"
-"They need to be downloaded to proceed with validation.\n"
-"Do you want to download them?"
-msgstr ""
-"Relasi rute tidak memiliki member yang komplit. \n"
-"Perlu diunduh untuk melanjutkan validasi.\n"
-"Anda ingin mengunduhnya?"
 
 msgid "Save"
 msgstr "Simpan"
@@ -255,9 +237,6 @@ msgstr "Atur arah panah"
 
 msgid "Toggle reference labels"
 msgstr "Ubah label referensi"
-
-msgid "Tool: {0}"
-msgstr "Alat: {0}"
 
 msgid "Tram"
 msgstr "Trem"
@@ -287,15 +266,7 @@ msgstr "Anda ingin segmen ini seperti apa?"
 msgid "Yes"
 msgstr "Ya"
 
-msgid "{0} direction error"
-msgid_plural "{0} direction errors"
-msgstr[0] "{0} kesalahan arah"
-
-msgid "{0} road type error"
-msgid_plural "{0} road type errors"
-msgstr[0] "{0} tipe jalan salah"
-
-#. Plugin description for pt_assistant
+#. Plugin description for project ':pt_assistant'.name
 msgid ""
 "Provides validation and fixing for public transport route according to "
 "version 2 of the public transport schema"

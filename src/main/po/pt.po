@@ -1,20 +1,28 @@
 # Translations for the JOSM plugin 'pt_assistant' (pt)
-# Copyright (C) 2018
+# Copyright (C) 2022
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR, YEAR.
 #
+# Translators:
+# Florian Schäfer, 2018
+# Rui, 2019
+# Simon Legner, 2019
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
+"Project-Id-Version: josm-plugin_pt_assistant 2.1.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Portuguese (https://www.transifex.com/josm/teams/2544/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+
+msgid " "
+msgstr " "
 
 msgid ""
 "''from'' tag not set. Set it to\n"
@@ -58,12 +66,29 @@ msgstr "É necessária uma rota public_transport:version=2 válida"
 msgid "Add oneway:bus=no to way"
 msgstr "Adicionar à via oneway:bus=no"
 
-#. i18n: name of the `AddStopPositionAction` map mode
+msgid "Add public_transport=stop_position + mode of transport on these nodes"
+msgstr ""
+"Adicionar public_transport=stop_position + modo de transporte nestes nós"
+
 msgid "Add stop position"
 msgstr "Adicionar posição de paragem"
 
+msgid "Always split ways, even if they are not at the end of the itinerary"
+msgstr ""
+"Dividir sempre as linhas, mesmo que estas não estejam no final de um "
+"itinerário"
+
 msgid "Area"
 msgstr "É uma área e não uma linha"
+
+msgid "Area around way"
+msgstr "Área à volta de uma linha"
+
+msgid "Area before removal"
+msgstr "Área antes da remoção"
+
+msgid "Assign transport type to platform"
+msgstr "Atribuir o tipo de transporte à plataforma"
 
 msgid "Bench"
 msgstr "Banco"
@@ -87,16 +112,52 @@ msgid "Change name tag?"
 msgstr "Alterar etiqueta nome?"
 
 msgid ""
+"Change name to\n"
+"''{0}''\n"
+"?"
+msgstr ""
+"Alterar nome para\n"
+"''{0}''\n"
+"?"
+
+msgid "Change to tag?"
+msgstr "Alterar para a etiqueta?"
+
+msgid ""
 "Check if route relations are compatible with public transport version 2"
 msgstr ""
 "Verificar se as relações são compatíveis com a versão 2 do esquema de "
 "transportes públicos"
 
+msgid "City transport"
+msgstr "Transporte citadino"
+
 msgid "Close"
 msgstr "Fechar"
 
+msgid "Close the options"
+msgstr "Fechar as opções"
+
+msgid "Cover"
+msgstr "Coberto"
+
+msgid "Create ''route'' relation for opposite direction of travel?"
+msgstr "Criar relação de ''route'' (rota) para a direção oposta da viagem?"
+
+msgid "Create a route_master?"
+msgstr "Criar uma route_master (rota mestre)?"
+
+msgid "Customize stop"
+msgstr "Personalizar paragem"
+
+msgid "Customize stop under osm public transit standard v2"
+msgstr "Personalizar paragem de acordo com a norma v2 de transporte públicos"
+
 msgid "Distance between stops"
 msgstr "Distância entre paragens"
+
+msgid "Do not remove ways"
+msgstr "Não remover linhas"
 
 msgid "Do you want to make the roundabout round?"
 msgstr "Quer tornar a rotunda circular?"
@@ -111,11 +172,29 @@ msgstr "Descarregar membros incompletos da relação de rota"
 msgid "Download started: {0}"
 msgstr "Descarregamento iniciado: {0}"
 
+msgid "Edge Selection"
+msgstr "Seleção de bordas"
+
 msgid "Entire area"
 msgstr "Toda a área"
 
+msgid "Error in roundabout"
+msgstr "Erro na rotunda"
+
+msgid ""
+"Error: The paths connecting the roundabout in the relation do not allow "
+"bicycles."
+msgstr ""
+"Erro: as linhas que ligam a rotunda na relação não permitem bicicletas."
+
 msgid "Extract node from line"
 msgstr "Extrair nó de uma linha"
+
+msgid "Extract platform node"
+msgstr "Extrair nó da plataforma"
+
+msgid "Extracts platform node from a node"
+msgstr "Extrai o nó da plataforma de um nó"
 
 msgid "Fix error"
 msgstr "Corrigir erro"
@@ -123,8 +202,11 @@ msgstr "Corrigir erro"
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Corrigindo ({0}/{1}): ''{2}''"
 
-msgid "How do you want to proceed?"
-msgstr "Como quer continuar?"
+msgid "Fixing errors …"
+msgstr "A corrigir erros…"
+
+msgid "High speed"
+msgstr "Alta velocidade"
 
 msgid "Include stop_area tests"
 msgstr "Inluir testes stop_area (área de paragem)"
@@ -132,27 +214,63 @@ msgstr "Inluir testes stop_area (área de paragem)"
 msgid "Incomplete Members"
 msgstr "Membros Incompletos"
 
+msgid "Incomplete relations"
+msgstr "Relações incompletas"
+
 msgid "Invalid selection"
 msgstr "Seleção incorreta"
 
+msgid "Long distance"
+msgstr "Distância longa"
+
+msgid ""
+"Mode of Travel -> {0} \n"
+" total ways selected -> {1}"
+msgstr ""
+"Modo de viagem -> {0} \n"
+" total de linhas selecionadas -> {1}"
+
+msgid ""
+"Mode of Travel: {0} \n"
+" total ways selected: {1}"
+msgstr ""
+"Modo de viagem: {0} \n"
+" total de linhas selecionadas: {1}"
+
 msgid "Mode: {0}"
 msgstr "Modo: {0}"
+
+msgid "NA"
+msgstr "NA"
 
 #. i18n: label for the tag name=*
 msgid "Name"
 msgstr "Nome"
 
+#. i18n: label for the tag name:en=*
+msgid "Name (en.)"
+msgstr "Name (en.)"
+
 msgid "Network"
 msgstr "Rede de Rota"
 
+msgid "Network level"
+msgstr "Nível da rede"
+
 msgid "No"
 msgstr "Não"
+
+msgid "Not all members are downloaded"
+msgstr "Nem todos os membros foram descarregados"
 
 msgid "Ok"
 msgstr "Ok"
 
 msgid "Operator"
 msgstr "Empresa/organismo que faz a gestão"
+
+msgid "Opposite itinerary?"
+msgstr "Itinerário oposto?"
 
 msgid "PT Wizard"
 msgstr "Assistente TP"
@@ -168,6 +286,12 @@ msgstr "TP: Problema no segmento de rota sem correção automática"
 
 msgid "PT: Problem in the route segment with one automatic fix"
 msgstr "TP: Problema no segmento de rota com uma correção automática"
+
+msgid ""
+"PT: Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
+"TP: as referências das rotas não coincidem com a etiqueta route_ref do "
+"elemento"
 
 msgid "PT: Relation member roles do not match tags"
 msgstr "TP: As funções dos membros da relação não correspondem às etiquetas"
@@ -258,18 +382,8 @@ msgstr "TP: aviso de teste simulado"
 msgid "PTAssistantPlugin settings"
 msgstr "Configurações do Módulo de Assistente TP"
 
-msgid "PT_Assistant Fetch Request"
-msgstr "Pedido de Processamento do Assistente_TP"
-
 msgid "PT_Assistant Message"
 msgstr "Mensagem do Assistente_TP"
-
-#. showDialog(); FIXME
-msgid "PT_Assistant Proceed Request"
-msgstr "Pedido de Continuação do Assistente_TP"
-
-msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
-msgstr "O módulo Assistente_TP descobriu que esta relação (id={0}) tem erros:"
 
 msgctxt "menu"
 msgid "Public Transport"
@@ -281,23 +395,34 @@ msgstr "Testes de Assistência de Transporte Público"
 msgid "Public transport routes"
 msgstr "Rotas de transporte público"
 
-msgid "Remember my choice and do not ask me again in this session"
-msgstr "Lembrar a minha escolha e não perguntar novamente durante esta sessão"
+msgid "Railway station"
+msgstr "Estação de comboios"
 
-msgid "Repeat last fix"
-msgstr "Repetir última correção"
+msgid "Railway stop"
+msgstr "Paragem de comboios"
+
+msgid ""
+"Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
+"As referências das rotas não coincidem com a etiqueta route_ref do elemento"
+
+msgid "Regional"
+msgstr "Regional"
+
+msgid "Remove current edge (white)"
+msgstr "Remover a borda atual (branco)"
+
+msgid "Remove roundabout from relations"
+msgstr "Remover a rotunda das relações"
+
+msgid "Remove ways"
+msgstr "Remover linhas"
+
+msgid "Remove ways along with previous way"
+msgstr "Remover linhas ao longo da linha anterior"
 
 msgid "Roundabout round"
 msgstr "Rotunda circular"
-
-msgid ""
-"Route relations have incomplete members.\n"
-"They need to be downloaded to proceed with validation.\n"
-"Do you want to download them?"
-msgstr ""
-"As relações de rotas têm membros incompletos.\n"
-"Eles têm de ser descarregados para continuar com a validação.\n"
-"Quer descarregá-los?"
 
 msgid "Routing Helper"
 msgstr "Assistente de Roteamento"
@@ -305,20 +430,49 @@ msgstr "Assistente de Roteamento"
 msgid "Save"
 msgstr "Gravar"
 
+msgid "Set from tag?"
+msgstr "Definir da etiqueta?"
+
+msgid "Set to tag?"
+msgstr "Definir na etiqueta?"
+
+msgid "Set up PT Assistant for more convenient use"
+msgstr ""
+"Configurar o Assistente de Transportes Públicos para uma utilização mais "
+"conveniente"
+
 msgid "Share taxi"
 msgstr "Táxi coletivo"
 
 msgid "Shelter"
 msgstr "Abrigo Social"
 
+msgid "Skip"
+msgstr "Ignorar"
+
+msgid "Sort PT Route Members"
+msgstr "Ordenar membros da rota de TP"
+
+msgid "Sort PT Route Members Relation Editor"
+msgstr "Ordenar membros da rota de TP no editos de relações"
+
+msgid "Split Roundabout"
+msgstr "Dividir rotunda"
+
 msgid "Split way"
 msgstr "Separar linha"
 
+msgid "Stop area tag assign"
+msgstr "Parar de atribuir etiqueta de área"
+
+msgid "Stop customizing"
+msgstr "Parar de personalizar"
+
+msgid "This is not a PT v2 relation"
+msgstr "Isto não é uma relação TP v2"
+
 msgid "Toggle direction arrows"
 msgstr "Inverter setas de direção"
-
-msgid "Tool: {0}"
-msgstr "Ferramenta: {0}"
 
 msgid "Tram"
 msgstr "Elétrico"
@@ -331,6 +485,9 @@ msgstr ""
 "Digite a letra para selecionar a variante de correção ou pressione a tecla "
 "Escape para não corrigir"
 
+msgid "Unable to connect to {0}"
+msgstr "Não é possível conectar a {0}"
+
 msgid "Updating map ..."
 msgstr "A atualizar o mapa ..."
 
@@ -342,18 +499,11 @@ msgstr ""
 "Aviso: as variantes de correção mostradas são baseadas em critérios menos "
 "rigorosos"
 
+msgid "What do you want the segment to be?"
+msgstr "Como quer que o segmento seja?"
+
 msgid "Yes"
 msgstr "Sim"
 
-msgid "suggested value : "
-msgstr "valor sugerido : "
-
-msgid "{0} direction error"
-msgid_plural "{0} direction errors"
-msgstr[0] "{0} erro de direção"
-msgstr[1] "{0} erros de direção"
-
-msgid "{0} road type error"
-msgid_plural "{0} road type errors"
-msgstr[0] "{0} erro de tipo de estrada"
-msgstr[1] "{0} erros de tipo de estrada"
+msgid "solutions based on other route relations"
+msgstr "soluções baseadas em outras relações de rotas"

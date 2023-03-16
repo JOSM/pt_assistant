@@ -1,27 +1,82 @@
 # Translations for the JOSM plugin 'pt_assistant' (es)
-# Copyright (C) 2018
+# Copyright (C) 2022
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR, YEAR.
 #
+# Translators:
+# Rodrigo, 2018
+# Florian Schäfer, 2018
+# Simon Legner, 2019
+# kaze kaze, 2019
+# Jorge Sanz, 2020
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
+"Project-Id-Version: josm-plugin_pt_assistant 2.1.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
 "Language-Team: Spanish (https://www.transifex.com/josm/teams/2544/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+
+msgid " "
+msgstr " "
+
+msgid ""
+"''from'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+"La etiqueta ''from'' no esta establecida. ¿Poner\n"
+"{0} ?"
+
+msgid ""
+"''from''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+"''from''={0}.\n"
+"¿En lugar de \n"
+"''{1}''\n"
+" ?"
+
+msgid ""
+"''to'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+"La etiqueta ''to'' no esta establecida. ¿Poner\n"
+"{0} ?"
+
+msgid ""
+"''to''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+"''to''={0}.\n"
+"¿En lugar de \n"
+"''{1}''\n"
+" ?"
 
 msgid "A valid public_transport:version=2 route is required"
 msgstr "Se requiere una ruta valida public_transport:version=2"
 
+msgid "Add oneway:bicycle=no to way"
+msgstr "Agregar oneway:bicycle=no to way"
+
+msgid "Add oneway:bus=no to way"
+msgstr "Añadir oneway:bus a la vía"
+
 msgid "Add public_transport=stop_position + mode of transport on these nodes"
 msgstr ""
 "Añadir public_transport=stop_position + modos de transporte en estos nodos"
+
+msgid "Add stop position"
+msgstr "Añadir posición de parada"
 
 msgid "Always split ways, even if they are not at the end of the itinerary"
 msgstr "Siembre separar vías, aunque no estén al final del itinerario"
@@ -35,6 +90,9 @@ msgstr "Área alrededor de la vía"
 msgid "Area before removal"
 msgstr "Área antes de eliminación"
 
+msgid "Assign transport type to platform"
+msgstr "Asignar tipo de transporte a plataforma"
+
 msgid "Bench"
 msgstr "Banco"
 
@@ -44,8 +102,29 @@ msgstr "Pruebas de rutas pedestres y bicisendas"
 msgid "Bus"
 msgstr "Autobús"
 
+msgid "Bus station"
+msgstr "Estación de autobús"
+
 msgid "Cancel"
 msgstr "Cancelar"
+
+msgid "Change from tag?"
+msgstr "¿Cambiar la etiqueta de from?"
+
+msgid "Change name tag?"
+msgstr "¿Cambiar la etiqueta de nombre?"
+
+msgid ""
+"Change name to\n"
+"''{0}''\n"
+"?"
+msgstr ""
+"Cambiar nombre a\n"
+"''{0}''\n"
+"?"
+
+msgid "Change to tag?"
+msgstr "¿Cambiar la etiqueta?"
 
 msgid ""
 "Check if route relations are compatible with public transport version 2"
@@ -53,20 +132,46 @@ msgstr ""
 "Comprobar si las relaciones de ruta son compatibles con la versión 2 del "
 "transporte público"
 
+msgid "City transport"
+msgstr "Transporte urbano"
+
 msgid "Close"
 msgstr "Cerrar"
 
+msgid "Close the options"
+msgstr "Cerrar las opciones"
+
+msgid "Commuter"
+msgstr "Cercanias"
+
+msgid "Cover"
+msgstr "Cubierto"
+
+msgid "Create ''route'' relation for opposite direction of travel?"
+msgstr "¿Crear una relación de \"ruta\" para la dirección opuesta?"
+
+msgid "Create ''route_master'' relation and add these route relations to it?"
+msgstr ""
+"¿Crear una relación ''route_master'' y agregarle estas relaciones de ruta?"
+
+msgid "Create a route_master?"
+msgstr "¿Crear route_master?"
+
+msgid "Customize stop"
+msgstr "Personalizar parada"
+
+msgid "Customize stop under osm public transit standard v2"
+msgstr "Personalizar parada usando estándar osm de transporte público v2"
+
 msgid "Displays stops of selected public transport routes as graph"
 msgstr ""
-"Muestra las paradas de rutas de transporte público seleccionadas como "
-"gráfico"
+"Muestra las parada de rutas de transporte público seleccionadas como gráfico"
 
 msgid "Distance between stops"
 msgstr "Distancia entre paradas"
 
-msgid "Do you want to download referrers of platforms and stop positions?"
-msgstr ""
-"¿Desea descargar las referentes de plataformas y posiciones de paradas?"
+msgid "Do not remove ways"
+msgstr "No eliminar vías"
 
 msgid "Do you want to make the roundabout round?"
 msgstr "¿Desea hacer redonda la rotonda?"
@@ -92,8 +197,11 @@ msgstr ""
 
 msgid "Don’t compare name of last stop with to tag in route relation"
 msgstr ""
-"No compare el nombre de la primera parada con la etiqueta A en la relación "
-"de ruta"
+"No compare el nombre de la última parada con la etiqueta A en la relación de"
+" ruta"
+
+msgid "Double Split"
+msgstr "Doble división"
 
 msgid "Download finished: {0}"
 msgstr "Descarga finalizada: {0}"
@@ -112,8 +220,24 @@ msgstr ""
 "Descargando miembros de la relación incompletos. Por favor espere hasta que "
 "la descarga termine."
 
+msgid "Edge Selection"
+msgstr "Selección de borde"
+
 msgid "Entire area"
 msgstr "Área completa"
+
+msgid "Error in roundabout"
+msgstr "Error en rotonda"
+
+msgid ""
+"Error: The paths connecting the roundabout in the relation do not allow "
+"bicycles."
+msgstr ""
+"Error: Los caminos que conectan la rotonda en la relación no permiten "
+"bicicletas."
+
+msgid "Esc"
+msgstr "Esc"
 
 msgid "Extract node from line"
 msgstr "Extraer el nodo de la línea"
@@ -121,22 +245,31 @@ msgstr "Extraer el nodo de la línea"
 msgid "Extract platform node"
 msgstr "Extraer nodo de plataforma"
 
+msgid "ExtractPlatformNodeAction"
+msgstr "ExtraerAcciónNodoPlataforma"
+
 msgid "Extracts platform node from a node"
 msgstr "Extraer nodo de plataforma de un nodo"
 
 msgid "Fix error"
-msgstr "Arreglar error"
+msgstr "Corregir error"
 
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Corrigiendo ({0}/{1}): ''{2}''"
+
+msgid "Fixing errors …"
+msgstr "Corrigiendo errores..."
 
 msgid "Here you can change some preferences of PTAssistant functions"
 msgstr ""
 "Aquí puede cambiar algunas de las preferencias de las funciones de "
 "PTAssistant"
 
-msgid "How do you want to proceed?"
-msgstr "¿Cómo desea proceder?"
+msgid "High speed"
+msgstr "Alta velocidad"
+
+msgid "How would you want the download to take place?"
+msgstr "¿Cómo quieres que se realice la descarga?"
 
 msgid "Include stop_area tests"
 msgstr "Incluir análisis de stop_area"
@@ -150,12 +283,22 @@ msgstr "Relaciones incompletas"
 msgid "Invalid selection"
 msgstr "Selección no válida"
 
+msgid "Long distance"
+msgstr "Larga distancia"
+
 msgid ""
 "Mode of Travel -> {0} \n"
 " total ways selected -> {1}"
 msgstr ""
 "Modo de Viaje -> {0}\n"
 " total de vías seleccionadas -> {1}"
+
+msgid ""
+"Mode of Travel: {0} \n"
+" total ways selected: {1}"
+msgstr ""
+"Modo de Viaje: {0}\n"
+" total de vías seleccionadas: {1}"
 
 msgid "Mode: {0}"
 msgstr "Modo: {0}"
@@ -167,17 +310,30 @@ msgstr "NA"
 msgid "Name"
 msgstr "Nombre"
 
+#. i18n: label for the tag name:en=*
+msgid "Name (en.)"
+msgstr "Nombre (en.)"
+
 msgid "Network"
 msgstr "Red"
 
+msgid "Network level"
+msgstr "Red level"
+
 msgid "No"
 msgstr "No"
+
+msgid "Not all members are downloaded"
+msgstr "No todos los miembros son descargados"
 
 msgid "Ok"
 msgstr "Aceptar"
 
 msgid "Operator"
 msgstr "Operador"
+
+msgid "Opposite itinerary?"
+msgstr "¿Itinerario opuesto?"
 
 msgid "PT Wizard"
 msgstr "Asistente PT"
@@ -292,20 +448,8 @@ msgstr "PT: advertencia de ensayo simulado"
 msgid "PTAssistantPlugin settings"
 msgstr "Preferencias de PTAssistantPlugin"
 
-msgid "PT_Assistant Fetch Request"
-msgstr "Asistente PT de petición de recuperación"
-
 msgid "PT_Assistant Message"
 msgstr "Mensaje de PT_Assistant"
-
-#. showDialog(); FIXME
-msgid "PT_Assistant Proceed Request"
-msgstr "PT_Assistant procedió a la solicitud"
-
-msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
-msgstr ""
-"El complemento PT_Assistant encontró que esta relación (ID = {0}) tiene "
-"errores:"
 
 msgctxt "menu"
 msgid "Public Transport"
@@ -314,8 +458,17 @@ msgstr "Transporte público"
 msgid "Public Transport Assistant tests"
 msgstr "Tests del Asistente de Transporte Público"
 
+msgid "Public Transport: {0}"
+msgstr "Transporte público: {0}"
+
 msgid "Public transport routes"
 msgstr "Rutas de transporte público"
+
+msgid "Railway station"
+msgstr "Estación de ferrocarril"
+
+msgid "Railway stop"
+msgstr "Parada de ferrocarril"
 
 msgid ""
 "Refs of the routes do not match with the route_ref tag of the primitive"
@@ -323,14 +476,33 @@ msgstr ""
 "Referencias de las rutas no concuerdan con la etiqueta route_ref de la "
 "primitiva"
 
-msgid "Remember my choice and do not ask me again in this session"
-msgstr "Recordar mi elección y no volver a preguntar en esta sesión"
+msgid "Regional"
+msgstr "Regional"
+
+msgid "Remove current edge (white)"
+msgstr "Quitar borde actual (blanco)"
+
+msgid "Remove oneway and split roundabout ways?"
+msgstr "¿Remover oneway y cortar las vías de la rotonda?"
+
+msgid ""
+"Remove public_transport=platform from platform WAYS when transferring "
+"details to platform NODE."
+msgstr ""
+"Eliminar public_transport=platform de las WAYS de plataforma cuando se están"
+" transfiriendo detalles al NODE de la plataforma."
 
 msgid "Remove public_transport=platform from platform ways"
-msgstr "Quitar public_transport=platform de las vías de plataforma"
+msgstr "Eliminar public_transport=platform de las vías de plataforma"
 
-msgid "Repeat last fix"
-msgstr "Repetir la última corrección"
+msgid "Remove roundabout from relations"
+msgstr "Eliminar rotonda de las relaciones"
+
+msgid "Remove ways"
+msgstr "Eliminar vías"
+
+msgid "Remove ways along with previous way"
+msgstr "Eliminar vías junta con vía anterior"
 
 msgid "Replace Membership"
 msgstr "Reemplazar Miembros"
@@ -344,20 +516,17 @@ msgstr ""
 msgid "Roundabout round"
 msgstr "Rotonda redonda"
 
-msgid ""
-"Route relations have incomplete members.\n"
-"They need to be downloaded to proceed with validation.\n"
-"Do you want to download them?"
-msgstr ""
-"Las relaciones de ruta tienen miembros incompletos.\n"
-"Necesitan ser descargados para proceder a la validación.\n"
-"¿Desea descargarlas?"
-
 msgid "Routing Helper"
 msgstr "Ayudante de Ruteo"
 
 msgid "Save"
 msgstr "Guardar"
+
+msgid "Set from tag?"
+msgstr "¿Establecer etiqueta from?"
+
+msgid "Set to tag?"
+msgstr "¿Establecer etiqueta to?"
 
 msgid "Set up PT Assistant for more convenient use"
 msgstr "Configure el Asistente PT para uso más conveniente"
@@ -370,8 +539,40 @@ msgstr ""
 "Albergue temporal (para colectivos en situación de exclusión, riesgo o "
 "desastre)"
 
+msgid "Shortcut action to Transfer details of stop to platform node"
+msgstr ""
+"Atajo directo para Transferir detalles de la parada al nodo de la plataforma"
+
+msgid "Skip"
+msgstr "Omitir"
+
+msgid "Sort PT Route Members"
+msgstr "Ordenar los Miembros de la Ruta PT"
+
+msgid "Sort PT Route Members Relation Editor"
+msgstr "Ordenar los Miembros de la Ruta PT en Editor de Relaciones"
+
+msgid "Split Roundabout"
+msgstr "Dividir rotonda"
+
 msgid "Split way"
 msgstr "Dividir la vía"
+
+msgid "Split white edge"
+msgstr "Separar el borde blanco"
+
+msgid "Stop area tag assign"
+msgstr "Asignar etiquetas de Area de detección"
+
+msgid "Stop customizing"
+msgstr "Personalizar punto de derección"
+
+msgid ""
+"The relation has incomplete members.\n"
+"Do you want to download them and continue with the sorting?"
+msgstr ""
+"La relación tiene miembros incompletos. \n"
+"¿Desea descargarlos y continuar con la clasificación?"
 
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
@@ -380,21 +581,79 @@ msgstr ""
 "La relación tiene miembros incompletos. ¿Desea descargarlos y continuar con "
 "la clasificación?"
 
+msgid ""
+"The roundabout is not directly connected to either of the previous or next "
+"way in the relation"
+msgstr ""
+"La rotonda no está directamente conectada a la vía anterior o siguiente en "
+"la relación"
+
 msgid "The selected node is not a stop position for public transport!"
 msgstr ""
 "¡El nodo seleccionado no es una posición de parada para transporte público!"
 
+msgid ""
+"This action can only be performed if exactly one stop position node is "
+"selected."
+msgstr ""
+"Esta acción solo se puede realizar si se selecciona exactamente un nodo de "
+"posición de parada."
+
 msgid "This action requires single node to be selected."
 msgstr "Esta acción requiere un solo nodo a ser seleccionado."
+
+msgid "This is not a PT v2 relation"
+msgstr "Esto no es una relación PT v2"
+
+msgid ""
+"This relation is not PT version 2. Sorting its stops wouldn't make sense.\n"
+"\n"
+"Would you like to set ''public_transport:version=2''?\n"
+"\n"
+"There will still be some extra work needed,\n"
+"\n"
+"but PT_Assistant can help prepare the \n"
+"''route'' and ''route_master'' relations."
+msgstr ""
+"Esta relación no es PT version 2. No tendría sentido ordenar sus paradas.\n"
+"¿Te gustaría convertir a ''public_transport:version=2''?\n"
+"\n"
+"Habría que realizar algún proceso extra,\n"
+"\n"
+"pero PT_Assistant puede ayudarte a crear \n"
+"las relaciones \"route\" y \"route_master\"."
+
+msgid "This stop has been removed"
+msgstr "Esta parada ha sido eliminada"
+
+msgid ""
+"To prepare for conversion to PT v2\n"
+"\n"
+"it may help to remove oneway and split roundabout ways?\n"
+"\n"
+"Would you like to do this automatically?\n"
+"\n"
+"When asked to remove stops that cannot be served,\n"
+"answer ''no'' and use the button to sort the stops\n"
+"once more after adding the ways once again\n"
+"by using the routing helper"
+msgstr ""
+"Para prepararse para la conversión a PT v2\n"
+"\n"
+"Puede ser útil eliminar las vías de sentido único y dividir las rotondas?\n"
+"\n"
+"¿Le gustaría hacer esto automáticamente?\n"
+"\n"
+"Cuando se le solicite que elimine las paradas que no se pueden servir, \n"
+"responda '' no '' y use el botón para ordenar las paradas\n"
+"una vez más después de agregar las formas, \n"
+"utiliza otra vez el asistente de enrutamiento"
 
 msgid "Toggle direction arrows"
 msgstr "Cambiar la dirección de las flechas"
 
 msgid "Toggle reference labels"
 msgstr "Cambiar las etiquetas de referencia"
-
-msgid "Tool: {0}"
-msgstr "Herramienta: {0}"
 
 msgid "Tram"
 msgstr "Tranvía"
@@ -411,6 +670,12 @@ msgid ""
 msgstr ""
 "Transferir detalles desde los nodos de posición de parada al nodo "
 "representando la parada."
+
+msgid "Transfer details of stop to platform node"
+msgstr "Transferir detalles de la parada al nodo de la plataforma"
+
+msgid "Transferring details to platform NODE."
+msgstr "Transfiriendo detalles de plataforma NODO."
 
 msgid "Trolleybus"
 msgstr "Trolebús"
@@ -443,20 +708,16 @@ msgstr "¿Qué quiere que sea el segmento?"
 msgid "Yes"
 msgstr "Si"
 
-msgid "suggested value : "
-msgstr "Valor sugerido :"
+msgid "pt_assistant layer"
+msgstr "Capa pt_assistant"
 
-msgid "{0} direction error"
-msgid_plural "{0} direction errors"
-msgstr[0] "{0} error de dirección"
-msgstr[1] "{0} errores de dirección"
+msgid "solutions based on other route relations"
+msgstr "soluciones basadas en otras relaciones de ruta"
 
-msgid "{0} road type error"
-msgid_plural "{0} road type errors"
-msgstr[0] "{0} error en el tipo de carretera"
-msgstr[1] "{0} errores en el tipo de carretera"
+msgid "turn-by-turn at next intersection"
+msgstr "giro-a-giro en la siguiente intersección"
 
-#. Plugin description for pt_assistant
+#. Plugin description for project ':pt_assistant'.name
 msgid ""
 "Provides validation and fixing for public transport route according to "
 "version 2 of the public transport schema"
