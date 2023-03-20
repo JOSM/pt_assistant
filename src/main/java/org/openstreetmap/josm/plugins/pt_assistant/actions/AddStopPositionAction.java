@@ -86,8 +86,6 @@ public class AddStopPositionAction extends MapMode {
 
     @Override
     public void enterMode() {
-        if (!isEnabled())
-            return;
         super.enterMode();
         MainApplication.getMap().mapView.addMouseListener(this);
         MainApplication.getMap().mapView.addMouseMotionListener(this);

@@ -115,8 +115,6 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
     @Override
     public void enterMode() {
-        if (!isEnabled())
-            return;
         super.enterMode();
         MainApplication.getMap().mapView.addMouseListener(this);
         MainApplication.getMap().mapView.addMouseMotionListener(this);
