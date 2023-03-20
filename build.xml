@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="pt_assistant" default="dist" basedir=".">
   <property name="plugin.src.dir" value="src/main/java"/>
+  <property name="plugin.resources.dir" value="src/main/resources/"/>
+  <property name="plugin.po.dir" value="src/main/po"/>
+  <property name="i18n.dir" value="../../i18n"/>
+  <property name="po.dir" value="data"/>
+  <property name="po.build.dir" value="${po.dir}/build"/>
+  <property name="gettext.keywords" value="-k -ktrc:1c,2 -kmarktrc:1c,2 -ktr -kmarktr -ktrn:1,2 -ktrnc:1c,2,3"/>
+  <property name="gettexttasks.jar" value="${i18n.dir}/lib/gettext-ant-tasks-0.9.7.jar"/>
 
   <!-- edit the properties of this plugin in the file `gradle.properties` -->
   <property file="${basedir}/gradle.properties"/>
@@ -11,14 +18,30 @@
   <!-- Override the `setup-dist-default` task from build-common.xml -->
   <target name="setup-dist-default">
     <copy todir="${plugin.build.dir}" failonerror="no" includeemptydirs="no">
-      <fileset dir="src/main/resources"/>
+      <fileset dir="${plugin.resources.dir}"/>
     </copy>
     <copy todir="${plugin.build.dir}">
       <fileset dir=".">
-        <include name="README"/>
         <include name="LICENSE*"/>
-        <include name="*GPL*"/>
+        <include name="README.md"/>
       </fileset>
     </copy>
+  </target>
+
+  <!-- Call to convert po files to lang files -->
+  <target name="plugintrans">
+    <taskdef name="gettext-extract" classname="org.xnap.commons.ant.gettext.GettextExtractKeysTask" classpath="${gettexttasks.jar}"/>
+    <echo message="Run plugintrans target for plugin ${ant.project.name}" level="info"/>
+    <mkdir dir="${po.build.dir}"/>
+    <exec executable="perl" failonerror="true" output="${po.build.dir}/trans_plugin.java">
+      <arg line="${i18n.dir}/convplugins.pl build.xml"/>
+    </exec>
+    <gettext-extract keysFile="josm.pot" poDirectory="${po.build.dir}" keywords="${gettext.keywords}">
+      <fileset dir="${plugin.src.dir}" includes="**/*.java"/>
+    </gettext-extract>
+    <exec executable="perl" failonerror="true">
+      <arg line="${i18n.dir}/i18n.pl --potfile=${po.build.dir}/josm.pot --basedir=${po.dir} ${plugin.po.dir}/*.po"/>
+    </exec>
+    <delete dir="${po.build.dir}"/>
   </target>
 </project>
