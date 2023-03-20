@@ -115,8 +115,6 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
     @Override
     public void enterMode() {
-        if (!isEnabled())
-            return;
         super.enterMode();
         MainApplication.getMap().mapView.addMouseListener(this);
         MainApplication.getMap().mapView.addMouseMotionListener(this);
@@ -703,7 +701,9 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
             osm.setHighlighted(true);
         }
 
-        MainApplication.getLayerManager().getEditLayer().invalidate();
+        if (MainApplication.getLayerManager().getEditLayer() != null) {
+            MainApplication.getLayerManager().getEditLayer().invalidate();
+        }
 
         assert oldHighlights != null;
         oldHighlights.clear();
@@ -713,12 +713,11 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        System.out.println("keyTyped");
+        // Do nothing
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        System.out.println("keyPressed");
         boolean z = e.getKeyCode() == KeyEvent.VK_Z;
         updateKeyModifiers(e);
         if (z) {
@@ -732,7 +731,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        System.out.println("keyReleased");
+        // Do nothing
     }
 
     // A dialogBox to query whether to select bus_bay, tunnel or bridge.

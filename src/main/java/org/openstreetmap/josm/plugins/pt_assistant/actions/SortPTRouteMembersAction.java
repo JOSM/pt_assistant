@@ -137,7 +137,7 @@ public class SortPTRouteMembersAction extends AbstractRelationEditorAction {
                 DialogUtils.showYesNoQuestion(
                     MainApplication.getMainFrame(),
                     tr("This is not a PT v2 relation"),
-                    tr("This relation is not PT version 2. Sorting its stops wouldn't make sense.\n\n"
+                    tr("This relation is not PT version 2. Sorting its stops wouldn''t make sense.\n\n"
                             + "Would you like to set ''public_transport:version=2''?\n\n"
                             + "There will still be some extra work needed,\n\n"
                             + "but PT_Assistant can help prepare the \n" +
