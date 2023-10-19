@@ -673,6 +673,7 @@ public class SegmentChecker extends Checker {
      * marked as not fixable.
      * @param builder error builder
      */
+    @SuppressWarnings("CollectionIncompatibleType") // This is a false positive from error_prone 2.22
     private void findFix(TestError.Builder builder) {
 
         PTRouteSegment wrongSegment = wrongSegmentBuilders.get(builder);
