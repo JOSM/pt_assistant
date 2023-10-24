@@ -10,8 +10,6 @@ on:
     branches:
       - master
       - $default-branch
-  schedule:
-  - cron: "6 9 * * 0"
   workflow_dispatch:
 
 jobs:
@@ -19,7 +17,7 @@ jobs:
     strategy:
       matrix:
         josm-revision: ["", "r17903"]
-    uses: JOSM/JOSMPluginAction/.github/workflows/ant.yml@v1
+    uses: JOSM/JOSMPluginAction/.github/workflows/ant.yml@v2
     with:
       josm-revision: ${{ matrix.josm-revision }}
       perform-revision-tagging: ${{ github.repository == 'JOSM/pt_assistant' && github.ref_type == 'branch' && github.ref_name == 'master' && github.event_name != 'schedule' && github.event_name != 'pull_request' && matrix.josm-revision == 'r17903' }}
