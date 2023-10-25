@@ -14,7 +14,7 @@ public class NearestWaySegment {
     /**
      * Square of distance
      */
-    public Double distanceSq = 1000000000.0;
+    public double distanceSq;
     /**
      * Way segment
      */
@@ -31,7 +31,7 @@ public class NearestWaySegment {
      * @param waySegment Way segment
      * @param newNode Node
      */
-    public NearestWaySegment(Double distanceSq, IWaySegment<Node, Way> waySegment, Node newNode) {
+    public NearestWaySegment(double distanceSq, IWaySegment<Node, Way> waySegment, Node newNode) {
         this.distanceSq = distanceSq;
         this.waySegment = waySegment;
         this.newNode = newNode;

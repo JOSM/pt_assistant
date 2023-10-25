@@ -22,15 +22,15 @@ public abstract class StopAreaOperationBase implements IStopAreaCustomizer {
     /**
      * Current dataset of Josm
      */
-    private final DataSet _CurrentDataSet;
+    private final DataSet currentDataSet;
 
     /**
      * Constructor of operation of customizing of stop area
      *
      * @param currentDataSet Current data set of JOSM
      */
-    public StopAreaOperationBase(DataSet currentDataSet) {
-        _CurrentDataSet = currentDataSet;
+    protected StopAreaOperationBase(DataSet currentDataSet) {
+        this.currentDataSet = currentDataSet;
     }
 
     /**
@@ -39,7 +39,7 @@ public abstract class StopAreaOperationBase implements IStopAreaCustomizer {
      * @return Current dataset of Josm
      */
     protected DataSet getCurrentDataSet() {
-        return _CurrentDataSet;
+        return currentDataSet;
     }
 
     /**
@@ -88,7 +88,7 @@ public abstract class StopAreaOperationBase implements IStopAreaCustomizer {
      */
     public static List<Command> assignTag(List<Command> commands, OsmPrimitive target, String tag, String tagValue) {
         if (commands == null)
-            commands = new ArrayList<Command>();
+            commands = new ArrayList<>();
         commands.add(new ChangePropertyCommand(target, tag, tagValue));
         return commands;
     }

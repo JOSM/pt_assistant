@@ -6,13 +6,14 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,6 +67,9 @@ import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.tools.Logging;
 import org.openstreetmap.josm.tools.Pair;
 import org.openstreetmap.josm.tools.RightAndLefthandTraffic;
+import org.openstreetmap.josm.tools.Shortcut;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * The DoubleSplitAction is a mapmode that allows users to add a bus_bay,a
@@ -74,15 +78,27 @@ import org.openstreetmap.josm.tools.RightAndLefthandTraffic;
  * @author Biswesh
  */
 public class DoubleSplitAction extends MapMode implements KeyListener {
+    private static final String BOTH = "both";
+    private static final String BRIDGE = "bridge";
+    private static final String BUILDING_PASSAGE = "building_passage";
+    private static final String BUS_BAY = "bus_bay";
+    private static final String CULVERT = "culvert";
+    private static final String LEFT = "left";
+    private static final String RIGHT = "right";
+    private static final String TRAFFIC_CALMING = "traffic_calming";
+    private static final String TUNNEL = "tunnel";
+    private static final String WATERWAY = "waterway";
+    private static final String LAYER = "layer";
+    private static final String TABLE = "table";
 
     private final transient Set<OsmPrimitive> newHighlights = new HashSet<>();
     private final transient Set<OsmPrimitive> oldHighlights = new HashSet<>();
     private final List<Node> atNodes = new ArrayList<>();
-    private final DoubleSplitLayer temporaryLayer = new DoubleSplitLayer();
-    ILatLon Pos1 = null;
-    ILatLon Pos2 = null;
-    Way SegWay1 = null;
-    Way SegWay2 = null;
+    private final transient DoubleSplitLayer temporaryLayer = new DoubleSplitLayer();
+    ILatLon Pos1;
+    ILatLon Pos2;
+    Way SegWay1;
+    Way SegWay2;
     Way affected;
     Way previousAffectedWay;
 
@@ -93,10 +109,11 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
      * Creates a new DoubleSplitAction
      */
     public DoubleSplitAction() {
-        super(tr("Double Split"), "double_split", tr("Double Split"), null, getCursor());
+        super(tr("Double Split"), "double_split", tr("Double Split"),
+            Shortcut.registerShortcut("pt_assistant:double_split", tr("PT Assistant: Double Split"),
+                KeyEvent.CHAR_UNDEFINED, Shortcut.NONE), getCursor());
         cursorJoinNode = ImageProvider.getCursor("crosshair", "joinnode");
         cursorJoinWay = ImageProvider.getCursor("crosshair", "joinway");
-
     }
 
     private static Cursor getCursor() {
@@ -157,12 +174,10 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
         try {
             for (Way way : atNodes.get(0).getParentWays()) {
-                if (atNodes.get(1).getParentWays().contains(way)) {
-                    if (way.isFirstLastNode(atNodes.get(0)) && way.isFirstLastNode(atNodes.get(1))) {
-                        newHighlights.add(way);
-                        dialogBox(SelectFromOptionDialog.TYPE_NODES_ARE_ENDS_OF_SAME_WAY, null, way, way, commandList);
-                        return true;
-                    }
+                if (atNodes.get(1).getParentWays().contains(way) && way.isFirstLastNode(atNodes.get(0)) && way.isFirstLastNode(atNodes.get(1))) {
+                    newHighlights.add(way);
+                    dialogBox(SelectFromOptionDialog.TYPE_NODES_ARE_ENDS_OF_SAME_WAY, null, way, way, commandList);
+                    return true;
                 }
             }
         } catch (Exception e) {
@@ -203,28 +218,15 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
         // check if the user has selected an existing node, or a new one
         Point curP1 = MainApplication.getMap().mapView.getPoint(Pos1);
-        ILatLon P1 = new LatLon(curP1.getX(), curP1.getY());
-        Node node1 = createNode(P1, commandList);
-        if (node1 == null) {
-            resetLayer();
-            reset();
-            return;
-        }
+        ILatLon p1 = new LatLon(curP1.getX(), curP1.getY());
+        Node node1 = createNode(p1, commandList);
 
         Point curP2 = MainApplication.getMap().mapView.getPoint(Pos2);
-        ILatLon P2 = new LatLon(curP2.getX(), curP2.getY());
-        Node node2 = createNode(P2, commandList);
-        if (node2 == null) {
-            node1.setDeleted(true);
-            Pos2 = null;
-            SegWay2 = null;
-            reset();
-            return;
-        }
+        ILatLon p2 = new LatLon(curP2.getX(), curP2.getY());
+        Node node2 = createNode(p2, commandList);
 
         if (node1.equals(node2)) {
             resetLayer();
-            System.out.println("same");
             return;
         }
 
@@ -294,17 +296,18 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
     }
 
     // create a node in the position that the user has marked
-    private Node createNode(ILatLon Pos, List<Command> commandList) {
+    @Nonnull
+    private Node createNode(ILatLon pos, List<Command> commandList) {
         boolean newNode = false;
         Node newStopPos;
 
         Point p = new Point();
-        p.setLocation(Pos.lat(), Pos.lon());
+        p.setLocation(pos.lat(), pos.lon());
 
         Node n = MainApplication.getMap().mapView.getNearestNode(p, OsmPrimitive::isUsable);
         if (n == null) {
             newNode = true;
-            newStopPos = new Node(MainApplication.getMap().mapView.getLatLon(Pos.lat(), Pos.lon()));
+            newStopPos = new Node(MainApplication.getMap().mapView.getLatLon(pos.lat(), pos.lon()));
         } else {
             newStopPos = new Node(n);
         }
@@ -414,7 +417,8 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
         final List<Relation> referrers2 = WayUtils.findPTRouteParents(affected);
         final Map<Relation, List<Integer>> indices2 = PrimitiveUtils.findIndicesOfPrimitiveInRelations(affected, referrers2);
 
-        Way way1 = null, way2 = null;
+        Way way1 = null;
+        Way way2 = null;
 
         // Find middle way which is a part of both the ways, so find the 2 ways which
         // together would form middle way
@@ -482,19 +486,17 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
     }
 
     // check if a way is present in a relation, if not then add it
-    private void checkMembership(Way way, List<Relation> referrers, Map<Relation, List<Integer>> Index) {
+    private static void checkMembership(Way way, List<Relation> referrers, Map<Relation, List<Integer>> index) {
         for (Relation r : referrers) {
             boolean isMember = false;
             for (RelationMember rm : r.getMembers()) {
-                if (rm.getType() == OsmPrimitiveType.WAY) {
-                    if (rm.getWay().equals(way)) {
-                        isMember = true;
-                    }
+                if (rm.getType() == OsmPrimitiveType.WAY && rm.getWay().equals(way)) {
+                    isMember = true;
                 }
             }
             if (!isMember) {
-                for (int i = 0; i < Index.get(r).size(); i++) {
-                    r.addMember(Index.get(r).get(i), new RelationMember("", way));
+                for (int i = 0; i < index.get(r).size(); i++) {
+                    r.addMember(index.get(r).get(i), new RelationMember("", way));
                 }
             }
         }
@@ -509,20 +511,20 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
         TagMap newKeys1 = affectedKeysList.get(0);
         String prevValue = null;
 
-        if (keys.getSelectedItem() == "bridge") {
+        if (BRIDGE.equals(keys.getSelectedItem())) {
             newKeys1.put(keys.getSelectedItem().toString(), Objects.requireNonNull(values.getSelectedItem()).toString());
-            newKeys1.put("layer", "1");
-        } else if (keys.getSelectedItem() == "tunnel") {
+            newKeys1.put(LAYER, "1");
+        } else if (TUNNEL.equals(keys.getSelectedItem())) {
             newKeys1.put(keys.getSelectedItem().toString(), Objects.requireNonNull(values.getSelectedItem()).toString());
-            if (!values.getSelectedItem().toString().equals("building_passage"))
-                newKeys1.put("layer", "-1");
-        } else if (keys.getSelectedItem() == "traffic_calming") {
+            if (!values.getSelectedItem().toString().equals(BUILDING_PASSAGE))
+                newKeys1.put(LAYER, "-1");
+        } else if (keys.getSelectedItem() == TRAFFIC_CALMING) {
             newKeys1.put(keys.getSelectedItem().toString(), Objects.requireNonNull(values.getSelectedItem()).toString());
             newKeys1.put("maxspeed", "30");
         } else if (keys.getSelectedItem() != "none") {
-            if (newKeys1.containsKey("bus_bay")) {
-                prevValue = newKeys1.get("bus_bay");
-                newKeys1.put(Objects.requireNonNull(keys.getSelectedItem()).toString(), "both");
+            if (newKeys1.containsKey(BUS_BAY)) {
+                prevValue = newKeys1.get(BUS_BAY);
+                newKeys1.put(Objects.requireNonNull(keys.getSelectedItem()).toString(), BOTH);
             } else {
                 newKeys1.put(Objects.requireNonNull(keys.getSelectedItem()).toString(),
                     Objects.requireNonNull(values.getSelectedItem()).toString());
@@ -532,30 +534,30 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
         if (affectedKeysList.size() == 2) {
             TagMap newKeys2 = affectedKeysList.get(1);
 
-            if (keys.getSelectedItem() == "bridge") {
+            if (keys.getSelectedItem() == BRIDGE) {
                 newKeys2.put(keys.getSelectedItem().toString(), Objects.requireNonNull(values.getSelectedItem()).toString());
-                newKeys2.put("layer", "1");
-            } else if (keys.getSelectedItem() == "tunnel") {
+                newKeys2.put(LAYER, "1");
+            } else if (keys.getSelectedItem() == TUNNEL) {
                 newKeys2.put(keys.getSelectedItem().toString(), Objects.requireNonNull(values.getSelectedItem()).toString());
-                if (!values.getSelectedItem().toString().equals("building_passage"))
-                    newKeys2.put("layer", "-1");
-            } else if (keys.getSelectedItem() == "traffic_calming") {
+                if (!values.getSelectedItem().toString().equals(BUILDING_PASSAGE))
+                    newKeys2.put(LAYER, "-1");
+            } else if (keys.getSelectedItem() == TRAFFIC_CALMING) {
                 newKeys2.put(keys.getSelectedItem().toString(), Objects.requireNonNull(values.getSelectedItem()).toString());
                 newKeys2.put("maxspeed", "30");
             } else if (keys.getSelectedItem() != "none") {
-                if (newKeys2.containsKey("bus_bay")) {
-                    prevValue = newKeys2.get("bus_bay");
-                    newKeys2.put(keys.getSelectedItem().toString(), "both");
-                    if (Objects.equals(values.getSelectedItem(), "left") && prevValue.equals("left"))
-                        newKeys1.put("bus_bay", "right");
-                    else if (Objects.equals(values.getSelectedItem(), "right") && prevValue.equals("right"))
-                        newKeys1.put("bus_bay", "left");
+                if (newKeys2.containsKey(BUS_BAY)) {
+                    prevValue = newKeys2.get(BUS_BAY);
+                    newKeys2.put(keys.getSelectedItem().toString(), BOTH);
+                    if (Objects.equals(values.getSelectedItem(), LEFT) && prevValue.equals(LEFT))
+                        newKeys1.put(BUS_BAY, RIGHT);
+                    else if (Objects.equals(values.getSelectedItem(), RIGHT) && prevValue.equals(RIGHT))
+                        newKeys1.put(BUS_BAY, LEFT);
                 } else {
-                    if (newKeys1.get("bus_bay").equals("both")) {
-                        if (Objects.equals(values.getSelectedItem(), "left") && Objects.equals(prevValue, "left"))
-                            newKeys2.put("bus_bay", "right");
-                        else if (Objects.equals(values.getSelectedItem(), "right") && Objects.equals(prevValue, "right"))
-                            newKeys2.put("bus_bay", "left");
+                    if (newKeys1.get(BUS_BAY).equals(BOTH)) {
+                        if (Objects.equals(values.getSelectedItem(), LEFT) && Objects.equals(prevValue, LEFT))
+                            newKeys2.put(BUS_BAY, RIGHT);
+                        else if (Objects.equals(values.getSelectedItem(), RIGHT) && Objects.equals(prevValue, RIGHT))
+                            newKeys2.put(BUS_BAY, LEFT);
                         else
                             newKeys2.put(keys.getSelectedItem().toString(), values.getSelectedItem().toString());
                     } else {
@@ -596,7 +598,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
                 if (count == 1) {
                     waysToBeRemoved.add(way);
                 } else {
-                    if (!way.hasKey("highway") && !way.hasKey("waterway") && !way.hasKey("railway")) {
+                    if (!way.hasKey("highway") && !way.hasKey(WATERWAY) && !way.hasKey("railway")) {
                         waysToBeRemoved.add(way);
                     }
                 }
@@ -713,26 +715,23 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        System.out.println("keyTyped");
+        // Do nothing
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        System.out.println("keyPressed");
         boolean z = e.getKeyCode() == KeyEvent.VK_Z;
         updateKeyModifiers(e);
-        if (z) {
-            if (Pos1 != null && Pos2 == null) {
-                Pos1 = null;
-                SegWay1 = null;
-                temporaryLayer.invalidate();
-            }
+        if (z && Pos1 != null && Pos2 == null) {
+            Pos1 = null;
+            SegWay1 = null;
+            temporaryLayer.invalidate();
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        System.out.println("keyReleased");
+        // Do nothing
     }
 
     // A dialogBox to query whether to select bus_bay, tunnel or bridge.
@@ -742,7 +741,8 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
         private static final int TYPE_NODES_ON_SAME_WAY = 2;
         private static final int TYPE_NODES_ARE_ENDS_OF_SAME_WAY = 3;
 
-        Way affected, previousAffectedWay;
+        Way affected;
+        Way previousAffectedWay;
         private final JComboBox<String> keys;
         private final JComboBox<String> values;
         private final int type;
@@ -777,7 +777,7 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
             configureContextsensitiveHelp("/Dialog/AddValue", true /* show help button */);
 
             final JPanel pane = new JPanel(new GridBagLayout());
-            pane.add(new JLabel("Select the appropriate option"), GBC.eol().fill(GBC.HORIZONTAL));
+            pane.add(new JLabel("Select the appropriate option"), GBC.eol().fill(GridBagConstraints.HORIZONTAL));
 
             keys = new JComboBox<>();
             values = new JComboBox<>();
@@ -785,18 +785,18 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
             Set<Way> newWays = new HashSet<>();
             findIntersection(newWays);
 
-            if (previousAffectedWay.hasKey("waterway") || affected.hasKey("waterway")) {
+            if (previousAffectedWay.hasKey(WATERWAY) || affected.hasKey(WATERWAY)) {
                 setOptionsWithTunnel();
-            } else if (previousAffectedWay.hasKey("bus_bay") || affected.hasKey("bus_bay")) {
+            } else if (previousAffectedWay.hasKey(BUS_BAY) || affected.hasKey(BUS_BAY)) {
                 setOptionsWithBusBay();
-            } else if (newWays.size() != 0) {
+            } else if (!newWays.isEmpty()) {
                 setOptionsWithBridge();
             } else {
                 setOptionsWithBusBay();
             }
 
-            pane.add(keys, GBC.eop().fill(GBC.HORIZONTAL));
-            pane.add(values, GBC.eop().fill(GBC.HORIZONTAL));
+            pane.add(keys, GBC.eop().fill(GridBagConstraints.HORIZONTAL));
+            pane.add(values, GBC.eop().fill(GridBagConstraints.HORIZONTAL));
 
             setContent(pane, false);
             setDefaultCloseOperation(HIDE_ON_CLOSE);
@@ -804,37 +804,37 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
         private void setOptionsWithBusBay() {
             keys.setModel(
-                    new DefaultComboBoxModel<>(new String[] {"bus_bay", "bridge", "tunnel", "traffic_calming", "none" }));
+                    new DefaultComboBoxModel<>(new String[] {BUS_BAY, BRIDGE, TUNNEL, TRAFFIC_CALMING, "none" }));
 
-            if (affected.hasTag("bus_bay", "right") || previousAffectedWay.hasTag("bus_bay", "right")) {
-                values.setModel(new DefaultComboBoxModel<>(new String[] {"left", "right", "both" }));
-            } else if (affected.hasTag("bus_bay", "left") || previousAffectedWay.hasTag("bus_bay", "left")) {
-                values.setModel(new DefaultComboBoxModel<>(new String[] {"right", "left", "both" }));
+            if (affected.hasTag(BUS_BAY, RIGHT) || previousAffectedWay.hasTag(BUS_BAY, RIGHT)) {
+                values.setModel(new DefaultComboBoxModel<>(new String[] {LEFT, RIGHT, BOTH }));
+            } else if (affected.hasTag(BUS_BAY, LEFT) || previousAffectedWay.hasTag(BUS_BAY, LEFT)) {
+                values.setModel(new DefaultComboBoxModel<>(new String[] {RIGHT, LEFT, BOTH }));
             } else if (rightHandTraffic) {
-                values.setModel(new DefaultComboBoxModel<>(new String[] {"right", "left", "both" }));
+                values.setModel(new DefaultComboBoxModel<>(new String[] {RIGHT, LEFT, BOTH }));
             } else {
-                values.setModel(new DefaultComboBoxModel<>(new String[] {"left", "right", "both" }));
+                values.setModel(new DefaultComboBoxModel<>(new String[] {LEFT, RIGHT, BOTH }));
             }
 
             // below code changes the list in values on the basis of key
             keys.addActionListener(e -> {
-                if ("bus_bay".equals(keys.getSelectedItem())) {
-                    values.setModel(new DefaultComboBoxModel<>(new String[] {"both", "right", "left" }));
+                if (BUS_BAY.equals(keys.getSelectedItem())) {
+                    values.setModel(new DefaultComboBoxModel<>(new String[] {BOTH, RIGHT, LEFT}));
                     if (rightHandTraffic)
-                        values.setModel(new DefaultComboBoxModel<>(new String[] {"right", "left", "both" }));
+                        values.setModel(new DefaultComboBoxModel<>(new String[] {RIGHT, LEFT, BOTH}));
                     else
-                        values.setModel(new DefaultComboBoxModel<>(new String[] {"left", "right", "both" }));
-                } else if ("bridge".equals(keys.getSelectedItem())) {
+                        values.setModel(new DefaultComboBoxModel<>(new String[] {LEFT, RIGHT, BOTH}));
+                } else if (BRIDGE.equals(keys.getSelectedItem())) {
                     values.setModel(new DefaultComboBoxModel<>(new String[] {"yes" }));
-                } else if ("tunnel".equals(keys.getSelectedItem())) {
-                    if (previousAffectedWay.hasKey("waterway") || affected.hasKey("waterway"))
+                } else if (TUNNEL.equals(keys.getSelectedItem())) {
+                    if (previousAffectedWay.hasKey(WATERWAY) || affected.hasKey(WATERWAY))
                         values.setModel(
-                                new DefaultComboBoxModel<>(new String[] {"culvert", "yes", "building_passage" }));
+                                new DefaultComboBoxModel<>(new String[] {CULVERT, "yes", BUILDING_PASSAGE }));
                     else
                         values.setModel(
-                                new DefaultComboBoxModel<>(new String[] {"yes", "culvert", "building_passage" }));
-                } else if ("traffic_calming".equals(keys.getSelectedItem())) {
-                    values.setModel(new DefaultComboBoxModel<>(new String[] {"table" }));
+                                new DefaultComboBoxModel<>(new String[] {"yes", CULVERT, BUILDING_PASSAGE }));
+                } else if (TRAFFIC_CALMING.equals(keys.getSelectedItem())) {
+                    values.setModel(new DefaultComboBoxModel<>(new String[] {TABLE }));
                 } else if ("none".equals(keys.getSelectedItem())) {
                     values.setModel(new DefaultComboBoxModel<>(new String[] {"" }));
                 }
@@ -843,32 +843,32 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
         private void setOptionsWithTunnel() {
             keys.setModel(
-                    new DefaultComboBoxModel<>(new String[] {"tunnel", "bridge", "bus_bay", "traffic_calming", "none" }));
+                    new DefaultComboBoxModel<>(new String[] {TUNNEL, BRIDGE, BUS_BAY, TRAFFIC_CALMING, "none" }));
 
-            if (previousAffectedWay.hasKey("waterway") || affected.hasKey("waterway"))
-                values.setModel(new DefaultComboBoxModel<>(new String[] {"culvert", "yes", "building_passage" }));
+            if (previousAffectedWay.hasKey(WATERWAY) || affected.hasKey(WATERWAY))
+                values.setModel(new DefaultComboBoxModel<>(new String[] {CULVERT, "yes", BUILDING_PASSAGE }));
             else
-                values.setModel(new DefaultComboBoxModel<>(new String[] {"yes", "culvert", "building_passage" }));
+                values.setModel(new DefaultComboBoxModel<>(new String[] {"yes", CULVERT, BUILDING_PASSAGE }));
 
             // below code changes the list in values on the basis of key
             keys.addActionListener(e -> {
-                if ("tunnel".equals(keys.getSelectedItem())) {
-                    if (previousAffectedWay.hasKey("waterway") || affected.hasKey("waterway"))
+                if (TUNNEL.equals(keys.getSelectedItem())) {
+                    if (previousAffectedWay.hasKey(WATERWAY) || affected.hasKey(WATERWAY))
                         values.setModel(
-                                new DefaultComboBoxModel<>(new String[] {"culvert", "yes", "building_passage" }));
+                                new DefaultComboBoxModel<>(new String[] {CULVERT, "yes", BUILDING_PASSAGE }));
                     else
                         values.setModel(
-                                new DefaultComboBoxModel<>(new String[] {"yes", "culvert", "building_passage" }));
-                } else if ("bus_bay".equals(keys.getSelectedItem())) {
-                    values.setModel(new DefaultComboBoxModel<>(new String[] {"both", "right", "left" }));
+                                new DefaultComboBoxModel<>(new String[] {"yes", CULVERT, BUILDING_PASSAGE }));
+                } else if (BUS_BAY.equals(keys.getSelectedItem())) {
+                    values.setModel(new DefaultComboBoxModel<>(new String[] {BOTH, RIGHT, LEFT }));
                     if (rightHandTraffic)
-                        values.setModel(new DefaultComboBoxModel<>(new String[] {"right", "left", "both" }));
+                        values.setModel(new DefaultComboBoxModel<>(new String[] {RIGHT, LEFT, BOTH }));
                     else
-                        values.setModel(new DefaultComboBoxModel<>(new String[] {"left", "right", "both" }));
-                } else if ("bridge".equals(keys.getSelectedItem())) {
+                        values.setModel(new DefaultComboBoxModel<>(new String[] {LEFT, RIGHT, BOTH }));
+                } else if (BRIDGE.equals(keys.getSelectedItem())) {
                     values.setModel(new DefaultComboBoxModel<>(new String[] {"yes" }));
-                } else if ("traffic_calming".equals(keys.getSelectedItem())) {
-                    values.setModel(new DefaultComboBoxModel<>(new String[] {"table" }));
+                } else if (TRAFFIC_CALMING.equals(keys.getSelectedItem())) {
+                    values.setModel(new DefaultComboBoxModel<>(new String[] {TABLE }));
                 } else if ("none".equals(keys.getSelectedItem())) {
                     values.setModel(new DefaultComboBoxModel<>(new String[] {"" }));
                 }
@@ -877,29 +877,29 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
 
         private void setOptionsWithBridge() {
             keys.setModel(
-                    new DefaultComboBoxModel<>(new String[] {"bridge", "bus_bay", "tunnel", "traffic_calming", "none" }));
+                    new DefaultComboBoxModel<>(new String[] {BRIDGE, BUS_BAY, TUNNEL, TRAFFIC_CALMING, "none" }));
 
             values.setModel(new DefaultComboBoxModel<>(new String[] {"yes" }));
 
             // below code changes the list in values on the basis of key
             keys.addActionListener(e -> {
-                if ("tunnel".equals(keys.getSelectedItem())) {
-                    if (previousAffectedWay.hasKey("waterway") || affected.hasKey("waterway"))
+                if (TUNNEL.equals(keys.getSelectedItem())) {
+                    if (previousAffectedWay.hasKey(WATERWAY) || affected.hasKey(WATERWAY))
                         values.setModel(
-                                new DefaultComboBoxModel<>(new String[] {"culvert", "yes", "building_passage" }));
+                                new DefaultComboBoxModel<>(new String[] {CULVERT, "yes", BUILDING_PASSAGE }));
                     else
                         values.setModel(
-                                new DefaultComboBoxModel<>(new String[] {"yes", "culvert", "building_passage" }));
-                } else if ("bus_bay".equals(keys.getSelectedItem())) {
-                    values.setModel(new DefaultComboBoxModel<>(new String[] {"both", "right", "left" }));
+                                new DefaultComboBoxModel<>(new String[] {"yes", CULVERT, BUILDING_PASSAGE }));
+                } else if (BUS_BAY.equals(keys.getSelectedItem())) {
+                    values.setModel(new DefaultComboBoxModel<>(new String[] {BOTH, RIGHT, LEFT }));
                     if (rightHandTraffic)
-                        values.setModel(new DefaultComboBoxModel<>(new String[] {"right", "left", "both" }));
+                        values.setModel(new DefaultComboBoxModel<>(new String[] {RIGHT, LEFT, BOTH }));
                     else
-                        values.setModel(new DefaultComboBoxModel<>(new String[] {"left", "right", "both" }));
-                } else if ("bridge".equals(keys.getSelectedItem())) {
+                        values.setModel(new DefaultComboBoxModel<>(new String[] {LEFT, RIGHT, BOTH }));
+                } else if (BRIDGE.equals(keys.getSelectedItem())) {
                     values.setModel(new DefaultComboBoxModel<>(new String[] {"yes" }));
-                } else if ("traffic_calming".equals(keys.getSelectedItem())) {
-                    values.setModel(new DefaultComboBoxModel<>(new String[] {"table" }));
+                } else if (TRAFFIC_CALMING.equals(keys.getSelectedItem())) {
+                    values.setModel(new DefaultComboBoxModel<>(new String[] {TABLE }));
                 } else if ("none".equals(keys.getSelectedItem())) {
                     values.setModel(new DefaultComboBoxModel<>(new String[] {"" }));
                 }
@@ -934,13 +934,13 @@ public class DoubleSplitAction extends MapMode implements KeyListener {
                 Point curP1 = MainApplication.getMap().mapView.getPoint(Pos1);
                 CheckParameterUtil.ensureParameterNotNull(mv, "mv");
                 g.setColor(Color.RED);
-                g.fill(new Rectangle.Double(curP1.x - 3, curP1.y - 3, 6, 6));
+                g.fill(new Rectangle2D.Double(curP1.x - 3d, curP1.y - 3d, 6, 6));
             }
             if (Pos2 != null) {
                 Point curP2 = MainApplication.getMap().mapView.getPoint(Pos2);
                 CheckParameterUtil.ensureParameterNotNull(mv, "mv");
                 g.setColor(Color.RED);
-                g.fill(new Rectangle.Double(curP2.x - 3, curP2.y - 3, 6, 6));
+                g.fill(new Rectangle2D.Double(curP2.x - 3d, curP2.y - 3d, 6, 6));
             }
         }
     }

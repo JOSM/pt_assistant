@@ -62,14 +62,14 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
     private static final String CITY_NETWORK_CAPTION = I18n.marktr("City transport");
     private static final String HIGH_SPEED_NETWORK_CAPTION = I18n.marktr("High speed");
 
-    private String[] serviceCaptionStrings = {CITY_NETWORK_CAPTION, COMMUTER_NETWORK_CAPTION, REGIONAL_NETWORK_CAPTION,
+    private final String[] serviceCaptionStrings = {CITY_NETWORK_CAPTION, COMMUTER_NETWORK_CAPTION, REGIONAL_NETWORK_CAPTION,
             LONG_DISTANCE_NETWORK_CAPTION, HIGH_SPEED_NETWORK_CAPTION};
-    private String[] serviceStrings = {OSMTags.CITY_NETWORK_TAG_VALUE, OSMTags.COMMUTER_NETWORK_TAG_VALUE,
+    private final String[] serviceStrings = {OSMTags.CITY_NETWORK_TAG_VALUE, OSMTags.COMMUTER_NETWORK_TAG_VALUE,
             OSMTags.REGIONAL_NETWORK_TAG_VALUE, OSMTags.LONG_DISTANCE_NETWORK_TAG_VALUE,
             OSMTags.HIGH_SPEED_NETWORK_TAG_VALUE};
 
-    private JDialog jDialog = null;
-    private JTextField textFieldName = null;
+    private JDialog jDialog;
+    private JTextField textFieldName;
     private JTextField textFieldNameEn;
     private JTextField textFieldNetwork;
     private JTextField textFieldOperator;
@@ -99,7 +99,7 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
     /**
      * Map of check boxes
      */
-    private HashMap<JCheckBox, Boolean> checkBoxValues = new HashMap<JCheckBox, Boolean>();
+    private final HashMap<JCheckBox, Boolean> checkBoxValues = new HashMap<>();
 
     /**
      * Previous stop name
@@ -112,11 +112,11 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
     /**
      * Network name at previous call
      */
-    private static String previousNetwork = null;
+    private static String previousNetwork;
     /**
      * Operator name at previous call
      */
-    private static String previousOperator = null;
+    private static String previousOperator;
 
     /**
      * Reference to dialog object
@@ -238,7 +238,7 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
         for (int i = 0; i < serviceCaptionStrings.length; i++) {
             serviceTransStrings[i] = tr(serviceCaptionStrings[i]);
         }
-        comboBoxService = new JComboBox<String>(serviceTransStrings);
+        comboBoxService = new JComboBox<>(serviceTransStrings);
         comboBoxService.setSelectedIndex(0);
         layoutCons.gridx = 1;
         layoutCons.gridy = 4;
@@ -435,7 +435,7 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
      * @param checkBox Check box
      * @param value Value of check box
      */
-    public void setCheckBoxValue(JCheckBox checkBox, Boolean value) {
+    public void setCheckBoxValue(JCheckBox checkBox, boolean value) {
         checkBoxValues.put(checkBox, value);
         checkBox.setSelected(value);
     }
@@ -446,7 +446,7 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
      * @param checkBox Check box
      * @return Value of check box
      */
-    public Boolean getCheckBoxValue(JCheckBox checkBox) {
+    public boolean getCheckBoxValue(JCheckBox checkBox) {
         try {
             if (checkBoxValues.containsKey(checkBox)) {
                 return checkBoxValues.get(checkBox);
@@ -476,7 +476,7 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
      *
      * @param isVisible Flag of dialog visibility
      */
-    public void setVisible(Boolean isVisible) {
+    public void setVisible(boolean isVisible) {
         if (jDialog != null)
             jDialog.setVisible(isVisible);
     }
@@ -554,35 +554,39 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
      * @return Stop area
      */
     public StopArea saveValues() {
-        StopArea stopArea = this.stopArea;
+        StopArea currentStopArea = this.stopArea;
         try {
-            if (stopArea == null)
-                stopArea = new StopArea();
-            stopArea.name = getTextFromControl(textFieldName);
-            previousName = stopArea.name;
-            stopArea.nameEn = getTextFromControl(textFieldNameEn);
-            previousNameEn = stopArea.nameEn;
-            stopArea.network = getTextFromControl(textFieldNetwork);
-            previousNetwork = stopArea.network;
-            stopArea.operator = getTextFromControl(textFieldOperator);
-            previousOperator = stopArea.operator;
-            stopArea.service = serviceStrings[comboBoxService.getSelectedIndex()];
-            stopArea.isBus = getCheckBoxValue(checkBoxIsBus);
-            stopArea.isShareTaxi = getCheckBoxValue(checkBoxIsShareTaxi);
-            stopArea.isTrolleybus = getCheckBoxValue(checkBoxIsTrolleybus);
-            stopArea.isBusStation = getCheckBoxValue(checkBoxIsBusStation);
-            stopArea.isAssignTransportType = getCheckBoxValue(checkBoxIsAssignTransportType);
-            stopArea.isTram = getCheckBoxValue(checkBoxIsTram);
-            stopArea.isTrainStation = getCheckBoxValue(checkBoxIsTrainStation);
-            stopArea.isTrainStop = getCheckBoxValue(checkBoxIsTrainStop);
-            stopArea.isBench = getCheckBoxValue(checkBoxIsBench);
-            stopArea.isShelter = getCheckBoxValue(checkBoxIsShelder);
-            stopArea.isCovered = getCheckBoxValue(checkBoxIsCover);
-            stopArea.isArea = getCheckBoxValue(checkBoxIsArea);
+            if (currentStopArea == null)
+                currentStopArea = new StopArea();
+            currentStopArea.name = getTextFromControl(textFieldName);
+            currentStopArea.nameEn = getTextFromControl(textFieldNameEn);
+            currentStopArea.network = getTextFromControl(textFieldNetwork);
+            currentStopArea.operator = getTextFromControl(textFieldOperator);
+            currentStopArea.service = serviceStrings[comboBoxService.getSelectedIndex()];
+            currentStopArea.isBus = getCheckBoxValue(checkBoxIsBus);
+            currentStopArea.isShareTaxi = getCheckBoxValue(checkBoxIsShareTaxi);
+            currentStopArea.isTrolleybus = getCheckBoxValue(checkBoxIsTrolleybus);
+            currentStopArea.isBusStation = getCheckBoxValue(checkBoxIsBusStation);
+            currentStopArea.isAssignTransportType = getCheckBoxValue(checkBoxIsAssignTransportType);
+            currentStopArea.isTram = getCheckBoxValue(checkBoxIsTram);
+            currentStopArea.isTrainStation = getCheckBoxValue(checkBoxIsTrainStation);
+            currentStopArea.isTrainStop = getCheckBoxValue(checkBoxIsTrainStop);
+            currentStopArea.isBench = getCheckBoxValue(checkBoxIsBench);
+            currentStopArea.isShelter = getCheckBoxValue(checkBoxIsShelder);
+            currentStopArea.isCovered = getCheckBoxValue(checkBoxIsCover);
+            currentStopArea.isArea = getCheckBoxValue(checkBoxIsArea);
+            setPreviousFields(stopArea);
         } catch (Exception ex) {
             DialogUtils.showOkWarning("Exception when saving preferences!", ex.getMessage());
         }
-        return stopArea;
+        return currentStopArea;
+    }
+
+    private static void setPreviousFields(StopArea stopArea) {
+        previousName = stopArea.name;
+        previousNameEn = stopArea.nameEn;
+        previousNetwork = stopArea.network;
+        previousOperator = stopArea.operator;
     }
 
     /**
@@ -593,8 +597,8 @@ public class CustomizePublicTransportStopDialog implements ActionListener, ItemL
         if (SAVE_COMMAND.equals(event.getActionCommand())) {
             setVisible(false);
             if (customizeStopAction != null) {
-                StopArea stopArea = saveValues();
-                customizeStopAction.performCustomizing(stopArea);
+                StopArea currentStopArea = saveValues();
+                customizeStopAction.performCustomizing(currentStopArea);
             }
         } else {
             setVisible(false);

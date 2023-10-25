@@ -5,6 +5,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.openstreetmap.josm.command.AddCommand;
 import org.openstreetmap.josm.command.ChangeCommand;
@@ -51,7 +52,7 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
      */
     public List<Command> nameTagAssign(OsmPrimitive target, List<Command> commands, StopArea stopArea) {
         if (commands == null)
-            commands = new ArrayList<Command>();
+            commands = new ArrayList<>();
 
         commands = assignTag(commands, target, OSMTags.NAME_TAG, "".equals(stopArea.name) ? null : stopArea.name);
         commands = assignTag(commands, target, OSMTags.NAME_EN_TAG,
@@ -85,9 +86,9 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
      * @return Resulting list of commands
      */
     protected List<Command> transportTypeTagAssign(OsmPrimitive target, List<Command> commands, StopArea stopArea,
-            Boolean isStopPoint) {
+            boolean isStopPoint) {
         if (commands == null)
-            commands = new ArrayList<Command>();
+            commands = new ArrayList<>();
 
         if (isStopPoint) {
             if (stopArea.isTrainStop || stopArea.isTrainStation) {
@@ -136,7 +137,7 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
      */
     public List<Command> generalTagAssign(OsmPrimitive target, List<Command> commands, StopArea stopArea) {
         if (commands == null)
-            commands = new ArrayList<Command>();
+            commands = new ArrayList<>();
 
         commands = nameTagAssign(target, commands, stopArea);
         commands = assignTag(commands, target, OSMTags.NETWORK_TAG,
@@ -160,9 +161,9 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
      * @return Resulting command list
      */
     public List<Command> stopPointTagAssign(OsmPrimitive target, List<Command> commands, StopArea stopArea,
-            Boolean isFirst) {
+            boolean isFirst) {
         if (commands == null)
-            commands = new ArrayList<Command>();
+            commands = new ArrayList<>();
 
         commands = generalTagAssign(target, commands, stopArea);
         commands = transportTypeTagAssign(target, commands, stopArea, true);
@@ -196,9 +197,9 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
      * @return Resulting command list
      */
     public List<Command> platformTagAssign(OsmPrimitive target, List<Command> commands, StopArea stopArea,
-            Boolean isFirst) {
+            boolean isFirst) {
         if (commands == null)
-            commands = new ArrayList<Command>();
+            commands = new ArrayList<>();
 
         commands = generalTagAssign(target, commands, stopArea);
         commands = transportTypeTagAssign(target, commands, stopArea, false);
@@ -237,7 +238,7 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
      */
     public List<Command> otherMemberTagAssign(OsmPrimitive target, List<Command> commands, StopArea stopArea) {
         if (commands == null)
-            commands = new ArrayList<Command>();
+            commands = new ArrayList<>();
 
         commands = nameTagAssign(target, commands, stopArea);
         commands = clearTag(commands, target, OSMTags.NETWORK_TAG);
@@ -258,7 +259,7 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
      */
     private List<Command> createStopAreaRelation(List<Command> commands, StopArea stopArea) {
         if (commands == null)
-            commands = new ArrayList<Command>();
+            commands = new ArrayList<>();
 
         Relation newRelation = new Relation();
         for (Node node : stopArea.stopPoints) {
@@ -289,11 +290,11 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
     public static List<Command> addNewRelationMember(List<Command> commands, Relation targetRelation,
             OsmPrimitive member, String roleName) {
         if (commands == null)
-            commands = new ArrayList<Command>();
+            commands = new ArrayList<>();
 
         for (RelationMember relationMember : targetRelation.getMembers()) {
             if (relationMember.getMember() == member) {
-                if (relationMember.getRole() == roleName) {
+                if (Objects.equals(relationMember.getRole(), roleName)) {
                     return commands;
                 }
                 return commands;
@@ -313,7 +314,7 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
      */
     private List<Command> addNewRelationMembers(List<Command> commands, StopArea stopArea) {
         if (commands == null)
-            commands = new ArrayList<Command>();
+            commands = new ArrayList<>();
 
         for (OsmPrimitive stopPoint : stopArea.stopPoints) {
             commands = addNewRelationMember(commands, stopArea.stopAreaRelation, stopPoint, OSMTags.STOP_ROLE);
@@ -381,10 +382,7 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
      * @return True, stop area must to have separate bus stop node
      */
     public boolean needSeparateBusStop(StopArea stopArea, OsmPrimitive firstPlatform) {
-        if (((stopArea.isBus || stopArea.isShareTaxi || stopArea.isTrolleybus) && (firstPlatform instanceof Way))) {
-            return true;
-        }
-        return false;
+        return (stopArea.isBus || stopArea.isShareTaxi || stopArea.isTrolleybus) && (firstPlatform instanceof Way);
     }
 
     /**
@@ -398,7 +396,7 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
      */
     private List<Command> clearExcessTags(List<Command> commands, OsmPrimitive target, String tag, String tagValue) {
         if (commands == null)
-            commands = new ArrayList<Command>();
+            commands = new ArrayList<>();
 
         if (compareTag(target, tag, tagValue)) {
             commands = clearTag(commands, target, tag);
@@ -425,7 +423,7 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
      */
     public List<Command> clearExcessTags(List<Command> commands, StopArea stopArea, String tag, String tagValue) {
         if (commands == null)
-            commands = new ArrayList<Command>();
+            commands = new ArrayList<>();
 
         for (OsmPrimitive stopPoint : stopArea.stopPoints) {
             clearExcessTags(commands, stopPoint, tag, tagValue);
@@ -452,7 +450,7 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
     protected List<Command> createSeparateBusStopNode(List<Command> commands, StopArea stopArea,
             OsmPrimitive firstPlatform, String tag, String tagValue) {
         if (commands == null)
-            commands = new ArrayList<Command>();
+            commands = new ArrayList<>();
 
         LatLon centerOfPlatform = getCenterOfWay(firstPlatform);
         if (firstPlatform instanceof Way) {
@@ -479,7 +477,7 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
      */
     public List<Command> customize(StopArea stopArea) {
         try {
-            List<Command> commands = new ArrayList<Command>();
+            List<Command> commands = new ArrayList<>();
             Node separateBusStopNode = searchBusStop(stopArea, OSMTags.AMENITY_TAG, OSMTags.BUS_STATION_TAG_VALUE);
             if (separateBusStopNode == null)
                 separateBusStopNode = searchBusStop(stopArea, OSMTags.HIGHWAY_TAG, OSMTags.BUS_STOP_TAG_VALUE);
@@ -496,7 +494,7 @@ public class CustomizeStopAreaOperation extends StopAreaOperationBase {
                         getCurrentDataSet());
                 createNewStopPointOperation.performCustomizing(stopArea);
             }
-            Boolean isFirst = true;
+            boolean isFirst = true;
             for (Node node : stopArea.stopPoints) {
                 commands = stopPointTagAssign(node, commands, stopArea, isFirst);
                 isFirst = false;

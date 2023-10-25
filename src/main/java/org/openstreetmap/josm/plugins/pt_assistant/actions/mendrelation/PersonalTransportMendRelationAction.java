@@ -49,14 +49,20 @@ import org.openstreetmap.josm.tools.Utils;
  * @author Ashish Singh and sudhanshu2
  */
 public class PersonalTransportMendRelationAction extends PublicTransportMendRelationAction {
+    private static final String FORWARD = "forward";
+    private static final String BACKWARD = "backward";
+    private static final String ROUTE = "route";
+    private static final String ROUNDABOUT = "roundabout";
+    private static final String JUNCTION = "junction";
+    private static final String BICYCLE = "bicycle";
 
     ////////////////////////Assigning Variables///////////////
 
     Way lastForWay;
     Way lastBackWay;
-    int brokenidx = 0;
-    HashMap<Node, Integer> Isthere = new HashMap<>();
-    static HashMap<Way, Integer> IsWaythere = new HashMap<>();
+    int brokenidx;
+    HashMap<Node, Integer> isThere = new HashMap<>();
+    static HashMap<Way, Integer> isWaythere = new HashMap<>();
     static List<WayConnectionType> links;
     static WayConnectionType link;
     static WayConnectionType prelink;
@@ -82,7 +88,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
         super.members = super.editor.getRelation().getMembers();
         super.members.removeIf(m -> !m.isWay());
         links = connectionTypeCalculator.updateLinks(super.members);
-        if (super.halt == false) {
+        if (!super.halt) {
             updateStates();
             getListOfAllWays();
             makepanelanddownloadArea();
@@ -127,15 +133,15 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
             }
 
             Way way = super.members.get(idx).getWay();
-            if (IsWaythere.get(way) == null) {
+            if (isWaythere.get(way) == null) {
                 for (Node nod : way.getNodes()) {
-                    if (Isthere.get(nod) == null || Isthere.get(nod) == 0) {
-                        Isthere.put(nod, 1);
+                    if (isThere.get(nod) == null || isThere.get(nod) == 0) {
+                        isThere.put(nod, 1);
                     } else {
-                        Isthere.put(nod, Isthere.get(nod) + 1);
+                        isThere.put(nod, isThere.get(nod) + 1);
                     }
                 }
-                IsWaythere.put(way, 1);
+                isWaythere.put(way, 1);
             }
             super.wayToReachAfterGap = super.members.get(nexidx).getWay();
             Node node = checkVaildityOfWays(way, nexidx);
@@ -159,16 +165,16 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
                 }
             } else {
                 if (node == null) {
-                    if (super.members.get(super.currentIndex).getRole().equals("forward")
+                    if (super.members.get(super.currentIndex).getRole().equals(FORWARD)
                             && prelink.isOnewayLoopBackwardPart) {
                         node = way.lastNode();
-                    } else if (super.members.get(super.currentIndex).getRole().equals("backward")
+                    } else if (super.members.get(super.currentIndex).getRole().equals(BACKWARD)
                             && prelink.isOnewayLoopForwardPart) {
                         node = way.lastNode();
                     } else {
                         if (super.currentIndex - 1 >= 0) {
                             Way prevw = super.members.get(super.currentIndex - 1).getWay();
-                            if (prevw.firstNode().equals(way.lastNode()) || prevw.lastNode().equals(way.lastNode())) {
+                            if (Objects.equals(prevw.firstNode(), way.lastNode()) || Objects.equals(prevw.lastNode(), way.lastNode())) {
                                 node = way.lastNode();
                             } else {
                                 node = way.firstNode();
@@ -178,7 +184,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
                     if (link.isOnewayLoopBackwardPart) {
                         super.previousWay = way;
                         super.nextIndex = false;
-                        if (Isthere.get(way.firstNode()) != null && Isthere.get(way.firstNode()) != 0) {
+                        if (isThere.get(way.firstNode()) != null && isThere.get(way.firstNode()) != 0) {
                             node = way.firstNode();
                         } else {
                             node = way.lastNode();
@@ -214,25 +220,24 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
     boolean checkOneWaySatisfiability(Way way, Node node) {
         String[] acceptedTags = new String[] { "yes", "designated" };
 
-        if ((link.isOnewayLoopBackwardPart && super.relation.hasTag("route", "bicycle"))
+        if ((link.isOnewayLoopBackwardPart && super.relation.hasTag(ROUTE, BICYCLE))
                 || prelink.isOnewayLoopBackwardPart) {
             return true;
         }
 
-        if (way.hasTag("oneway:bicycle", acceptedTags) && way.lastNode().equals(node)
-                && relation.hasTag("route", "bicycle"))
+        if (way.hasTag("oneway:bicycle", acceptedTags) && Objects.equals(way.lastNode(), node)
+                && relation.hasTag(ROUTE, BICYCLE))
             return false;
 
-        if (!WayUtils.isNonSplitRoundAbout(way) && way.hasTag("junction", "roundabout")) {
-            if (way.lastNode().equals(node))
-                return false;
+        if (!WayUtils.isNonSplitRoundAbout(way) && way.hasTag(JUNCTION, ROUNDABOUT) && Objects.equals(node, way.lastNode())) {
+            return false;
         }
 
         if (RouteUtils.isOnewayForBicycles(way) == 0)
             return true;
-        else if (RouteUtils.isOnewayForBicycles(way) == 1 && way.lastNode().equals(node))
+        else if (RouteUtils.isOnewayForBicycles(way) == 1 && Objects.equals(way.lastNode(), node))
             return false;
-        else if (RouteUtils.isOnewayForBicycles(way) == -1 && way.firstNode().equals(node))
+        else if (RouteUtils.isOnewayForBicycles(way) == -1 && Objects.equals(way.firstNode(), node))
             return false;
 
         return true;
@@ -266,7 +271,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
         if (WayUtils.isNonSplitRoundAbout(way)) {
             nexWayDelete = false;
             for (Node n : way.getNodes()) {
-                if (super.wayToReachAfterGap.firstNode().equals(n) || super.wayToReachAfterGap.lastNode().equals(n)) {
+                if (Objects.equals(super.wayToReachAfterGap.firstNode(), n) || Objects.equals(super.wayToReachAfterGap.lastNode(), n)) {
                     node = n;
                     super.currentNode = n;
                 }
@@ -305,12 +310,12 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
             parentWays.addAll(findNextWay(way, node2));
         }
         directroutes = getDirectRouteBetweenWaysByLookingAtOtherRouteRelations(super.currentWay, super.wayToReachAfterGap);
-        if (directroutes == null || directroutes.size() == 0) {
+        if (directroutes == null || directroutes.isEmpty()) {
             super.showOption0 = false;
         } else {
             super.showOption0 = true;
         }
-        if (directroutes != null && directroutes.size() > 0 && !super.shorterRoutes && parentWays.size() > 0
+        if (directroutes != null && !directroutes.isEmpty() && !super.shorterRoutes && !parentWays.isEmpty()
                 && super.notice == null) {
             displayFixVariantsWithOverlappingWays(directroutes);
             return;
@@ -341,15 +346,16 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
             r1 = new ArrayList<>(Utils.filteredCollection(current.getReferrers(), Relation.class));
             r2 = new ArrayList<>(Utils.filteredCollection(next.getReferrers(), Relation.class));
         } catch (Exception e) {
+            Logging.error(e);
             return list;
         }
 
         List<Relation> rel = new ArrayList<>();
         //checking whether relations you are getting are bicycle routes or not
-        String value = super.relation.get("route");
+        String value = super.relation.get(ROUTE);
 
         for (Relation R1 : r1) {
-            if (r2.contains(R1) && value.equals(R1.get("route")))
+            if (r2.contains(R1) && value.equals(R1.get(ROUTE)))
                 rel.add(R1);
         }
         rel.remove(super.relation);
@@ -359,8 +365,10 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
             boolean alreadyPresent = false;
             if (lst != null) {
                 for (List<Way> l : list) {
-                    if (l.containsAll(lst))
+                    if (l.containsAll(lst)) {
                         alreadyPresent = true;
+                        break;
+                    }
                 }
                 if (!alreadyPresent)
                     list.add(lst);
@@ -370,8 +378,10 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
             if (lst != null) {
                 alreadyPresent = false;
                 for (List<Way> l : list) {
-                    if (l.containsAll(lst))
+                    if (l.containsAll(lst)) {
                         alreadyPresent = true;
+                        break;
+                    }
                 }
                 if (!alreadyPresent)
                     list.add(lst);
@@ -386,15 +396,15 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
         List<Way> lst = new ArrayList<>();
         boolean canAdd = false;
         Way prev = null;
-        for (int i = 0; i < member.size(); i++) {
-            if (member.get(i).isWay()) {
-                Way w = member.get(i).getWay();
+        for (RelationMember relationMember : member) {
+            if (relationMember.isWay()) {
+                Way w = relationMember.getWay();
                 if (!reverse) {
                     if (w.equals(current)) {
                         lst.clear();
                         canAdd = true;
                         prev = w;
-                    } else if (w.equals(next) && lst.size() > 0) {
+                    } else if (w.equals(next) && !lst.isEmpty()) {
                         return lst;
                     } else if (canAdd) {
                         if (findNumberOfCommonNodes(w, prev) != 0) {
@@ -409,7 +419,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
                         lst.clear();
                         canAdd = true;
                         prev = w;
-                    } else if (w.equals(current) && lst.size() > 0) {
+                    } else if (w.equals(current) && !lst.isEmpty()) {
                         Collections.reverse(lst);
                         return lst;
                     } else if (canAdd) {
@@ -463,7 +473,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
                 w1.setKeys(w.getKeys());
                 w2.setKeys(w.getKeys());
 
-                if (!w.hasTag("junction", "roundabout")) {
+                if (!w.hasTag(JUNCTION, ROUNDABOUT)) {
                     waysToBeRemoved.add(w);
                     waysToBeAdded.add(w1);
                     waysToBeAdded.add(w2);
@@ -509,7 +519,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
                 w1.setKeys(w.getKeys());
                 w2.setKeys(w.getKeys());
 
-                if (!w.hasTag("junction", "roundabout")) {
+                if (!w.hasTag(JUNCTION, ROUNDABOUT)) {
                     waysToBeRemoved.add(w);
                     if (w1.containsNode(node))
                         waysToBeAdded.add(w1);
@@ -527,19 +537,19 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
         waysToBeRemoved.clear();
 
         for (Way w : parentWays) {
-            if (WayUtils.findNumberOfCommonFirstLastNodes(way, w) != 1 && !w.hasTag("junction", "roundabout")) {
+            if (WayUtils.findNumberOfCommonFirstLastNodes(way, w) != 1 && !w.hasTag(JUNCTION, ROUNDABOUT)) {
                 waysToBeRemoved.add(w);
             }
         }
 
         // check if any of them belong to roundabout, if yes then show ways accordingly
         parentWays.stream()
-                .filter(it -> it.hasTag("junction", "roundabout")
+                .filter(it -> it.hasTag(JUNCTION, ROUNDABOUT)
                         && WayUtils.findNumberOfCommonFirstLastNodes(way, it) == 1 && it.lastNode().equals(node))
                 .forEach(waysToBeRemoved::add);
 
         // check mode of transport, also check if there is no loop
-        if (super.relation.hasTag("route", "bicycle")) {
+        if (super.relation.hasTag(ROUTE, BICYCLE)) {
             parentWays.stream().filter(it -> !WayUtils.isSuitableForBicycle(it)).forEach(waysToBeRemoved::add);
         }
 
@@ -551,7 +561,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
         // check restrictions
         parentWays.stream().filter(it -> isRestricted(it, way, node)).forEach(waysToBeRemoved::add);
         for (Way w : parentWays) {
-            if (IsWaythere.get(w) != null) {
+            if (isWaythere.get(w) != null) {
                 waysToBeRemoved.add(w);
             }
         }
@@ -574,32 +584,32 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
                 for (Way w : allWays) {
                     if (!w.equals(super.currentWay)) {
                         if (!WayUtils.isOneWay(w)) {
-                            if (relation.hasTag("route", "bus")) {
+                            if (relation.hasTag(ROUTE, "bus")) {
                                 if (WayUtils.isSuitableForBuses(w)) {
                                     fixVariants.add(w);
                                 }
-                            } else if (relation.hasTag("route", "bicycle")) {
+                            } else if (relation.hasTag(ROUTE, BICYCLE)) {
                                 if (WayUtils.isSuitableForBicycle(w)) {
                                     fixVariants.add(w);
                                 }
                             }
                         } else {
                             if (w.firstNode().equals(nod)) {
-                                if (relation.hasTag("route", "bus")) {
+                                if (relation.hasTag(ROUTE, "bus")) {
                                     if (WayUtils.isSuitableForBuses(w)) {
                                         fixVariants.add(w);
                                     }
-                                } else if (relation.hasTag("route", "bicycle")) {
+                                } else if (relation.hasTag(ROUTE, BICYCLE)) {
                                     if (WayUtils.isSuitableForBicycle(w)) {
                                         fixVariants.add(w);
                                     }
                                 }
                             } else {
-                                if (relation.hasTag("route", "bus")) {
+                                if (relation.hasTag(ROUTE, "bus")) {
                                     if (RouteUtils.isOnewayForPublicTransport(w) == 0) {
                                         fixVariants.add(w);
                                     }
-                                } else if (relation.hasTag("route", "bicycle")) {
+                                } else if (relation.hasTag(ROUTE, BICYCLE)) {
                                     if (RouteUtils.isOnewayForBicycles(w) == 0) {
                                         fixVariants.add(w);
                                     }
@@ -610,7 +620,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
                 }
             }
             super.currentNode = nod;
-            if (fixVariants.size() > 0) {
+            if (!fixVariants.isEmpty()) {
                 displayBacktrackFixVariant(fixVariants, idx);
             } else {
                 backTrack(way, idx + 1);
@@ -687,7 +697,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
                                         temp.add(w.firstNode());
                                     if (!v.isFirstLastNode(w.lastNode()))
                                         temp.add(w.lastNode());
-                                    if (temp.size() != 0) {
+                                    if (!temp.isEmpty()) {
                                         w1 = v;
                                         breakNode = new ArrayList<>(temp);
                                         break;
@@ -772,7 +782,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
                     super.currentNode = getOtherNode(nextw, node2);
                 }
             }
-            if (Isthere.get(super.currentNode) != null && Isthere.get(super.currentNode) >= 3) {
+            if (isThere.get(super.currentNode) != null && isThere.get(super.currentNode) >= 3) {
                 super.currentIndex++;
                 if (super.currentIndex <= super.members.size() - 1) {
                     assignRolesafterloop(super.currentNode);
@@ -813,16 +823,16 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
             for (int k = 0; k < ways.size(); k++) {
                 c.add(new RelationMember(s, ways.get(k)));
                 // check if the way that is getting added is already present or not
-                if (!super.waysAlreadyPresent.containsKey(ways.get(k)) && IsWaythere.get(ways.get(k)) == null) {
+                if (!super.waysAlreadyPresent.containsKey(ways.get(k)) && isWaythere.get(ways.get(k)) == null) {
                     super.waysAlreadyPresent.put(ways.get(k), 1);
                     for (Node node : ways.get(k).getNodes()) {
-                        if (Isthere.get(node) == null || Isthere.get(node) == 0) {
-                            Isthere.put(node, 1);
+                        if (isThere.get(node) == null || isThere.get(node) == 0) {
+                            isThere.put(node, 1);
                         } else {
-                            Isthere.put(node, Isthere.get(node) + 1);
+                            isThere.put(node, isThere.get(node) + 1);
                         }
                     }
-                    IsWaythere.put(ways.get(k), 1);
+                    isWaythere.put(ways.get(k), 1);
                 } else {
                     deleteWayAfterIndex(ways.get(k), i);
                 }
@@ -847,9 +857,9 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
         String s = "";
         if (w.firstNode().equals(jointNode)) {
             node = w.lastNode();
-            s = "backward";
+            s = BACKWARD;
         } else {
-            s = "forward";
+            s = FORWARD;
             node = w.firstNode();
         }
         idxlst[0] = idx;
@@ -861,12 +871,12 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
             if (w.firstNode().equals(node)) {
                 node = w.lastNode();
                 node1 = w.firstNode();
-                s = "backward";
+                s = BACKWARD;
                 // roles[idx]=s;
             } else {
                 node = w.firstNode();
                 node1 = w.lastNode();
-                s = "forward";
+                s = FORWARD;
                 // roles[idx]=s;
             }
             idxlst[0] = idx;
@@ -896,7 +906,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
                     .filter(Objects::nonNull)
                     .map(it -> findNextWay(current, it))
                     .flatMap(Collection::stream)
-                    .filter(it -> IsWaythere.get(it) == null)
+                    .filter(it -> isWaythere.get(it) == null)
                     .mapToDouble(it -> WayUtils.calcDistanceSqToFirstOrLastWayNode(it.lastNode(), super.wayToReachAfterGap))
                     .min()
                     .orElse(-Double.MAX_VALUE)
@@ -941,11 +951,11 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
         int j = super.currentIndex;
         Way curr = super.currentWay;
         Node n = null;
-        if (IsWaythere.get(curr) != null) {
-            IsWaythere.put(curr, null);
+        if (isWaythere.get(curr) != null) {
+            isWaythere.put(curr, null);
         }
         for (Node node : curr.getNodes()) {
-            Isthere.put(node, Isthere.get(node) - 1);
+            isThere.put(node, isThere.get(node) - 1);
         }
 
         int prevInd = getPreviousWayIndex(j);
@@ -972,9 +982,9 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
             }
             super.currentNode = n;
 
-            IsWaythere.put(w, null);
+            isWaythere.put(w, null);
             for (Node node : w.getNodes()) {
-                Isthere.put(node, Isthere.get(node) - 1);
+                isThere.put(node, isThere.get(node) - 1);
             }
             callNextWay(super.currentIndex);
         } else {
@@ -990,12 +1000,12 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
             int[] lst = wayIndices.stream().mapToInt(Integer::intValue).toArray();
             for (int i = 0; i < lst.length; i++) {
                 Way way = super.members.get(i).getWay();
-                if (IsWaythere.get(way) != null) {
-                    IsWaythere.put(way, null);
+                if (isWaythere.get(way) != null) {
+                    isWaythere.put(way, null);
                 }
                 for (Node node : way.getNodes()) {
-                    if (Isthere.get(node) != null) {
-                        Isthere.put(node, Isthere.get(node) - 1);
+                    if (isThere.get(node) != null) {
+                        isThere.put(node, isThere.get(node) - 1);
                     }
                 }
             }
@@ -1115,9 +1125,9 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
             Way n = super.members.get(i).getWay();
             Node f = n.firstNode();
             Node l = n.lastNode();
-            Isthere.put(f, 0);
-            Isthere.put(l, 0);
-            IsWaythere.put(n, null);
+            isThere.put(f, 0);
+            isThere.put(l, 0);
+            isWaythere.put(n, null);
         }
     }
 }

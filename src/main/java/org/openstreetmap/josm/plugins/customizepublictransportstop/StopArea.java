@@ -2,6 +2,7 @@
 package org.openstreetmap.josm.plugins.customizepublictransportstop;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -18,101 +19,101 @@ public class StopArea {
     /**
      * Name of stop area
      */
-    public String name = null;
+    public String name;
     /**
      * English name of stop area
      */
-    public String nameEn = null;
+    public String nameEn;
     /**
      * Operator of stop area
      */
-    public String operator = null;
+    public String operator;
     /**
      * Network name
      */
-    public String network = null;
+    public String network;
     /**
      * Level of network including this stop area
      */
-    public String service = null;
+    public String service;
     /**
      * Flag of bus stop area
      */
-    public Boolean isBus = false;
+    public boolean isBus;
     /**
      * Flag of trolleybus stop area
      */
-    public Boolean isTrolleybus = false;
+    public boolean isTrolleybus;
     /**
      * Flag of share taxi stop area
      */
-    public Boolean isShareTaxi = false;
+    public boolean isShareTaxi;
     /**
      * Flag of bus station stop area
      */
-    public Boolean isBusStation = false;
+    public boolean isBusStation;
     /**
      * Flag of tram stop area
      */
-    public Boolean isTram = false;
+    public boolean isTram;
     /**
      * Flag of railway stop area
      */
-    public Boolean isTrainStop = false;
+    public boolean isTrainStop;
     /**
      * Flag of railway station
      */
-    public Boolean isTrainStation = false;
+    public boolean isTrainStation;
     /**
      * Flag of bench on selected platform
      */
-    public Boolean isAssignTransportType = false;
+    public boolean isAssignTransportType;
     /**
      * Flag of bench near platform
      */
-    public Boolean isBench = false;
+    public boolean isBench;
     /**
      * Flag of covered platform
      */
-    public Boolean isCovered = false;
+    public boolean isCovered;
     /**
      * Flag of shelter on selected platform
      */
-    public Boolean isShelter = false;
+    public boolean isShelter;
     /**
      * Relation of stop area
      */
-    public Relation stopAreaRelation = null;
+    public Relation stopAreaRelation;
     /**
      * Flag of existing of stop position
      */
-    public Boolean isStopPointExists = false;
+    public boolean isStopPointExists;
     /**
      * Flag of area platform
      */
-    public Boolean isArea = false;
+    public boolean isArea;
     /**
      * Separate node of bus stop or bus station
      */
-    public Node separateBusStopNode = null;
+    public Node separateBusStopNode;
 
     /**
      * List of nodes of stop positions
      */
-    public final ArrayList<Node> stopPoints = new ArrayList<Node>();
+    public final List<Node> stopPoints = new ArrayList<>();
     /**
      * List of josm objects of platforms
      */
-    public final ArrayList<OsmPrimitive> platforms = new ArrayList<OsmPrimitive>();
+    public final List<OsmPrimitive> platforms = new ArrayList<>();
     /**
      * List of non stop positions or platform stop area members
      */
-    public final ArrayList<OsmPrimitive> otherMembers = new ArrayList<OsmPrimitive>();
+    public final List<OsmPrimitive> otherMembers = new ArrayList<>();
 
     /**
      * Selected josm objects. Must be a platform
      */
-    public OsmPrimitive selectedObject = null;
+    public OsmPrimitive selectedObject;
 
     /**
      * Constructor of stop area object
