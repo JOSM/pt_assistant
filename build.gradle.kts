@@ -8,8 +8,8 @@ plugins {
 }
 
 object Versions {
-  const val jacoco = "0.8.8"
-  const val junit = "5.9.2"
+  const val jacoco = "0.8.11"
+  const val junit = "5.10.1"
 }
 
 repositories {
@@ -19,6 +19,7 @@ dependencies {
   testImplementation("org.openstreetmap.josm:josm-unittest:SNAPSHOT"){isChanging=true}
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${Versions.junit}")
   testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.junit}")
+  testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.junit}")
 }
 
 tasks.withType(JavaCompile::class) {
@@ -75,9 +76,8 @@ jacoco {
 
 tasks.jacocoTestReport {
   reports {
-    xml.isEnabled = true
     html.isEnabled = true
+    xml.isEnabled = true
   }
-  dependsOn(tasks.test)
-  tasks.check.get().dependsOn(this)
 }
+

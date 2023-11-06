@@ -4,18 +4,12 @@ package org.openstreetmap.josm.plugins.pt_assistant.validation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 class StopCheckerTest {
-
-    @RegisterExtension
-    static JOSMTestRules rules = new JOSMTestRules();
-
     @Test
     void testNodePartOfStopArea() {
 
@@ -33,9 +27,9 @@ class StopCheckerTest {
 
         NodeChecker nodeChecker = new NodeChecker(node, test);
         nodeChecker.performNodePartOfStopAreaTest();
-        assertEquals(nodeChecker.getErrors().size(), 1);
-        assertEquals(nodeChecker.getErrors().get(0).getCode(),
-                PTAssistantValidatorTest.ERROR_CODE_NOT_PART_OF_STOP_AREA);
+        assertEquals(1, nodeChecker.getErrors().size());
+        assertEquals(PTAssistantValidatorTest.ERROR_CODE_NOT_PART_OF_STOP_AREA,
+            nodeChecker.getErrors().get(0).getCode());
     }
 
     @Test
@@ -55,9 +49,9 @@ class StopCheckerTest {
 
         StopChecker stopChecker = new StopChecker(stopArea, test);
         stopChecker.performStopAreaRelationsTest();
-        assertEquals(stopChecker.getErrors().size(), 1);
-        assertEquals(stopChecker.getErrors().get(0).getCode(),
-                PTAssistantValidatorTest.ERROR_CODE_STOP_AREA_COMPARE_RELATIONS);
+        assertEquals(1, stopChecker.getErrors().size());
+        assertEquals(PTAssistantValidatorTest.ERROR_CODE_STOP_AREA_COMPARE_RELATIONS,
+            stopChecker.getErrors().get(0).getCode());
     }
 
     @Test
@@ -76,9 +70,9 @@ class StopCheckerTest {
 
         StopChecker stopChecker = new StopChecker(stopArea, test);
         stopChecker.performStopAreaStopPositionTest();
-        assertEquals(stopChecker.getErrors().size(), 1);
-        assertEquals(stopChecker.getErrors().get(0).getCode(),
-                PTAssistantValidatorTest.ERROR_CODE_STOP_AREA_NO_STOPS);
+        assertEquals(1, stopChecker.getErrors().size());
+        assertEquals(PTAssistantValidatorTest.ERROR_CODE_STOP_AREA_NO_STOPS,
+            stopChecker.getErrors().get(0).getCode());
     }
 
     @Test
@@ -97,9 +91,9 @@ class StopCheckerTest {
 
         StopChecker stopChecker = new StopChecker(stopArea, test);
         stopChecker.performStopAreaPlatformTest();
-        assertEquals(stopChecker.getErrors().size(), 1);
-        assertEquals(stopChecker.getErrors().get(0).getCode(),
-                PTAssistantValidatorTest.ERROR_CODE_STOP_AREA_NO_PLATFORM);
+        assertEquals(1, stopChecker.getErrors().size());
+        assertEquals(PTAssistantValidatorTest.ERROR_CODE_STOP_AREA_NO_PLATFORM,
+            stopChecker.getErrors().get(0).getCode());
 
     }
 }

@@ -4,20 +4,14 @@ package org.openstreetmap.josm.plugins.pt_assistant.validation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
 import org.openstreetmap.josm.plugins.pt_assistant.data.PTRouteDataManager;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 class SegmentCheckerTest {
-
-    @RegisterExtension
-    static JOSMTestRules rules = new JOSMTestRules();
-
     @Test
     void testBasics() {
         DataSet ds = TestFiles.importOsmFile(TestFiles.SEGMENT_TEST(), "testLayer");

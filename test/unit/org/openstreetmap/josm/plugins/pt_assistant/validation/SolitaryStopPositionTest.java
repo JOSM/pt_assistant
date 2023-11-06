@@ -4,17 +4,11 @@ package org.openstreetmap.josm.plugins.pt_assistant.validation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 class SolitaryStopPositionTest {
-
-    @RegisterExtension
-    static JOSMTestRules rules = new JOSMTestRules();
-
     @Test
     void testSolitaryStopPosition() {
 
@@ -34,15 +28,15 @@ class SolitaryStopPositionTest {
 
         NodeChecker checkerPlatform = new NodeChecker(platform, test);
         checkerPlatform.performPlatformPartOfWayTest();
-        assertEquals(checkerPlatform.getErrors().size(), 1);
-        assertEquals(checkerPlatform.getErrors().get(0).getCode(),
-                PTAssistantValidatorTest.ERROR_CODE_PLATFORM_PART_OF_HIGHWAY);
+        assertEquals(1, checkerPlatform.getErrors().size());
+        assertEquals(PTAssistantValidatorTest.ERROR_CODE_PLATFORM_PART_OF_HIGHWAY,
+                checkerPlatform.getErrors().get(0).getCode());
 
         NodeChecker checkerStopPosition = new NodeChecker(stopPosition, test);
         checkerStopPosition.performSolitaryStopPositionTest();
-        assertEquals(checkerStopPosition.getErrors().size(), 1);
-        assertEquals(checkerStopPosition.getErrors().get(0).getCode(),
-                PTAssistantValidatorTest.ERROR_CODE_SOLITARY_STOP_POSITION);
+        assertEquals(1, checkerStopPosition.getErrors().size());
+        assertEquals(PTAssistantValidatorTest.ERROR_CODE_SOLITARY_STOP_POSITION,
+                checkerStopPosition.getErrors().get(0).getCode());
 
     }
 }

@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.openstreetmap.josm.data.osm.DataSet;
@@ -15,13 +14,8 @@ import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.RouteUtils;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 class AdjacentWaysTest {
-
-    @RegisterExtension
-    static JOSMTestRules rules = new JOSMTestRules();
-
     @ParameterizedTest
     @ValueSource(ints = {1, 2})
     void testAdjacentOneways(int oneWayTestSize) {

@@ -6,12 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 /**
  * Tests if the representation of a route relation is created correctly in the
@@ -21,10 +19,6 @@ import org.openstreetmap.josm.testutils.JOSMTestRules;
  *
  */
 class RouteRepresentationTest {
-
-    @RegisterExtension
-    static JOSMTestRules rules = new JOSMTestRules();
-
     @Test
     void testCorrectRoute() {
 
@@ -102,8 +96,8 @@ class RouteRepresentationTest {
 
         PTRouteDataManager manager = new PTRouteDataManager(route);
 
-        assertEquals(manager.getPTStopCount(), 5);
-        assertEquals(manager.getPTWayCount(), 4);
+        assertEquals(5, manager.getPTStopCount());
+        assertEquals(4, manager.getPTWayCount());
 
     }
 
@@ -172,8 +166,8 @@ class RouteRepresentationTest {
 
         PTRouteDataManager manager = new PTRouteDataManager(route);
 
-        assertEquals(manager.getFailedMembers().size(), 1);
-        assertEquals(manager.getPTStopCount(), 5);
-        assertEquals(manager.getPTWayCount(), 3);
+        assertEquals(1, manager.getFailedMembers().size());
+        assertEquals(5, manager.getPTStopCount());
+        assertEquals(3, manager.getPTWayCount());
     }
 }

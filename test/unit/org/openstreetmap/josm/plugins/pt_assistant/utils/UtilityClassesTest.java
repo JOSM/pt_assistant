@@ -1,15 +1,9 @@
 package org.openstreetmap.josm.plugins.pt_assistant.utils;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.plugins.pt_assistant.TestUtil;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 class UtilityClassesTest {
-
-    @RegisterExtension
-    static JOSMTestRules rules = new JOSMTestRules();
-
     @Test
     void testAllUtilityClasses() {
         TestUtil.testUtilityClass(BoundsUtils.class);

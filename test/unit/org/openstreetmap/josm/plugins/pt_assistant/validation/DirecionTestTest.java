@@ -9,19 +9,13 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 class DirecionTestTest {
-
-    @RegisterExtension
-    static JOSMTestRules rules = new JOSMTestRules();
-
     @Test
     void testOnewayTrue() {
 
@@ -37,7 +31,7 @@ class DirecionTestTest {
             errors.addAll(wayChecker.getErrors());
         }
 
-        assertEquals(errors.size(), 2);
+        assertEquals(2, errors.size());
         int onewayErrorCaught = 0;
         for (TestError e : errors) {
             if (e.getCode() == PTAssistantValidatorTest.ERROR_CODE_DIRECTION) {
@@ -45,7 +39,7 @@ class DirecionTestTest {
             }
         }
 
-        assertEquals(onewayErrorCaught, 2);
+        assertEquals(2, onewayErrorCaught);
 
         boolean detectedErrorsAreCorrect = true;
         for (TestError e : errors) {

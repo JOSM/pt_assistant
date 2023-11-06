@@ -7,20 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
-public class PlatformAsWayTest {
-
-    @RegisterExtension
-    static JOSMTestRules rules = new JOSMTestRules();
-
+class PlatformAsWayTest {
     @Test
-    void sortingTest() {
+    void testSorting() {
         DataSet ds = TestFiles.importOsmFile(TestFiles.PLATFORM_AS_WAY(), "testLayer");
 
         PTAssistantValidatorTest test = new PTAssistantValidatorTest();
@@ -37,6 +31,6 @@ public class PlatformAsWayTest {
             errors.addAll(routeChecker.getErrors());
         }
 
-        assertEquals(errors.size(), 0);
+        assertEquals(0, errors.size());
     }
 }

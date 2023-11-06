@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.TestUtils;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
@@ -22,7 +21,7 @@ import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.io.IllegalDataException;
 import org.openstreetmap.josm.io.OsmReader;
 import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
+import org.openstreetmap.josm.testutils.annotations.Projection;
 
 /**
  * Unit tests for class {@link SortPTRouteMembersAction}.
@@ -30,11 +29,8 @@ import org.openstreetmap.josm.testutils.JOSMTestRules;
  * @author giack
  *
  */
+@Projection
 class SortPTRouteMembersActionTest {
-
-    @RegisterExtension
-    public static JOSMTestRules rules = new JOSMTestRules().projection();
-
     private DataSet ds;
 
     @BeforeEach

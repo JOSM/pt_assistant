@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -23,16 +22,11 @@ import org.openstreetmap.josm.io.OsmReader;
 import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopUtils;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 /**
 * Unit tests of {@link StopToWayAssigner}.
 */
 class PTStopTest {
-
-    @RegisterExtension
-    static JOSMTestRules rules = new JOSMTestRules();
-
     private DataSet ds;
 
     @BeforeEach
@@ -66,8 +60,7 @@ class PTStopTest {
             if (referredPrimitive.getType().equals(OsmPrimitiveType.RELATION)) {
                 Relation referredRelation = (Relation) referredPrimitive;
                 if (checkRelationContainsStop(referredRelation, stop) != null) {
-                    PTStop pts = new PTStop(checkRelationContainsStop(referredRelation, stop));
-                    return pts;
+                    return new PTStop(checkRelationContainsStop(referredRelation, stop));
                 }
             }
         }

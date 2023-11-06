@@ -4,7 +4,6 @@ package org.openstreetmap.josm.plugins.pt_assistant.actions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.command.SplitWayCommand;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
@@ -26,16 +24,11 @@ import org.openstreetmap.josm.io.IllegalDataException;
 import org.openstreetmap.josm.io.OsmReader;
 import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.PTProperties;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 /**
  * Unit tests of {@link SplitRoundaboutAction}.
  */
 class SplitRoundaboutTest {
-
-    @RegisterExtension
-    static JOSMTestRules rules = new JOSMTestRules();
-
     private DataSet ds, ds1, ds2;
     private OsmDataLayer layer;
     private SplitRoundaboutAction action;

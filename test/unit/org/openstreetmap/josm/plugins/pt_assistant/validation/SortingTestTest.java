@@ -8,18 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 class SortingTestTest {
-
-    @RegisterExtension
-    static JOSMTestRules rules = new JOSMTestRules();
-
     @Test
     void testSortingBeforeFile() {
         DataSet ds = TestFiles.importOsmFile(TestFiles.DL131_BEFORE(), "testLayer");
@@ -35,9 +29,9 @@ class SortingTestTest {
 
         }
 
-        assertEquals(errors.size(), 1);
-        assertEquals(errors.iterator().next().getCode(), PTAssistantValidatorTest.ERROR_CODE_SORTING);
-        assertEquals(errors.iterator().next().getTester().getClass().getName(), PTAssistantValidatorTest.class.getName());
+        assertEquals(1, errors.size());
+        assertEquals(PTAssistantValidatorTest.ERROR_CODE_SORTING, errors.iterator().next().getCode());
+        assertEquals(PTAssistantValidatorTest.class.getName(), errors.iterator().next().getTester().getClass().getName());
     }
 
     @Test
@@ -56,7 +50,7 @@ class SortingTestTest {
         }
 
 
-        assertEquals(errors.size(), 0);
+        assertEquals(0, errors.size());
     }
 
     // TODO: this test will only pass after the functionality for recognizing
@@ -92,6 +86,6 @@ class SortingTestTest {
             errors.addAll(routeChecker.getErrors());
         }
 
-        assertEquals(errors.size(), 0);
+        assertEquals(0, errors.size());
     }
 }

@@ -4,22 +4,16 @@ package org.openstreetmap.josm.plugins.pt_assistant.data;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.plugins.pt_assistant.TestFiles;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.StopToWayAssigner;
-import org.openstreetmap.josm.testutils.JOSMTestRules;
 
 /**
  * Unit tests of {@link StopToWayAssigner}.
  */
 class StopToWayAssignerTest {
-
-    @RegisterExtension
-    static JOSMTestRules rules = new JOSMTestRules();
-
     @Test
     void testOnewayBadMemberSorting() {
 
