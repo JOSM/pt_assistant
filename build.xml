@@ -21,4 +21,12 @@
       </fileset>
     </copy>
   </target>
+  <target name="additional-manifest">
+    <manifest file="MANIFEST" mode="update">
+      <attribute name="13957_Plugin-Url" value="v2.0.0;https://github.com/JOSM/pt_assistant/releases/download/v2.0.0/pt_assistant.jar" />
+      <attribute name="14027_Plugin-Url" value="v2.1.4;https://github.com/JOSM/pt_assistant/releases/download/v2.1.4/pt_assistant.jar" />
+      <attribute name="14149_Plugin-Url" value="v2.1.6;https://github.com/JOSM/pt_assistant/releases/download/v2.1.6/pt_assistant.jar" />
+      <attribute name="17903_Plugin-Url" value="v2.1.15;https://github.com/JOSM/pt_assistant/releases/download/v2.1.15/pt_assistant.jar" />
+    </manifest>
+  </target>
 </project>
