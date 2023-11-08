@@ -7,7 +7,7 @@
 # fayçal fatihi, 2018
 # Florian Schäfer, 2018
 # Simon Legner, 2018
-# Andrey Golovin, 2020
+# Andrii Holovin, 2020
 #
 msgid ""
 msgstr ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
-"Language-Team: Ukrainian (https://www.transifex.com/josm/teams/2544/uk/)\n"
+"Language-Team: Ukrainian (https://app.transifex.com/josm/teams/2544/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -140,11 +140,17 @@ msgstr "Закрити"
 msgid "Close the options"
 msgstr "Закрити параметри"
 
+msgid "Commuter"
+msgstr ""
+
 msgid "Cover"
 msgstr "Навіс"
 
 msgid "Create ''route'' relation for opposite direction of travel?"
 msgstr "Створити зв’язок ''route'' для зворотнього напрямку?"
+
+msgid "Create ''route_master'' relation and add these route relations to it?"
+msgstr ""
 
 msgid "Create a route_master?"
 msgstr "Створити route_master?"
@@ -186,6 +192,9 @@ msgstr "Не звіряти назву першої зупинки з теґом
 msgid "Don’t compare name of last stop with to tag in route relation"
 msgstr "Не звіряти назву останньої зупинки з теґом to зі зв’язка"
 
+msgid "Double Split"
+msgstr ""
+
 msgid "Download finished: {0}"
 msgstr "Завантаження завершено: {0}"
 
@@ -203,6 +212,12 @@ msgstr ""
 "Завантаження відсутніх членів звʼязку маршруту. Будь ласка, зачекайте доки "
 "завантаження закінчиться."
 
+msgid "Edge Selection"
+msgstr ""
+
+msgid "Entire area"
+msgstr ""
+
 msgid "Error in roundabout"
 msgstr "Помилка на кільці"
 
@@ -212,11 +227,17 @@ msgid ""
 msgstr ""
 "Помилка: шлях, приєднаний до кільця у зв’язку не дозволяє рух велосипедом."
 
+msgid "Esc"
+msgstr ""
+
 msgid "Extract node from line"
 msgstr "Виокремити точку з лінії"
 
 msgid "Extract platform node"
 msgstr "Виокремити точку платформи"
+
+msgid "ExtractPlatformNodeAction"
+msgstr ""
 
 msgid "Extracts platform node from a node"
 msgstr "Виокремити точку платформи з точки"
@@ -233,33 +254,71 @@ msgstr "Виправлення помилок…"
 msgid "Here you can change some preferences of PTAssistant functions"
 msgstr "Тут ви можете змінити деякі налаштування параметрів PTAssistant"
 
+msgid "High speed"
+msgstr ""
+
+msgid "How would you want the download to take place?"
+msgstr ""
+
 msgid "Include stop_area tests"
 msgstr "Включаючи перевірку stop_area"
 
 msgid "Incomplete Members"
 msgstr "Незавантажені члени"
 
+msgid "Incomplete relations"
+msgstr ""
+
 msgid "Invalid selection"
 msgstr "Неправильне виділення"
 
+msgid "Long distance"
+msgstr ""
+
+msgid ""
+"Mode of Travel -> {0} \n"
+" total ways selected -> {1}"
+msgstr ""
+
+msgid ""
+"Mode of Travel: {0} \n"
+" total ways selected: {1}"
+msgstr ""
+
 msgid "Mode: {0}"
 msgstr "Режим {0}"
+
+msgid "NA"
+msgstr ""
 
 #. i18n: label for the tag name=*
 msgid "Name"
 msgstr "Назва"
 
+#. i18n: label for the tag name:en=*
+msgid "Name (en.)"
+msgstr ""
+
 msgid "Network"
 msgstr "Мережа"
 
+msgid "Network level"
+msgstr ""
+
 msgid "No"
 msgstr "Ні"
+
+msgid "Not all members are downloaded"
+msgstr ""
 
 msgid "Ok"
 msgstr "Так"
 
 msgid "Operator"
 msgstr "Оператор"
+
+msgid "Opposite itinerary?"
+msgstr ""
 
 msgid "PT Wizard"
 msgstr "ГТ Майстер"
@@ -275,6 +334,10 @@ msgstr "ГТ: Проблема з відрізком маршруту, без а
 
 msgid "PT: Problem in the route segment with one automatic fix"
 msgstr "ГТ: Проблема з відрізком маршруту з одним автоматичним виправленням"
+
+msgid ""
+"PT: Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
 
 msgid "PT: Relation member roles do not match tags"
 msgstr "ГТ: Роль члена звʼязку не відповідає теґам"
@@ -349,8 +412,14 @@ msgid ""
 msgstr ""
 "ГТ: Назва останньої зупинки не збігається з теґом \"to\" у звʼязку маршруту"
 
+msgid "PT: There is a gap in the {0} route"
+msgstr ""
+
 msgid "PT: dummy test warning"
 msgstr "ГТ: фіктивне попередження"
+
+msgid "PTAssistantPlugin settings"
+msgstr ""
 
 msgid "PT_Assistant Message"
 msgstr "ГТ_Помічник Повідомлення"
@@ -362,23 +431,90 @@ msgstr "Громадський транспорт"
 msgid "Public Transport Assistant tests"
 msgstr "Перевірки Помічника громадського транспорту"
 
+msgid "Public Transport: {0}"
+msgstr ""
+
 msgid "Public transport routes"
 msgstr "Маршрути громадського транспорту"
 
 msgid "Railway station"
 msgstr "Залізнична станція"
 
+msgid "Railway stop"
+msgstr ""
+
+msgid ""
+"Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
+
+msgid "Regional"
+msgstr ""
+
+msgid "Remove current edge (white)"
+msgstr ""
+
+msgid "Remove oneway and split roundabout ways?"
+msgstr ""
+
+msgid ""
+"Remove public_transport=platform from platform WAYS when transferring "
+"details to platform NODE."
+msgstr ""
+
+msgid "Remove public_transport=platform from platform ways"
+msgstr ""
+
+msgid "Remove roundabout from relations"
+msgstr ""
+
+msgid "Remove ways"
+msgstr ""
+
+msgid "Remove ways along with previous way"
+msgstr ""
+
+msgid "Replace Membership"
+msgstr ""
+
+msgid ""
+"Replace platform way in the route relations by node representing the stop"
+msgstr ""
+
 msgid "Roundabout round"
 msgstr "Проїзд по кругу"
+
+msgid "Routing Helper"
+msgstr ""
 
 msgid "Save"
 msgstr "Зберегти"
 
+msgid "Set from tag?"
+msgstr ""
+
+msgid "Set to tag?"
+msgstr ""
+
+msgid "Set up PT Assistant for more convenient use"
+msgstr ""
+
+msgid "Share taxi"
+msgstr ""
+
 msgid "Shelter"
 msgstr "Навіс"
 
+msgid "Shortcut action to Transfer details of stop to platform node"
+msgstr ""
+
 msgid "Skip"
 msgstr "Пропустити"
+
+msgid "Sort PT Route Members"
+msgstr ""
+
+msgid "Sort PT Route Members Relation Editor"
+msgstr ""
 
 msgid "Split Roundabout"
 msgstr "Розрізати кільце"
@@ -388,6 +524,12 @@ msgstr "Розрізати лінію"
 
 msgid "Split white edge"
 msgstr "Розрізати біле ребро"
+
+msgid "Stop area tag assign"
+msgstr ""
+
+msgid "Stop customizing"
+msgstr ""
 
 msgid ""
 "The relation has incomplete members.\n"
@@ -403,6 +545,52 @@ msgstr ""
 "Звʼязок завантажено не повністю. Завантажити відсутніх членів та продовжити "
 "сортування?"
 
+msgid ""
+"The roundabout is not directly connected to either of the previous or next "
+"way in the relation"
+msgstr ""
+
+msgid "The selected node is not a stop position for public transport!"
+msgstr ""
+
+msgid ""
+"This action can only be performed if exactly one stop position node is "
+"selected."
+msgstr ""
+
+msgid "This action requires single node to be selected."
+msgstr ""
+
+msgid "This is not a PT v2 relation"
+msgstr ""
+
+msgid ""
+"This relation is not PT version 2. Sorting its stops wouldn't make sense.\n"
+"\n"
+"Would you like to set ''public_transport:version=2''?\n"
+"\n"
+"There will still be some extra work needed,\n"
+"\n"
+"but PT_Assistant can help prepare the \n"
+"''route'' and ''route_master'' relations."
+msgstr ""
+
+msgid "This stop has been removed"
+msgstr ""
+
+msgid ""
+"To prepare for conversion to PT v2\n"
+"\n"
+"it may help to remove oneway and split roundabout ways?\n"
+"\n"
+"Would you like to do this automatically?\n"
+"\n"
+"When asked to remove stops that cannot be served,\n"
+"answer ''no'' and use the button to sort the stops\n"
+"once more after adding the ways once again\n"
+"by using the routing helper"
+msgstr ""
+
 msgid "Toggle direction arrows"
 msgstr "Показувати стрілки напрямку"
 
@@ -412,6 +600,21 @@ msgstr "Показувати таблички маршрутів"
 msgid "Tram"
 msgstr "Трамвай"
 
+msgid ""
+"Transfer details from platform way to node representing the stop (leave "
+"tactile_paving and wheelchair on the platform way)"
+msgstr ""
+
+msgid ""
+"Transfer details from stop_position nodes to node representing the stop"
+msgstr ""
+
+msgid "Transfer details of stop to platform node"
+msgstr ""
+
+msgid "Transferring details to platform NODE."
+msgstr ""
+
 msgid "Trolleybus"
 msgstr "Тролейбус"
 
@@ -420,8 +623,14 @@ msgstr ""
 "Натисніть літеру, щоб вибрати варіант виправлення або натисніть Esc, що "
 "оминути його"
 
+msgid "Unable to connect to {0}"
+msgstr ""
+
 msgid "Updating map ..."
 msgstr "Оновлення мапи…"
+
+msgid "Use 1/2/3/4 instead of A/B/C/D for selecting which way to follow"
+msgstr ""
 
 msgid "Visualize public transport routes"
 msgstr "Показати маршрути громадського транспорту"
@@ -436,6 +645,15 @@ msgstr "Чим повинен бути цей відрізок?"
 
 msgid "Yes"
 msgstr "Так"
+
+msgid "pt_assistant layer"
+msgstr ""
+
+msgid "solutions based on other route relations"
+msgstr ""
+
+msgid "turn-by-turn at next intersection"
+msgstr ""
 
 #. Plugin description for project ':pt_assistant'.name
 msgid ""

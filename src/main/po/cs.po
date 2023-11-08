@@ -1,26 +1,88 @@
 # Translations for the JOSM plugin 'pt_assistant' (cs)
-# Copyright (C) 2018
+# Copyright (C) 2022
 # This file is distributed under the same license as the josm-plugin_pt_assistant package.
 # FIRST AUTHOR, YEAR.
 #
+# Translators:
+# Florian Schäfer, 2018
+# Simon Legner, 2019
+# Jakub Slabák, 2023
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: josm-plugin_pt_assistant v2.1.9-72-g1429cfa\n"
+"Project-Id-Version: josm-plugin_pt_assistant 2.1.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 16:58+0000\n"
+"POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
-"Language-Team: Czech (https://www.transifex.com/josm/teams/2544/cs/)\n"
+"Language-Team: Czech (https://app.transifex.com/josm/teams/2544/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cs\n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
+msgid " "
+msgstr " "
+
+msgid ""
+"''from'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+
+msgid ""
+"''from''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+"''from''={0}.\n"
+"Změnit na\n"
+"''{1}''?"
+
+msgid ""
+"''to'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+
+msgid ""
+"''to''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+"''to''={0}.\n"
+"Změnit na\n"
+"''{1}''?"
+
 msgid "A valid public_transport:version=2 route is required"
 msgstr "Je vyžadována platná trasa public_transport:version=2"
 
+msgid "Add oneway:bicycle=no to way"
+msgstr ""
+
+msgid "Add oneway:bus=no to way"
+msgstr ""
+
+msgid "Add public_transport=stop_position + mode of transport on these nodes"
+msgstr ""
+
+msgid "Add stop position"
+msgstr ""
+
+msgid "Always split ways, even if they are not at the end of the itinerary"
+msgstr ""
+
 msgid "Area"
 msgstr "Označit jako plochu"
+
+msgid "Area around way"
+msgstr ""
+
+msgid "Area before removal"
+msgstr ""
+
+msgid "Assign transport type to platform"
+msgstr ""
 
 msgid "Bench"
 msgstr "Lavička"
@@ -31,8 +93,29 @@ msgstr "Testy tras pro jízdní kola a pěší"
 msgid "Bus"
 msgstr "Autobus"
 
+msgid "Bus station"
+msgstr "Autobusové nádraží"
+
 msgid "Cancel"
 msgstr "Zrušit"
+
+msgid "Change from tag?"
+msgstr ""
+
+msgid "Change name tag?"
+msgstr ""
+
+msgid ""
+"Change name to\n"
+"''{0}''\n"
+"?"
+msgstr ""
+"Změnit název na\n"
+"''{0}''\n"
+"?"
+
+msgid "Change to tag?"
+msgstr ""
 
 msgid ""
 "Check if route relations are compatible with public transport version 2"
@@ -40,8 +123,35 @@ msgstr ""
 "Kontroluje, zda relace route jsou kompatibilní se schématem veřejné dopravy "
 "verze 2"
 
+msgid "City transport"
+msgstr "Doprava ve městě"
+
 msgid "Close"
 msgstr "Zavřít"
+
+msgid "Close the options"
+msgstr "Zavřít volby"
+
+msgid "Commuter"
+msgstr ""
+
+msgid "Cover"
+msgstr ""
+
+msgid "Create ''route'' relation for opposite direction of travel?"
+msgstr ""
+
+msgid "Create ''route_master'' relation and add these route relations to it?"
+msgstr ""
+
+msgid "Create a route_master?"
+msgstr ""
+
+msgid "Customize stop"
+msgstr "Přizpůsobit zastávku"
+
+msgid "Customize stop under osm public transit standard v2"
+msgstr ""
 
 msgid "Displays stops of selected public transport routes as graph"
 msgstr "Zobrazuje zastávky zvolených tras veřejné dopravy jako graf"
@@ -49,18 +159,73 @@ msgstr "Zobrazuje zastávky zvolených tras veřejné dopravy jako graf"
 msgid "Distance between stops"
 msgstr "Vzdálenost mezi zastávkami"
 
-msgid "Do you want to download referrers of platforms and stop positions?"
-msgstr "Chcete stáhnout prvky odkazující na nástupiště a místa zastavení?"
+msgid "Do not remove ways"
+msgstr "Neodstraňujte cesty"
 
 msgid "Do you want to make the roundabout round?"
 msgstr "Chcete udělat kruhový objezd kulatým?"
+
+msgid ""
+"Don’t add public_transport=platform and mode of transport to node "
+"representing the stop (suffice with highway=bus_stop or railway=tram_stop)"
+msgstr ""
+
+msgid ""
+"Don’t check whether route relation starts and ends on stop_position node"
+msgstr ""
+
+msgid "Don’t compare name of first stop with from tag in route relation"
+msgstr ""
+
+msgid "Don’t compare name of last stop with to tag in route relation"
+msgstr ""
+
+msgid "Double Split"
+msgstr ""
+
+msgid "Download finished: {0}"
+msgstr "Stahování dokončeno: {0}"
 
 #. CHECKSTYLE.OFF: LineLength
 msgid "Download incomplete route relation members"
 msgstr "Stáhnout nekompletní členy relace route"
 
+msgid "Download started: {0}"
+msgstr "Stahování zahájeno: {0}"
+
+msgid ""
+"Downloading incomplete relation members. Kindly wait till download gets "
+"over."
+msgstr ""
+
+msgid "Edge Selection"
+msgstr "Výběr okraje"
+
+msgid "Entire area"
+msgstr "Celá oblast"
+
+msgid "Error in roundabout"
+msgstr "Chyba na kruhovém objezdu"
+
+msgid ""
+"Error: The paths connecting the roundabout in the relation do not allow "
+"bicycles."
+msgstr ""
+
+msgid "Esc"
+msgstr "Esc"
+
 msgid "Extract node from line"
 msgstr "Vyjme bod z cesty"
+
+msgid "Extract platform node"
+msgstr ""
+
+msgid "ExtractPlatformNodeAction"
+msgstr ""
+
+msgid "Extracts platform node from a node"
+msgstr ""
 
 msgid "Fix error"
 msgstr "Opravit chybu"
@@ -68,8 +233,17 @@ msgstr "Opravit chybu"
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Opravuji ({0}/{1}): ''{2}''"
 
-msgid "How do you want to proceed?"
-msgstr "Jak chcete pokračovat?"
+msgid "Fixing errors …"
+msgstr "Oprava chyb…"
+
+msgid "Here you can change some preferences of PTAssistant functions"
+msgstr ""
+
+msgid "High speed"
+msgstr "Vysokorychlostní"
+
+msgid "How would you want the download to take place?"
+msgstr ""
 
 msgid "Include stop_area tests"
 msgstr "Zahrnout testy stop_area"
@@ -77,27 +251,62 @@ msgstr "Zahrnout testy stop_area"
 msgid "Incomplete Members"
 msgstr "Nekompletní členy"
 
+msgid "Incomplete relations"
+msgstr "Neúplné relace"
+
 msgid "Invalid selection"
 msgstr "Neplatný výběr"
 
+msgid "Long distance"
+msgstr "Dálkový"
+
+msgid ""
+"Mode of Travel -> {0} \n"
+" total ways selected -> {1}"
+msgstr ""
+
+msgid ""
+"Mode of Travel: {0} \n"
+" total ways selected: {1}"
+msgstr ""
+
 msgid "Mode: {0}"
 msgstr "Režim: {0}"
+
+msgid "NA"
+msgstr ""
 
 #. i18n: label for the tag name=*
 msgid "Name"
 msgstr "Název"
 
+#. i18n: label for the tag name:en=*
+msgid "Name (en.)"
+msgstr "Anglický název"
+
 msgid "Network"
 msgstr "Síť"
 
+msgid "Network level"
+msgstr ""
+
 msgid "No"
 msgstr "Ne"
+
+msgid "Not all members are downloaded"
+msgstr ""
 
 msgid "Ok"
 msgstr "Ok"
 
 msgid "Operator"
 msgstr "Provozovatel"
+
+msgid "Opposite itinerary?"
+msgstr ""
+
+msgid "PT Wizard"
+msgstr ""
 
 msgid "PT: First or last way needs to be split"
 msgstr "VD: První nebo poslední cesta by měla být rozdělena"
@@ -110,6 +319,10 @@ msgstr "VD: Problém se segmentem trasy s žádnou automatickou opravou"
 
 msgid "PT: Problem in the route segment with one automatic fix"
 msgstr "VD: Problém se segmentem trasy s jednou automatickou opravou"
+
+msgid ""
+"PT: Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
 
 msgid "PT: Relation member roles do not match tags"
 msgstr "VD: Role členů relace neodpovídají značkám"
@@ -179,21 +392,17 @@ msgid ""
 "relation"
 msgstr "VD: Název poslední zastávky neodpovídá značce \"to\" relace trasy"
 
+msgid "PT: There is a gap in the {0} route"
+msgstr ""
+
 msgid "PT: dummy test warning"
 msgstr "VD: varování testovacího testu"
 
-msgid "PT_Assistant Fetch Request"
-msgstr "PT_Assistant Požadavek na čtení"
+msgid "PTAssistantPlugin settings"
+msgstr ""
 
 msgid "PT_Assistant Message"
 msgstr "Zpráva Asistenta VD"
-
-#. showDialog(); FIXME
-msgid "PT_Assistant Proceed Request"
-msgstr "PT_Assistant Požadavek na pokračování"
-
-msgid "PT_Assistant plugin found that this relation (id={0}) has errors:"
-msgstr "Doplněk PT_Assistant zjistil, že tato relace (id={0}) obsahuje chyby:"
 
 msgctxt "menu"
 msgid "Public Transport"
@@ -202,35 +411,110 @@ msgstr "Hromadná doprava"
 msgid "Public Transport Assistant tests"
 msgstr "Public Transport Assistant testy"
 
+msgid "Public Transport: {0}"
+msgstr "Veřejná doprava: {0}"
+
 msgid "Public transport routes"
 msgstr "Trasy veřejné dopravy"
 
-msgid "Remember my choice and do not ask me again in this session"
-msgstr "Pamatuj si moje volbu a při tomto sezení se již neptej"
+msgid "Railway station"
+msgstr "Železniční stanice"
 
-msgid "Repeat last fix"
-msgstr "Opakovat poslední opravu"
+msgid "Railway stop"
+msgstr "Železniční zastávka"
+
+msgid ""
+"Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
+
+msgid "Regional"
+msgstr "Regionální"
+
+msgid "Remove current edge (white)"
+msgstr ""
+
+msgid "Remove oneway and split roundabout ways?"
+msgstr ""
+
+msgid ""
+"Remove public_transport=platform from platform WAYS when transferring "
+"details to platform NODE."
+msgstr ""
+
+msgid "Remove public_transport=platform from platform ways"
+msgstr ""
+
+msgid "Remove roundabout from relations"
+msgstr "Odebrat kruhov objezd z relací"
+
+msgid "Remove ways"
+msgstr "Odebrat cesty"
+
+msgid "Remove ways along with previous way"
+msgstr ""
+
+msgid "Replace Membership"
+msgstr ""
+
+msgid ""
+"Replace platform way in the route relations by node representing the stop"
+msgstr ""
 
 msgid "Roundabout round"
 msgstr "Zakulatit kruhový objezd"
 
-msgid ""
-"Route relations have incomplete members.\n"
-"They need to be downloaded to proceed with validation.\n"
-"Do you want to download them?"
+msgid "Routing Helper"
 msgstr ""
-"Relace route má nekompletní členy.\n"
-"Před pokračováním kontroly musí být staženy.\n"
-"Chcete je stáhnout?"
 
 msgid "Save"
 msgstr "Uložit"
+
+msgid "Set from tag?"
+msgstr ""
+
+msgid "Set to tag?"
+msgstr ""
+
+msgid "Set up PT Assistant for more convenient use"
+msgstr ""
 
 msgid "Share taxi"
 msgstr "Sdílené taxi"
 
 msgid "Shelter"
 msgstr "Zařízení poskytující dočasné přístřeší."
+
+msgid "Shortcut action to Transfer details of stop to platform node"
+msgstr ""
+
+msgid "Skip"
+msgstr "Přeskočit"
+
+msgid "Sort PT Route Members"
+msgstr ""
+
+msgid "Sort PT Route Members Relation Editor"
+msgstr ""
+
+msgid "Split Roundabout"
+msgstr "Rozdělit kruhový objezd"
+
+msgid "Split way"
+msgstr "Rozdělit cestu"
+
+msgid "Split white edge"
+msgstr ""
+
+msgid "Stop area tag assign"
+msgstr ""
+
+msgid "Stop customizing"
+msgstr ""
+
+msgid ""
+"The relation has incomplete members.\n"
+"Do you want to download them and continue with the sorting?"
+msgstr ""
 
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
@@ -239,17 +523,76 @@ msgstr ""
 "Relace obsahuje nekompletní členy. Chcete je stáhnout a pokračovat v "
 "třídění?"
 
+msgid ""
+"The roundabout is not directly connected to either of the previous or next "
+"way in the relation"
+msgstr ""
+"Kruhový objezd není přímo připojen k předchozí či následující cestě v relaci"
+
+msgid "The selected node is not a stop position for public transport!"
+msgstr "Zvolený uzel není místem zastavení hromadné dopravy!"
+
+msgid ""
+"This action can only be performed if exactly one stop position node is "
+"selected."
+msgstr ""
+
+msgid "This action requires single node to be selected."
+msgstr ""
+
+msgid "This is not a PT v2 relation"
+msgstr ""
+
+msgid ""
+"This relation is not PT version 2. Sorting its stops wouldn't make sense.\n"
+"\n"
+"Would you like to set ''public_transport:version=2''?\n"
+"\n"
+"There will still be some extra work needed,\n"
+"\n"
+"but PT_Assistant can help prepare the \n"
+"''route'' and ''route_master'' relations."
+msgstr ""
+
+msgid "This stop has been removed"
+msgstr "Tato zastávka byla odstraněna"
+
+msgid ""
+"To prepare for conversion to PT v2\n"
+"\n"
+"it may help to remove oneway and split roundabout ways?\n"
+"\n"
+"Would you like to do this automatically?\n"
+"\n"
+"When asked to remove stops that cannot be served,\n"
+"answer ''no'' and use the button to sort the stops\n"
+"once more after adding the ways once again\n"
+"by using the routing helper"
+msgstr ""
+
 msgid "Toggle direction arrows"
 msgstr "Přepnout směrové šipky"
 
 msgid "Toggle reference labels"
 msgstr "Přepnout referenční štítky"
 
-msgid "Tool: {0}"
-msgstr "Nástroj: {0}"
-
 msgid "Tram"
 msgstr "Tramvaj"
+
+msgid ""
+"Transfer details from platform way to node representing the stop (leave "
+"tactile_paving and wheelchair on the platform way)"
+msgstr ""
+
+msgid ""
+"Transfer details from stop_position nodes to node representing the stop"
+msgstr ""
+
+msgid "Transfer details of stop to platform node"
+msgstr ""
+
+msgid "Transferring details to platform NODE."
+msgstr ""
 
 msgid "Trolleybus"
 msgstr "Trolejbus"
@@ -259,8 +602,14 @@ msgstr ""
 "Stiskněte písmeno pro volbu opravy, nebo stiskněte Escape pro opuštění bez "
 "oprav"
 
+msgid "Unable to connect to {0}"
+msgstr "Připojení k {0} se nezdařilo."
+
 msgid "Updating map ..."
 msgstr "Aktualizuji mapu ..."
+
+msgid "Use 1/2/3/4 instead of A/B/C/D for selecting which way to follow"
+msgstr ""
 
 msgid "Visualize public transport routes"
 msgstr "Vizualizovat trasy veřejné dopravy"
@@ -276,21 +625,16 @@ msgstr "Čím se má segment stát?"
 msgid "Yes"
 msgstr "Ano"
 
-msgid "{0} direction error"
-msgid_plural "{0} direction errors"
-msgstr[0] "{0} směrová chyba"
-msgstr[1] "{0} směrové chyby"
-msgstr[2] "{0} směrových chyb"
-msgstr[3] "{0} směrových chyb"
+msgid "pt_assistant layer"
+msgstr ""
 
-msgid "{0} road type error"
-msgid_plural "{0} road type errors"
-msgstr[0] "{0} chyba typu silnice"
-msgstr[1] "{0} chyby typu silnice"
-msgstr[2] "{0} chyb typu silnice"
-msgstr[3] "{0} chyb typu silnice"
+msgid "solutions based on other route relations"
+msgstr ""
 
-#. Plugin description for pt_assistant
+msgid "turn-by-turn at next intersection"
+msgstr ""
+
+#. Plugin description for project ':pt_assistant'.name
 msgid ""
 "Provides validation and fixing for public transport route according to "
 "version 2 of the public transport schema"

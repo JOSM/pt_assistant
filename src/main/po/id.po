@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
-"Language-Team: Indonesian (https://www.transifex.com/josm/teams/2544/id/)\n"
+"Language-Team: Indonesian (https://app.transifex.com/josm/teams/2544/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -24,11 +24,59 @@ msgstr ""
 msgid " "
 msgstr " "
 
+msgid ""
+"''from'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+
+msgid ""
+"''from''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+
+msgid ""
+"''to'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+
+msgid ""
+"''to''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+
 msgid "A valid public_transport:version=2 route is required"
 msgstr "Rute public_trasnport:version=2 yang valid dibutuhkan"
 
+msgid "Add oneway:bicycle=no to way"
+msgstr ""
+
+msgid "Add oneway:bus=no to way"
+msgstr ""
+
+msgid "Add public_transport=stop_position + mode of transport on these nodes"
+msgstr ""
+
+msgid "Add stop position"
+msgstr ""
+
+msgid "Always split ways, even if they are not at the end of the itinerary"
+msgstr ""
+
 msgid "Area"
 msgstr "Area"
+
+msgid "Area around way"
+msgstr ""
+
+msgid "Area before removal"
+msgstr ""
+
+msgid "Assign transport type to platform"
+msgstr ""
 
 msgid "Bench"
 msgstr "Kursi Taman"
@@ -39,15 +87,60 @@ msgstr "Uji coba rute sepeda dan pejalan kaki"
 msgid "Bus"
 msgstr "Bis"
 
+msgid "Bus station"
+msgstr ""
+
 msgid "Cancel"
 msgstr "Batalkan"
+
+msgid "Change from tag?"
+msgstr ""
+
+msgid "Change name tag?"
+msgstr ""
+
+msgid ""
+"Change name to\n"
+"''{0}''\n"
+"?"
+msgstr ""
+
+msgid "Change to tag?"
+msgstr ""
 
 msgid ""
 "Check if route relations are compatible with public transport version 2"
 msgstr "Periksa apakah relasi rute sesuai dengan transportasi publik versi 2"
 
+msgid "City transport"
+msgstr ""
+
 msgid "Close"
 msgstr "Tutup"
+
+msgid "Close the options"
+msgstr ""
+
+msgid "Commuter"
+msgstr ""
+
+msgid "Cover"
+msgstr ""
+
+msgid "Create ''route'' relation for opposite direction of travel?"
+msgstr ""
+
+msgid "Create ''route_master'' relation and add these route relations to it?"
+msgstr ""
+
+msgid "Create a route_master?"
+msgstr ""
+
+msgid "Customize stop"
+msgstr ""
+
+msgid "Customize stop under osm public transit standard v2"
+msgstr ""
 
 msgid "Displays stops of selected public transport routes as graph"
 msgstr ""
@@ -56,8 +149,26 @@ msgstr ""
 msgid "Distance between stops"
 msgstr "Jarak antar pemberhentian"
 
+msgid "Do not remove ways"
+msgstr ""
+
 msgid "Do you want to make the roundabout round?"
 msgstr "Apakah Anda mau membuat bundaran lalu lintas?"
+
+msgid ""
+"Don’t add public_transport=platform and mode of transport to node "
+"representing the stop (suffice with highway=bus_stop or railway=tram_stop)"
+msgstr ""
+
+msgid ""
+"Don’t check whether route relation starts and ends on stop_position node"
+msgstr ""
+
+msgid "Don’t compare name of first stop with from tag in route relation"
+msgstr ""
+
+msgid "Don’t compare name of last stop with to tag in route relation"
+msgstr ""
 
 msgid "Double Split"
 msgstr "Split Ganda"
@@ -69,8 +180,42 @@ msgstr "Unduhan selesai: {0}"
 msgid "Download incomplete route relation members"
 msgstr "Download anggota relasi rute yang belum lengkap"
 
+msgid "Download started: {0}"
+msgstr ""
+
+msgid ""
+"Downloading incomplete relation members. Kindly wait till download gets "
+"over."
+msgstr ""
+
+msgid "Edge Selection"
+msgstr ""
+
+msgid "Entire area"
+msgstr ""
+
+msgid "Error in roundabout"
+msgstr ""
+
+msgid ""
+"Error: The paths connecting the roundabout in the relation do not allow "
+"bicycles."
+msgstr ""
+
+msgid "Esc"
+msgstr ""
+
 msgid "Extract node from line"
 msgstr "Ekstrak node/titik dari garis"
+
+msgid "Extract platform node"
+msgstr ""
+
+msgid "ExtractPlatformNodeAction"
+msgstr ""
+
+msgid "Extracts platform node from a node"
+msgstr ""
 
 msgid "Fix error"
 msgstr "Betulkan kesalahan"
@@ -78,33 +223,80 @@ msgstr "Betulkan kesalahan"
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Memperbaiki ({0}/{1}):\"{2}\""
 
+msgid "Fixing errors …"
+msgstr ""
+
+msgid "Here you can change some preferences of PTAssistant functions"
+msgstr ""
+
+msgid "High speed"
+msgstr ""
+
+msgid "How would you want the download to take place?"
+msgstr ""
+
 msgid "Include stop_area tests"
 msgstr "Masukkan uji coba stop_area"
 
 msgid "Incomplete Members"
 msgstr "Anggota tidak lengkap"
 
+msgid "Incomplete relations"
+msgstr ""
+
 msgid "Invalid selection"
 msgstr "Pilihan tidak valid"
 
+msgid "Long distance"
+msgstr ""
+
+msgid ""
+"Mode of Travel -> {0} \n"
+" total ways selected -> {1}"
+msgstr ""
+
+msgid ""
+"Mode of Travel: {0} \n"
+" total ways selected: {1}"
+msgstr ""
+
 msgid "Mode: {0}"
 msgstr "Modus: {0}"
+
+msgid "NA"
+msgstr ""
 
 #. i18n: label for the tag name=*
 msgid "Name"
 msgstr "Nama"
 
+#. i18n: label for the tag name:en=*
+msgid "Name (en.)"
+msgstr ""
+
 msgid "Network"
 msgstr "jaringan"
 
+msgid "Network level"
+msgstr ""
+
 msgid "No"
 msgstr "Tidak"
+
+msgid "Not all members are downloaded"
+msgstr ""
 
 msgid "Ok"
 msgstr "Ok"
 
 msgid "Operator"
 msgstr "Operator"
+
+msgid "Opposite itinerary?"
+msgstr ""
+
+msgid "PT Wizard"
+msgstr ""
 
 msgid "PT: First or last way needs to be split"
 msgstr "PT: Jalan pertama atau terakhir perlu dipisah"
@@ -117,6 +309,10 @@ msgstr "PT: Kesalahan pada segmen rute tanpa perbaikan otomatis"
 
 msgid "PT: Problem in the route segment with one automatic fix"
 msgstr "PT: Kesalahan di segmen rute dengan satu perbaikan otomatis"
+
+msgid ""
+"PT: Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
 
 msgid "PT: Relation member roles do not match tags"
 msgstr "PT: Peran anggota relasi tidak cocok dengan tag"
@@ -194,8 +390,14 @@ msgstr ""
 "PT: Nama pemberhentian terakhir tidak sesuai dengan tag \"to\" dari relasi "
 "rute"
 
+msgid "PT: There is a gap in the {0} route"
+msgstr ""
+
 msgid "PT: dummy test warning"
 msgstr "PT: peringatan tes palsu"
+
+msgid "PTAssistantPlugin settings"
+msgstr ""
 
 msgid "PT_Assistant Message"
 msgstr "Pesan PT_Assistant"
@@ -207,14 +409,72 @@ msgstr "Transportasi Publik"
 msgid "Public Transport Assistant tests"
 msgstr "Uji coba Public Transport Assistant"
 
+msgid "Public Transport: {0}"
+msgstr ""
+
 msgid "Public transport routes"
 msgstr "Rute transportasi umum"
+
+msgid "Railway station"
+msgstr ""
+
+msgid "Railway stop"
+msgstr ""
+
+msgid ""
+"Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
+
+msgid "Regional"
+msgstr ""
+
+msgid "Remove current edge (white)"
+msgstr ""
+
+msgid "Remove oneway and split roundabout ways?"
+msgstr ""
+
+msgid ""
+"Remove public_transport=platform from platform WAYS when transferring "
+"details to platform NODE."
+msgstr ""
+
+msgid "Remove public_transport=platform from platform ways"
+msgstr ""
+
+msgid "Remove roundabout from relations"
+msgstr ""
+
+msgid "Remove ways"
+msgstr ""
+
+msgid "Remove ways along with previous way"
+msgstr ""
+
+msgid "Replace Membership"
+msgstr ""
+
+msgid ""
+"Replace platform way in the route relations by node representing the stop"
+msgstr ""
 
 msgid "Roundabout round"
 msgstr "Bundaran lalu lintas"
 
+msgid "Routing Helper"
+msgstr ""
+
 msgid "Save"
 msgstr "Simpan"
+
+msgid "Set from tag?"
+msgstr ""
+
+msgid "Set to tag?"
+msgstr ""
+
+msgid "Set up PT Assistant for more convenient use"
+msgstr ""
 
 msgid "Share taxi"
 msgstr "Berbagi taksi"
@@ -222,8 +482,37 @@ msgstr "Berbagi taksi"
 msgid "Shelter"
 msgstr "Tempat bernaung"
 
+msgid "Shortcut action to Transfer details of stop to platform node"
+msgstr ""
+
+msgid "Skip"
+msgstr ""
+
+msgid "Sort PT Route Members"
+msgstr ""
+
+msgid "Sort PT Route Members Relation Editor"
+msgstr ""
+
+msgid "Split Roundabout"
+msgstr ""
+
 msgid "Split way"
 msgstr "Memisahkan garis/way"
+
+msgid "Split white edge"
+msgstr ""
+
+msgid "Stop area tag assign"
+msgstr ""
+
+msgid "Stop customizing"
+msgstr ""
+
+msgid ""
+"The relation has incomplete members.\n"
+"Do you want to download them and continue with the sorting?"
+msgstr ""
 
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
@@ -231,6 +520,52 @@ msgid ""
 msgstr ""
 "Relasi memiliki anggota yang tidak lengkap. Apakah Anda mau mengunduhnya dan"
 " melanjutkan dengan penyortiran?"
+
+msgid ""
+"The roundabout is not directly connected to either of the previous or next "
+"way in the relation"
+msgstr ""
+
+msgid "The selected node is not a stop position for public transport!"
+msgstr ""
+
+msgid ""
+"This action can only be performed if exactly one stop position node is "
+"selected."
+msgstr ""
+
+msgid "This action requires single node to be selected."
+msgstr ""
+
+msgid "This is not a PT v2 relation"
+msgstr ""
+
+msgid ""
+"This relation is not PT version 2. Sorting its stops wouldn't make sense.\n"
+"\n"
+"Would you like to set ''public_transport:version=2''?\n"
+"\n"
+"There will still be some extra work needed,\n"
+"\n"
+"but PT_Assistant can help prepare the \n"
+"''route'' and ''route_master'' relations."
+msgstr ""
+
+msgid "This stop has been removed"
+msgstr ""
+
+msgid ""
+"To prepare for conversion to PT v2\n"
+"\n"
+"it may help to remove oneway and split roundabout ways?\n"
+"\n"
+"Would you like to do this automatically?\n"
+"\n"
+"When asked to remove stops that cannot be served,\n"
+"answer ''no'' and use the button to sort the stops\n"
+"once more after adding the ways once again\n"
+"by using the routing helper"
+msgstr ""
 
 msgid "Toggle direction arrows"
 msgstr "Atur arah panah"
@@ -241,6 +576,21 @@ msgstr "Ubah label referensi"
 msgid "Tram"
 msgstr "Trem"
 
+msgid ""
+"Transfer details from platform way to node representing the stop (leave "
+"tactile_paving and wheelchair on the platform way)"
+msgstr ""
+
+msgid ""
+"Transfer details from stop_position nodes to node representing the stop"
+msgstr ""
+
+msgid "Transfer details of stop to platform node"
+msgstr ""
+
+msgid "Transferring details to platform NODE."
+msgstr ""
+
 msgid "Trolleybus"
 msgstr "Trem Bus"
 
@@ -249,8 +599,14 @@ msgstr ""
 "Ketikkan huruf untuk memilih jenis perbaikan atau pencet Escape untuk tidak "
 "ada perbaikan"
 
+msgid "Unable to connect to {0}"
+msgstr ""
+
 msgid "Updating map ..."
 msgstr "memperbarui peta"
+
+msgid "Use 1/2/3/4 instead of A/B/C/D for selecting which way to follow"
+msgstr ""
 
 msgid "Visualize public transport routes"
 msgstr "Visualisasikan rute transportasi umum"
@@ -265,6 +621,15 @@ msgstr "Anda ingin segmen ini seperti apa?"
 
 msgid "Yes"
 msgstr "Ya"
+
+msgid "pt_assistant layer"
+msgstr ""
+
+msgid "solutions based on other route relations"
+msgstr ""
+
+msgid "turn-by-turn at next intersection"
+msgstr ""
 
 #. Plugin description for project ':pt_assistant'.name
 msgid ""

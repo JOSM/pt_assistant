@@ -13,12 +13,54 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
-"Language-Team: Greek (https://www.transifex.com/josm/teams/2544/el/)\n"
+"Language-Team: Greek (https://app.transifex.com/josm/teams/2544/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid " "
+msgstr ""
+
+msgid ""
+"''from'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+
+msgid ""
+"''from''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+
+msgid ""
+"''to'' tag not set. Set it to\n"
+"{0} ?"
+msgstr ""
+
+msgid ""
+"''to''={0}.\n"
+"Change it to\n"
+"''{1}''\n"
+" instead?"
+msgstr ""
+
+msgid "A valid public_transport:version=2 route is required"
+msgstr ""
+
+msgid "Add oneway:bicycle=no to way"
+msgstr ""
+
+msgid "Add oneway:bus=no to way"
+msgstr ""
+
+msgid "Add public_transport=stop_position + mode of transport on these nodes"
+msgstr ""
+
+msgid "Add stop position"
+msgstr ""
 
 msgid "Always split ways, even if they are not at the end of the itinerary"
 msgstr ""
@@ -34,14 +76,38 @@ msgstr "Περιοχή γύρω από την διαδρομή"
 msgid "Area before removal"
 msgstr "Περιοχή πριν από την αφαίρεση"
 
+msgid "Assign transport type to platform"
+msgstr ""
+
 msgid "Bench"
 msgstr "Παγκάκι"
 
 msgid "Bicycle and foot routes Tests"
 msgstr "Δοκιμές πεζοπορικών και ποδηλατικών διαδρομών"
 
+msgid "Bus"
+msgstr ""
+
+msgid "Bus station"
+msgstr ""
+
 msgid "Cancel"
 msgstr "Ακύρωση"
+
+msgid "Change from tag?"
+msgstr ""
+
+msgid "Change name tag?"
+msgstr ""
+
+msgid ""
+"Change name to\n"
+"''{0}''\n"
+"?"
+msgstr ""
+
+msgid "Change to tag?"
+msgstr ""
 
 msgid ""
 "Check if route relations are compatible with public transport version 2"
@@ -49,11 +115,52 @@ msgstr ""
 "Ελέγξτε εάν οι σχέσεις διαδρομής είναι συμβατές με τη δημόσια συγκοινωνία "
 "έκδοση 2"
 
+msgid "City transport"
+msgstr ""
+
 msgid "Close"
 msgstr "Κλείσιμο"
 
+msgid "Close the options"
+msgstr ""
+
+msgid "Commuter"
+msgstr ""
+
+msgid "Cover"
+msgstr ""
+
+msgid "Create ''route'' relation for opposite direction of travel?"
+msgstr ""
+
+msgid "Create ''route_master'' relation and add these route relations to it?"
+msgstr ""
+
+msgid "Create a route_master?"
+msgstr ""
+
+msgid "Customize stop"
+msgstr ""
+
+msgid "Customize stop under osm public transit standard v2"
+msgstr ""
+
+msgid "Displays stops of selected public transport routes as graph"
+msgstr ""
+
+msgid "Distance between stops"
+msgstr ""
+
+msgid "Do not remove ways"
+msgstr ""
+
 msgid "Do you want to make the roundabout round?"
 msgstr "Θέλετε να κάνετε την κυκλική διαδρομή;"
+
+msgid ""
+"Don’t add public_transport=platform and mode of transport to node "
+"representing the stop (suffice with highway=bus_stop or railway=tram_stop)"
+msgstr ""
 
 msgid ""
 "Don’t check whether route relation starts and ends on stop_position node"
@@ -70,6 +177,9 @@ msgid "Don’t compare name of last stop with to tag in route relation"
 msgstr ""
 "Μην συγκρίνετε το όνομα της τελευταίας στάσης με την ετικέτα στη σχέση της "
 "διαδρομής"
+
+msgid "Double Split"
+msgstr ""
 
 msgid "Download finished: {0}"
 msgstr "Η λήψη ολοκληρώθηκε: {0}"
@@ -88,14 +198,31 @@ msgstr ""
 "Λήψη ημιτελών μελών σχέσης. Παρακαλούμε περιμένετε μέχρι να ολοκληρωθεί η "
 "λήψη."
 
+msgid "Edge Selection"
+msgstr ""
+
 msgid "Entire area"
 msgstr "Ολόκληρη η περιοχή"
+
+msgid "Error in roundabout"
+msgstr ""
+
+msgid ""
+"Error: The paths connecting the roundabout in the relation do not allow "
+"bicycles."
+msgstr ""
+
+msgid "Esc"
+msgstr ""
 
 msgid "Extract node from line"
 msgstr "Εξαγωγή κόμβου από τη γραμμή"
 
 msgid "Extract platform node"
 msgstr "Εξαγωγή κόμβου πλατφόρμας"
+
+msgid "ExtractPlatformNodeAction"
+msgstr ""
 
 msgid "Extracts platform node from a node"
 msgstr "Εξαγωγή κόμβου πλατφόρμας από έναν κόμβο"
@@ -106,10 +233,19 @@ msgstr "Επίλυση σφάλματος"
 msgid "Fixing ({0}/{1}): ''{2}''"
 msgstr "Διόρθωση ({0}/{1}): ''{2}''"
 
+msgid "Fixing errors …"
+msgstr ""
+
 msgid "Here you can change some preferences of PTAssistant functions"
 msgstr ""
 "Εδώ μπορείτε να αλλάξετε μερικές προτιμήσεις των λειτουργιών βοηθού "
 "PTAssistant"
+
+msgid "High speed"
+msgstr ""
+
+msgid "How would you want the download to take place?"
+msgstr ""
 
 msgid "Include stop_area tests"
 msgstr "Συμπεριλάβετε δοκιμές περιοχής στάσης"
@@ -123,12 +259,20 @@ msgstr "Ημιτελείς σχέσεις"
 msgid "Invalid selection"
 msgstr "Μη έγκυρη επιλογή"
 
+msgid "Long distance"
+msgstr ""
+
 msgid ""
 "Mode of Travel -> {0} \n"
 " total ways selected -> {1}"
 msgstr ""
 "Τρόπος ταξιδιού -> {0}\n"
 "επιλεγμένες συνολικές διαδρομές -> {1}"
+
+msgid ""
+"Mode of Travel: {0} \n"
+" total ways selected: {1}"
+msgstr ""
 
 msgid "Mode: {0}"
 msgstr "Κατάσταση: {0}"
@@ -140,17 +284,30 @@ msgstr "NA"
 msgid "Name"
 msgstr "Όνομα"
 
+#. i18n: label for the tag name:en=*
+msgid "Name (en.)"
+msgstr ""
+
 msgid "Network"
 msgstr "Δίκτυο"
 
+msgid "Network level"
+msgstr ""
+
 msgid "No"
 msgstr "Όχι"
+
+msgid "Not all members are downloaded"
+msgstr ""
 
 msgid "Ok"
 msgstr "Εντάξει"
 
 msgid "Operator"
 msgstr "Λειτουργός"
+
+msgid "Opposite itinerary?"
+msgstr ""
 
 msgid "PT Wizard"
 msgstr "PT Βοηθός"
@@ -166,6 +323,10 @@ msgstr "PT: Πρόβλημα στο τμήμα διαδρομής χωρίς α�
 
 msgid "PT: Problem in the route segment with one automatic fix"
 msgstr "PT: Πρόβλημα στο τμήμα διαδρομής με μία αυτόματη επιδιόρθωση"
+
+msgid ""
+"PT: Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
 
 msgid "PT: Relation member roles do not match tags"
 msgstr "PT: Οι ρόλοι των μελών σχέσης δεν ταιριάζουν με τις ετικέτες"
@@ -255,6 +416,9 @@ msgstr "PT: Υπάρχει ένα κενό στην {0} διαδρομή"
 msgid "PT: dummy test warning"
 msgstr "PT: προειδοποίηση εικονικής δοκιμής"
 
+msgid "PTAssistantPlugin settings"
+msgstr ""
+
 msgid "PT_Assistant Message"
 msgstr "PT Μήνυμα Βοηθού"
 
@@ -265,14 +429,56 @@ msgstr "Μέσα Μαζικής Μεταφοράς"
 msgid "Public Transport Assistant tests"
 msgstr "Δοκιμές Βοηθού Δημόσιας Συγκοινωνίας"
 
+msgid "Public Transport: {0}"
+msgstr ""
+
+msgid "Public transport routes"
+msgstr ""
+
+msgid "Railway station"
+msgstr ""
+
+msgid "Railway stop"
+msgstr ""
+
 msgid ""
 "Refs of the routes do not match with the route_ref tag of the primitive"
 msgstr ""
 "Οι αναφορές των δρομολογίων δεν ταιριάζουν με την ετικέτα route_ref του "
 "πρωτότυπου"
 
+msgid "Regional"
+msgstr ""
+
+msgid "Remove current edge (white)"
+msgstr ""
+
+msgid "Remove oneway and split roundabout ways?"
+msgstr ""
+
+msgid ""
+"Remove public_transport=platform from platform WAYS when transferring "
+"details to platform NODE."
+msgstr ""
+
+msgid "Remove public_transport=platform from platform ways"
+msgstr ""
+
+msgid "Remove roundabout from relations"
+msgstr ""
+
+msgid "Remove ways"
+msgstr ""
+
+msgid "Remove ways along with previous way"
+msgstr ""
+
 msgid "Replace Membership"
 msgstr "Αντικατάσταση της ιδιότητας μέλους"
+
+msgid ""
+"Replace platform way in the route relations by node representing the stop"
+msgstr ""
 
 msgid "Roundabout round"
 msgstr "Κυκλική διαδρομή"
@@ -283,11 +489,52 @@ msgstr "Βοηθός δρομολόγησης"
 msgid "Save"
 msgstr "Αποθήκευση"
 
+msgid "Set from tag?"
+msgstr ""
+
+msgid "Set to tag?"
+msgstr ""
+
 msgid "Set up PT Assistant for more convenient use"
 msgstr "Ρύθμιση του PT Βοηθού για πιο εύκολη χρήση"
 
+msgid "Share taxi"
+msgstr ""
+
 msgid "Shelter"
 msgstr "Καταφύγιο"
+
+msgid "Shortcut action to Transfer details of stop to platform node"
+msgstr ""
+
+msgid "Skip"
+msgstr ""
+
+msgid "Sort PT Route Members"
+msgstr ""
+
+msgid "Sort PT Route Members Relation Editor"
+msgstr ""
+
+msgid "Split Roundabout"
+msgstr ""
+
+msgid "Split way"
+msgstr ""
+
+msgid "Split white edge"
+msgstr ""
+
+msgid "Stop area tag assign"
+msgstr ""
+
+msgid "Stop customizing"
+msgstr ""
+
+msgid ""
+"The relation has incomplete members.\n"
+"Do you want to download them and continue with the sorting?"
+msgstr ""
 
 msgid ""
 "The relation has incomplete members. Do you want to download them and "
@@ -296,14 +543,78 @@ msgstr ""
 "Η σχέση έχει ελλιπή μέλη. Θέλετε να τα κατεβάσετε και να συνεχίσετε με την "
 "ταξινόμηση;"
 
+msgid ""
+"The roundabout is not directly connected to either of the previous or next "
+"way in the relation"
+msgstr ""
+
 msgid "The selected node is not a stop position for public transport!"
 msgstr "Ο επιλεγμένος κόμβος δεν είναι στάση για τη δημόσια συγκοινωνία!"
+
+msgid ""
+"This action can only be performed if exactly one stop position node is "
+"selected."
+msgstr ""
 
 msgid "This action requires single node to be selected."
 msgstr "Αυτή η ενέργεια απαιτεί την επιλογή ενός κόμβου."
 
+msgid "This is not a PT v2 relation"
+msgstr ""
+
+msgid ""
+"This relation is not PT version 2. Sorting its stops wouldn't make sense.\n"
+"\n"
+"Would you like to set ''public_transport:version=2''?\n"
+"\n"
+"There will still be some extra work needed,\n"
+"\n"
+"but PT_Assistant can help prepare the \n"
+"''route'' and ''route_master'' relations."
+msgstr ""
+
+msgid "This stop has been removed"
+msgstr ""
+
+msgid ""
+"To prepare for conversion to PT v2\n"
+"\n"
+"it may help to remove oneway and split roundabout ways?\n"
+"\n"
+"Would you like to do this automatically?\n"
+"\n"
+"When asked to remove stops that cannot be served,\n"
+"answer ''no'' and use the button to sort the stops\n"
+"once more after adding the ways once again\n"
+"by using the routing helper"
+msgstr ""
+
+msgid "Toggle direction arrows"
+msgstr ""
+
+msgid "Toggle reference labels"
+msgstr ""
+
 msgid "Tram"
 msgstr "Τραμ"
+
+msgid ""
+"Transfer details from platform way to node representing the stop (leave "
+"tactile_paving and wheelchair on the platform way)"
+msgstr ""
+
+msgid ""
+"Transfer details from stop_position nodes to node representing the stop"
+msgstr ""
+
+msgid "Transfer details of stop to platform node"
+msgstr ""
+
+msgid "Transferring details to platform NODE."
+msgstr ""
+
+msgid "Trolleybus"
+msgstr ""
 
 msgid "Type letter to select the fix variant or press Escape for no fix"
 msgstr ""
@@ -321,6 +632,9 @@ msgstr ""
 "Χρησιμοποιήστε 1/2/3/4 αντί για A/B/C/D για να επιλέξετε την διαδρομή που θα"
 " ακολουθήσετε"
 
+msgid "Visualize public transport routes"
+msgstr ""
+
 msgid "Warning: the diplayed fix variants are based on less strict criteria"
 msgstr ""
 "Προειδοποίηση: οι εμφανιζόμενες παραλλαγές διόρθωσης βασίζονται σε λιγότερο "
@@ -331,6 +645,15 @@ msgstr "Τι θέλετε να είναι το τμήμα;"
 
 msgid "Yes"
 msgstr "Ναι"
+
+msgid "pt_assistant layer"
+msgstr ""
+
+msgid "solutions based on other route relations"
+msgstr ""
+
+msgid "turn-by-turn at next intersection"
+msgstr ""
 
 #. Plugin description for project ':pt_assistant'.name
 msgid ""

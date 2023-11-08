@@ -14,12 +14,15 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
-"Language-Team: Korean (https://www.transifex.com/josm/teams/2544/ko/)\n"
+"Language-Team: Korean (https://app.transifex.com/josm/teams/2544/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid " "
+msgstr ""
 
 msgid ""
 "''from'' tag not set. Set it to\n"
@@ -162,6 +165,11 @@ msgstr "길을 삭제 하지 마시오"
 
 msgid "Do you want to make the roundabout round?"
 msgstr "원형교차로를 돌고 싶으십니까?"
+
+msgid ""
+"Don’t add public_transport=platform and mode of transport to node "
+"representing the stop (suffice with highway=bus_stop or railway=tram_stop)"
+msgstr ""
 
 msgid ""
 "Don’t check whether route relation starts and ends on stop_position node"
@@ -416,6 +424,10 @@ msgstr "기차역"
 
 msgid "Railway stop"
 msgstr "기차역"
+
+msgid ""
+"Refs of the routes do not match with the route_ref tag of the primitive"
+msgstr ""
 
 msgid "Regional"
 msgstr "지역"
