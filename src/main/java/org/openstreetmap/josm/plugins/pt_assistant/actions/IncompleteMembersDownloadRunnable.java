@@ -1,16 +1,15 @@
 // License: GPL. For details, see LICENSE file.
 package org.openstreetmap.josm.plugins.pt_assistant.actions;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-
-import javax.swing.SwingUtilities;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.openstreetmap.josm.data.osm.Node;
-import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
-import org.openstreetmap.josm.data.osm.PrimitiveId;
 import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.io.DownloadPrimitivesWithReferrersTask;
@@ -35,50 +34,39 @@ public class IncompleteMembersDownloadRunnable implements Runnable {
     public void run() {
 
         synchronized (this) {
+            Optional.ofNullable(MainApplication.getLayerManager().getEditDataSet()).ifPresent(dataset -> {
+                final List<Relation> ptv2Relations =
+                    Stream.of(
+                        dataset.getSelectedRelations(), // if there are selected routes, try adding them first
+                        dataset.getRelations() // fallback in case there are no selected ptv2 routes: use all ptv2 relations in the edit dataset
+                    )
+                        // keep only PTv2 relations in each relation list
+                        .map(it -> it.stream().filter(RouteUtils::isVersionTwoPTRoute).collect(Collectors.toList()))
+                        // take the first non-empty relation list
+                        .filter(it -> !it.isEmpty()).findFirst()
+                        // fallback: empty list
+                        .orElse(Collections.emptyList());
 
-            ArrayList<PrimitiveId> list = new ArrayList<>();
+                // add all stop_positions:
+                final List<Node> stopPositions = dataset.getNodes().stream()
+                    .filter(StopUtils::isStopPosition)
+                    // only keep those nodes that do not have a referer way
+                    .filter(node -> node.getReferrers().stream().noneMatch(referer -> referer.getType() == OsmPrimitiveType.WAY))
+                    .collect(Collectors.toList());
 
-            // if there are selected routes, try adding them first:
-            for (Relation currentSelectedRelation : MainApplication.getLayerManager().getEditDataSet().getSelectedRelations()) {
-                if (RouteUtils.isVersionTwoPTRoute(currentSelectedRelation)) {
-                    list.add(currentSelectedRelation);
-                }
-            }
-
-            if (list.isEmpty()) {
-                // add all route relations that are of public_transport
-                // version 2:
-                Collection<Relation> allRelations = MainApplication.getLayerManager().getEditDataSet().getRelations();
-                for (Relation currentRelation : allRelations) {
-                    if (RouteUtils.isVersionTwoPTRoute(currentRelation)) {
-                        list.add(currentRelation);
-                    }
-                }
-            }
-
-            // add all stop_positions:
-            Collection<Node> allNodes = MainApplication.getLayerManager().getEditDataSet().getNodes();
-            for (Node currentNode : allNodes) {
-                if (StopUtils.isStopPosition(currentNode)) {
-                    List<OsmPrimitive> referrers = currentNode.getReferrers();
-                    boolean parentWayExists = false;
-                    for (OsmPrimitive referrer : referrers) {
-                        if (referrer.getType() == OsmPrimitiveType.WAY) {
-                            parentWayExists = true;
-                            break;
-                        }
-                    }
-                    if (!parentWayExists) {
-                        list.add(currentNode);
-
-                    }
-
-                }
-            }
-
-            DownloadPrimitivesWithReferrersTask task = new DownloadPrimitivesWithReferrersTask(false, list, false, true,
-                null, null);
-            task.run();
+                DownloadPrimitivesWithReferrersTask task = new DownloadPrimitivesWithReferrersTask(
+                    false,
+                    Stream.of(ptv2Relations, stopPositions)
+                        .flatMap(Collection::stream)
+                        .filter(it -> !it.isNew()) // https://josm.openstreetmap.de/ticket/23640 (only download not-new elements)
+                        .collect(Collectors.toList()),
+                    false,
+                    true,
+                    null,
+                    null
+                );
+                task.run();
+            });
         }
     }
 }
