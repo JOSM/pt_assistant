@@ -1122,19 +1122,14 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
             else {
                 boolean remove = true;
                 String routeValue = relation.get("route");
-                String[] restrictionTypes = Arrays.stream(restrictions)
-                    .filter(s -> s.startsWith("restriction:"))
-                    .map(s -> s.substring("restriction:".length()))
-                    .toArray(String[]::new);
-
-                for (String type : restrictionTypes) {
-                    if (!routeValue.equals(type)) {
+                for (String s : restrictions) {
+                    if (s.length() <= 12)
                         continue;
-                    }
-
-                    if (rel.hasKey("restriction:" + type) || rel.hasTag("type", type)) {
+                    String sub = s.substring(12);
+                    if (routeValue.equals(sub) && rel.hasTag("type", s))
                         remove = false;
-                    }
+                    else if (routeValue.equals(sub) && rel.hasKey("restriction:" + sub))
+                        remove = false;
                 }
                 return remove;
             }
