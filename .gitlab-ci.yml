@@ -118,7 +118,6 @@ transifex.com:
         name: transifex.com
         url: https://www.transifex.com/josm/josm/josm-plugin_pt_assistant/
     script:
-        - mv .tx/config_old .tx/config
         - TX_TOKEN="$TRANSIFEX_TOKEN" tx push -s --no-interactive
     needs:
         - build

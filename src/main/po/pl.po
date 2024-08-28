@@ -7,7 +7,7 @@
 # Florian Schäfer, 2018
 # Right Path, 2019
 # Simon Legner, 2019
-# Piotr Strębski, 2023
+# Piotr Strębski, 2021
 #
 msgid ""
 msgstr ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-02-17 01:42+0100\n"
 "PO-Revision-Date: 2018-05-10 08:41+0000\n"
-"Language-Team: Polish (https://app.transifex.com/josm/teams/2544/pl/)\n"
+"Language-Team: Polish (https://www.transifex.com/josm/teams/2544/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -63,9 +63,6 @@ msgstr ""
 
 msgid "A valid public_transport:version=2 route is required"
 msgstr "Poprawna trasa public_transport:version=2 jest wymagana"
-
-msgid "Add oneway:bicycle=no to way"
-msgstr ""
 
 msgid "Add oneway:bus=no to way"
 msgstr "Dodaj oneway:bus=no do linii"
@@ -149,9 +146,6 @@ msgstr "Dach"
 msgid "Create ''route'' relation for opposite direction of travel?"
 msgstr "Utworzyć relację ''route'' dla odwrotnego kierunku podróży?"
 
-msgid "Create ''route_master'' relation and add these route relations to it?"
-msgstr ""
-
 msgid "Create a route_master?"
 msgstr "Utworzyć route_master?"
 
@@ -226,17 +220,11 @@ msgid ""
 "bicycles."
 msgstr "Błąd: ścieżki łączące rondo w relacji nie zezwalają na ruch rowerów."
 
-msgid "Esc"
-msgstr ""
-
 msgid "Extract node from line"
 msgstr "Wydziel węzeł z drogi"
 
 msgid "Extract platform node"
 msgstr "Wydziel węzeł przystanku"
-
-msgid "ExtractPlatformNodeAction"
-msgstr ""
 
 msgid "Extracts platform node from a node"
 msgstr "Wydziel węzeł przystanku z węzła"
@@ -439,9 +427,6 @@ msgstr "Transport publiczny"
 msgid "Public Transport Assistant tests"
 msgstr "Testy asystenta transportu publicznego"
 
-msgid "Public Transport: {0}"
-msgstr "Transport publiczny: {0}"
-
 msgid "Public transport routes"
 msgstr "Trasy pojazdów transportu publicznego"
 
@@ -460,9 +445,6 @@ msgstr "Regionalny"
 
 msgid "Remove current edge (white)"
 msgstr "Usuń obecną krawędź (biała)"
-
-msgid "Remove oneway and split roundabout ways?"
-msgstr ""
 
 msgid ""
 "Remove public_transport=platform from platform WAYS when transferring "
@@ -533,9 +515,6 @@ msgstr "Podziel rondo"
 msgid "Split way"
 msgstr "Podziel linię"
 
-msgid "Split white edge"
-msgstr ""
-
 msgid "Stop area tag assign"
 msgstr "Przypisywanie znaczników obszaru zatrzymania"
 
@@ -566,43 +545,14 @@ msgstr ""
 msgid "The selected node is not a stop position for public transport!"
 msgstr "Wybrany węzeł nie jest miejscem zatrzymania transportu publicznego!"
 
-msgid ""
-"This action can only be performed if exactly one stop position node is "
-"selected."
-msgstr ""
-
 msgid "This action requires single node to be selected."
 msgstr "Ta akcja wymaga wybrania pojedynczego węzła."
 
 msgid "This is not a PT v2 relation"
 msgstr "To nie jest relacja PT v2"
 
-msgid ""
-"This relation is not PT version 2. Sorting its stops wouldn't make sense.\n"
-"\n"
-"Would you like to set ''public_transport:version=2''?\n"
-"\n"
-"There will still be some extra work needed,\n"
-"\n"
-"but PT_Assistant can help prepare the \n"
-"''route'' and ''route_master'' relations."
-msgstr ""
-
 msgid "This stop has been removed"
 msgstr "To miejsce zatrzymania zostało usunięte"
-
-msgid ""
-"To prepare for conversion to PT v2\n"
-"\n"
-"it may help to remove oneway and split roundabout ways?\n"
-"\n"
-"Would you like to do this automatically?\n"
-"\n"
-"When asked to remove stops that cannot be served,\n"
-"answer ''no'' and use the button to sort the stops\n"
-"once more after adding the ways once again\n"
-"by using the routing helper"
-msgstr ""
 
 msgid "Toggle direction arrows"
 msgstr "Odwróć strzałki kierunkowe"
