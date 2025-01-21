@@ -4,13 +4,11 @@ Contributions to this project are always welcome! You can either contribute tran
 
 ## Translation
 
-Translations are managed at Transifex: https://www.transifex.com/josm/josm/josm-plugin_pt_assistant/
+Translations are managed at Launchpad: https://josm.openstreetmap.de/wiki/Translations
 
-You can contribute translations for the texts used in this project at the link above. For this currently a Transifex account is required (login with GitHub, Google or LinkedIn is possible).
+You can contribute translations for the texts used in this project at the link above.
 
 🇬🇧 English is used as the baseline language by the developers, so changes to English texts need to be made in the code (see next section about code changes).
-
-[![translation status](https://www.transifex.com/projects/p/josm/resource/josm-plugin_pt_assistant/chart/image_png/)](https://www.transifex.com/josm/josm/josm-plugin_pt_assistant/)
 
 ## Code
 
