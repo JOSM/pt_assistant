@@ -180,7 +180,7 @@ public final class RouteUtils {
 
             if (!way.hasTag("busway", "lane") && !way.hasTag("busway", "opposite_lane")
                     && !way.hasTag("busway:left", "lane") && !way.hasTag("busway:right", "lane")
-                    && !way.hasTag("oneway:bus", "no") && !way.hasTag("oneway:psv", "no")
+                    && !way.hasTag("oneway:bus", "no") && !way.hasTag("oneway","no") && !way.hasTag("oneway:psv", "no")
                     && !way.hasTag("trolley_wire", "backward")) {
 
                 if (OsmUtils.isReversed(way.get("oneway"))) {
