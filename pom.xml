@@ -109,7 +109,7 @@
     <testSourceDirectory>test/unit</testSourceDirectory>
     <testResources>
       <testResource>
-        <directory>test/resources</directory>
+        <directory>test/data</directory>
       </testResource>
     </testResources>
     <plugins>
