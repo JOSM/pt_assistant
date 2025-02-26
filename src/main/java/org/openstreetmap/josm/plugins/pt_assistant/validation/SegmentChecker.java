@@ -781,12 +781,12 @@ public class SegmentChecker extends Checker {
                 // display the notification:
                 if (SwingUtilities.isEventDispatchThread()) {
                     Notification notification = new Notification(
-                            tr("Warning: the diplayed fix variants are based on less strict criteria"));
+                            tr("Warning: the displayed fix variants are based on less strict criteria"));
                     notification.show();
                 } else {
                     SwingUtilities.invokeLater(() -> {
                         Notification notification = new Notification(
-                                tr("Warning: the diplayed fix variants are based on less strict criteria"));
+                                tr("Warning: the displayed fix variants are based on less strict criteria"));
                         notification.show();
                     });
                 }
