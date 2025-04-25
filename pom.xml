@@ -14,11 +14,11 @@
   <repositories>
     <repository>
       <id>JOSM-releases</id>
-      <url>https://josm.openstreetmap.de/nexus/content/repositories/releases/</url>
+      <url>https://josm.openstreetmap.de/repository/releases/</url>
     </repository>
     <repository>
       <id>JOSM-snapshots</id>
-      <url>https://josm.openstreetmap.de/nexus/content/repositories/snapshots/</url>
+      <url>https://josm.openstreetmap.de/repository/snapshots/</url>
     </repository>
   </repositories>
   <dependencyManagement>
