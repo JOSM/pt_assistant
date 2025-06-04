@@ -660,7 +660,7 @@ public class SegmentChecker extends Checker {
             } else if (numberOfFixes == 1) {
                 builder.message(tr("PT: Problem in the route segment with one automatic fix"));
             } else {
-                builder.message("PT: Problem in the route segment with several automatic fixes");
+                builder.message(tr("PT: Problem in the route segment with several automatic fixes"));
             }
 
         }
