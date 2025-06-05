@@ -71,7 +71,7 @@ public class PTAssistantPluginPreferences extends DefaultTabPreferenceSetting {
 
         markCheckBoxes();
 
-        mainPanel.add(new JLabel("<html><b>Validator :</b></html>"), GBC.eol().fill(GBC.HORIZONTAL));
+        mainPanel.add(new JLabel("<html><b>"+tr("Validator :")+"</b></html>"), GBC.eol().fill(GBC.HORIZONTAL));
         mainPanel.add(downloadIncompleteMembers);
         mainPanel.add(stopArea);
         mainPanel.add(compareNameWithFirstStop);
@@ -79,7 +79,7 @@ public class PTAssistantPluginPreferences extends DefaultTabPreferenceSetting {
         mainPanel.add(checkStartEndIsStopPosition);
         mainPanel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
 
-        mainPanel.add(new JLabel("<html><b>Move details to nodes next to highway/railway :</b></html>"),
+        mainPanel.add(new JLabel("<html><b>"+tr("Move details to nodes next to highway/railway :")+"</b></html>"),
                 GBC.eol().fill(GBC.HORIZONTAL));
         mainPanel.add(substitutePlatformRelation);
         mainPanel.add(transferDetails);
@@ -88,11 +88,11 @@ public class PTAssistantPluginPreferences extends DefaultTabPreferenceSetting {
         mainPanel.add(modeOfTransportToStop);
         mainPanel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
 
-        mainPanel.add(new JLabel("<html><b>Routing Assistant :</b></html>"), GBC.eol().fill(GBC.HORIZONTAL));
+        mainPanel.add(new JLabel("<html><b>"+tr("Routing Assistant :")+"</b></html>"), GBC.eol().fill(GBC.HORIZONTAL));
         mainPanel.add(optionsForMendAction);
         mainPanel.add(new JLabel("<html><br></html>"), GBC.eol().fill(GBC.HORIZONTAL));
 
-        mainPanel.add(new JLabel("<html><b>Split way at start/end of route relations mapping mode :</b></html>"),
+        mainPanel.add(new JLabel("<html><b>"+tr("Split way at start/end of route relations mapping mode :")+"</b></html>"),
                 GBC.eol().fill(GBC.HORIZONTAL));
         mainPanel.add(splitWay1);
         mainPanel.add(splitWay2);
