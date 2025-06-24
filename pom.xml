@@ -1,22 +1,24 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.openstreetmap.josm.plugins</groupId>
+  <parent>
+    <groupId>org.openstreetmap.josm.plugins</groupId>
+    <artifactId>plugin-root</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
   <artifactId>pt_assistant</artifactId>
   <version>1.0-SNAPSHOT</version>
   <properties>
-    <jmockit.version>1.49.a</jmockit.version>
-    <pmd.version>7.5.0</pmd.version>
-    <jacoco.version>0.8.12</jacoco.version>
-    <checkstyle.version>10.18.1</checkstyle.version>
-    <spotbugs.version>4.8.6</spotbugs.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <plugin.src.dir>src/main/java</plugin.src.dir>
+    <plugin.main.version>19044</plugin.main.version>
+    <plugin.author>Biswesh Mohapatra &lt;biswesh123@gmail.com&gt;, simon04, Rodion Scherbakov</plugin.author>
+    <plugin.class>org.openstreetmap.josm.plugins.pt_assistant.PTAssistantPlugin</plugin.class>
+    <plugin.description>Provides validation and fixing for public transport route according to version 2 of the public transport schema</plugin.description>
+    <plugin.icon>images/bus.svg</plugin.icon>
+    <plugin.link>https://wiki.openstreetmap.org/wiki/JOSM/Plugins/PT_Assistant</plugin.link>
+    <plugin.canloadatruntime>true</plugin.canloadatruntime>
   </properties>
-  <repositories>
-    <repository>
-      <id>JOSM-public</id>
-      <url>https://josm.openstreetmap.de/repository/public/</url>
-    </repository>
-  </repositories>
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -102,93 +104,18 @@
     </dependency>
   </dependencies>
   <build>
-    <testSourceDirectory>test/unit</testSourceDirectory>
-    <testResources>
-      <testResource>
-        <directory>test/data</directory>
-      </testResource>
-    </testResources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.13.0</version>
+        <artifactId>maven-jar-plugin</artifactId>
         <configuration>
-          <release>11</release>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>com.diffplug.spotless</groupId>
-        <artifactId>spotless-maven-plugin</artifactId>
-        <version>2.43.0</version>
-        <configuration>
-          <java>
-            <eclipse>
-              <version>4.21</version>
-              <file>${project.basedir}/../00_core_tools/eclipse/formatter.xml</file>
-            </eclipse>
-            <removeUnusedImports/>
-            <licenseHeader>
-              <content>// License: GPL. For details, see LICENSE file.</content>
-            </licenseHeader>
-            <includes>
-              <include>src/main/java/**/*.java</include>
-              <include>test/unit/**/*.java</include>
-              <include>test/integration/**/*.java</include>
-            </includes>
-          </java>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.5.0</version>
-        <executions>
-          <execution>
-            <id>enforce-maven</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <rules>
-            <requireMavenVersion>
-              <version>3.6.3</version>
-            </requireMavenVersion>
-          </rules>
-        </configuration>
-      </plugin>
-      <!-- Configure the test plugin, specifically enable autodetection of global extensions -->
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.2.5</version>
-        <configuration>
-          <skipAfterFailureCount>1</skipAfterFailureCount>
-          <argLine>-javaagent:"${settings.localRepository}"/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar</argLine>
-          <properties>
-            <configurationParameters>
-                file.encoding = UTF-8
-                java.locale.providers = SPI,CLDR
-                junit.jupiter.extensions.autodetection.enabled = true
-                junit.jupiter.execution.parallel.enabled = true
-              </configurationParameters>
-          </properties>
-          <systemPropertyVariables>
-            <josm.home>test/build/config/josm.home</josm.home>
-            <josm.test.data>test/resources</josm.test.data>
-            <java.awt.headless>true</java.awt.headless>
-            <glass.platform>Monocle</glass.platform>
-            <monocle.platform>Headless</monocle.platform>
-            <prism.order>sw</prism.order>
-          </systemPropertyVariables>
+          <archive>
+            <manifestEntries>
+              <Plugin-Link>${plugin.link}</Plugin-Link>
+              <Plugin-Icon>${plugin.icon}</Plugin-Icon>
+              <Plugin-Canloadatruntime>${plugin.canloadatruntime}</Plugin-Canloadatruntime>
+            </manifestEntries>
+          </archive>
         </configuration>
       </plugin>
     </plugins>
