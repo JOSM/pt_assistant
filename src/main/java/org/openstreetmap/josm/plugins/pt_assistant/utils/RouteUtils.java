@@ -102,8 +102,8 @@ public final class RouteUtils {
         // todo this adds the stops multiple times and the ways too.
         if (isPTRoute(r)) {
             List<RelationMember> members = r.getMembers();
-            for (RelationMember relationMember : r.getMembers()) {
-                if (isPTPlatform(relationMember)){
+            for (RelationMember relationMember : members) {
+                if (isPTPlatform(relationMember)) {
                     PTStop ptStop = new PTStop(relationMember);
                     Way served_way = ptStop.findServingWays(ptStop);
                     if (served_way != null) {
@@ -113,10 +113,10 @@ public final class RouteUtils {
                                 found = true;
                                 break;
                             }
-                        if (!found) {
-                            r.addMember(new RelationMember("", served_way));
+                            if (!found) {
+                                r.addMember(new RelationMember("", served_way));
+                            }
                         }
-                    }
                     }
                 }
             }
