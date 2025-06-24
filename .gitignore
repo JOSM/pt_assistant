@@ -7,3 +7,5 @@
 /javadoc/
 /checkstyle-josm-pt_assistant.xml
 /bintest/
+/target
+/test/build

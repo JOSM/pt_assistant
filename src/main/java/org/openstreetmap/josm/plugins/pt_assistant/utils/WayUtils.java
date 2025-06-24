@@ -55,6 +55,8 @@ public final class WayUtils {
     }
 
     /**
+     * Find first common node
+     *
      * @param w1 a way
      * @param w2 another way
      * @return The first node of the ways {@code w1} and {@code w2} that is also part of the other
