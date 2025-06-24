@@ -76,7 +76,7 @@ public class PersonalTransportMendRelationAction extends PublicTransportMendRela
         super.editor = (GenericRelationEditor) editorAccess.getEditor();
         super.memberTableModel = editorAccess.getMemberTableModel();
         super.relation = editor.getRelation();
-        super.editor.addWindowListener(new PersonalTransportMendRelationAction.WindowEventHandler());
+        super.editor.addWindowListener(new WindowEventHandler());
     }
 
     /////////////on action call initialise()/////////////
