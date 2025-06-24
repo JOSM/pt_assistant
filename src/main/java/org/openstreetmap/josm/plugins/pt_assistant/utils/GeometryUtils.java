@@ -21,6 +21,8 @@ public final class GeometryUtils {
     }
 
     /**
+     * Direction of a point relative to a line
+     *
      * @param line a pair of two points A and B, representing a line from A to B
      * @param point the point for which the direction relative to {@code line} is returned
      * @return a positive value when {@code point} is to the right of the line from A to B (looking in that direction).
