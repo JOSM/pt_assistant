@@ -13,8 +13,6 @@ import org.openstreetmap.josm.plugins.pt_assistant.actions.CreatePlatformNodeAct
  * PT assistant plugin properties.
  */
 public final class PTProperties {
-    private static final String EMPTY_STRING = "";
-
     public static final BooleanProperty DOWNLOAD_INCOMPLETE =
         new BooleanProperty("pt_assistant.download-incomplete", false);
     public static final BooleanProperty STOP_AREA_TESTS =
@@ -42,9 +40,9 @@ public final class PTProperties {
      * Options for the wizard
      */
     public static final StringProperty WIZARD_PAGES =
-        new StringProperty("pt_assistant.wizard.pages", EMPTY_STRING);
+        new StringProperty("pt_assistant.wizard.pages", "");
     public static final StringProperty WIZARD_INFORMATION =
-        new StringProperty("pt_assistant.wizard.0.information", EMPTY_STRING);
+        new StringProperty("pt_assistant.wizard.0.information", "");
     public static final IntegerProperty WIZARD_1_SUGGESTION =
         new IntegerProperty("pt_assistant.wizard.1.suggestion", 12);
     public static List<List<String>> getWizardSuggestions(final int i) {

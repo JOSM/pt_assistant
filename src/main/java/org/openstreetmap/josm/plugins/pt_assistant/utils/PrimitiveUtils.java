@@ -16,6 +16,8 @@ public final class PrimitiveUtils {
     }
 
     /**
+     * Return Indices of the primitive in given relations
+     *
      * @param primitive the primitive for which the occurences should be found
      * @param relations a {@link List} of {@link Relation}s in which this method searches for occurences
      * @return a map where the keys are the relations given as argument {@code relations}.
@@ -26,6 +28,14 @@ public final class PrimitiveUtils {
         return relations.stream().collect(Collectors.toMap(Function.identity(), it -> findIndicesOfPrimitiveInRelation(primitive, it)));
     }
 
+    /**
+     * Return Indices of the primitive in given relation
+     *
+     * @param primitive the primitive for which the occurences should be found
+     * @param relation a {@link Relation} in which this method searches for occurences
+     * @return a list of indices of all members of that relation that are equal
+     *     to the primitive given as method parameter {@code primitive}.
+     */
     public static List<Integer> findIndicesOfPrimitiveInRelation(final OsmPrimitive primitive, final Relation relation) {
         return IntStream.range(0, relation.getMembers().size())
             .filter(i -> relation.getMember(i).refersTo(primitive))
