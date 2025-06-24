@@ -719,7 +719,7 @@ public class PublicTransportMendRelationAction extends AbstractMendRelation {
             // if the ways directly touch the next way
             way.isFirstLastNode(wayToReachAfterGap.firstNode()) || way.isFirstLastNode(wayToReachAfterGap.lastNode())
             // if next way turns out to be a roundabout
-            || wayToReachAfterGap.containsNode(exitNode) && WayUtils.isRoundabout(wayToReachAfterGap)
+            || (wayToReachAfterGap.containsNode(exitNode) && WayUtils.isRoundabout(wayToReachAfterGap))
         ) {
             lst.add(wayList);
             displayFixVariantsWithOverlappingWays(lst);
