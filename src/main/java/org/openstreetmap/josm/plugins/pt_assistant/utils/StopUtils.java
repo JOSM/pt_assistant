@@ -35,8 +35,10 @@ public final class StopUtils {
     }
 
     /**
+     * Check if node is a highway or railway stop
+     *
      * @param n the node that is checked
-     * @return true iff one of the tags `highway=bus_stop`, `railway=tram_stop`
+     * @return true if one of the tags `highway=bus_stop`, `railway=tram_stop`
      *     or the combination of `public_transport=stop_position` and either `highway=*` or `railway=*` is present
      */
     public static boolean isHighwayOrRailwayStopPosition(final Node n) {
