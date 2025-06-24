@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.openstreetmap.josm.data.preferences.BooleanProperty;
+import org.openstreetmap.josm.gui.help.HelpUtil;
 import org.openstreetmap.josm.gui.preferences.DefaultTabPreferenceSetting;
 import org.openstreetmap.josm.gui.preferences.PreferenceTabbedPane;
 import org.openstreetmap.josm.plugins.pt_assistant.utils.PTProperties;
@@ -149,5 +150,10 @@ public class PTAssistantPluginPreferences extends DefaultTabPreferenceSetting {
         splitWay1.setSelected(SPLITWAY_1.get());
 
         splitWay2.setSelected(SPLITWAY_2.get());
+    }
+
+    @Override
+    public String getHelpContext() {
+        return HelpUtil.ht("/Plugin/PT_Assistant");
     }
 }

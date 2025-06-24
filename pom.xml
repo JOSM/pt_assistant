@@ -13,12 +13,8 @@
   </properties>
   <repositories>
     <repository>
-      <id>JOSM-releases</id>
-      <url>https://josm.openstreetmap.de/repository/releases/</url>
-    </repository>
-    <repository>
-      <id>JOSM-snapshots</id>
-      <url>https://josm.openstreetmap.de/repository/snapshots/</url>
+      <id>JOSM-public</id>
+      <url>https://josm.openstreetmap.de/repository/public/</url>
     </repository>
   </repositories>
   <dependencyManagement>

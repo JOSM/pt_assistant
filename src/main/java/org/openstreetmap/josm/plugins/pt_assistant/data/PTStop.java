@@ -281,7 +281,6 @@ public class PTStop extends RelationMember implements ILatLon {
         if (platform == null) {
             return null;
         }
-        StopToWayAssigner assigner = new StopToWayAssigner();
         LatLon platformCenter = platform.getBBox().getCenter();
         double ax = platformCenter.getX() - searchRadius;
         double bx = platformCenter.getX() + searchRadius;
